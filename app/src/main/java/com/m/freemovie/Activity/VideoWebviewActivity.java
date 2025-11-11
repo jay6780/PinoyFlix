@@ -47,7 +47,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
 
         title_name.setText(title);
         String videoUrl = "https://vidsrc-embed.ru/embed/movie?tmdb="+videoId;
-        Log.d("VideoUrl","value: "+videoUrl);
+//        Log.d("VideoUrl","value: "+videoUrl);
         setupWebView(videoUrl);
         rotate.setOnClickListener(view -> rotateScreen());
         webviewOverlay.setOnClickListener(new View.OnClickListener() {
