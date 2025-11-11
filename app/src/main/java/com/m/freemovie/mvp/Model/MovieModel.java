@@ -18,7 +18,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MovieModel {
-    private static final String BASE_URL = "https://vidsrc-embed.ru/movies/";
+    private static final String BASE_URL = "https://api.themoviedb.org/3/";
 
     private MovieApi api;
 
@@ -38,21 +38,44 @@ public class MovieModel {
         api = retrofit.create(MovieApi.class);
     }
 
-    public void getMovieQuery(String page, final VideoMovieListerner listener) {
-        api.getMovieData(page).enqueue(new Callback<MovieBean>() {
+    public void getLatestMovie(String apiKey, int page,final VideoMovieListerner listener) {
+        String authHeader = "Bearer " + apiKey;
+        api.getMovieList("en-US",authHeader,page).enqueue(new Callback<MovieBean>() {
             @Override
             public void onResponse(Call<MovieBean> call, Response<MovieBean> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     MovieBean movieBean = response.body();
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                    String prettyJson = gson.toJson(movieBean);
-                    Log.d("ResponseBody", prettyJson);
+//                    String prettyJson = gson.toJson(movieBean);
+//                    Log.d("ResponseBody", prettyJson);
                     listener.onSuccess(movieBean);
                 } else {
                     listener.onError("Failed to load videos");
                 }
             }
 
+            @Override
+            public void onFailure(Call<MovieBean> call, Throwable t) {
+                listener.onError(t.getMessage());
+            }
+        });
+    }
+
+    public void getSearch(String apiKey, String query, int page, final VideoMovieListerner listener) {
+        String authHeader = "Bearer " + apiKey;
+        api.getSearchList("en-US", authHeader, query, page, false).enqueue(new Callback<MovieBean>() {
+            @Override
+            public void onResponse(Call<MovieBean> call, Response<MovieBean> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    MovieBean movieBean = response.body();
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//                    String prettyJson = gson.toJson(movieBean);
+//                    Log.d("ResponseBody", prettyJson);
+                    listener.onSuccess(movieBean);
+                } else {
+                    listener.onError("Failed to load videos - HTTP " + response.code());
+                }
+            }
             @Override
             public void onFailure(Call<MovieBean> call, Throwable t) {
                 listener.onError(t.getMessage());

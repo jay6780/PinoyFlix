@@ -11,9 +11,11 @@ public interface MovieContract {
         void showError(String error);
         void hideLoading();
         void getMovieResponse(MovieBean movieBean);
+        void getSearchResponse(MovieBean movieBean);
     }
 
     interface Presenter {
-        void getMovieQuery(String page);
+        void getLatestMovie(String apiKey,int page);
+        void getSearchQuery(String apiKey,String query,int page);
     }
 }

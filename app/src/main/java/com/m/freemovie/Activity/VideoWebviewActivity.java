@@ -28,7 +28,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
     private View webviewOverlay;
     private TextView title_name;
     private String title;
-    private String videoUrl;
+    private String videoId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,10 +43,11 @@ public class VideoWebviewActivity extends AppCompatActivity {
         rotate = findViewById(R.id.rotate);
         btn_back.setOnClickListener(view -> onBackPressed());
         title = getIntent().getStringExtra("title");
-        videoUrl = getIntent().getStringExtra("videoUrl");
+        videoId = getIntent().getStringExtra("videoId");
 
         title_name.setText(title);
-
+        String videoUrl = "https://vidsrc-embed.ru/embed/movie?tmdb="+videoId;
+        Log.d("VideoUrl","value: "+videoUrl);
         setupWebView(videoUrl);
         rotate.setOnClickListener(view -> rotateScreen());
         webviewOverlay.setOnClickListener(new View.OnClickListener() {

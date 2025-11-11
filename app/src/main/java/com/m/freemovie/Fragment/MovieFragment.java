@@ -7,9 +7,12 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
@@ -27,36 +30,49 @@ public class MovieFragment extends Fragment implements MovieContract.View {
     private int page = 1;
     private MovieAdapter movieAdapter;
     private boolean isLoading = false;
-    private List<MovieBean.MovieList> movieLists = new ArrayList<>();
+    private List<MovieBean.ResultsBean> movieLists = new ArrayList<>();
     private KProgressHUD hud;
+    private EditText search;
+    private boolean isSearch = false;
+    private String lastQuery;
+    private boolean isNomore = false;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_movie, container, false);
         rv_movie = view.findViewById(R.id.rv_movie);
-        rv_movie.setLayoutManager(new LinearLayoutManager(getContext()));
+        search = view.findViewById(R.id.search);
+        rv_movie.setLayoutManager(new GridLayoutManager(getContext(), 2));
         movieAdapter = new MovieAdapter(getContext(),movieLists);
         rv_movie.setAdapter(movieAdapter);
         hud = KProgressHUD.create(getContext())
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
         moviePresenter = new MoviePresenter(this);
-        String query = "page-"+page+".json";
-        moviePresenter.getMovieQuery(query);
+
+        moviePresenter.getLatestMovie(getString(R.string.key),page);
 
         view.findViewById(R.id.rotate).setOnClickListener(view1 -> refresh());
-
+        view.findViewById(R.id.btn_send).setOnClickListener(view1 -> searchData());
 
         rv_movie.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                GridLayoutManager layoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
                 if (!isLoading && layoutManager != null &&
                         layoutManager.findLastVisibleItemPosition() >= movieLists.size() - 1) {
+                    if(isNomore){
+                        return;
+                    }
                     isLoading = true;
                     page++;
-                    loadMore();
+                    if(isSearch){
+                        loadSearch();
+                    }else{
+                        loadMore();
+                    }
+
                 }
             }
         });
@@ -64,17 +80,36 @@ public class MovieFragment extends Fragment implements MovieContract.View {
         return view;
     }
 
+    private void searchData() {
+        String query = search.getText().toString().trim();
+        if(query.isEmpty()){
+            Toast.makeText(getContext(),"Please enter movie name",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        isSearch = true;
+        lastQuery = query;
+        isNomore = false;
+        page = 1;
+        movieLists.clear();
+        movieAdapter.notifyDataSetChanged();
+        moviePresenter.getSearchQuery(getString(R.string.key),query,page);
+    }
+
     private void refresh(){
+        isSearch = false;
+        isNomore = false;
+        search.setText("");
         movieLists.clear();
         movieAdapter.notifyDataSetChanged();
         page = 1;
-        String query = "page-"+page+".json";
-        moviePresenter.getMovieQuery(query);
+        moviePresenter.getLatestMovie(getString(R.string.key),page);
     }
 
+    private void loadSearch() {
+        moviePresenter.getSearchQuery(getString(R.string.key),lastQuery,page);
+    }
     private void loadMore() {
-        String query = "page-"+page+".json";
-        moviePresenter.getMovieQuery(query);
+        moviePresenter.getLatestMovie(getString(R.string.key),page);
     }
 
     @Override
@@ -84,7 +119,9 @@ public class MovieFragment extends Fragment implements MovieContract.View {
 
     @Override
     public void showError(String error) {
-
+        isLoading = false;
+        isNomore = true;
+        Log.e("MovieFragment", "Error: " + error);
     }
 
     @Override
@@ -96,13 +133,32 @@ public class MovieFragment extends Fragment implements MovieContract.View {
 
     @Override
     public void getMovieResponse(MovieBean movieBean) {
-        if(movieBean!=null && movieBean.getResult() != null){
+        if(movieBean!=null && movieBean.getResults() != null){
+            isSearch = false;
             isLoading = false;
-            for(MovieBean.MovieList movieBean1 : movieBean.getResult()){
-                movieLists.add(movieBean1);
+            if(!movieBean.getResults().isEmpty()){
+                movieLists.addAll(movieBean.getResults());
                 movieAdapter.notifyDataSetChanged();
+            }else{
+                Toast.makeText(getContext(),"No more movies",Toast.LENGTH_SHORT).show();
+                isLoading = false;
+                isNomore = true;
             }
         }
+    }
 
+    @Override
+    public void getSearchResponse(MovieBean movieBean) {
+        if(movieBean!=null && movieBean.getResults() != null){
+            isLoading = false;
+            if(!movieBean.getResults().isEmpty()){
+                movieLists.addAll(movieBean.getResults());
+                movieAdapter.notifyDataSetChanged();
+            }else{
+                Toast.makeText(getContext(),"No more movies",Toast.LENGTH_SHORT).show();
+                isLoading = false;
+                isNomore = true;
+            }
+        }
     }
 }

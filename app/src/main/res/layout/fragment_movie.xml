@@ -3,14 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#313647"
     android:orientation="vertical">
 
   <RelativeLayout
       android:id="@+id/rl_title"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:padding="7dp"
-      android:background="#262626">
+      android:background="#262626"
+      android:padding="7dp">
 
     <TextView
         android:id="@+id/title_name"
@@ -35,11 +36,43 @@
   </RelativeLayout>
 
 
+  <RelativeLayout
+      android:id="@+id/rl_view"
+      android:layout_width="match_parent"
+      android:background="@drawable/bg_search"
+      android:layout_marginStart="5dp"
+      android:layout_marginEnd="5dp"
+      android:layout_marginTop="5dp"
+      android:padding="5dp"
+      android:layout_height="50dp">
+
+    <EditText
+        android:id="@+id/search"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="45dp"
+        android:background="@null"
+        android:hint="Enter keyword"
+        android:textColor="#ffffff"
+        android:textColorHint="#FFFFFF" />
+
+    <ImageView
+        android:id="@+id/btn_send"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="5dp"
+        android:layout_alignParentEnd="true"
+        android:src="@mipmap/send" />
+
+  </RelativeLayout>
+
 
 
   <androidx.recyclerview.widget.RecyclerView
       android:id="@+id/rv_movie"
       android:layout_width="match_parent"
+      android:layout_marginTop="5dp"
       android:layout_height="match_parent"/>
 
 </LinearLayout>

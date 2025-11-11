@@ -5,30 +5,34 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.m.freemovie.Activity.VideoWebviewActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
 import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
-    private List<MovieBean.MovieList> movieBeanList;
+    private List<MovieBean.ResultsBean> movieBeanList;
     private Context context;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tv_title;
+        ImageView iv_thumb;
         public ViewHolder(View view) {
             super(view);
             tv_title = view.findViewById(R.id.tv_title);
+            iv_thumb = view.findViewById(R.id.iv_thumb);
 
         }
 
     }
 
-    public MovieAdapter(Context context,List<MovieBean.MovieList> movieBeanList) {
+    public MovieAdapter(Context context,List<MovieBean.ResultsBean> movieBeanList) {
         this.context = context;
         this.movieBeanList = movieBeanList;
     }
@@ -42,15 +46,23 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        MovieBean.MovieList movieBean = movieBeanList.get(position);
+        MovieBean.ResultsBean movieBean = movieBeanList.get(position);
         holder.tv_title.setText(movieBean.getTitle());
+
+        String posterPath = "https://image.tmdb.org/t/p/w500/"+movieBean.getPoster_path();
+
+        Glide.with(context)
+                .asBitmap().
+                load(posterPath)
+                .centerCrop()
+                .into(holder.iv_thumb);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, VideoWebviewActivity.class);
                 intent.putExtra("title",movieBean.getTitle());
-                intent.putExtra("videoUrl",movieBean.getEmbed_url_tmdb());
+                intent.putExtra("videoId",movieBean.getId());
                 context.startActivity(intent);
             }
         });

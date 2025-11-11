@@ -14,13 +14,31 @@ public class MoviePresenter implements MovieContract.Presenter {
     }
 
     @Override
-    public void getMovieQuery(String page) {
+    public void getLatestMovie(String apikey,int page) {
         view.showLoading();
-        model.getMovieQuery(page, new MovieModel.VideoMovieListerner() {
+        model.getLatestMovie(apikey,page, new MovieModel.VideoMovieListerner() {
             @Override
             public void onSuccess(MovieBean movieBean) {
                 view.hideLoading();
                 view.getMovieResponse(movieBean);
+            }
+
+            @Override
+            public void onError(String error) {
+                view.hideLoading();
+                view.showError(error);
+            }
+        });
+    }
+
+    @Override
+    public void getSearchQuery(String apiKey, String query, int page) {
+        view.showLoading();
+        model.getSearch(apiKey,query,page, new MovieModel.VideoMovieListerner() {
+            @Override
+            public void onSuccess(MovieBean movieBean) {
+                view.hideLoading();
+                view.getSearchResponse(movieBean);
             }
 
             @Override
