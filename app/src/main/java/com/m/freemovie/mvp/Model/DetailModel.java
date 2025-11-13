@@ -43,9 +43,9 @@ public class DetailModel {
             public void onResponse(Call<DetailBean> call, Response<DetailBean> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     DetailBean movieBean = response.body();
-                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                    String prettyJson = gson.toJson(movieBean);
-                    Log.d("DetailResponse", prettyJson);
+//                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//                    String prettyJson = gson.toJson(movieBean);
+//                    Log.d("DetailResponse", prettyJson);
                     listener.onSuccess(movieBean);
                 } else {
                     listener.onError("Failed to load videos");

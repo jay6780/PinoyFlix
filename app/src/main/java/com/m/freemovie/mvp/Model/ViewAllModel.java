@@ -42,15 +42,14 @@ public class ViewAllModel {
         String authHeader = "Bearer " + apiKey;
         switch (position){
             case 1:
-                Log.d("VieAll","Popular");
                 api.getPopularList("en-US",authHeader,page).enqueue(new Callback<MovieBean>() {
                     @Override
                     public void onResponse(Call<MovieBean> call, Response<MovieBean> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             MovieBean movieBean = response.body();
-                            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                            String prettyJson = gson.toJson(movieBean);
-                            Log.d("ResponseBody", prettyJson);
+//                            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//                            String prettyJson = gson.toJson(movieBean);
+//                            Log.d("ResponseBody", prettyJson);
                             listener.onSuccess(movieBean);
                         } else {
                             listener.onError("Failed to load videos");
@@ -65,15 +64,14 @@ public class ViewAllModel {
                 break;
 
             case 2:
-                Log.d("VieAll","Top Rated");
                 api.getTopRated("en-US",authHeader,page).enqueue(new Callback<MovieBean>() {
                     @Override
                     public void onResponse(Call<MovieBean> call, Response<MovieBean> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             MovieBean movieBean = response.body();
-                            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                            String prettyJson = gson.toJson(movieBean);
-                            Log.d("ResponseBody", prettyJson);
+//                            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//                            String prettyJson = gson.toJson(movieBean);
+//                            Log.d("ResponseBody", prettyJson);
                             listener.onSuccess(movieBean);
                         } else {
                             listener.onError("Failed to load videos");
@@ -88,15 +86,14 @@ public class ViewAllModel {
                 break;
 
             case 3:
-                Log.d("VieAll","GetNow");
                 api.getNow("en-US",authHeader,page).enqueue(new Callback<MovieBean>() {
                     @Override
                     public void onResponse(Call<MovieBean> call, Response<MovieBean> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             MovieBean movieBean = response.body();
-                            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                            String prettyJson = gson.toJson(movieBean);
-                            Log.d("ResponseBody", prettyJson);
+//                            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//                            String prettyJson = gson.toJson(movieBean);
+//                            Log.d("ResponseBody", prettyJson);
                             listener.onSuccess(movieBean);
                         } else {
                             listener.onError("Failed to load videos");
@@ -111,15 +108,14 @@ public class ViewAllModel {
                 break;
 
             case 4:
-                Log.d("VieAll","Upcoming");
                 api.getUpcoming("en-US",authHeader,page).enqueue(new Callback<MovieBean>() {
                     @Override
                     public void onResponse(Call<MovieBean> call, Response<MovieBean> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             MovieBean movieBean = response.body();
-                            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                            String prettyJson = gson.toJson(movieBean);
-                            Log.d("ResponseBody", prettyJson);
+//                            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//                            String prettyJson = gson.toJson(movieBean);
+//                            Log.d("ResponseBody", prettyJson);
                             listener.onSuccess(movieBean);
                         } else {
                             listener.onError("Failed to load videos");

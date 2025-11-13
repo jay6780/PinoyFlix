@@ -46,9 +46,9 @@ public class MovieModel {
             public void onResponse(Call<MovieBean> call, Response<MovieBean> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     MovieBean movieBean = response.body();
-                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                    String prettyJson = gson.toJson(movieBean);
-                    Log.d("ResponseBody", prettyJson);
+//                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//                    String prettyJson = gson.toJson(movieBean);
+//                    Log.d("ResponseBody", prettyJson);
                     listener.onSuccess(movieBean);
                 } else {
                     listener.onError("Failed to load videos");
