@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.m.freemovie.Activity.Details_activity;
 import com.m.freemovie.Activity.VideoWebviewActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
@@ -54,15 +55,13 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         Glide.with(context)
                 .asBitmap().
                 load(posterPath)
-                .centerCrop()
                 .into(holder.iv_thumb);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, VideoWebviewActivity.class);
-                intent.putExtra("title",movieBean.getTitle());
-                intent.putExtra("videoId",movieBean.getId());
+                Intent intent = new Intent(context, Details_activity.class);
+                intent.putExtra("id",movieBean.getId());
                 context.startActivity(intent);
             }
         });

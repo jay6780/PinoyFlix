@@ -38,9 +38,79 @@ public class MovieModel {
         api = retrofit.create(MovieApi.class);
     }
 
-    public void getLatestMovie(String apiKey, int page,final VideoMovieListerner listener) {
+
+    public void getPopular(String apiKey, int page,final VideoMovieListerner listener) {
         String authHeader = "Bearer " + apiKey;
-        api.getMovieList("en-US",authHeader,page).enqueue(new Callback<MovieBean>() {
+        api.getPopularList("en-US",authHeader,page).enqueue(new Callback<MovieBean>() {
+            @Override
+            public void onResponse(Call<MovieBean> call, Response<MovieBean> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    MovieBean movieBean = response.body();
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    String prettyJson = gson.toJson(movieBean);
+                    Log.d("ResponseBody", prettyJson);
+                    listener.onSuccess(movieBean);
+                } else {
+                    listener.onError("Failed to load videos");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MovieBean> call, Throwable t) {
+                listener.onError(t.getMessage());
+            }
+        });
+    }
+
+    public void getTopRated(String apiKey, int page,final VideoMovieListerner listener) {
+        String authHeader = "Bearer " + apiKey;
+        api.getTopRated("en-US",authHeader,page).enqueue(new Callback<MovieBean>() {
+            @Override
+            public void onResponse(Call<MovieBean> call, Response<MovieBean> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    MovieBean movieBean = response.body();
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//                    String prettyJson = gson.toJson(movieBean);
+//                    Log.d("ResponseBody", prettyJson);
+                    listener.onSuccess(movieBean);
+                } else {
+                    listener.onError("Failed to load videos");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MovieBean> call, Throwable t) {
+                listener.onError(t.getMessage());
+            }
+        });
+    }
+
+    public void getUpcoming(String apiKey, int page,final VideoMovieListerner listener) {
+        String authHeader = "Bearer " + apiKey;
+        api.getUpcoming("en-US",authHeader,page).enqueue(new Callback<MovieBean>() {
+            @Override
+            public void onResponse(Call<MovieBean> call, Response<MovieBean> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    MovieBean movieBean = response.body();
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//                    String prettyJson = gson.toJson(movieBean);
+//                    Log.d("ResponseBody", prettyJson);
+                    listener.onSuccess(movieBean);
+                } else {
+                    listener.onError("Failed to load videos");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MovieBean> call, Throwable t) {
+                listener.onError(t.getMessage());
+            }
+        });
+    }
+
+    public void getNow(String apiKey, int page,final VideoMovieListerner listener) {
+        String authHeader = "Bearer " + apiKey;
+        api.getNow("en-US",authHeader,page).enqueue(new Callback<MovieBean>() {
             @Override
             public void onResponse(Call<MovieBean> call, Response<MovieBean> response) {
                 if (response.isSuccessful() && response.body() != null) {

@@ -14,13 +14,13 @@ public class MoviePresenter implements MovieContract.Presenter {
     }
 
     @Override
-    public void getLatestMovie(String apikey,int page) {
+    public void getPopularMovie(String apiKey, int page) {
         view.showLoading();
-        model.getLatestMovie(apikey,page, new MovieModel.VideoMovieListerner() {
+        model.getPopular(apiKey,page, new MovieModel.VideoMovieListerner() {
             @Override
             public void onSuccess(MovieBean movieBean) {
                 view.hideLoading();
-                view.getMovieResponse(movieBean);
+                view.getPopularResponse(movieBean);
             }
 
             @Override
@@ -32,13 +32,50 @@ public class MoviePresenter implements MovieContract.Presenter {
     }
 
     @Override
-    public void getSearchQuery(String apiKey, String query, int page) {
+    public void getTopRated(String apiKey, int page) {
         view.showLoading();
-        model.getSearch(apiKey,query,page, new MovieModel.VideoMovieListerner() {
+        model.getTopRated(apiKey,page, new MovieModel.VideoMovieListerner() {
             @Override
             public void onSuccess(MovieBean movieBean) {
                 view.hideLoading();
-                view.getSearchResponse(movieBean);
+                view.getTopRatedResponse(movieBean);
+            }
+
+            @Override
+            public void onError(String error) {
+                view.hideLoading();
+                view.showError(error);
+            }
+        });
+    }
+
+    @Override
+    public void getUpcoming(String apiKey, int page) {
+        view.showLoading();
+        model.getUpcoming(apiKey,page, new MovieModel.VideoMovieListerner() {
+            @Override
+            public void onSuccess(MovieBean movieBean) {
+                view.hideLoading();
+                view.getUpcomingResponse(movieBean);
+            }
+
+            @Override
+            public void onError(String error) {
+                view.hideLoading();
+                view.showError(error);
+            }
+        });
+
+    }
+
+    @Override
+    public void getNow(String apiKey, int page) {
+        view.showLoading();
+        model.getNow(apiKey,page, new MovieModel.VideoMovieListerner() {
+            @Override
+            public void onSuccess(MovieBean movieBean) {
+                view.hideLoading();
+                view.getNowResponse(movieBean);
             }
 
             @Override

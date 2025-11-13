@@ -1,6 +1,9 @@
 package com.m.freemovie.Activity;
 
+import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,8 +17,11 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 
 
@@ -29,6 +35,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
     private TextView title_name;
     private String title;
     private String videoId;
+    private KProgressHUD hud;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,12 +51,22 @@ public class VideoWebviewActivity extends AppCompatActivity {
         btn_back.setOnClickListener(view -> onBackPressed());
         title = getIntent().getStringExtra("title");
         videoId = getIntent().getStringExtra("videoId");
+        hud = KProgressHUD.create(this)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setLabel("Please wait");
 
         title_name.setText(title);
         String videoUrl = "https://vidsrc-embed.ru/embed/movie?tmdb="+videoId;
-//        Log.d("VideoUrl","value: "+videoUrl);
-        setupWebView(videoUrl);
+        Log.d("VideoUrl","value: "+videoUrl);
         rotate.setOnClickListener(view -> rotateScreen());
+
+        if(!isNetworkAvailable()){
+            webView.setVisibility(View.GONE);
+            Toast.makeText(getApplicationContext(),"Please check your internet and try again",Toast.LENGTH_SHORT).show();
+        }else{
+            setupWebView(videoUrl);
+            webView.setVisibility(View.VISIBLE);
+        }
         webviewOverlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -57,6 +74,12 @@ public class VideoWebviewActivity extends AppCompatActivity {
                 rl_title.setVisibility(isVisible ? View.VISIBLE : View.GONE);
             }
         });
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     private void setupWebView(String videoUrl) {
@@ -96,6 +119,13 @@ public class VideoWebviewActivity extends AppCompatActivity {
                     view.stopLoading();
                 }
                 super.onPageStarted(view, url, favicon);
+                hud.show();
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                hud.dismiss();
             }
         });
 

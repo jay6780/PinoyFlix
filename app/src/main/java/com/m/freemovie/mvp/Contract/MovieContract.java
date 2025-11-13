@@ -10,12 +10,16 @@ public interface MovieContract {
         void showLoading();
         void showError(String error);
         void hideLoading();
-        void getMovieResponse(MovieBean movieBean);
-        void getSearchResponse(MovieBean movieBean);
+        void getPopularResponse(MovieBean movieBean);
+        void getTopRatedResponse(MovieBean movieBean);
+        void getUpcomingResponse(MovieBean movieBean);
+        void getNowResponse(MovieBean movieBean);
     }
 
     interface Presenter {
-        void getLatestMovie(String apiKey,int page);
-        void getSearchQuery(String apiKey,String query,int page);
+        void getPopularMovie(String apiKey,int page);
+        void getTopRated(String apiKey,int page);
+        void getUpcoming(String apiKey,int page);
+        void getNow(String apiKey,int page);
     }
 }

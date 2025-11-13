@@ -1,78 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#313647"
-    android:orientation="vertical">
+    android:id="@+id/swipeRefreshLayout"
+    android:layout_height="match_parent">
 
-  <RelativeLayout
-      android:id="@+id/rl_title"
+  <androidx.core.widget.NestedScrollView
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:background="#262626"
-      android:padding="7dp">
+      android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/title_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="5dp"
-        android:text="Free movies"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:background="#313647"
+          android:padding="15dp"
+          android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/rotate"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="5dp"
-        android:elevation="20dp"
-        android:src="@mipmap/refresh_white" />
-  </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/rl_popular"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Popular"
+              android:textSize="18sp" />
 
-  <RelativeLayout
-      android:id="@+id/rl_view"
-      android:layout_width="match_parent"
-      android:background="@drawable/bg_search"
-      android:layout_marginStart="5dp"
-      android:layout_marginEnd="5dp"
-      android:layout_marginTop="5dp"
-      android:padding="5dp"
-      android:layout_height="50dp">
-
-    <EditText
-        android:id="@+id/search"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="45dp"
-        android:background="@null"
-        android:hint="Enter keyword"
-        android:textColor="#ffffff"
-        android:textColorHint="#FFFFFF" />
-
-    <ImageView
-        android:id="@+id/btn_send"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:padding="5dp"
-        android:layout_alignParentEnd="true"
-        android:src="@mipmap/send" />
-
-  </RelativeLayout>
+          <TextView
+              android:id="@+id/tv_popular"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:textColor="@color/SecondColor"
+              android:textSize="18sp"
+              android:layout_alignParentEnd="true"
+              android:text="See all"/>
+        </RelativeLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_popular"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_marginTop="5dp"
+            android:layout_height="wrap_content"/>
 
 
+        <RelativeLayout
+            android:id="@+id/rl_topRated"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_marginTop="10dp"
+            android:layout_height="wrap_content">
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:textSize="18sp"
+              android:text="Top Rated"/>
 
-  <androidx.recyclerview.widget.RecyclerView
-      android:id="@+id/rv_movie"
-      android:layout_width="match_parent"
-      android:layout_marginTop="5dp"
-      android:layout_height="match_parent"/>
+          <TextView
+              android:id="@+id/tv_topRated"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:textColor="@color/SecondColor"
+              android:textSize="18sp"
+              android:layout_alignParentEnd="true"
+              android:text="See all"/>
+        </RelativeLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_topRated"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_marginTop="5dp"
+            android:layout_height="wrap_content"/>
 
-</LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_now"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_marginTop="10dp"
+            android:layout_height="wrap_content">
+
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Now Playing"
+              android:textSize="18sp" />
+
+          <TextView
+              android:id="@+id/tv_nowPlaying"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:textColor="@color/SecondColor"
+              android:textSize="18sp"
+              android:layout_alignParentEnd="true"
+              android:text="See all"/>
+        </RelativeLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_nowPlaying"
+            android:layout_width="match_parent"
+            android:layout_marginTop="5dp"
+            android:visibility="gone"
+            android:layout_height="wrap_content"/>
+
+
+
+        <RelativeLayout
+            android:id="@+id/rl_upcoming"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_height="wrap_content">
+
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Upcoming"
+              android:textSize="18sp" />
+
+          <TextView
+              android:id="@+id/tv_upComing"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignParentEnd="true"
+              android:text="See all"
+              android:textColor="@color/SecondColor"
+              android:textSize="18sp" />
+        </RelativeLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_upComing"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_marginTop="5dp"
+            android:layout_height="wrap_content"/>
+
+      </LinearLayout>
+  </androidx.core.widget.NestedScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
