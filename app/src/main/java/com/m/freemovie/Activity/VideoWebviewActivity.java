@@ -2,6 +2,7 @@ package com.m.freemovie.Activity;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -31,7 +32,6 @@ public class VideoWebviewActivity extends AppCompatActivity {
     private boolean isRotate = false;
     private RelativeLayout rl_title;
     private boolean isVisible = false;
-    private View webviewOverlay;
     private TextView title_name;
     private String title;
     private String videoId;
@@ -44,8 +44,6 @@ public class VideoWebviewActivity extends AppCompatActivity {
         webView = findViewById(R.id.webView);
         btn_back = findViewById(R.id.btn_back);
         title_name = findViewById(R.id.title_name);
-
-        webviewOverlay = findViewById(R.id.webview_overlay);
         rl_title = findViewById(R.id.rl_title);
         rotate = findViewById(R.id.rotate);
         btn_back.setOnClickListener(view -> onBackPressed());
@@ -67,13 +65,6 @@ public class VideoWebviewActivity extends AppCompatActivity {
             setupWebView(videoUrl);
             webView.setVisibility(View.VISIBLE);
         }
-        webviewOverlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                isVisible = !isVisible;
-                rl_title.setVisibility(isVisible ? View.VISIBLE : View.GONE);
-            }
-        });
     }
 
     private boolean isNetworkAvailable() {
@@ -105,7 +96,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
             }
 
             private boolean handleUrlLoading(WebView view, String url) {
-                if (url.contains("vidsrc-embed.ru") || url.contains("vidsrcme.ru")) {
+                if (url.contains("vidsrc-embed.ru")) {
                     return false;
                 } else {
                     view.stopLoading();
@@ -115,7 +106,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
 
             @Override
             public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
-                if (!url.contains("vidsrc-embed.ru") && !url.contains("vidsrcme.ru")) {
+                if (!url.contains("vidsrc-embed.ru")) {
                     view.stopLoading();
                 }
                 super.onPageStarted(view, url, favicon);
@@ -135,14 +126,14 @@ public class VideoWebviewActivity extends AppCompatActivity {
     private void rotateScreen() {
         isRotate = !isRotate;
         if(!isRotate){
-            webviewOverlay.setEnabled(false);
+            rl_title.setBackgroundColor(Color.parseColor("#313647"));
             rl_title.setVisibility(View.VISIBLE);
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             isVisible = false;
         }else{
             if(!isVisible){
-                webviewOverlay.setEnabled(true);
+                rl_title.setBackgroundColor(Color.parseColor("#000000"));
                 final Handler handler = new Handler(Looper.getMainLooper());
                 handler.postDelayed(new Runnable() {
                     @Override
@@ -162,6 +153,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (isRotate) {
             rl_title.setVisibility(View.VISIBLE);
+            rl_title.setBackgroundColor(Color.parseColor("#313647"));
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             isRotate = false;

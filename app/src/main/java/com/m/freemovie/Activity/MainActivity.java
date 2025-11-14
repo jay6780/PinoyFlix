@@ -1,6 +1,7 @@
 package com.m.freemovie.Activity;
 
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -11,16 +12,12 @@ import com.m.freemovie.Fragment.SearchFragment;
 import com.m.freemovie.R;
 import com.m.freemovie.databinding.ActivityMainBinding;
 
-import java.util.HashMap;
-
 import meow.bottomnavigation.MeowBottomNavigation;
 
 public class MainActivity extends AppCompatActivity {
 
     private MeowBottomNavigation bottomNavigation;
     private ActivityMainBinding binding;
-    private Fragment currentFragment;
-    private HashMap<Integer, Fragment> fragmentMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

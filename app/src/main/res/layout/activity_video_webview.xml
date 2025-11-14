@@ -8,8 +8,8 @@
         android:id="@+id/rl_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="7dp"
-        android:background="#313647">
+        android:background="#313647"
+        android:padding="7dp">
 
         <ImageView
             android:id="@+id/btn_back"
@@ -53,13 +53,4 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/rl_title" />
-
-    <View
-        android:id="@+id/webview_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginStart="70dp"
-        android:layout_below="@+id/rl_title"
-        android:layout_marginTop="15dp"
-        android:background="@android:color/transparent" />
 </RelativeLayout>

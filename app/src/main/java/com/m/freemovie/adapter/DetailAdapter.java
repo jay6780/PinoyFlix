@@ -1,74 +1,48 @@
 package com.m.freemovie.adapter;
 
-import android.content.Context;
+
 import android.content.Intent;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.m.freemovie.Activity.Details_activity;
 import com.m.freemovie.R;
+import com.m.freemovie.Utils.base.BaseQuickAdapter;
+import com.m.freemovie.Utils.base.BaseViewHolder;
 import com.m.freemovie.mvp.ClassBean.DetailBean;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
 
 import java.util.List;
 
-public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder> {
-    private List<DetailBean> movieBeanList;
-    private Context context;
+public class DetailAdapter extends BaseQuickAdapter<DetailBean, BaseViewHolder> {
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tv_title;
-        ImageView iv_thumb;
-        public ViewHolder(View view) {
-            super(view);
-            tv_title = view.findViewById(R.id.tv_title);
-            iv_thumb = view.findViewById(R.id.iv_thumb);
-
-        }
-
-    }
-
-    public DetailAdapter(Context context, List<DetailBean> movieBeanList) {
-        this.context = context;
-        this.movieBeanList = movieBeanList;
-    }
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.detail_item, viewGroup, false);
-
-        return new ViewHolder(view);
+    public DetailAdapter() {
+        super(R.layout.view_all_item);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
-        DetailBean movieBean = movieBeanList.get(position);
-        holder.tv_title.setText(movieBean.getMovieName());
 
-        Glide.with(context)
+    protected void convert(BaseViewHolder helper, DetailBean item) {
+        TextView tv_title  = helper.getView(R.id.tv_title);
+        ImageView iv_thumb = helper.getView(R.id.iv_thumb);
+
+        Glide.with(mContext)
                 .asBitmap().
-                load(movieBean.getTempImage())
-                .centerCrop()
-                .into(holder.iv_thumb);
+                load(item.getTempImage())
+                .into(iv_thumb);
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        tv_title.setText(item.getMovieName());
+
+        helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, Details_activity.class);
-                intent.putExtra("id",movieBean.getVideoId());
-                context.startActivity(intent);
+                Intent intent = new Intent(mContext, Details_activity.class);
+                intent.putExtra("id",item.getVideoId());
+                mContext.startActivity(intent);
             }
         });
     }
 
-    @Override
-    public int getItemCount() {
-        return movieBeanList.size();
-    }
 }

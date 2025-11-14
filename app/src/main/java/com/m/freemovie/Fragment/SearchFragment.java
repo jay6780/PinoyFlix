@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,13 +12,12 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
-import com.m.freemovie.adapter.MovieAdapter;
 import com.m.freemovie.adapter.ViewAllAdapter;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Contract.SearchContract;
@@ -35,11 +33,11 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     private SearchPresenter searchPresenter;
     private ViewAllAdapter movieAdapter;
     private boolean isLoading = false;
-    private List<MovieBean.ResultsBean> movieLists = new ArrayList<>();
     private KProgressHUD hud;
     private String lastQuery;
     private boolean isNomore = false;
     private ImageView btn_send;
+    private List<MovieBean.ResultsBean> movieLists = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,9 +47,10 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         rv_search =view.findViewById(R.id.rv_search);
         btn_send= view.findViewById(R.id.btn_send);
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
-        rv_search.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        movieAdapter = new ViewAllAdapter(getContext(),movieLists);
+        rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        movieAdapter = new ViewAllAdapter();
         rv_search.setAdapter(movieAdapter);
+        rv_search.setHasFixedSize(true);
         searchPresenter = new SearchPresenter(this);
         btn_send.setOnClickListener(this);
         hud = KProgressHUD.create(getContext())
@@ -62,16 +61,29 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                GridLayoutManager layoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
-                if (!isLoading && layoutManager != null &&
-                        layoutManager.findLastVisibleItemPosition() >= movieLists.size() - 1) {
-                    if(isNomore){
-                        return;
+                StaggeredGridLayoutManager layoutManager = (StaggeredGridLayoutManager) recyclerView.getLayoutManager();
+                if (!isLoading && layoutManager != null) {
+                    int[] lastVisiblePositions = layoutManager.findLastVisibleItemPositions(null);
+                    int lastVisiblePosition = getMaxPosition(lastVisiblePositions);
+                    if (lastVisiblePosition >= movieLists.size() - 1) {
+                        if(isNomore){
+                            return;
+                        }
+                        isLoading = true;
+                        page++;
+                        loadSearch();
                     }
-                    isLoading = true;
-                    page++;
-                    loadSearch();
                 }
+            }
+
+            private int getMaxPosition(int[] positions) {
+                int max = positions[0];
+                for (int position : positions) {
+                    if (position > max) {
+                        max = position;
+                    }
+                }
+                return max;
             }
         });
 
@@ -86,25 +98,21 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     }
 
     private void refresh(){
+        if (swipeRefreshLayout.isRefreshing()) {
+            swipeRefreshLayout.setRefreshing(false);
+        }
         if(!isNetworkAvailable()){
-            if (swipeRefreshLayout.isRefreshing()) {
-                swipeRefreshLayout.setRefreshing(false);
-            }
             Toast.makeText(getContext(),"Please check network and try again",Toast.LENGTH_SHORT).show();
             return;
         }
         String query = et_search.getText().toString().trim();
         if(query.isEmpty()){
-            if (swipeRefreshLayout.isRefreshing()) {
-                swipeRefreshLayout.setRefreshing(false);
-            }
             Toast.makeText(getContext(),"Please enter movie name",Toast.LENGTH_SHORT).show();
             return;
         }
         isNomore = false;
         et_search.setText("");
-        movieLists.clear();
-        movieAdapter.notifyDataSetChanged();
+        movieAdapter.setNewData(new ArrayList<>());
         lastQuery ="";
         page = 1;
     }
@@ -150,7 +158,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
             isLoading = false;
             if(!movieBean.getResults().isEmpty()){
                 movieLists.addAll(movieBean.getResults());
-                movieAdapter.notifyDataSetChanged();
+                movieAdapter.setNewData(movieLists);
             }else{
                 Toast.makeText(getContext(),"No more movies",Toast.LENGTH_SHORT).show();
                 isLoading = false;
@@ -185,7 +193,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         isNomore = false;
         page = 1;
         movieLists.clear();
-        movieAdapter.notifyDataSetChanged();
+        movieAdapter.setNewData(new ArrayList<>());
         searchPresenter.getSearchQuery(getString(R.string.key),query,page);
     }
 }

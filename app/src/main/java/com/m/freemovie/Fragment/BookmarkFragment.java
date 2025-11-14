@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.SPUtils;
@@ -42,8 +43,8 @@ public class BookmarkFragment extends Fragment {
     }
 
     private void initRecycler() {
-        rv_bookmark.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        detailAdapter = new DetailAdapter(getContext(), movieBeanList);
+        rv_bookmark.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        detailAdapter = new DetailAdapter();
         rv_bookmark.setAdapter(detailAdapter);
     }
 
@@ -51,7 +52,7 @@ public class BookmarkFragment extends Fragment {
         List<DetailBean> bookmarks = getDetails();
         movieBeanList.clear();
         movieBeanList.addAll(bookmarks);
-        detailAdapter.notifyDataSetChanged();
+        detailAdapter.setNewData(movieBeanList);
     }
 
     private List<DetailBean> getDetails() {

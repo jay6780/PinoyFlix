@@ -3,6 +3,7 @@ package com.m.freemovie.Activity;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Context;
@@ -48,23 +49,37 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
-        rv_viewAll.setLayoutManager(new GridLayoutManager(this, 2));
-        viewAllAdapter = new ViewAllAdapter(this,movieLists);
+        rv_viewAll.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        viewAllAdapter = new ViewAllAdapter();
         rv_viewAll.setAdapter(viewAllAdapter);
+        rv_viewAll.setHasFixedSize(true);
         rv_viewAll.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                GridLayoutManager layoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
-                if (!isLoading && layoutManager != null &&
-                        layoutManager.findLastVisibleItemPosition() >= movieLists.size() - 1) {
-                    if(isNomore){
-                        return;
+                StaggeredGridLayoutManager layoutManager = (StaggeredGridLayoutManager) recyclerView.getLayoutManager();
+                if (!isLoading && layoutManager != null) {
+                    int[] lastVisiblePositions = layoutManager.findLastVisibleItemPositions(null);
+                    int lastVisiblePosition = getMaxPosition(lastVisiblePositions);
+                    if (lastVisiblePosition >= movieLists.size() - 1) {
+
+                        if (isNomore) {
+                            return;
+                        }
+                        isLoading = true;
+                        page++;
+                        loadMore();
                     }
-                    isLoading = true;
-                    page++;
-                    loadMore();
                 }
+            }
+            private int getMaxPosition(int[] positions) {
+                int max = positions[0];
+                for (int position : positions) {
+                    if (position > max) {
+                        max = position;
+                    }
+                }
+                return max;
             }
         });
 
@@ -99,7 +114,6 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
     }
 
     private void loadMore() {
-        viewAllAdapter.notifyDataSetChanged();
         switch (position){
             case 1:
                 viewAllPresenter.getViewAll(getString(R.string.key),page,1);
@@ -123,7 +137,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
         }
         page = 1;
         movieLists.clear();
-        viewAllAdapter.notifyDataSetChanged();
+        viewAllAdapter.setNewData(movieLists);
         switch (position){
             case 1:
                 viewAllPresenter.getViewAll(getString(R.string.key),page,1);
@@ -180,7 +194,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
             isLoading = false;
             if(!movieBean.getResults().isEmpty()){
                 movieLists.addAll(movieBean.getResults());
-                viewAllAdapter.notifyDataSetChanged();
+                viewAllAdapter.setNewData(movieLists);
             }else{
                 Toast.makeText(this,"No more movies",Toast.LENGTH_SHORT).show();
                 isLoading = false;
