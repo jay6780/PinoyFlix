@@ -5,23 +5,19 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
-import android.util.Log;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kaopiz.kprogresshud.KProgressHUD;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.m.freemovie.Activity.ViewAllActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.adapter.MovieAdapter;
@@ -39,11 +35,6 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
     private int page = 1;
     private MovieAdapter popularAdapter,topRatedAdapter,upcommingAdapter;
     private MovieNowAdapter movieNowAdapter;
-    private List<MovieBean.ResultsBean> popularList = new ArrayList<>();
-    private List<MovieBean.ResultsBean> topRatingList = new ArrayList<>();
-    private List<MovieBean.ResultsBean> nowPlayingList = new ArrayList<>();
-    private List<MovieBean.ResultsBean> upCommingList = new ArrayList<>();
-    private KProgressHUD hud;
     private TextView tv_popular,tv_topRated,tv_nowPlaying,tv_upComing;
     private RelativeLayout rl_popular,rl_topRated,rl_now,rl_upcoming;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -76,9 +67,6 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
         }
 
         initRecycler();
-        hud = KProgressHUD.create(getContext())
-                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                .setLabel("Please wait");
         moviePresenter = new MoviePresenter(this);
 
         moviePresenter.getPopularMovie(getString(R.string.key),page);
@@ -106,11 +94,43 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
         }
 
         page = 1;
+        clearAllData();
         moviePresenter.getPopularMovie(getString(R.string.key),page);
         moviePresenter.getTopRated(getString(R.string.key),page);
         moviePresenter.getUpcoming(getString(R.string.key),page);
         moviePresenter.getNow(getString(R.string.key),page);
     }
+
+
+    private void clearAllData() {
+        rl_upcoming.setVisibility(View.GONE);
+        rl_topRated.setVisibility(View.GONE);
+        rl_now.setVisibility(View.GONE);
+        rl_popular.setVisibility(View.GONE);
+        rv_popular.setVisibility(View.GONE);
+        rv_topRated.setVisibility(View.GONE);
+        rv_upComing.setVisibility(View.GONE);
+        rv_nowPlaying.setVisibility(View.GONE);
+        List<MovieAdapter> movieAdapters = new ArrayList<>();
+        movieAdapters.add(popularAdapter);
+        movieAdapters.add(upcommingAdapter);
+        movieAdapters.add(topRatedAdapter);
+        for(MovieAdapter movieAdapter : movieAdapters){
+            movieAdapter.setNewData(new ArrayList<>());
+        }
+        movieNowAdapter.setNewData(new ArrayList<>());
+
+        List<RecyclerView> recyclerViewList = new ArrayList<>();
+        recyclerViewList.add(rv_nowPlaying);
+        recyclerViewList.add(rv_popular);
+        recyclerViewList.add(rv_topRated);
+        recyclerViewList.add(rv_upComing);
+
+        for (RecyclerView recyclerView : recyclerViewList){
+            recyclerView.scrollToPosition(0);
+        }
+    }
+
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -124,51 +144,47 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
         rv_nowPlaying.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         rv_upComing.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
-        popularAdapter = new MovieAdapter(getContext(),popularList);
+        popularAdapter = new MovieAdapter();
         rv_popular.setAdapter(popularAdapter);
 
-        topRatedAdapter = new MovieAdapter(getContext(),topRatingList);
+        topRatedAdapter = new MovieAdapter();
         rv_topRated.setAdapter(topRatedAdapter);
 
-        movieNowAdapter = new MovieNowAdapter(getContext(),nowPlayingList);
+        movieNowAdapter = new MovieNowAdapter();
         rv_nowPlaying.setAdapter(movieNowAdapter);
 
-        upcommingAdapter = new MovieAdapter(getContext(),upCommingList);
+        upcommingAdapter = new MovieAdapter();
         rv_upComing.setAdapter(upcommingAdapter);
     }
 
     @Override
     public void showLoading() {
-        hud.show();
+        swipeRefreshLayout.setRefreshing(true);
     }
 
     @Override
     public void showError(String error) {
-        if (swipeRefreshLayout.isRefreshing()) {
+        new Handler().postDelayed(() -> {
+            Toast.makeText(getContext(),"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
             swipeRefreshLayout.setRefreshing(false);
-        }
+        }, 500);
     }
 
     @Override
     public void hideLoading() {
-        if (hud != null && hud.isShowing() && isAdded()) {
-            hud.dismiss();
-        }
-        if (swipeRefreshLayout.isRefreshing()) {
+        new Handler().postDelayed(() -> {
             swipeRefreshLayout.setRefreshing(false);
-        }
+        }, 500);
     }
 
 
     @Override
     public void getPopularResponse(MovieBean movieBean) {
         if(movieBean!=null && movieBean.getResults() != null){
-            popularList.clear();
             if(!movieBean.getResults().isEmpty()) {
                 rv_popular.setVisibility(View.VISIBLE);
                 rl_popular.setVisibility(View.VISIBLE);
-                popularList.addAll(movieBean.getResults());
-                popularAdapter.notifyDataSetChanged();
+                popularAdapter.setNewData(movieBean.getResults());
             }else{
                 rv_popular.setVisibility(View.GONE);
                 rl_popular.setVisibility(View.GONE);
@@ -179,12 +195,10 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
     @Override
     public void getTopRatedResponse(MovieBean movieBean) {
         if(movieBean!=null && movieBean.getResults() != null){
-            topRatingList.clear();
             if(!movieBean.getResults().isEmpty()) {
                 rv_topRated.setVisibility(View.VISIBLE);
                 rl_topRated.setVisibility(View.VISIBLE);
-                topRatingList.addAll(movieBean.getResults());
-                topRatedAdapter.notifyDataSetChanged();
+                topRatedAdapter.setNewData(movieBean.getResults());
             }
         }else{
             rv_topRated.setVisibility(View.GONE);
@@ -195,12 +209,10 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
     @Override
     public void getUpcomingResponse(MovieBean movieBean) {
         if(movieBean!=null && movieBean.getResults() != null){
-            upCommingList.clear();
             if(!movieBean.getResults().isEmpty()) {
                 rv_upComing.setVisibility(View.VISIBLE);
                 rl_upcoming.setVisibility(View.VISIBLE);
-                upCommingList.addAll(movieBean.getResults());
-                upcommingAdapter.notifyDataSetChanged();
+                upcommingAdapter.setNewData(movieBean.getResults());
             }
         }else{
             rv_upComing.setVisibility(View.GONE);
@@ -211,12 +223,10 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
     @Override
     public void getNowResponse(MovieBean movieBean) {
         if(movieBean!=null && movieBean.getResults() != null){
-            nowPlayingList.clear();
             if(!movieBean.getResults().isEmpty()) {
                 rv_nowPlaying.setVisibility(View.VISIBLE);
                 rl_now.setVisibility(View.VISIBLE);
-                nowPlayingList.addAll(movieBean.getResults());
-                movieNowAdapter.notifyDataSetChanged();
+                movieNowAdapter.setNewData(movieBean.getResults());
             }
         }else{
             rv_nowPlaying.setVisibility(View.GONE);

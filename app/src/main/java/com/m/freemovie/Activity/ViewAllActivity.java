@@ -1,19 +1,18 @@
 package com.m.freemovie.Activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kaopiz.kprogresshud.KProgressHUD;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.m.freemovie.R;
 import com.m.freemovie.adapter.ViewAllAdapter;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
@@ -29,7 +28,6 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
     private int page = 1;
     private boolean isLoading = false;
     private List<MovieBean.ResultsBean> movieLists = new ArrayList<>();
-    private KProgressHUD hud;
     private boolean isNomore = false;
     private ViewAllAdapter viewAllAdapter;
     private int position;
@@ -46,9 +44,6 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
         position = getIntent().getIntExtra("position",1);
         findViewById(R.id.btn_back).setOnClickListener(view -> finish());
         viewAllPresenter = new ViewAllPresenter(this);
-        hud = KProgressHUD.create(this)
-                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                .setLabel("Please wait");
         rv_viewAll.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         viewAllAdapter = new ViewAllAdapter();
         rv_viewAll.setAdapter(viewAllAdapter);
@@ -168,24 +163,22 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
 
     @Override
     public void showLoading() {
-        hud.show();
+        swipeRefreshLayout.setRefreshing(true);
     }
 
     @Override
     public void showError(String error) {
-        if (swipeRefreshLayout.isRefreshing()) {
+        new Handler().postDelayed(() -> {
+            Toast.makeText(getApplicationContext(),"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
             swipeRefreshLayout.setRefreshing(false);
-        }
+        }, 500);
     }
 
     @Override
     public void hideLoading() {
-        if (hud != null && hud.isShowing()) {
-            hud.dismiss();
-        }
-        if (swipeRefreshLayout.isRefreshing()) {
+        new Handler().postDelayed(() -> {
             swipeRefreshLayout.setRefreshing(false);
-        }
+        }, 500);
     }
 
     @Override

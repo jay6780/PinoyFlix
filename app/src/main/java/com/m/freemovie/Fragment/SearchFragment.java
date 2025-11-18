@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.adapter.ViewAllAdapter;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
@@ -33,7 +33,6 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     private SearchPresenter searchPresenter;
     private ViewAllAdapter movieAdapter;
     private boolean isLoading = false;
-    private KProgressHUD hud;
     private String lastQuery;
     private boolean isNomore = false;
     private ImageView btn_send;
@@ -53,10 +52,6 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         rv_search.setHasFixedSize(true);
         searchPresenter = new SearchPresenter(this);
         btn_send.setOnClickListener(this);
-        hud = KProgressHUD.create(getContext())
-                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                .setLabel("Please wait");
-
         rv_search.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -129,28 +124,23 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
 
     @Override
     public void showLoading() {
-        hud.show();
+        swipeRefreshLayout.setRefreshing(true);
     }
 
     @Override
     public void showError(String error) {
-        isLoading = false;
-        isNomore = true;
-        if (swipeRefreshLayout.isRefreshing()) {
+        new Handler().postDelayed(() -> {
+            Toast.makeText(getContext(),"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
             swipeRefreshLayout.setRefreshing(false);
-        }
+        }, 500);
     }
 
     @Override
     public void hideLoading() {
-        if (hud != null && hud.isShowing() && isAdded()) {
-            hud.dismiss();
-        }
-        if (swipeRefreshLayout.isRefreshing()) {
+        new Handler().postDelayed(() -> {
             swipeRefreshLayout.setRefreshing(false);
-        }
+        }, 500);
     }
-
 
     @Override
     public void getSearchResponse(MovieBean movieBean) {
