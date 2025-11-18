@@ -6,22 +6,28 @@
     android:background="#313647"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/iv_back"
-        android:src="@drawable/ic_baseline_arrow_back_24"
-        android:elevation="2sp"
-        android:layout_margin="20sp"/>
+    <RelativeLayout
+        android:id="@+id/rl_back"
+        android:layout_width="match_parent"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginStart="15dp"
+        android:elevation="10sp"
+        android:layout_height="wrap_content">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/iv_book"
-        android:background="@drawable/unbooked"
-        android:layout_alignParentEnd="true"
-        android:elevation="2sp"
-        android:layout_margin="20sp"/>
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_arrow_back_24" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/iv_book"
+            android:background="@drawable/unbooked"
+            android:layout_alignParentEnd="true" />
+    </RelativeLayout>
 
 
     <ImageView
@@ -35,9 +41,9 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="35dp"
-        android:layout_above="@+id/tv_watch">
+        android:layout_below="@+id/rl_back"
+        android:layout_above="@+id/tv_watch"
+        android:layout_marginBottom="5dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -58,7 +64,7 @@
                 android:layout_height="220sp"
                 android:layout_below="@+id/tv_title"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="10sp"
+                android:layout_marginTop="15sp"
                 android:layout_marginEnd="10sp"
                 android:layout_marginBottom="10sp"
                 app:cardCornerRadius="5sp">
@@ -78,6 +84,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tv_title"
                 android:layout_marginTop="20dp"
+                android:textSize="20sp"
                 android:layout_toRightOf="@+id/card" />
 
             <TextView
@@ -87,7 +94,7 @@
                 android:layout_below="@+id/tv_date"
                 android:layout_toRightOf="@+id/card"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
 
@@ -115,7 +122,7 @@
                         android:padding="5sp"
                         android:text="0.0"
                         android:textColor="@color/white"
-                        android:textSize="16sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -151,7 +158,7 @@
                         android:text="none"
                         android:textAllCaps="true"
                         android:textColor="@color/white"
-                        android:textSize="16sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -172,7 +179,7 @@
                 android:layout_toRightOf="@+id/card"
                 android:text="Votes"
                 android:textColor="#7C7C7C"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
 
@@ -200,7 +207,7 @@
                 android:layout_toRightOf="@+id/card"
                 android:text="Status"
                 android:textColor="#7C7C7C"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -227,7 +234,7 @@
                 android:layout_toRightOf="@+id/card"
                 android:text="Revenue"
                 android:textColor="#7C7C7C"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -237,7 +244,6 @@
                 android:layout_below="@+id/revenue"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="5dp"
-                android:layout_marginBottom="7dp"
                 android:layout_toRightOf="@+id/card"
                 android:text="0"
                 android:textColor="@color/SecondColor"
@@ -249,9 +255,8 @@
                 android:id="@+id/orig"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/card"
+                android:layout_below="@+id/tv_revenue"
                 android:layout_marginStart="15dp"
-                android:layout_marginTop="5dp"
                 android:text="Orinal Title"
                 android:textColor="#7C7C7C"
                 android:textSize="14sp"

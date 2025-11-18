@@ -33,6 +33,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
     private int position;
     private ViewAllPresenter viewAllPresenter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private boolean isReload = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +63,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
                             return;
                         }
                         isLoading = true;
+                        isReload = false;
                         page++;
                         loadMore();
                     }
@@ -132,7 +134,8 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
         }
         page = 1;
         movieLists.clear();
-        viewAllAdapter.setNewData(movieLists);
+        isReload = true;
+        viewAllAdapter.setNewData(new ArrayList<>());
         switch (position){
             case 1:
                 viewAllPresenter.getViewAll(getString(R.string.key),page,1);
@@ -172,6 +175,10 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
             Toast.makeText(getApplicationContext(),"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
             swipeRefreshLayout.setRefreshing(false);
         }, 500);
+        if(isReload){
+            rv_viewAll.scrollToPosition(0);
+        }
+        isReload = false;
     }
 
     @Override
@@ -188,6 +195,9 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
             if(!movieBean.getResults().isEmpty()){
                 movieLists.addAll(movieBean.getResults());
                 viewAllAdapter.setNewData(movieLists);
+                if(isReload){
+                    rv_viewAll.scrollToPosition(0);
+                }
             }else{
                 Toast.makeText(this,"No more movies",Toast.LENGTH_SHORT).show();
                 isLoading = false;

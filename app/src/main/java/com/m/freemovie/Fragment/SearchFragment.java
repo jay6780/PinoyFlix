@@ -49,7 +49,6 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         movieAdapter = new ViewAllAdapter();
         rv_search.setAdapter(movieAdapter);
-        rv_search.setHasFixedSize(true);
         searchPresenter = new SearchPresenter(this);
         btn_send.setOnClickListener(this);
         rv_search.addOnScrollListener(new RecyclerView.OnScrollListener() {

@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -34,13 +36,16 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     private String title;
     private SPUtils spUtils;
     private String lastImage;
-    private String movieName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
         getSupportActionBar().hide();
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        );
 
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
@@ -176,6 +181,16 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+        );
+    }
+
+
+
+    @Override
     public void getDetailResponse(DetailBean movieBean) {
         if (movieBean != null && !isFinishing() && !isDestroyed()) {
             String posterPath = "https://image.tmdb.org/t/p/w500/" + movieBean.getPoster_path();
@@ -224,6 +239,9 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     protected void onResume() {
         super.onResume();
         setImageData(id);
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+        );
     }
 
     @Override
