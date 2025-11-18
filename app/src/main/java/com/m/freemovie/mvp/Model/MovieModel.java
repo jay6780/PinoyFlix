@@ -1,161 +1,137 @@
 package com.m.freemovie.mvp.Model;
 
-import android.util.Log;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.m.freemovie.mvp.Api.MovieApi;
+import com.m.freemovie.Retrofit.Callback;
+import com.m.freemovie.Retrofit.NetworkingUtils;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import okhttp3.OkHttpClient;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MovieModel {
-    private static final String BASE_URL = "https://api.themoviedb.org/3/";
-
-    private MovieApi api;
-
-    public MovieModel() {
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        api = retrofit.create(MovieApi.class);
-    }
-
-
-    public void getPopular(String apiKey, int page,final VideoMovieListerner listener) {
+    public static void getPopular(String apiKey, int page,final Callback<MovieBean> callback) {
         String authHeader = "Bearer " + apiKey;
-        api.getPopularList("en-US",authHeader,page).enqueue(new Callback<MovieBean>() {
-            @Override
-            public void onResponse(Call<MovieBean> call, Response<MovieBean> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    MovieBean movieBean = response.body();
-//                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//                    String prettyJson = gson.toJson(movieBean);
-//                    Log.d("ResponseBody", prettyJson);
-                    listener.onSuccess(movieBean);
-                } else {
-                    listener.onError("Failed to load videos");
-                }
-            }
+        NetworkingUtils.getMovieData()
+                .getPopularList("en-US",authHeader,page)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<MovieBean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {}
 
-            @Override
-            public void onFailure(Call<MovieBean> call, Throwable t) {
-                listener.onError(t.getMessage());
-            }
-        });
+                    @Override
+                    public void onNext(MovieBean data) {
+                        callback.returnResult(data);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.returnError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {}
+                });
     }
 
-    public void getTopRated(String apiKey, int page,final VideoMovieListerner listener) {
+    public static void getTopRated(String apiKey, int page,final Callback<MovieBean> callback) {
         String authHeader = "Bearer " + apiKey;
-        api.getTopRated("en-US",authHeader,page).enqueue(new Callback<MovieBean>() {
-            @Override
-            public void onResponse(Call<MovieBean> call, Response<MovieBean> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    MovieBean movieBean = response.body();
-                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//                    String prettyJson = gson.toJson(movieBean);
-//                    Log.d("ResponseBody", prettyJson);
-                    listener.onSuccess(movieBean);
-                } else {
-                    listener.onError("Failed to load videos");
-                }
-            }
+        NetworkingUtils.getMovieData()
+                .getTopRated("en-US",authHeader,page)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<MovieBean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {}
 
-            @Override
-            public void onFailure(Call<MovieBean> call, Throwable t) {
-                listener.onError(t.getMessage());
-            }
-        });
+                    @Override
+                    public void onNext(MovieBean data) {
+                        callback.returnResult(data);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.returnError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {}
+                });
     }
 
-    public void getUpcoming(String apiKey, int page,final VideoMovieListerner listener) {
+    public static void getUpcoming(String apiKey, int page,final Callback<MovieBean> callback) {
         String authHeader = "Bearer " + apiKey;
-        api.getUpcoming("en-US",authHeader,page).enqueue(new Callback<MovieBean>() {
-            @Override
-            public void onResponse(Call<MovieBean> call, Response<MovieBean> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    MovieBean movieBean = response.body();
-                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//                    String prettyJson = gson.toJson(movieBean);
-//                    Log.d("ResponseBody", prettyJson);
-                    listener.onSuccess(movieBean);
-                } else {
-                    listener.onError("Failed to load videos");
-                }
-            }
+        NetworkingUtils.getMovieData()
+                .getUpcoming("en-US",authHeader,page)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<MovieBean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {}
 
-            @Override
-            public void onFailure(Call<MovieBean> call, Throwable t) {
-                listener.onError(t.getMessage());
-            }
-        });
+                    @Override
+                    public void onNext(MovieBean data) {
+                        callback.returnResult(data);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.returnError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {}
+                });
     }
 
-    public void getNow(String apiKey, int page,final VideoMovieListerner listener) {
+    public static void getNow(String apiKey, int page,final Callback<MovieBean> callback) {
         String authHeader = "Bearer " + apiKey;
-        api.getNow("en-US",authHeader,page).enqueue(new Callback<MovieBean>() {
-            @Override
-            public void onResponse(Call<MovieBean> call, Response<MovieBean> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    MovieBean movieBean = response.body();
-                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//                    String prettyJson = gson.toJson(movieBean);
-//                    Log.d("ResponseBody", prettyJson);
-                    listener.onSuccess(movieBean);
-                } else {
-                    listener.onError("Failed to load videos");
-                }
-            }
+        NetworkingUtils.getMovieData()
+                .getNow("en-US",authHeader,page)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<MovieBean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {}
 
-            @Override
-            public void onFailure(Call<MovieBean> call, Throwable t) {
-                listener.onError(t.getMessage());
-            }
-        });
+                    @Override
+                    public void onNext(MovieBean data) {
+                        callback.returnResult(data);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.returnError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {}
+                });
     }
 
-    public void getSearch(String apiKey, String query, int page, final VideoMovieListerner listener) {
+    public static void getSearch(String apiKey, String query, int page, final Callback<MovieBean> callback) {
         String authHeader = "Bearer " + apiKey;
-        api.getSearchList("en-US", authHeader, query, page, false).enqueue(new Callback<MovieBean>() {
-            @Override
-            public void onResponse(Call<MovieBean> call, Response<MovieBean> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    MovieBean movieBean = response.body();
-                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//                    String prettyJson = gson.toJson(movieBean);
-//                    Log.d("ResponseBody", prettyJson);
-                    listener.onSuccess(movieBean);
-                } else {
-                    listener.onError("Failed to load videos - HTTP " + response.code());
-                }
-            }
-            @Override
-            public void onFailure(Call<MovieBean> call, Throwable t) {
-                listener.onError(t.getMessage());
-            }
-        });
-    }
+        NetworkingUtils.getMovieData()
+                .getSearchList("en-US", authHeader, query, page, false)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<MovieBean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {}
 
-    public interface VideoMovieListerner {
-        void onSuccess(MovieBean movieBean);
+                    @Override
+                    public void onNext(MovieBean data) {
+                        callback.returnResult(data);
+                    }
 
-        void onError(String error);
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.returnError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {}
+                });
     }
 }

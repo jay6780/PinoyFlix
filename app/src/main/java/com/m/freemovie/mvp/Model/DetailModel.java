@@ -1,67 +1,37 @@
 package com.m.freemovie.mvp.Model;
 
-import android.util.Log;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.m.freemovie.mvp.Api.MovieApi;
+import com.m.freemovie.Retrofit.Callback;
+import com.m.freemovie.Retrofit.NetworkingUtils;
 import com.m.freemovie.mvp.ClassBean.DetailBean;
 
-import java.util.concurrent.TimeUnit;
-
-import okhttp3.OkHttpClient;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class DetailModel {
-    private static final String BASE_URL = "https://api.themoviedb.org/3/";
-
-    private MovieApi api;
-
-    public DetailModel() {
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        api = retrofit.create(MovieApi.class);
-    }
-    public void getDetailData(String id,String apiKey,final DetailListener listener) {
+    public static void getDetailData(String id,String apiKey,final Callback<DetailBean> callback) {
         String authHeader = "Bearer " + apiKey;
-        api.getDetails(id,"en-US",authHeader).enqueue(new Callback<DetailBean>() {
-            @Override
-            public void onResponse(Call<DetailBean> call, Response<DetailBean> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    DetailBean movieBean = response.body();
-//                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//                    String prettyJson = gson.toJson(movieBean);
-//                    Log.d("DetailResponse", prettyJson);
-                    listener.onSuccess(movieBean);
-                } else {
-                    listener.onError("Failed to load videos");
-                }
-            }
+        NetworkingUtils.getMovieData()
+                .getDetails(id,"en-US",authHeader)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<DetailBean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {}
 
-            @Override
-            public void onFailure(Call<DetailBean> call, Throwable t) {
-                listener.onError(t.getMessage());
-            }
-        });
-    }
+                    @Override
+                    public void onNext(DetailBean data) {
+                        callback.returnResult(data);
+                    }
 
-    public interface DetailListener {
-        void onSuccess(DetailBean movieBean);
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.returnError(e.getMessage());
+                    }
 
-        void onError(String error);
+                    @Override
+                    public void onComplete() {}
+                });
     }
 }

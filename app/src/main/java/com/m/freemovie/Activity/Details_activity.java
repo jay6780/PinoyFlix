@@ -1,19 +1,17 @@
 package com.m.freemovie.Activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.SPUtils;
+import com.m.freemovie.databinding.ActivityDetailsBinding;
 import com.m.freemovie.mvp.ClassBean.DetailBean;
 import com.m.freemovie.mvp.Contract.DetailContract;
 import com.m.freemovie.mvp.Presenter.DetailPresenter;
@@ -30,17 +28,17 @@ import java.util.Locale;
 public class Details_activity extends AppCompatActivity implements DetailContract.View {
     private DetailPresenter detailPresenter;
     private String id;
-    private TextView tv_title,tv_rate,tv_date,tv_vote,tv_status,tv_info,language,tv_revenue,tv_description,tv_original;
-    private ImageView iv_smallimg,iv_big,iv_book;
     private KProgressHUD hud;
     private String title;
     private SPUtils spUtils;
     private String lastImage;
+    private ActivityDetailsBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_details);
+        binding = ActivityDetailsBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         getSupportActionBar().hide();
         getWindow().setFlags(
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
@@ -53,24 +51,10 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
         detailPresenter = new DetailPresenter(this);
         id = getIntent().getStringExtra("id");
-        findViewById(R.id.iv_back).setOnClickListener(view -> finish());
-        findViewById(R.id.iv_book).setOnClickListener(view -> savedBook());
+        binding.ivBack.setOnClickListener(view -> finish());
+        binding.ivBook.setOnClickListener(view -> savedBook());
         detailPresenter.getDetail(id,getString(R.string.key));
-        findViewById(R.id.tv_watch).setOnClickListener(view -> watchNow());
-
-        tv_title = findViewById(R.id.tv_title);
-        tv_rate = findViewById(R.id.tv_rate);
-        tv_date = findViewById(R.id.tv_date);
-        tv_vote = findViewById(R.id.tv_vote);
-        tv_status = findViewById(R.id.tv_status);
-        tv_info = findViewById(R.id.tv_info);
-        language  = findViewById(R.id.language);
-        tv_revenue = findViewById(R.id.tv_revenue);
-        iv_smallimg = findViewById(R.id.iv_smallimg);
-        iv_big = findViewById(R.id.iv_big);
-        tv_description = findViewById(R.id.tv_description);
-        iv_book = findViewById(R.id.iv_book);
-        tv_original = findViewById(R.id.tv_original);
+        binding.tvWatch.setOnClickListener(view -> watchNow());
         spUtils = SPUtils.getInstance("detailPrefs");
 
         setImageData(id);
@@ -94,14 +78,14 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                     break;
                 }
             }
-            iv_book.setImageResource(R.drawable.unbooked);
+            binding.ivBook.setImageResource(R.drawable.unbooked);
         } else {
             String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
             DetailBean details = new DetailBean(id, timestamp,lastImage,title);
             details.setVideoId(id);
             details.setTimeStamp(timestamp);
             detailBeans.add(0, details);
-            iv_book.setImageResource(R.drawable.booked);
+            binding.ivBook.setImageResource(R.drawable.booked);
         }
 
         saveDetailData(detailBeans);
@@ -133,7 +117,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                 break;
             }
         }
-        iv_book.setImageResource(isBookmarked ? R.drawable.booked : R.drawable.unbooked);
+        binding.ivBook.setImageResource(isBookmarked ? R.drawable.booked : R.drawable.unbooked);
     }
 
     private List<DetailBean> getDetailData() {
@@ -195,7 +179,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
         if (movieBean != null && !isFinishing() && !isDestroyed()) {
             String posterPath = "https://image.tmdb.org/t/p/w500/" + movieBean.getPoster_path();
             this.lastImage = posterPath;
-            tv_title.setText(movieBean.getOriginal_title());
+            binding.tvTitle.setText(movieBean.getOriginal_title());
 
             StringBuilder sb = new StringBuilder();
             List<String> names = new ArrayList<>();
@@ -210,26 +194,26 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                 }
             }
 
-            tv_info.setText(sb.toString());
-            tv_date.setText(movieBean.getRelease_date());
+            binding.tvInfo.setText(sb.toString());
+            binding.tvDate.setText(movieBean.getRelease_date());
             int avg = (int) movieBean.getVote_average();
-            tv_rate.setText(String.valueOf(avg));
-            language.setText(movieBean.getOriginal_language());
-            tv_vote.setText(String.valueOf(movieBean.getVote_count()));
-            tv_status.setText(movieBean.getStatus());
-            tv_revenue.setText(String.valueOf(movieBean.getRevenue()));
-            tv_description.setText(movieBean.getOverview());
-            tv_original.setText(movieBean.getOriginal_title());
+            binding.tvRate.setText(String.valueOf(avg));
+            binding.language.setText(movieBean.getOriginal_language());
+            binding.tvVote.setText(String.valueOf(movieBean.getVote_count()));
+            binding.tvStatus.setText(movieBean.getStatus());
+            binding.tvRevenue.setText(String.valueOf(movieBean.getRevenue()));
+            binding.tvDescription.setText(movieBean.getOverview());
+            binding.tvOriginal.setText(movieBean.getOriginal_title());
             this.title = movieBean.getTitle();
 
             Glide.with(this)
                     .asBitmap()
                     .load(posterPath)
-                    .into(iv_smallimg);
+                    .into(binding.ivSmallimg);
             Glide.with(this)
                     .asBitmap()
                     .load(posterPath)
-                    .into(iv_big);
+                    .into(binding.ivBig);
 
             setImageData(id);
         }

@@ -1,7 +1,9 @@
 package com.m.freemovie.mvp.Api;
+
 import com.m.freemovie.mvp.ClassBean.DetailBean;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
-import retrofit2.Call;
+
+import io.reactivex.rxjava3.core.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Path;
@@ -9,20 +11,20 @@ import retrofit2.http.Query;
 
 public interface MovieApi {
     @GET("movie/popular")
-    Call<MovieBean> getPopularList(
+    Observable<MovieBean> getPopularList(
             @Query("language") String language,
             @Header("Authorization") String authHeader,
             @Query("page") int page);
 
     @GET("movie/top_rated")
-    Call<MovieBean> getTopRated(
+    Observable<MovieBean> getTopRated(
             @Query("language") String language,
             @Header("Authorization") String authHeader,
             @Query("page") int page);
 
 
     @GET("movie/upcoming")
-    Call<MovieBean> getUpcoming(
+    Observable<MovieBean> getUpcoming(
             @Query("language") String language,
             @Header("Authorization") String authHeader,
             @Query("page") int page);
@@ -30,21 +32,21 @@ public interface MovieApi {
 
 
     @GET("movie/now_playing")
-    Call<MovieBean> getNow(
+    Observable<MovieBean> getNow(
             @Query("language") String language,
             @Header("Authorization") String authHeader,
             @Query("page") int page);
 
 
     @GET("movie/{id}")
-    Call<DetailBean> getDetails(
+    Observable<DetailBean> getDetails(
             @Path("id") String id,
             @Query("language") String language,
             @Header("Authorization") String authHeader);
 
 
     @GET("search/movie")
-    Call<MovieBean> getSearchList(
+    Observable<MovieBean> getSearchList(
             @Query("language") String language,
             @Header("Authorization") String authHeader,
             @Query("query") String query,

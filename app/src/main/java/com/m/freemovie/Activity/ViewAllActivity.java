@@ -5,7 +5,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +14,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.m.freemovie.R;
 import com.m.freemovie.adapter.ViewAllAdapter;
+import com.m.freemovie.databinding.ActivityViewAllBinding;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Contract.MovieAllContract;
 import com.m.freemovie.mvp.Presenter.ViewAllPresenter;
@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ViewAllActivity extends AppCompatActivity implements MovieAllContract.View {
-    private TextView title_name;
-    private RecyclerView rv_viewAll;
     private int page = 1;
     private boolean isLoading = false;
     private List<MovieBean.ResultsBean> movieLists = new ArrayList<>();
@@ -34,22 +32,22 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
     private ViewAllPresenter viewAllPresenter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private boolean isReload = false;
+    private ActivityViewAllBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_all);
+        binding = ActivityViewAllBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         getSupportActionBar().hide();
-        title_name = findViewById(R.id.title_name);
-        rv_viewAll = findViewById(R.id.rv_viewAll);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         position = getIntent().getIntExtra("position",1);
         findViewById(R.id.btn_back).setOnClickListener(view -> finish());
         viewAllPresenter = new ViewAllPresenter(this);
-        rv_viewAll.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        binding.rvViewAll.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         viewAllAdapter = new ViewAllAdapter();
-        rv_viewAll.setAdapter(viewAllAdapter);
-        rv_viewAll.setHasFixedSize(true);
-        rv_viewAll.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        binding.rvViewAll.setAdapter(viewAllAdapter);
+        binding.rvViewAll.setHasFixedSize(true);
+        binding.rvViewAll.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
@@ -92,19 +90,19 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
 
         switch (position){
             case 1:
-                title_name.setText("Popular Movies");
+                binding.titleName.setText("Popular Movies");
                 viewAllPresenter.getViewAll(getString(R.string.key),page,1);
                 break;
             case 2:
-                title_name.setText("Top Rated Movies");
+                binding.titleName.setText("Top Rated Movies");
                 viewAllPresenter.getViewAll(getString(R.string.key),page,2);
                 break;
             case 3:
-                title_name.setText("Now Playing");
+                binding.titleName.setText("Now Playing");
                 viewAllPresenter.getViewAll(getString(R.string.key),page,3);
                 break;
             case 4:
-                title_name.setText("Upcoming Movies");
+                binding.titleName.setText("Upcoming Movies");
                 viewAllPresenter.getViewAll(getString(R.string.key),page,4);
                 break;
         }
@@ -175,9 +173,6 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
             Toast.makeText(getApplicationContext(),"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
             swipeRefreshLayout.setRefreshing(false);
         }, 500);
-        if(isReload){
-            rv_viewAll.scrollToPosition(0);
-        }
         isReload = false;
     }
 
@@ -196,7 +191,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
                 movieLists.addAll(movieBean.getResults());
                 viewAllAdapter.setNewData(movieLists);
                 if(isReload){
-                    rv_viewAll.scrollToPosition(0);
+                    binding.rvViewAll.scrollToPosition(0);
                 }
             }else{
                 Toast.makeText(this,"No more movies",Toast.LENGTH_SHORT).show();

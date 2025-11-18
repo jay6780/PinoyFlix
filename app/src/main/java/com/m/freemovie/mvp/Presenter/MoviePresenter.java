@@ -1,32 +1,47 @@
 package com.m.freemovie.mvp.Presenter;
 
+import androidx.annotation.NonNull;
+
+import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Contract.MovieContract;
 import com.m.freemovie.mvp.Model.MovieModel;
 
+import java.io.IOException;
+import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Response;
+
 public class MoviePresenter implements MovieContract.Presenter {
     private MovieContract.View view;
-    private MovieModel model;
 
     public MoviePresenter(MovieContract.View view) {
         this.view = view;
-        this.model = new MovieModel();
     }
 
     @Override
     public void getPopularMovie(String apiKey, int page) {
         view.showLoading();
-        model.getPopular(apiKey,page, new MovieModel.VideoMovieListerner() {
+        MovieModel.getPopular(apiKey,page, new Callback<MovieBean>() {
             @Override
-            public void onSuccess(MovieBean movieBean) {
-                view.hideLoading();
-                view.getPopularResponse(movieBean);
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
             }
 
             @Override
-            public void onError(String error) {
+            public void returnResult(MovieBean apiBean) {
                 view.hideLoading();
-                view.showError(error);
+                view.getPopularResponse(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
             }
         });
     }
@@ -34,17 +49,25 @@ public class MoviePresenter implements MovieContract.Presenter {
     @Override
     public void getTopRated(String apiKey, int page) {
         view.showLoading();
-        model.getTopRated(apiKey,page, new MovieModel.VideoMovieListerner() {
+        MovieModel.getTopRated(apiKey,page, new Callback<MovieBean>() {
             @Override
-            public void onSuccess(MovieBean movieBean) {
-                view.hideLoading();
-                view.getTopRatedResponse(movieBean);
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
             }
 
             @Override
-            public void onError(String error) {
+            public void returnResult(MovieBean apiBean) {
                 view.hideLoading();
-                view.showError(error);
+                view.getTopRatedResponse(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
             }
         });
     }
@@ -52,37 +75,57 @@ public class MoviePresenter implements MovieContract.Presenter {
     @Override
     public void getUpcoming(String apiKey, int page) {
         view.showLoading();
-        model.getUpcoming(apiKey,page, new MovieModel.VideoMovieListerner() {
+        MovieModel.getUpcoming(apiKey,page, new Callback<MovieBean>() {
             @Override
-            public void onSuccess(MovieBean movieBean) {
-                view.hideLoading();
-                view.getUpcomingResponse(movieBean);
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+
             }
 
             @Override
-            public void onError(String error) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(MovieBean apiBean) {
                 view.hideLoading();
-                view.showError(error);
+                view.getUpcomingResponse(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
             }
         });
-
     }
 
     @Override
     public void getNow(String apiKey, int page) {
         view.showLoading();
-        model.getNow(apiKey,page, new MovieModel.VideoMovieListerner() {
+        MovieModel.getNow(apiKey, page, new Callback<MovieBean>() {
             @Override
-            public void onSuccess(MovieBean movieBean) {
-                view.hideLoading();
-                view.getNowResponse(movieBean);
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+
             }
 
             @Override
-            public void onError(String error) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(MovieBean apiBean) {
                 view.hideLoading();
-                view.showError(error);
+                view.getNowResponse(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
             }
         });
+
     }
 }

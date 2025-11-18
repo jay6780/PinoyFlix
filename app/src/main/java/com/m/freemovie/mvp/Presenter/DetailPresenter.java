@@ -1,33 +1,48 @@
 package com.m.freemovie.mvp.Presenter;
 
+import androidx.annotation.NonNull;
+
+import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.mvp.ClassBean.DetailBean;
 import com.m.freemovie.mvp.Contract.DetailContract;
 import com.m.freemovie.mvp.Model.DetailModel;
 
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Response;
+
 public class DetailPresenter implements DetailContract.Presenter {
     private DetailContract.View view;
-    private DetailModel model;
 
     public DetailPresenter(DetailContract.View view) {
         this.view = view;
-        this.model = new DetailModel();
     }
 
 
     @Override
     public void getDetail(String id, String apiKey) {
         view.showLoading();
-        model.getDetailData(id,apiKey, new DetailModel.DetailListener() {
+
+        DetailModel.getDetailData(id,apiKey, new Callback<DetailBean>() {
             @Override
-            public void onSuccess(DetailBean movieBean) {
-                view.hideLoading();
-                view.getDetailResponse(movieBean);
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
             }
 
             @Override
-            public void onError(String error) {
+            public void returnResult(DetailBean apiBean) {
                 view.hideLoading();
-                view.showError(error);
+                view.getDetailResponse(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
             }
         });
     }

@@ -1,32 +1,47 @@
 package com.m.freemovie.mvp.Presenter;
 
+import androidx.annotation.NonNull;
+
+import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Contract.MovieAllContract;
+import com.m.freemovie.mvp.Model.MovieModel;
 import com.m.freemovie.mvp.Model.ViewAllModel;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class ViewAllPresenter implements MovieAllContract.Presenter {
     private MovieAllContract.View view;
-    private ViewAllModel model;
 
     public ViewAllPresenter(MovieAllContract.View view) {
         this.view = view;
-        this.model = new ViewAllModel();
     }
 
     @Override
     public void getViewAll(String apiKey, int page,int positon) {
         view.showLoading();
-        model.getListResponse(apiKey,page,positon, new ViewAllModel.VideoMovieListerner() {
+        ViewAllModel.getListResponse(apiKey,page,positon,new Callback<MovieBean>() {
             @Override
-            public void onSuccess(MovieBean movieBean) {
-                view.hideLoading();
-                view.getViewAllResponse(movieBean);
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
             }
 
             @Override
-            public void onError(String error) {
+            public void returnResult(MovieBean apiBean) {
                 view.hideLoading();
-                view.showError(error);
+                view.getViewAllResponse(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
             }
         });
     }

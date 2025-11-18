@@ -15,8 +15,6 @@ import com.m.freemovie.databinding.ActivityMainBinding;
 import meow.bottomnavigation.MeowBottomNavigation;
 
 public class MainActivity extends AppCompatActivity {
-
-    private MeowBottomNavigation bottomNavigation;
     private ActivityMainBinding binding;
 
     @Override
@@ -29,11 +27,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializeBottomNavigation() {
-        bottomNavigation = findViewById(R.id.nav);
-
-        bottomNavigation.add(new MeowBottomNavigation.Model(1, R.drawable.ic_baseline_search_24));
-        bottomNavigation.add(new MeowBottomNavigation.Model(2, R.drawable.ic_baseline_home_24));
-        bottomNavigation.add(new MeowBottomNavigation.Model(3, R.drawable.unbooked));
+        binding.nav.add(new MeowBottomNavigation.Model(1, R.drawable.ic_baseline_search_24));
+        binding.nav.add(new MeowBottomNavigation.Model(2, R.drawable.ic_baseline_home_24));
+        binding.nav.add(new MeowBottomNavigation.Model(3, R.drawable.unbooked));
 
         Fragment searchFragment = new SearchFragment();
         Fragment movieFragment = new MovieFragment();
@@ -69,6 +65,6 @@ public class MainActivity extends AppCompatActivity {
             return null;
         });
 
-        bottomNavigation.show(2, true);
+        binding.nav.show(2, true);
     }
 }
