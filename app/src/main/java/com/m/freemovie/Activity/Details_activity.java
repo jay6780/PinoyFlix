@@ -168,7 +168,6 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     }
 
 
-
     @Override
     public void getDetailResponse(DetailBean movieBean) {
         if (movieBean != null && !isFinishing() && !isDestroyed()) {
@@ -217,6 +216,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     @Override
     protected void onResume() {
         super.onResume();
+        new WindowUtils(this);
         setImageData(id);
     }
 
