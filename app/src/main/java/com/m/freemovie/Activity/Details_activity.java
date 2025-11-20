@@ -1,6 +1,7 @@
 package com.m.freemovie.Activity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -11,6 +12,7 @@ import com.bumptech.glide.Glide;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.SPUtils;
+import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.databinding.ActivityDetailsBinding;
 import com.m.freemovie.mvp.ClassBean.DetailBean;
 import com.m.freemovie.mvp.Contract.DetailContract;
@@ -40,11 +42,6 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
         binding = ActivityDetailsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
-        getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-        );
-
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
@@ -167,9 +164,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     @Override
     protected void onStart() {
         super.onStart();
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-        );
+        new WindowUtils(this);
     }
 
 
@@ -223,9 +218,6 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     protected void onResume() {
         super.onResume();
         setImageData(id);
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-        );
     }
 
     @Override
