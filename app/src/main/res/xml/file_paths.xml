@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingDefaultResource">
+    <external-path name="external_storage" path="." />
+    <external-path name="downloads" path="Download/" />
+    <external-path name="dainty_downloads" path="DaintyDownloads/" />
+    <external-files-path name="external_files" path="." />
+    <cache-path name="cache" path="." />
+</paths>

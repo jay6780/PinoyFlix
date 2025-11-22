@@ -1,15 +1,20 @@
 package com.m.freemovie.Activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.ConsoleMessage;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -29,6 +34,8 @@ public class VideoWebviewActivity extends AppCompatActivity {
     private String videoId;
     private KProgressHUD hud;
     private ActivityVideoWebviewBinding binding;
+    private int videoPosition;
+    private String videoUrl;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,12 +45,24 @@ public class VideoWebviewActivity extends AppCompatActivity {
         binding.btnBack.setOnClickListener(view -> onBackPressed());
         title = getIntent().getStringExtra("title");
         videoId = getIntent().getStringExtra("videoId");
+        videoPosition = getIntent().getIntExtra("videoPosition",0);
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
 
         binding.titleName.setText(title);
-        String videoUrl = "https://vidsrc-embed.ru/embed/movie?tmdb="+videoId;
+
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
+        );
+
+        if(videoPosition == 1){
+            videoUrl = "https://vidsrc-embed.ru/embed/movie?tmdb="+videoId;
+        }else if(videoPosition == 2) {
+            videoUrl = "https://vidrock.net/movie/" + videoId + "";
+        }
+
 //        Log.d("VideoUrl","value: "+videoUrl);
         binding.rotate.setOnClickListener(view -> rotateScreen());
 
@@ -71,6 +90,18 @@ public class VideoWebviewActivity extends AppCompatActivity {
         webSettings.setBuiltInZoomControls(false);
         webSettings.setSupportZoom(false);
         webSettings.setDomStorageEnabled(true);
+        binding.webView.setWebChromeClient(new WebChromeClient());
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            binding.webView.setWebContentsDebuggingEnabled(false);
+        }
+
+        binding.webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+                return true;
+            }
+        });
 
         binding.webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -85,7 +116,28 @@ public class VideoWebviewActivity extends AppCompatActivity {
             }
 
             private boolean handleUrlLoading(WebView view, String url) {
-                if (url.contains("vidsrc-embed.ru")) {
+                String videoDomain = "";
+                if (videoPosition == 1){
+                    videoDomain = "vidsrc-embed.ru";
+                }else if(videoPosition == 2) {
+                    videoDomain = "vidrock.net";
+                }
+
+                if (url.contains(videoDomain) || url.contains("dl.vidsrc.vip")) {
+                    if(videoPosition ==2 ){
+                        String downloadUrl ="https://dl.vidsrc.vip/movie/"+videoId;
+                        Intent intent = new Intent(getApplicationContext(), DownloadWebview.class);
+                        intent.putExtra("DownloadUrl",downloadUrl);
+                        intent.putExtra("title",title);
+                        startActivity(intent);
+                        if(!isNetworkAvailable()){
+                            binding.webView.setVisibility(View.GONE);
+                            Toast.makeText(getApplicationContext(),"Please check your internet and try again",Toast.LENGTH_SHORT).show();
+                        }else{
+                            setupWebView(videoUrl);
+                            binding.webView.setVisibility(View.VISIBLE);
+                        }
+                    }
                     return false;
                 } else {
                     view.stopLoading();
@@ -95,17 +147,30 @@ public class VideoWebviewActivity extends AppCompatActivity {
 
             @Override
             public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
-                if (!url.contains("vidsrc-embed.ru")) {
+                String videoDomain = "";
+                if (videoPosition == 1){
+                    videoDomain = "vidsrc-embed.ru";
+                }else if(videoPosition == 2) {
+                    videoDomain = "vidrock.net";
+                }
+                if (!url.contains(videoDomain)) {
                     view.stopLoading();
                 }
+                if(hud !=null){
+                    hud.show();
+                }
+
                 super.onPageStarted(view, url, favicon);
-                hud.show();
+
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                if(hud !=null && hud.isShowing()){
                 hud.dismiss();
+                }
+
             }
         });
 
@@ -137,6 +202,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
     }
+
 
     @Override
     public void onBackPressed() {

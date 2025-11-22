@@ -1,0 +1,327 @@
+package com.m.freemovie.Activity;
+
+import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Build;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.View;
+import android.webkit.ConsoleMessage;
+import android.webkit.CookieManager;
+import android.webkit.DownloadListener;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.kaopiz.kprogresshud.KProgressHUD;
+import com.m.freemovie.databinding.ActivityDownloadWebviewBinding;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class DownloadWebview extends AppCompatActivity {
+    private String downloadUrl;
+    private ActivityDownloadWebviewBinding binding;
+    private KProgressHUD hud;
+    private KProgressHUD downloadHud;
+    private String title;
+    private boolean isFirstTask = false;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getSupportActionBar().hide();
+        binding = ActivityDownloadWebviewBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        binding.btnBack.setOnClickListener(view -> onBackPressed());
+        binding.titleName.setText("Download video");
+        downloadUrl = getIntent().getStringExtra("DownloadUrl");
+        title = getIntent().getStringExtra("title");
+        hud = KProgressHUD.create(this)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setLabel("Please wait");
+
+        if(!isNetworkAvailable()){
+            binding.webView.setVisibility(View.GONE);
+            Toast.makeText(getApplicationContext(),"Please check your internet and try again",Toast.LENGTH_SHORT).show();
+        }else{
+            setupWebView(downloadUrl);
+            binding.webView.setVisibility(View.VISIBLE);
+        }
+    }
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    private void setupWebView(String videoUrl) {
+        WebSettings webSettings = binding.webView.getSettings();
+        setSettings(webSettings);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            binding.webView.setWebContentsDebuggingEnabled(false);
+        }
+        binding.webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+                return true;
+            }
+        });
+
+        binding.webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
+                super.onPageStarted(view, url, favicon);
+                if (!hud.isShowing()) {
+                    hud.show();
+                }
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                if (hud != null && hud.isShowing()) {
+                    hud.dismiss();
+                }
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                String url = request.getUrl().toString();
+                return handleUrlLoading(view, url);
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return handleUrlLoading(view, url);
+            }
+
+            private boolean handleUrlLoading(WebView view, String url) {
+                if (url.contains("dl.vidsrc.vip") || url.contains("cache.cardfightvanguard.site") || url.contains("dl.2ae8zric7z.workers.dev")) {
+                    return false;
+                } else {
+                    view.stopLoading();
+                    return true;
+                }
+            }
+
+        });
+
+        binding.webView.setDownloadListener(new DownloadListener() {
+            @Override
+            public void onDownloadStart(String videoUrl, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+                if (videoUrl.contains("cache.cardfightvanguard.site") || videoUrl.contains("dl.2ae8zric7z.workers.dev")) {
+                    if(isFirstTask){
+                        Toast.makeText(getApplicationContext(),"Download in progress",Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    downloadVideo(videoUrl);
+                }
+            }
+        });
+        binding.webView.loadUrl(videoUrl);
+
+    }
+    private File getLocalFile() {
+        String safeTitle = title.replaceAll("[^a-zA-Z0-9.-]", "_");
+        String fileName = safeTitle + ".mp4";
+        String dirName = safeTitle;
+
+        File freeMovieDir = new File(getFilesDir(), "FreeMovie");
+        if (!freeMovieDir.exists()) {
+            freeMovieDir.mkdirs();
+        }
+
+        File movieDir = new File(freeMovieDir, dirName);
+        if (!movieDir.exists()) {
+            movieDir.mkdirs();
+        }
+        return new File(movieDir, fileName);
+    }
+    private void downloadVideo(String videoUrl) {
+        isFirstTask = true;
+        downloadHud = KProgressHUD.create(this)
+                .setStyle(KProgressHUD.Style.ANNULAR_DETERMINATE)
+                .setLabel("Downloading...")
+                .setMaxProgress(100)
+                .setCancellable(false);
+        downloadHud.show();
+
+        new Thread(() -> {
+            FileOutputStream outputStream = null;
+            InputStream inputStream = null;
+            HttpURLConnection connection = null;
+
+            try {
+                URL url = new URL(videoUrl);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(60000);
+                connection.setReadTimeout(60000);
+                connection.setInstanceFollowRedirects(true);
+
+                File outputFile = getLocalFile();
+                long existingLength = 0;
+                if (outputFile.exists()) {
+                    existingLength = outputFile.length();
+                    connection.setRequestProperty("Range", "bytes=" + existingLength + "-");
+                }
+
+                connection.connect();
+                int responseCode = connection.getResponseCode();
+
+                boolean isResume = (responseCode == HttpURLConnection.HTTP_PARTIAL);
+                if (responseCode == HttpURLConnection.HTTP_OK || isResume) {
+                    inputStream = connection.getInputStream();
+
+                    if (isResume) {
+                        outputStream = new FileOutputStream(outputFile, true);
+                    } else {
+                        outputStream = new FileOutputStream(outputFile);
+                    }
+
+                    int contentLength = connection.getContentLength();
+                    if (isResume) {
+                        contentLength += existingLength;
+                    }
+
+                    byte[] buffer = new byte[8192];
+                    int bytesRead;
+                    long totalBytesRead = existingLength;
+
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                        totalBytesRead += bytesRead;
+
+                        if (contentLength > 0) {
+                            final int progress = (int) ((totalBytesRead * 100) / contentLength);
+                            runOnUiThread(() -> downloadHud.setProgress(progress));
+                        }
+
+                        if (!isFirstTask) {
+                            break;
+                        }
+                    }
+
+                    outputStream.close();
+                    inputStream.close();
+
+                    if (isFirstTask) {
+                        runOnUiThread(() -> {
+                            if (downloadHud != null && downloadHud.isShowing()) {
+                                downloadHud.dismiss();
+                            }
+                            isFirstTask = false;
+                            Toast.makeText(getApplicationContext(),
+                                    "Download Complete! Saved to: " + outputFile.getAbsolutePath(),
+                                    Toast.LENGTH_LONG).show();
+                            startActivity(new Intent(getApplicationContext(), Download_videoActivity.class));
+                        });
+                    }
+
+                } else {
+//                    Log.e("Download", "Server returned HTTP " + responseCode);
+                    runOnUiThread(() -> {
+                        if (downloadHud != null && downloadHud.isShowing()) {
+                            downloadHud.dismiss();
+                        }
+                        isFirstTask = false;
+                        Toast.makeText(getApplicationContext(), "Download Failed: HTTP " + responseCode,
+                                Toast.LENGTH_SHORT).show();
+                    });
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> {
+                    if (downloadHud != null && downloadHud.isShowing()) {
+                        downloadHud.dismiss();
+                    }
+                    isFirstTask = false;
+                    Toast.makeText(getApplicationContext(),
+                            "Download Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+            } finally {
+                try {
+                    if (outputStream != null) outputStream.close();
+                    if (inputStream != null) inputStream.close();
+                    if (connection != null) connection.disconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+
+    @Override
+    protected void onPause() {
+        isFirstTask = false;
+        super.onPause();
+
+    }
+
+    @Override
+    protected void onResume() {
+        isFirstTask = false;
+        if(!isNetworkAvailable()){
+            binding.webView.setVisibility(View.GONE);
+            Toast.makeText(getApplicationContext(),"Please check your internet and try again",Toast.LENGTH_SHORT).show();
+        }else{
+            setupWebView(downloadUrl);
+            binding.webView.setVisibility(View.VISIBLE);
+        }
+        super.onResume();
+
+    }
+
+    private void setSettings(WebSettings setting) {
+        setting.setJavaScriptEnabled(true);
+        setting.setJavaScriptCanOpenWindowsAutomatically(true);
+        setting.setAllowFileAccess(true);
+        setting.setSupportZoom(true);
+        setting.setBuiltInZoomControls(true);
+        setting.setDisplayZoomControls(false);
+        setting.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
+        setting.setSupportMultipleWindows(false);
+        String string = setting.getUserAgentString();
+        setting.setUserAgentString(string + "androidapp-v1.4");
+        setting.setGeolocationEnabled(true);
+        setting.setGeolocationDatabasePath(getDir("geolocation", 0).getPath());
+        setting.setSaveFormData(true);
+        setting.setDomStorageEnabled(true);
+        setting.setDatabaseEnabled(true);
+        setting.setCacheMode(WebSettings.LOAD_DEFAULT);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setting.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
+
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptCookie(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            cookieManager.setAcceptThirdPartyCookies(binding.webView, true);
+        }
+        setting.setUseWideViewPort(true);
+        setting.setTextZoom(Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("text_size", "100")));
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        isFirstTask = false;
+        finish();
+    }
+}

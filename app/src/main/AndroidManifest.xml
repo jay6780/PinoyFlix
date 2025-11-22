@@ -18,10 +18,26 @@
         android:theme="@style/Theme.FreeMovie"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
+        <activity
+            android:name=".Activity.Download_videoActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".Activity.FullViewVideoActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name=".Activity.DownloadWebview"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Activity.Details_activity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Activity.ViewAllActivity"
             android:exported="false"
