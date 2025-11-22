@@ -190,8 +190,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
             binding.tvInfo.setText(sb.toString());
             binding.tvDate.setText(movieBean.getRelease_date());
-            int avg = (int) movieBean.getVote_average();
-            binding.tvRate.setText(String.valueOf(avg));
+            binding.tvRate.setText(String.format("%.2f", movieBean.getVote_average()));
             binding.language.setText(movieBean.getOriginal_language());
             binding.tvVote.setText(String.valueOf(movieBean.getVote_count()));
             binding.tvStatus.setText(movieBean.getStatus());
