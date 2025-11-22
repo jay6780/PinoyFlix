@@ -46,6 +46,7 @@ public class DownloadWebview extends AppCompatActivity {
         setContentView(binding.getRoot());
         binding.btnBack.setOnClickListener(view -> onBackPressed());
         binding.titleName.setText("Download video");
+        binding.rotate.setVisibility(View.GONE);
         downloadUrl = getIntent().getStringExtra("DownloadUrl");
         title = getIntent().getStringExtra("title");
         hud = KProgressHUD.create(this)

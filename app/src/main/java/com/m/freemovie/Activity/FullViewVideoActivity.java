@@ -506,6 +506,7 @@ public class FullViewVideoActivity extends AppCompatActivity {
                 seekBar.setVisibility(View.INVISIBLE);
                 rotate.setVisibility(View.INVISIBLE);
                 btn_play.setVisibility(View.INVISIBLE);
+                ispause = false;
             }, 2000);
         }
     }
