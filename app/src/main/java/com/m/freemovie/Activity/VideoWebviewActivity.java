@@ -3,6 +3,7 @@ package com.m.freemovie.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -52,29 +53,30 @@ public class VideoWebviewActivity extends AppCompatActivity {
 
         binding.titleName.setText(title);
 
-        getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
-                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
-        );
-
+        if(videoId == null){
+            Toast.makeText(getApplicationContext(), "Please try again", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
         if(videoPosition == 1){
             videoUrl = "https://vidsrc-embed.ru/embed/movie?tmdb="+videoId;
         }else if(videoPosition == 2) {
-            videoUrl = "https://vidrock.net/movie/" + videoId + "";
+            videoUrl = "https://vidrock.net/movie/"+ videoId;
         }
-
 //        Log.d("VideoUrl","value: "+videoUrl);
         binding.rotate.setOnClickListener(view -> rotateScreen());
 
-        if(!isNetworkAvailable()){
+        initStart();
+    }
+    private void initStart(){
+        if (!isNetworkAvailable()) {
             binding.webView.setVisibility(View.GONE);
-            Toast.makeText(getApplicationContext(),"Please check your internet and try again",Toast.LENGTH_SHORT).show();
-        }else{
+            Toast.makeText(getApplicationContext(), "Please check your internet and try again", Toast.LENGTH_SHORT).show();
+        } else {
             setupWebView(videoUrl);
             binding.webView.setVisibility(View.VISIBLE);
         }
     }
-
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
@@ -117,28 +119,23 @@ public class VideoWebviewActivity extends AppCompatActivity {
 
             private boolean handleUrlLoading(WebView view, String url) {
                 String videoDomain = "";
-                if (videoPosition == 1){
+                if (videoPosition == 1) {
                     videoDomain = "vidsrc-embed.ru";
-                }else if(videoPosition == 2) {
+                } else if (videoPosition == 2) {
                     videoDomain = "vidrock.net";
                 }
-
-                if (url.contains(videoDomain) || url.contains("dl.vidsrc.vip")) {
-                    if(videoPosition ==2 ){
-                        String downloadUrl ="https://dl.vidsrc.vip/movie/"+videoId;
-                        Intent intent = new Intent(getApplicationContext(), DownloadWebview.class);
-                        intent.putExtra("DownloadUrl",downloadUrl);
-                        intent.putExtra("title",title);
-                        startActivity(intent);
-                        if(!isNetworkAvailable()){
-                            binding.webView.setVisibility(View.GONE);
-                            Toast.makeText(getApplicationContext(),"Please check your internet and try again",Toast.LENGTH_SHORT).show();
-                        }else{
-                            setupWebView(videoUrl);
-                            binding.webView.setVisibility(View.VISIBLE);
-                        }
-                    }
+                if (url.contains(videoDomain)) {
                     return false;
+                } else if (url.contains("dl.vidsrc.vip")) {
+//                    Log.d("VideOUrl", "value: " + url);
+                    if (videoPosition == 2) {
+                        String downloadUrl = "https://dl.vidsrc.vip/movie/" + videoId;
+                        Intent intent = new Intent(getApplicationContext(), DownloadWebview.class);
+                        intent.putExtra("DownloadUrl", downloadUrl);
+                        intent.putExtra("title", title);
+                        startActivity(intent);
+                    }
+                    return true;
                 } else {
                     view.stopLoading();
                     return true;
@@ -159,7 +156,6 @@ public class VideoWebviewActivity extends AppCompatActivity {
                 if(hud !=null){
                     hud.show();
                 }
-
                 super.onPageStarted(view, url, favicon);
 
             }
@@ -184,25 +180,32 @@ public class VideoWebviewActivity extends AppCompatActivity {
             binding.rlTitle.setVisibility(View.VISIBLE);
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            isVisible = false;
-        }else{
-            if(!isVisible){
-                binding.rlTitle.setBackgroundColor(Color.parseColor("#000000"));
-                final Handler handler = new Handler(Looper.getMainLooper());
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        binding.rlTitle.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+        }else {
+            binding.rlTitle.setBackgroundColor(Color.parseColor("#000000"));
+            final Handler handler = new Handler(Looper.getMainLooper());
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    binding.rlTitle.setVisibility(View.GONE);
                     }
                 }, 300);
-            }
-
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
     }
 
+    @Override
+    protected void onPause() {
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            isRotate = false;
+            binding.rlTitle.setVisibility(View.VISIBLE);
+            binding.rlTitle.setBackgroundColor(Color.parseColor("#313647"));
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+        super.onPause();
+    }
 
     @Override
     public void onBackPressed() {

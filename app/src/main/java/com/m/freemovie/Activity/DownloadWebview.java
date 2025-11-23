@@ -93,6 +93,7 @@ public class DownloadWebview extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                blockAds(view);
                 if (hud != null && hud.isShowing()) {
                     hud.dismiss();
                 }
@@ -135,6 +136,31 @@ public class DownloadWebview extends AppCompatActivity {
         binding.webView.loadUrl(videoUrl);
 
     }
+
+    private void blockAds(WebView view) {
+        String tags = view.getUrl();
+        StringBuilder sb = new StringBuilder();
+        sb.append("javascript: ");
+        String[] allTag = tags.split(",");
+        for (String tag : allTag) {
+            String adTag = tag;
+            if (adTag.trim().length() > 0) {
+                adTag = adTag.trim();
+                if (adTag.contains("#")) {
+                    adTag = adTag.substring(adTag.indexOf("#") + 1);
+                    sb.append("document.getElementById(\'").append(adTag).append("\').remove();");
+
+                } else if (adTag.contains(".")) {
+                    adTag = adTag.substring(adTag.indexOf(".") + 1);
+                    sb.append("var esc=document.getElementsByClassName(\'").append(adTag).append("\');for (var i = esc.length - 1; i >= 0; i--){esc[i].remove();};");
+
+                } else {
+                    sb.append("var esc=document.getElementsByTagName(\'").append(adTag).append("\');for (var i = esc.length - 1; i >= 0; i--){esc[i].remove();};");
+                }
+            }
+        }
+    }
+
     private File getLocalFile() {
         String safeTitle = title.replaceAll("[^a-zA-Z0-9.-]", "_");
         String fileName = safeTitle + ".mp4";
