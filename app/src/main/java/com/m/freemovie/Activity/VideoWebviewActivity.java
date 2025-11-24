@@ -153,7 +153,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
                 if (!url.contains(videoDomain)) {
                     view.stopLoading();
                 }
-                if(hud !=null){
+                if(hud !=null && !hud.isShowing()){
                     hud.show();
                 }
                 super.onPageStarted(view, url, favicon);
@@ -192,6 +192,18 @@ public class VideoWebviewActivity extends AppCompatActivity {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            View decorView = getWindow().getDecorView();
+            int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            decorView.setSystemUiVisibility(flags);
+            setCutoutMode(WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES);
+        }
+    }
+    private void setCutoutMode(int mode) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            WindowManager.LayoutParams params = getWindow().getAttributes();
+            params.layoutInDisplayCutoutMode = mode;
+            getWindow().setAttributes(params);
         }
     }
 
@@ -203,6 +215,9 @@ public class VideoWebviewActivity extends AppCompatActivity {
             binding.rlTitle.setBackgroundColor(Color.parseColor("#313647"));
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+            setCutoutMode(WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT);
         }
         super.onPause();
     }
@@ -214,6 +229,9 @@ public class VideoWebviewActivity extends AppCompatActivity {
             binding.rlTitle.setBackgroundColor(Color.parseColor("#313647"));
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+            setCutoutMode(WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT);
             isRotate = false;
         } else {
             super.onBackPressed();

@@ -26,7 +26,7 @@ import java.util.List;
 
 public class Download_videoActivity extends AppCompatActivity implements FileAdapter.DeleteListerner {
     private ImageView btn_back5;
-    private LinearLayout ll_bg;
+    private LinearLayout ll_bg,ll_empty;
     private RecyclerView file_recycler;
     private FileAdapter fileAdapter;
     private ImageView delete_btn;
@@ -50,6 +50,7 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
         btn_back5 = findViewById(R.id.btn_back5);
         ll_bg = findViewById(R.id.ll_bg);
         file_recycler = findViewById(R.id.file_recycler);
+        ll_empty = findViewById(R.id.ll_empty);
     }
 
     private void setupTheme() {
@@ -70,7 +71,12 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
         delete_btn.setVisibility(videoFiles.isEmpty() ? View.GONE : View.VISIBLE);
 
         if (!videoFiles.isEmpty()) {
+            file_recycler.setVisibility(View.VISIBLE);
+            ll_empty.setVisibility(View.GONE);
             file_recycler.post(() -> file_recycler.scrollToPosition(0));
+        }else{
+            file_recycler.setVisibility(View.GONE);
+            ll_empty.setVisibility(View.VISIBLE);
         }
     }
 
@@ -153,5 +159,7 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
         delete_btn.setImageResource(R.mipmap.delete_white);
         fileAdapter.showcheckBox(false);
         delete_now.setVisibility(View.GONE);
+        file_recycler.setVisibility(View.GONE);
+        ll_empty.setVisibility(View.VISIBLE);
     }
 }

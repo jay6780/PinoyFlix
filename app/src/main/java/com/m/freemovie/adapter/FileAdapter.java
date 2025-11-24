@@ -68,13 +68,13 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         VideoFile data = videoFileList.get(position);
-        holder.file_name.setText(data.title);
+        holder.file_name.setText(data.getName());
         holder.checkBox.setVisibility(isShow ? View.VISIBLE : View.GONE);
 
         Glide.with(context)
                 .asBitmap()
                 .centerCrop()
-                .load(data.path)
+                .load(data.getPath())
                 .into(holder.image_thumb);
 
         holder.checkBox.setOnCheckedChangeListener(null);
@@ -106,8 +106,9 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
 
             } else {
                 Intent viewFullvideo = new Intent(context, FullViewVideoActivity.class);
-                viewFullvideo.putExtra("videoURl", data.path);
+                viewFullvideo.putExtra("videoURl", data.getPath());
                 viewFullvideo.putExtra("isVisible", false);
+                viewFullvideo.putExtra("videoTitle",data.getName());
                 context.startActivity(viewFullvideo);
             }
         });

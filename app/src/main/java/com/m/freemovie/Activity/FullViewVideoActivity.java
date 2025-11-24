@@ -1,17 +1,16 @@
 package com.m.freemovie.Activity;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -24,16 +23,19 @@ import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.views.FullScreenVideoView;
 
-public class FullViewVideoActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
+
+public class FullViewVideoActivity extends AppCompatActivity implements View.OnClickListener {
     private ImageView btn_back;
     private FullScreenVideoView mPlayerView;
-    private TextView time;
+    private TextView time,title;
     private String path;
     private SeekBar seekBar;
     private Handler mSeekHandler = new Handler(Looper.getMainLooper());
     private Runnable mSeekRunnable;
     private int mDuration = 0;
-    private ImageView btn_play, download;
+    private ImageView btn_play, download,ten_negative,ten_positive;
     private KProgressHUD hud;
     private boolean isSeekBarTracking = false;
     private boolean isVisible;
@@ -43,7 +45,8 @@ public class FullViewVideoActivity extends AppCompatActivity {
     private boolean ispause = false;
     private boolean isContinue = false;
     private ImageView rotate;
-    private boolean isRotate = false;
+    private  Animation animRotate;
+    private String videoTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,14 +58,17 @@ public class FullViewVideoActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
         );
         path = getIntent().getStringExtra("videoURl");
+        videoTitle = getIntent().getStringExtra("videoTitle");
 //        Log.d("VideoUrl", "value: " + path);
+        Log.d("videoTitle", "value: " + videoTitle);
         btn_back = findViewById(R.id.btn_back);
         mPlayerView = findViewById(R.id.player);
         btn_play = findViewById(R.id.btn_play);
-        btn_back.setOnClickListener(view -> onBackPressed());
-        btn_play.setOnClickListener(view -> play_pause());
         seekBar = findViewById(R.id.seekBar);
+        title = findViewById(R.id.title);
         download = findViewById(R.id.download);
+        ten_negative = findViewById(R.id.ten_negative);
+        ten_positive = findViewById(R.id.ten_positive);
         full_wide = findViewById(R.id.full_wide);
         full_wide.setImageResource(R.mipmap.full_screen);
         relative_video = findViewById(R.id.relative_video);
@@ -72,22 +78,23 @@ public class FullViewVideoActivity extends AppCompatActivity {
         btn_back = findViewById(R.id.btn_back);
         isVisible = getIntent().getBooleanExtra("isVisible", false);
         download.setVisibility(isVisible ? View.VISIBLE : View.GONE);
-        rotate.setOnClickListener(v -> rotateScreen());
-        videoOrientation(true);
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
         full_wide.setVisibility(View.GONE);
-        full_wide.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("WrongConstant")
-            @Override
-            public void onClick(View view) {
-                isCrop = !isCrop;
-                seekBar.setVisibility(View.INVISIBLE);
-                time.setVisibility(View.INVISIBLE);
-                videoOrientation(isCrop);
-            }
-        });
+        initLandScape();
+        title.setVisibility(videoTitle !=null? View.VISIBLE : View.GONE);
+        title.setText(videoTitle !=null ? videoTitle : "video.mp4");
+        List<View> viewList = new ArrayList<>();
+        viewList.add(full_wide);
+        viewList.add(mPlayerView);
+        viewList.add(ten_negative);
+        viewList.add(ten_positive);
+        viewList.add(btn_back);
+        viewList.add(btn_play);
+        for(View v : viewList){
+            v.setOnClickListener(this);
+        }
 
         if (path != null) {
             initShow();
@@ -108,6 +115,9 @@ public class FullViewVideoActivity extends AppCompatActivity {
                                 seekBar.setVisibility(View.INVISIBLE);
                                 full_wide.setVisibility(View.INVISIBLE);
                                 rotate.setVisibility(View.INVISIBLE);
+                                title.setVisibility(View.INVISIBLE);
+                                ten_positive.setVisibility(View.INVISIBLE);
+                                ten_negative.setVisibility(View.INVISIBLE);
                                 setupSeekBar();
                                 startSeekUpdates();
                                 if(mPlayerView.isPlaying()){
@@ -152,72 +162,74 @@ public class FullViewVideoActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.btn_back:
+                onBackPressed();
+                break;
+            case R.id.btn_play:
+                play_pause();
+                break;
+            case R.id.player:
+                clickPause();
+                break;
+            case R.id.full_wide:
+                isCrop = !isCrop;
+                seekBar.setVisibility(View.INVISIBLE);
+                time.setVisibility(View.INVISIBLE);
+                break;
+            case R.id.ten_negative:
+                if (mPlayerView == null || mDuration == 0) return;
+                animRotate = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_image_negative_360);
+                ten_negative.startAnimation(animRotate);
+
+                int negativePosition = mPlayerView.getCurrentPosition();
+                int negative_newPosition = negativePosition - 10000;
+                if (negative_newPosition < 0) negative_newPosition = 0;
+
+                mPlayerView.seekTo(negative_newPosition);
+                seekBar.setProgress(negative_newPosition);
+                startSeekUpdates();
+                break;
+            case R.id.ten_positive:
+                if (mPlayerView == null || mDuration == 0) return;
+                animRotate = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_image_positive_360);
+                ten_positive.startAnimation(animRotate);
+
+                int positivePosition = mPlayerView.getCurrentPosition();
+                int positive_newPosition = positivePosition + 10000;
+                if (positive_newPosition > mDuration) positive_newPosition = mDuration;
+                mPlayerView.seekTo(positive_newPosition);
+                seekBar.setProgress(positive_newPosition);
+                startSeekUpdates();
+                break;
+        }
+
+    }
+
+    private void initLandScape() {
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        relative_video.setLayoutParams(params);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        View decorView = getWindow().getDecorView();
+        int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+        decorView.setSystemUiVisibility(flags);
+        setCutoutMode(WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES);
+    }
+
+    private void setCutoutMode(int mode) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            WindowManager.LayoutParams params = getWindow().getAttributes();
+            params.layoutInDisplayCutoutMode = mode;
+            getWindow().setAttributes(params);
+        }
+    }
+
     private void initShow() {
         hud.show();
-    }
-
-    private void rotateScreen() {
-        isRotate = !isRotate;
-        if (isRotate) {
-            isCrop = false;
-            ((Activity) mPlayerView.getContext()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        } else {
-            isCrop = true;
-            ((Activity) mPlayerView.getContext()).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
-    }
-
-    @SuppressLint("WrongConstant")
-    private void videoOrientation(boolean isCrop){
-        int marginPx = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                20,
-                getResources().getDisplayMetrics()
-        );
-
-        if(isCrop) {
-            full_wide.setImageResource(R.mipmap.full_screen);
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            WindowManager.LayoutParams lp = getWindow().getAttributes();
-            getWindow().setFlags(
-                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-            );
-            View decorView = getWindow().getDecorView();
-            decorView.setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
-                            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-                            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
-                            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            );
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                lp.layoutInDisplayCutoutMode =
-                        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
-            }
-            getWindow().setAttributes(lp);
-            setButtonMargins(25);
-            Toast.makeText(getApplicationContext(), "Crop", Toast.LENGTH_SHORT).show();
-
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.MATCH_PARENT,
-                    RelativeLayout.LayoutParams.MATCH_PARENT
-            );
-            params.setMargins(marginPx, marginPx, marginPx, marginPx);
-            params.addRule(RelativeLayout.ABOVE, time.getId());
-            relative_video.setLayoutParams(params);
-            RelativeLayout.LayoutParams imageParams = new RelativeLayout.LayoutParams(
-                    marginPx,
-                    marginPx
-            );
-            imageParams.setMargins(0, 0, 10, 20);
-            imageParams.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE);
-            imageParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-            full_wide.setImageResource(R.mipmap.full_screen);
-            full_wide.setLayoutParams(imageParams);
-        }
     }
 
     private void play_pause() {
@@ -232,21 +244,6 @@ public class FullViewVideoActivity extends AppCompatActivity {
         }
     }
 
-    private void setButtonMargins(int marginTopDp) {
-        int marginTopPx = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                marginTopDp,
-                getResources().getDisplayMetrics()
-        );
-
-        RelativeLayout.LayoutParams backParams = (RelativeLayout.LayoutParams) btn_back.getLayoutParams();
-        backParams.topMargin = marginTopPx;
-        btn_back.setLayoutParams(backParams);
-
-        RelativeLayout.LayoutParams downloadParams = (RelativeLayout.LayoutParams) download.getLayoutParams();
-        downloadParams.topMargin = marginTopPx;
-        download.setLayoutParams(downloadParams);
-    }
 
     private void clickPause() {
         ispause = !ispause;
@@ -254,6 +251,9 @@ public class FullViewVideoActivity extends AppCompatActivity {
             time.setVisibility(View.VISIBLE);
             seekBar.setVisibility(View.VISIBLE);
             rotate.setVisibility(View.VISIBLE);
+            ten_positive.setVisibility(View.VISIBLE);
+            ten_negative.setVisibility(View.VISIBLE);
+            title.setVisibility(View.VISIBLE);
             if(isVisible){
                 download.setVisibility(View.VISIBLE);
             }
@@ -269,6 +269,10 @@ public class FullViewVideoActivity extends AppCompatActivity {
                     rotate.setVisibility(View.INVISIBLE);
                     seekBar.setVisibility(View.INVISIBLE);
                     btn_play.setVisibility(View.INVISIBLE);
+                    title.setVisibility(View.INVISIBLE);
+                    ten_positive.setVisibility(View.INVISIBLE);
+                    ten_negative.setVisibility(View.INVISIBLE);
+                    ispause = false;
                 }
             }, 5000);
         } else {
@@ -279,6 +283,11 @@ public class FullViewVideoActivity extends AppCompatActivity {
             seekBar.setVisibility(View.INVISIBLE);
             rotate.setVisibility(View.INVISIBLE);
             btn_play.setVisibility(View.INVISIBLE);
+            ten_positive.setVisibility(View.INVISIBLE);
+            ten_negative.setVisibility(View.INVISIBLE);
+            title.setVisibility(View.INVISIBLE);
+            ten_positive.setVisibility(View.INVISIBLE);
+            ten_negative.setVisibility(View.INVISIBLE);
             startSeekUpdates();
         }
     }
@@ -318,12 +327,9 @@ public class FullViewVideoActivity extends AppCompatActivity {
                     seekBar.setVisibility(View.INVISIBLE);
                     time.setVisibility(View.INVISIBLE);
                     rotate.setVisibility(View.INVISIBLE);
-
-                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-                    if(isCrop) {
-                        params.addRule(RelativeLayout.ABOVE, time.getId());
-                    }
-                    relative_video.setLayoutParams(params);
+                    ten_positive.setVisibility(View.INVISIBLE);
+                    ten_negative.setVisibility(View.INVISIBLE);
+                    title.setVisibility(View.INVISIBLE);
                     startSeekUpdates();
                 }
             }
@@ -406,4 +412,5 @@ public class FullViewVideoActivity extends AppCompatActivity {
         super.onBackPressed();
         finish();
     }
+
 }

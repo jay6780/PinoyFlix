@@ -1,6 +1,7 @@
 package com.m.freemovie.Activity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -179,12 +180,24 @@ public class DownloadWebview extends AppCompatActivity {
     }
     private void downloadVideo(String videoUrl) {
         isFirstTask = true;
+        File outputFile = getLocalFile();
         downloadHud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.ANNULAR_DETERMINATE)
                 .setLabel("Downloading...")
                 .setMaxProgress(100)
-                .setCancellable(false);
+                .setCancellable(true);
         downloadHud.show();
+
+        downloadHud.setCancellable(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                isFirstTask = false;
+                if (outputFile.exists()) {
+                    outputFile.delete();
+                    Toast.makeText(getApplicationContext(), "Download cancelled", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
         new Thread(() -> {
             FileOutputStream outputStream = null;
@@ -199,7 +212,7 @@ public class DownloadWebview extends AppCompatActivity {
                 connection.setReadTimeout(60000);
                 connection.setInstanceFollowRedirects(true);
 
-                File outputFile = getLocalFile();
+
                 long existingLength = 0;
                 if (outputFile.exists()) {
                     existingLength = outputFile.length();
@@ -229,16 +242,17 @@ public class DownloadWebview extends AppCompatActivity {
                     long totalBytesRead = existingLength;
 
                     while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        // Check if download was cancelled
+                        if (!isFirstTask) {
+                            break;
+                        }
+
                         outputStream.write(buffer, 0, bytesRead);
                         totalBytesRead += bytesRead;
 
                         if (contentLength > 0) {
                             final int progress = (int) ((totalBytesRead * 100) / contentLength);
                             runOnUiThread(() -> downloadHud.setProgress(progress));
-                        }
-
-                        if (!isFirstTask) {
-                            break;
                         }
                     }
 
@@ -259,7 +273,6 @@ public class DownloadWebview extends AppCompatActivity {
                     }
 
                 } else {
-//                    Log.e("Download", "Server returned HTTP " + responseCode);
                     runOnUiThread(() -> {
                         if (downloadHud != null && downloadHud.isShowing()) {
                             downloadHud.dismiss();
@@ -271,15 +284,18 @@ public class DownloadWebview extends AppCompatActivity {
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
-                runOnUiThread(() -> {
-                    if (downloadHud != null && downloadHud.isShowing()) {
-                        downloadHud.dismiss();
-                    }
-                    isFirstTask = false;
-                    Toast.makeText(getApplicationContext(),
-                            "Download Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+                // Only show error if not cancelled
+                if (isFirstTask) {
+                    e.printStackTrace();
+                    runOnUiThread(() -> {
+                        if (downloadHud != null && downloadHud.isShowing()) {
+                            downloadHud.dismiss();
+                        }
+                        isFirstTask = false;
+                        Toast.makeText(getApplicationContext(),
+                                "Download Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+                }
             } finally {
                 try {
                     if (outputStream != null) outputStream.close();

@@ -6,20 +6,18 @@
 
     <ImageView
         android:id="@+id/btn_back"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
         android:elevation="20dp"
         android:src="@mipmap/icon_backwhite" />
-
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="25dp"
         android:layout_toRightOf="@+id/btn_back"
         android:textSize="18sp"
         android:elevation="20dp"/>
@@ -75,7 +73,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:padding="5dp"
+            android:padding="7dp"
             android:layout_marginEnd="50dp"
             android:layout_toLeftOf="@+id/btn_play"
             android:adjustViewBounds="true"
@@ -84,11 +82,11 @@
 
         <ImageView
             android:id="@+id/btn_play"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_centerInParent="true"
             android:adjustViewBounds="true"
-            android:padding="5dp"
+            android:padding="7dp"
             android:visibility="invisible" />
 
         <ImageView
@@ -96,14 +94,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:padding="5dp"
+            android:padding="7dp"
             android:layout_marginStart="50dp"
             android:layout_toRightOf="@+id/btn_play"
             android:adjustViewBounds="true"
             android:src="@mipmap/ten_rotate"
             android:visibility="invisible" />
-
-
     </RelativeLayout>
 
 
