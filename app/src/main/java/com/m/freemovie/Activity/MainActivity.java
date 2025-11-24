@@ -1,6 +1,7 @@
 package com.m.freemovie.Activity;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -8,6 +9,7 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -34,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
         initializeBottomNavigation();
+        initPermission();
         ll_file = findViewById(R.id.ll_file);
         btn_back5 = findViewById(R.id.btn_back5);
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -60,7 +63,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onDrawerStateChanged(int newState) {}
         });
     }
-
+    private void initPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE,android.Manifest.permission.READ_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
+    }
     private void initializeBottomNavigation() {
         binding.nav.add(new MeowBottomNavigation.Model(1, R.drawable.ic_baseline_search_24));
         binding.nav.add(new MeowBottomNavigation.Model(2, R.drawable.ic_baseline_home_24));

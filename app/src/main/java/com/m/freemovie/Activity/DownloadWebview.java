@@ -86,9 +86,7 @@ public class DownloadWebview extends AppCompatActivity {
             @Override
             public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-                if (!hud.isShowing()) {
-                    hud.show();
-                }
+                hud.show();
             }
 
             @Override

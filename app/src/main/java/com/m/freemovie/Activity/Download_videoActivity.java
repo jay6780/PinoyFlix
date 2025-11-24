@@ -3,6 +3,7 @@ package com.m.freemovie.Activity;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -15,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.adapter.FileAdapter;
 import com.m.freemovie.fileUtils.FilesExtractor;
@@ -24,7 +26,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Download_videoActivity extends AppCompatActivity implements FileAdapter.DeleteListerner {
+public class Download_videoActivity extends AppCompatActivity implements FileAdapter.DeleteListerner, FileAdapter.MoveFileListerner {
     private ImageView btn_back5;
     private LinearLayout ll_bg,ll_empty;
     private RecyclerView file_recycler;
@@ -32,6 +34,7 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
     private ImageView delete_btn;
     private boolean isdelete = false;
     private TextView delete_now;
+    private KProgressHUD hud;
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +69,7 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
         ArrayList<VideoFile> videoFiles = filesExtractor.listVideos();
         videoFiles.sort((v1, v2) -> Long.compare(v2.getLastModified(), v1.getLastModified()));
         file_recycler.setLayoutManager(new GridLayoutManager(this, 2));
-        fileAdapter = new FileAdapter(this, videoFiles, this);
+        fileAdapter = new FileAdapter(this, videoFiles, this,this);
         file_recycler.setAdapter(fileAdapter);
         delete_btn.setVisibility(videoFiles.isEmpty() ? View.GONE : View.VISIBLE);
 
@@ -161,5 +164,26 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
         delete_now.setVisibility(View.GONE);
         file_recycler.setVisibility(View.GONE);
         ll_empty.setVisibility(View.VISIBLE);
+    }
+    private boolean isSuccess = false;
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public void movefiles(boolean isMove) {
+        isSuccess = isMove;
+        hud = KProgressHUD.create(this)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setLabel("Moving files...");
+        hud.show();
+        if(isSuccess) {
+            Toast.makeText(getApplicationContext(), "Move success", Toast.LENGTH_SHORT).show();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (hud != null && hud.isShowing()) {
+                        hud.dismiss();
+                    }
+                    setupFileList();
+                    isSuccess = false;
+                }},500);}
     }
 }

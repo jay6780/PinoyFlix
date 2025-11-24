@@ -369,44 +369,17 @@ public class FullViewVideoActivity extends AppCompatActivity implements View.OnC
     @Override
     protected void onPause() {
         super.onPause();
-        if (mPlayerView != null) {
-            mPlayerView.pause();
-            btn_play.setVisibility(View.VISIBLE);
-        }
-        if (mSeekRunnable != null) {
-            mSeekHandler.removeCallbacks(mSeekRunnable);
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         if (mPlayerView != null && mPlayerView.isPlaying()) {
-            startSeekUpdates();
-        }
-    }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mSeekRunnable != null) {
-            mSeekHandler.removeCallbacks(mSeekRunnable);
-        }
-        if (mPlayerView != null) {
             mPlayerView.stopPlayback();
         }
-
         if (mSeekRunnable != null) {
             mSeekHandler.removeCallbacks(mSeekRunnable);
-        }
-        if (mPlayerView != null) {
-            mPlayerView.stopPlayback();
         }
     }
 
     @Override
     public void onBackPressed() {
         if (mPlayerView != null && mPlayerView.isPlaying()) {
-            mPlayerView.pause();
             mPlayerView.stopPlayback();
         }
         super.onBackPressed();

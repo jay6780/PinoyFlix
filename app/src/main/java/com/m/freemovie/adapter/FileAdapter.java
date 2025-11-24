@@ -2,20 +2,27 @@ package com.m.freemovie.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.m.freemovie.Activity.Download_videoActivity;
 import com.m.freemovie.Activity.FullViewVideoActivity;
 import com.m.freemovie.R;
+import com.m.freemovie.Utils.MoveFileUtils;
+import com.m.freemovie.fileUtils.FilesExtractor;
 import com.m.freemovie.fileUtils.VideoFile;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +31,13 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
     private Context context;
     private boolean isShow = false;
     private DeleteListerner deleteListerner;
-
+    private MoveFileListerner moveFileListerner;
     public interface DeleteListerner {
         void deletefiles(List<VideoFile> videoFiles);
+    }
+
+    public interface MoveFileListerner {
+        void movefiles(boolean isMove);
     }
 
     public void showcheckBox(boolean isdelete) {
@@ -52,10 +63,11 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         }
     }
 
-    public FileAdapter(Context context, List<VideoFile> videoFileList, DeleteListerner deleteListerner) {
+    public FileAdapter(Context context, List<VideoFile> videoFileList, DeleteListerner deleteListerner,MoveFileListerner moveFileListerner) {
         this.context = context;
         this.videoFileList = videoFileList;
         this.deleteListerner = deleteListerner;
+        this.moveFileListerner = moveFileListerner;
     }
 
     @Override
@@ -91,6 +103,31 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
             deleteListerner.deletefiles(selectedFiles);
         });
 
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                AlertDialog alertDialog = new AlertDialog.Builder(context, R.style.AlertDialogTheme)
+                        .setTitle("Move video")
+                        .setMessage("Are you sure you want to move " + data.getName())
+                        .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                            moveFiles(data);
+                        })
+                        .setNegativeButton(android.R.string.no, (dialog, which) -> {
+                            dialog.dismiss();
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .create();
+
+                alertDialog.setOnShowListener(dialog -> {
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK);
+                    alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
+                });
+
+                alertDialog.show();
+                return true;
+            }
+        });
+
         holder.itemView.setOnClickListener(view -> {
             if (isShow) {
                 boolean newState = !data.isSelected();
@@ -112,6 +149,14 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
                 context.startActivity(viewFullvideo);
             }
         });
+    }
+
+    private void moveFiles(VideoFile data) {
+        File filetoMove = new File(data.path);
+        if ((filetoMove.exists())) {
+            new MoveFileUtils(context, filetoMove, "Free Movies");
+            moveFileListerner.movefiles(true);
+        }
     }
 
     public void updateVideoFiles(List<VideoFile> newVideoFiles) {
