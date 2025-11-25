@@ -53,7 +53,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
-
+        hud.show();
         binding.titleName.setText(title);
 
         if(videoId == null){
@@ -162,9 +162,6 @@ public class VideoWebviewActivity extends AppCompatActivity {
                 if (!url.contains(videoDomain)) {
                     view.stopLoading();
                 }
-                if(hud !=null && !hud.isShowing()){
-                    hud.show();
-                }
                 super.onPageStarted(view, url, favicon);
 
             }
@@ -173,7 +170,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 if(hud !=null && hud.isShowing()){
-                hud.dismiss();
+                     hud.dismiss();
                 }
 
             }
