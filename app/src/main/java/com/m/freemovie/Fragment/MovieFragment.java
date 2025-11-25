@@ -226,21 +226,25 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
             case R.id.tv_popular:
                 intent = new Intent(getContext(), ViewAllActivity.class);
                 intent.putExtra("position",1);
+                intent.putExtra("isTvSeries",false);
                 startActivity(intent);
                 break;
             case R.id.tv_topRated:
                 intent = new Intent(getContext(), ViewAllActivity.class);
                 intent.putExtra("position",2);
+                intent.putExtra("isTvSeries",false);
                 startActivity(intent);
                 break;
             case R.id.tv_nowPlaying:
                 intent = new Intent(getContext(), ViewAllActivity.class);
                 intent.putExtra("position",3);
+                intent.putExtra("isTvSeries",false);
                 startActivity(intent);
                 break;
             case R.id.tv_upComing:
                 intent = new Intent(getContext(), ViewAllActivity.class);
                 intent.putExtra("position",4);
+                intent.putExtra("isTvSeries",false);
                 startActivity(intent);
                 break;
         }

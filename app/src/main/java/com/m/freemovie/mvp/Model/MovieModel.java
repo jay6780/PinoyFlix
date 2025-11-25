@@ -134,4 +134,29 @@ public class MovieModel {
                     public void onComplete() {}
                 });
     }
+
+    public static void getSearchSeries(String apiKey, String query, int page, final Callback<MovieBean> callback) {
+        String authHeader = "Bearer " + apiKey;
+        NetworkingUtils.getMovieData()
+                .getSearchSeries("en-US", authHeader, query, page, false)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<MovieBean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {}
+
+                    @Override
+                    public void onNext(MovieBean data) {
+                        callback.returnResult(data);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.returnError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {}
+                });
+    }
 }

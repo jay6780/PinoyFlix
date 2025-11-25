@@ -44,4 +44,34 @@ public class SearchPresenter implements SearchContract.Presenter {
             }
         });
     }
+
+
+    @Override
+    public void getSearchSeries(String apiKey, String query, int page) {
+        view.showLoading();
+        MovieModel.getSearchSeries(apiKey, query, page, new Callback<MovieBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(MovieBean apiBean) {
+                view.hideLoading();
+                view.getSearchSeriesResponse(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
 }

@@ -207,14 +207,12 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                         intent.putExtra("title", title);
                         intent.putExtra("videoPosition", 1);
                         intent.putExtra("videoId", id);
-                        intent.putExtra("isTv", isTv);
                         break;
                     case 1:
                         intent = new Intent(Details_activity.this, VideoWebviewActivity.class);
                         intent.putExtra("title", title);
                         intent.putExtra("videoPosition", 2);
                         intent.putExtra("videoId", id);
-                        intent.putExtra("isTv", isTv);
                         break;
                 }
                 startActivity(intent);
@@ -354,6 +352,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
         List<DetailTvBean.SeasonsBean> specialsSeasons = new ArrayList<>();
         for (DetailTvBean.SeasonsBean seasonsBean : seasons) {
             if (!"Specials".equals(seasonsBean.getName())) {
+                seasonsBean.setId(id);
                 specialsSeasons.add(seasonsBean);
             }
         }

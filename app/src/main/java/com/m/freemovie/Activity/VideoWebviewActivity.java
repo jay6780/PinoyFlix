@@ -35,8 +35,9 @@ public class VideoWebviewActivity extends AppCompatActivity {
     private String videoId;
     private KProgressHUD hud;
     private ActivityVideoWebviewBinding binding;
-    private int videoPosition;
+    private int videoPosition,epNumber;
     private String videoUrl;
+    private int seasonNum;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +48,8 @@ public class VideoWebviewActivity extends AppCompatActivity {
         title = getIntent().getStringExtra("title");
         videoId = getIntent().getStringExtra("videoId");
         videoPosition = getIntent().getIntExtra("videoPosition",0);
+        seasonNum = getIntent().getIntExtra("seasonNum",1);
+        epNumber = getIntent().getIntExtra("epNumber",0);
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
@@ -62,6 +65,8 @@ public class VideoWebviewActivity extends AppCompatActivity {
             videoUrl = "https://vidsrc-embed.ru/embed/movie?tmdb="+videoId;
         }else if(videoPosition == 2) {
             videoUrl = "https://vidrock.net/movie/"+ videoId;
+        }else if (videoPosition == 3){
+            videoUrl = "https://vidrock.net/tv/"+videoId+"/"+seasonNum+"/"+epNumber;
         }
 //        Log.d("VideoUrl","value: "+videoUrl);
         binding.rotate.setOnClickListener(view -> rotateScreen());
@@ -123,14 +128,16 @@ public class VideoWebviewActivity extends AppCompatActivity {
                     videoDomain = "vidsrc-embed.ru";
                 } else if (videoPosition == 2) {
                     videoDomain = "vidrock.net";
+                }else if(videoPosition == 3){
+                    videoDomain = "vidrock.net";
                 }
                 if (url.contains(videoDomain)) {
                     return false;
                 } else if (url.contains("dl.vidsrc.vip")) {
-//                    Log.d("VideOUrl", "value: " + url);
+                    Log.d("VideOUrl", "value: " + url);
                     if (videoPosition == 2) {
                         String downloadUrl = "https://dl.vidsrc.vip/movie/" + videoId;
-                        Intent intent = new Intent(getApplicationContext(), DownloadWebview.class);
+                        Intent intent  = new Intent(getApplicationContext(), DownloadWebview.class);
                         intent.putExtra("DownloadUrl", downloadUrl);
                         intent.putExtra("title", title);
                         startActivity(intent);
@@ -148,6 +155,8 @@ public class VideoWebviewActivity extends AppCompatActivity {
                 if (videoPosition == 1){
                     videoDomain = "vidsrc-embed.ru";
                 }else if(videoPosition == 2) {
+                    videoDomain = "vidrock.net";
+                }else if(videoPosition == 3){
                     videoDomain = "vidrock.net";
                 }
                 if (!url.contains(videoDomain)) {

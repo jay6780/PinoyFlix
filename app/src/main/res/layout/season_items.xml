@@ -9,10 +9,10 @@
     <ImageView
         android:id="@+id/iv_thumb"
         android:layout_width="90dp"
-        android:scaleType="fitXY"
+        android:layout_height="115dp"
         android:layout_marginTop="2dp"
         android:layout_marginBottom="2dp"
-        android:layout_height="115dp"/>
+        android:scaleType="fitXY" />
 
 
     <LinearLayout

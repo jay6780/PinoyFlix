@@ -668,7 +668,7 @@ public class DetailTvBean {
 
         private String air_date;
         private int episode_count;
-        private int id;
+        private String id;
         private String name;
         private String overview;
         private String poster_path;
@@ -691,11 +691,11 @@ public class DetailTvBean {
             this.episode_count = episode_count;
         }
 
-        public int getId() {
+        public String getId() {
             return id;
         }
 
-        public void setId(int id) {
+        public void setId(String id) {
             this.id = id;
         }
 

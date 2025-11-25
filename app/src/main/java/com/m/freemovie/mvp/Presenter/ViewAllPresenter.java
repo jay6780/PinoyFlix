@@ -4,8 +4,8 @@ import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
+import com.m.freemovie.mvp.ClassBean.TvSeriesBean;
 import com.m.freemovie.mvp.Contract.MovieAllContract;
-import com.m.freemovie.mvp.Model.MovieModel;
 import com.m.freemovie.mvp.Model.ViewAllModel;
 
 import java.io.IOException;
@@ -36,6 +36,32 @@ public class ViewAllPresenter implements MovieAllContract.Presenter {
             public void returnResult(MovieBean apiBean) {
                 view.hideLoading();
                 view.getViewAllResponse(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getSeriesAll(String apiKey, int page,int positon) {
+        view.showLoading();
+        ViewAllModel.getListSeries(apiKey,page,positon,new Callback<TvSeriesBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(TvSeriesBean apiBean) {
+                view.hideLoading();
+                view.getTvSeriesResponse(apiBean);
             }
 
             @Override

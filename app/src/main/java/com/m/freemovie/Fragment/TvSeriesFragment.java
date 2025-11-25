@@ -20,7 +20,6 @@ import com.m.freemovie.Activity.ViewAllActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.adapter.TvSeriesAdapter;
 import com.m.freemovie.databinding.FragmentTvseriesBinding;
-import com.m.freemovie.mvp.ClassBean.MovieBean;
 import com.m.freemovie.mvp.ClassBean.TvSeriesBean;
 import com.m.freemovie.mvp.Contract.TvSeriesContract;
 import com.m.freemovie.mvp.Presenter.TvSeriesPresenter;
@@ -224,21 +223,25 @@ public class TvSeriesFragment extends Fragment implements TvSeriesContract.View,
             case R.id.tv_today:
                 intent = new Intent(getContext(), ViewAllActivity.class);
                 intent.putExtra("position",1);
+                intent.putExtra("isTvSeries",true);
                 startActivity(intent);
                 break;
             case R.id.tv_air:
                 intent = new Intent(getContext(), ViewAllActivity.class);
                 intent.putExtra("position",2);
+                intent.putExtra("isTvSeries",true);
                 startActivity(intent);
                 break;
             case R.id.tv_popular:
                 intent = new Intent(getContext(), ViewAllActivity.class);
                 intent.putExtra("position",3);
+                intent.putExtra("isTvSeries",true);
                 startActivity(intent);
                 break;
             case R.id.tv_topRated:
                 intent = new Intent(getContext(), ViewAllActivity.class);
                 intent.putExtra("position",4);
+                intent.putExtra("isTvSeries",true);
                 startActivity(intent);
                 break;
         }

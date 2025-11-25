@@ -9,9 +9,11 @@ public interface SearchContract {
         void showError(String error);
         void hideLoading();
         void getSearchResponse(MovieBean movieBean);
+        void getSearchSeriesResponse(MovieBean movieBean);
     }
 
     interface Presenter {
         void getSearchQuery(String apiKey,String query,int page);
+        void getSearchSeries(String apiKey,String query,int page);
     }
 }

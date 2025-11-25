@@ -82,6 +82,7 @@ public class MovieBean {
         private double vote_average;
         private int vote_count;
         private List<Integer> genre_ids;
+        private String original_name;
 
         public boolean isAdult() {
             return adult;
@@ -201,6 +202,14 @@ public class MovieBean {
 
         public void setGenre_ids(List<Integer> genre_ids) {
             this.genre_ids = genre_ids;
+        }
+
+        public String getOriginal_name() {
+            return original_name;
+        }
+
+        public void setOriginal_name(String original_name) {
+            this.original_name = original_name;
         }
     }
 }

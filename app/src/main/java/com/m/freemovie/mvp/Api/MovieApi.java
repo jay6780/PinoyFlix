@@ -92,4 +92,12 @@ public interface MovieApi {
             @Query("query") String query,
             @Query("page") int page,
             @Query("include_adult") boolean includeAdult);
+
+    @GET("search/tv")
+    Observable<MovieBean> getSearchSeries(
+            @Query("language") String language,
+            @Header("Authorization") String authHeader,
+            @Query("query") String query,
+            @Query("page") int page,
+            @Query("include_adult") boolean includeAdult);
 }

@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +20,14 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.m.freemovie.R;
 import com.m.freemovie.adapter.ViewAllAdapter;
+import com.m.freemovie.mvp.ClassBean.FreeMovieEvent;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Contract.SearchContract;
 import com.m.freemovie.mvp.Presenter.SearchPresenter;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +44,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     private ImageView btn_send;
     private List<MovieBean.ResultsBean> movieLists = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
+    private boolean isTvSeries = false;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -80,6 +87,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
                 return max;
             }
         });
+        et_search.setHint("Enter movie name");
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -89,6 +97,25 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         });
 
         return view;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void changeSearch(FreeMovieEvent event) {
+        this.isTvSeries = event.isChangeSearch();
+//        Log.d("isTvSeries","value: "+isTvSeries);
+        et_search.setHint(isTvSeries? "Enter series name":"Enter movie name");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     private void refresh(){
@@ -101,7 +128,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         }
         String query = et_search.getText().toString().trim();
         if(query.isEmpty()){
-            Toast.makeText(getContext(),"Please enter movie name",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(),isTvSeries?"Please enter Tv series" :"Please enter movie name" ,Toast.LENGTH_SHORT).show();
             return;
         }
         isNomore = false;
@@ -118,7 +145,12 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     }
 
     private void loadSearch() {
-        searchPresenter.getSearchQuery(getString(R.string.key),lastQuery,page);
+        if(isTvSeries){
+            searchPresenter.getSearchSeries(getString(R.string.key),lastQuery,page);
+        }else{
+            searchPresenter.getSearchQuery(getString(R.string.key),lastQuery,page);
+        }
+
     }
 
     @Override
@@ -157,6 +189,21 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     }
 
     @Override
+    public void getSearchSeriesResponse(MovieBean movieBean) {
+        if(movieBean!=null && movieBean.getResults() != null){
+            isLoading = false;
+            if(!movieBean.getResults().isEmpty()){
+                movieLists.addAll(movieBean.getResults());
+                movieAdapter.setNewData(movieLists);
+            }else{
+                Toast.makeText(getContext(),"No more Tv series",Toast.LENGTH_SHORT).show();
+                isLoading = false;
+                isNomore = true;
+            }
+        }
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btn_send:
@@ -175,7 +222,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         }
         String query = et_search.getText().toString().trim();
         if(query.isEmpty()){
-            Toast.makeText(getContext(),"Please enter movie name",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(),isTvSeries?"Please enter Tv series" :"Please enter movie name" ,Toast.LENGTH_SHORT).show();
             return;
         }
         lastQuery = query;
@@ -183,6 +230,13 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         page = 1;
         movieLists.clear();
         movieAdapter.setNewData(new ArrayList<>());
-        searchPresenter.getSearchQuery(getString(R.string.key),query,page);
+        if(isTvSeries){
+            searchPresenter.getSearchSeries(getString(R.string.key),query,page);
+            movieAdapter.isTvSeries(true);
+        }else{
+            searchPresenter.getSearchQuery(getString(R.string.key),query,page);
+            movieAdapter.isTvSeries(false);
+        }
+
     }
 }

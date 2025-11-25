@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.m.freemovie.Fragment.BookmarkFragment;
-import com.m.freemovie.Fragment.MovieFragment;
+import com.m.freemovie.Fragment.HomeFragment;
 import com.m.freemovie.Fragment.SearchFragment;
 import com.m.freemovie.R;
 import com.m.freemovie.databinding.ActivityMainBinding;
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         binding.nav.add(new MeowBottomNavigation.Model(3, R.drawable.unbooked));
 
         Fragment searchFragment = new SearchFragment();
-        Fragment movieFragment = new MovieFragment();
+        Fragment movieFragment = new HomeFragment();
         Fragment bookmarkFragment = new BookmarkFragment();
 
         getSupportFragmentManager()

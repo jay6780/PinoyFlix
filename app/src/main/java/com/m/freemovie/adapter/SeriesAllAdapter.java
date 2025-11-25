@@ -12,17 +12,18 @@ import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
+import com.m.freemovie.mvp.ClassBean.TvSeriesBean;
 
-public class ViewAllAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, BaseViewHolder> {
+public class SeriesAllAdapter extends BaseQuickAdapter<TvSeriesBean.ResultsBean, BaseViewHolder> {
 
-    public ViewAllAdapter() {
+    public SeriesAllAdapter() {
         super(R.layout.view_all_item);
     }
     private boolean isTv = false;
 
     @Override
 
-    protected void convert(BaseViewHolder helper, MovieBean.ResultsBean item) {
+    protected void convert(BaseViewHolder helper, TvSeriesBean.ResultsBean item) {
         TextView tv_title  = helper.getView(R.id.tv_title);
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
 
@@ -35,7 +36,7 @@ public class ViewAllAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Base
                 .placeholder(R.drawable.noimage)
                 .into(iv_thumb);
 
-        tv_title.setText(isTv? item.getOriginal_name() : item.getTitle());
+        tv_title.setText(isTv? item.getOriginal_name() : item.getOriginal_name());
 
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
