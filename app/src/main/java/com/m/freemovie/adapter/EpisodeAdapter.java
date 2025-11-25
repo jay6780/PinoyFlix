@@ -41,7 +41,6 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
                 intent.putExtra("seasonNum", item.getSeasonNum());
                 intent.putExtra("videoPosition", 3);
                 intent.putExtra("videoId", item.getId());
-                intent.putExtra("seasonNum", item.getTitle());
                 intent.putExtra("epNumber", item.getEpisodeNum());
                 mContext.startActivity(intent);
             }

@@ -31,7 +31,7 @@ public class SeasonListActivity extends AppCompatActivity {
         thumbImage = getIntent().getStringExtra("thumbImage");
         episodeCount = getIntent().getIntExtra("episodeCount",0);
         seasonNum = getIntent().getIntExtra("seasonNum",0);
-//        Log.d("EpisodeCount","value: "+episodeCount);
+//        Log.d("seasonNum","value: "+seasonNum);
         binding.title.setText(title);
         binding.btnBack5.setImageResource(R.mipmap.back_white);
         binding.btnBack5.setOnClickListener(view ->onBackPressed());
