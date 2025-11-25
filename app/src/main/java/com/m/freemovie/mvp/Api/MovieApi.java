@@ -1,7 +1,9 @@
 package com.m.freemovie.mvp.Api;
 
 import com.m.freemovie.mvp.ClassBean.DetailBean;
+import com.m.freemovie.mvp.ClassBean.DetailTvBean;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
+import com.m.freemovie.mvp.ClassBean.TvSeriesBean;
 
 import io.reactivex.rxjava3.core.Observable;
 import retrofit2.http.GET;
@@ -36,6 +38,44 @@ public interface MovieApi {
             @Query("language") String language,
             @Header("Authorization") String authHeader,
             @Query("page") int page);
+
+
+    //tv series
+    @GET("tv/airing_today")
+    Observable<TvSeriesBean> getTodayTv(
+            @Query("language") String language,
+            @Header("Authorization") String authHeader,
+            @Query("page") int page);
+
+    @GET("tv/on_the_air")
+    Observable<TvSeriesBean> getOnAiringTv(
+            @Query("language") String language,
+            @Header("Authorization") String authHeader,
+            @Query("page") int page);
+
+
+    @GET("tv/popular")
+    Observable<TvSeriesBean> getPopularTv(
+            @Query("language") String language,
+            @Header("Authorization") String authHeader,
+            @Query("page") int page);
+
+
+
+    @GET("tv/top_rated")
+    Observable<TvSeriesBean> getTopRatedTv(
+            @Query("language") String language,
+            @Header("Authorization") String authHeader,
+            @Query("page") int page);
+
+
+
+
+    @GET("tv/{series_id}")
+    Observable<DetailTvBean> geTvDetails(
+            @Path("series_id") String id,
+            @Query("language") String language,
+            @Header("Authorization") String authHeader);
 
 
     @GET("movie/{id}")

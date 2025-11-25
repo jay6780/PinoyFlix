@@ -5,21 +5,27 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.WindowUtils;
+import com.m.freemovie.adapter.SeasonsAdapter;
 import com.m.freemovie.databinding.ActivityDetailsBinding;
+import com.m.freemovie.databinding.ActivityDetailsSeriesBinding;
 import com.m.freemovie.mvp.ClassBean.DetailBean;
+import com.m.freemovie.mvp.ClassBean.DetailTvBean;
 import com.m.freemovie.mvp.Contract.DetailContract;
 import com.m.freemovie.mvp.Presenter.DetailPresenter;
 
@@ -40,26 +46,51 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     private SPUtils spUtils;
     private String lastImage;
     private ActivityDetailsBinding binding;
+    private ActivityDetailsSeriesBinding seriesBinding;
+    private SeasonsAdapter seasonsAdapter;
+    private boolean isTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityDetailsBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+
+        isTv = getIntent().getBooleanExtra("isTv", false);
+        id = getIntent().getStringExtra("id");
+//        Log.d("IsTv", "value: " + isTv + " id: " + id);
+
+        if (isTv) {
+            seriesBinding = ActivityDetailsSeriesBinding.inflate(getLayoutInflater());
+            setContentView(seriesBinding.getRoot());
+        } else {
+            binding = ActivityDetailsBinding.inflate(getLayoutInflater());
+            setContentView(binding.getRoot());
+        }
+
         getSupportActionBar().hide();
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
 
         detailPresenter = new DetailPresenter(this);
-        id = getIntent().getStringExtra("id");
-        binding.ivBack.setOnClickListener(view -> finish());
-        binding.ivBook.setOnClickListener(view -> savedBook());
-        detailPresenter.getDetail(id,getString(R.string.key));
-        binding.tvWatch.setOnClickListener(view -> watchNow());
-        spUtils = SPUtils.getInstance("detailPrefs");
 
+        if (isTv) {
+            seriesBinding.ivBack.setOnClickListener(view -> finish());
+            seriesBinding.ivBook.setOnClickListener(view -> savedBook());
+            seriesBinding.tvWatch.setOnClickListener(view -> watchNow());
+        } else {
+            binding.ivBack.setOnClickListener(view -> finish());
+            binding.ivBook.setOnClickListener(view -> savedBook());
+            binding.tvWatch.setOnClickListener(view -> watchNow());
+        }
+
+        spUtils = SPUtils.getInstance("detailPrefs");
         setImageData(id);
+
+        if (isTv) {
+            detailPresenter.getTvDetail(id, getString(R.string.key));
+        } else {
+            detailPresenter.getDetail(id, getString(R.string.key));
+        }
     }
 
     private void savedBook() {
@@ -80,14 +111,22 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                     break;
                 }
             }
-            binding.ivBook.setImageResource(R.drawable.unbooked);
+            if (isTv) {
+                seriesBinding.ivBook.setImageResource(R.drawable.unbooked);
+            } else {
+                binding.ivBook.setImageResource(R.drawable.unbooked);
+            }
         } else {
             String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
-            DetailBean details = new DetailBean(id, timestamp,lastImage,title);
+            DetailBean details = new DetailBean(id, timestamp, lastImage, title);
             details.setVideoId(id);
             details.setTimeStamp(timestamp);
             detailBeans.add(0, details);
-            binding.ivBook.setImageResource(R.drawable.booked);
+            if (isTv) {
+                seriesBinding.ivBook.setImageResource(R.drawable.booked);
+            } else {
+                binding.ivBook.setImageResource(R.drawable.booked);
+            }
         }
 
         saveDetailData(detailBeans);
@@ -119,7 +158,11 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                 break;
             }
         }
-        binding.ivBook.setImageResource(isBookmarked ? R.drawable.booked : R.drawable.unbooked);
+        if (isTv) {
+            seriesBinding.ivBook.setImageResource(isBookmarked ? R.drawable.booked : R.drawable.unbooked);
+        } else {
+            binding.ivBook.setImageResource(isBookmarked ? R.drawable.booked : R.drawable.unbooked);
+        }
     }
 
     private List<DetailBean> getDetailData() {
@@ -143,7 +186,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     }
 
     private void watchNow() {
-        String[] videoPlayer = {"Player 1","Player 2 (With download)"};
+        String[] videoPlayer = {"Player 1", "Player 2 (With download)"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         TextView titleView = new TextView(this);
@@ -158,18 +201,20 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Intent intent = null;
-                switch (which){
+                switch (which) {
                     case 0:
                         intent = new Intent(Details_activity.this, VideoWebviewActivity.class);
-                        intent.putExtra("title",title);
-                        intent.putExtra("videoPosition",1);
-                        intent.putExtra("videoId",id);
+                        intent.putExtra("title", title);
+                        intent.putExtra("videoPosition", 1);
+                        intent.putExtra("videoId", id);
+                        intent.putExtra("isTv", isTv);
                         break;
                     case 1:
                         intent = new Intent(Details_activity.this, VideoWebviewActivity.class);
-                        intent.putExtra("title",title);
-                        intent.putExtra("videoPosition",2);
-                        intent.putExtra("videoId",id);
+                        intent.putExtra("title", title);
+                        intent.putExtra("videoPosition", 2);
+                        intent.putExtra("videoId", id);
+                        intent.putExtra("isTv", isTv);
                         break;
                 }
                 startActivity(intent);
@@ -185,7 +230,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
     @Override
     public void showError(String error) {
-
+        Log.d("ErrorData", "val: " + error);
     }
 
     @Override
@@ -201,10 +246,9 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
         new WindowUtils(this);
     }
 
-
     @Override
     public void getDetailResponse(DetailBean movieBean) {
-        if (movieBean != null && !isFinishing() && !isDestroyed()) {
+        if (movieBean != null && !isFinishing() && !isDestroyed() && !isTv) {
             String posterPath = "https://image.tmdb.org/t/p/w500/" + movieBean.getPoster_path();
             this.lastImage = posterPath;
             binding.tvTitle.setText(movieBean.getOriginal_title());
@@ -212,7 +256,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
             StringBuilder sb = new StringBuilder();
             List<String> names = new ArrayList<>();
 
-            for(DetailBean.GenresBean moviename : movieBean.getGenres()){
+            for (DetailBean.GenresBean moviename : movieBean.getGenres()) {
                 names.add(moviename.getName());
             }
             for (int i = 0; i < names.size(); i++) {
@@ -243,6 +287,73 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                     .into(binding.ivBig);
 
             setImageData(id);
+        }
+    }
+
+    @Override
+    public void getTvDetailResponse(DetailTvBean detailTvBean) {
+        if (detailTvBean != null && !isFinishing() && !isDestroyed() && isTv) {
+            String posterPath = "https://image.tmdb.org/t/p/w500/" + detailTvBean.getPoster_path();
+            this.lastImage = posterPath;
+            seriesBinding.tvTitle.setText(detailTvBean.getLast_episode_to_air().getName());
+
+            StringBuilder sb = new StringBuilder();
+            List<String> names = new ArrayList<>();
+
+            for (DetailTvBean.GenresBean moviename : detailTvBean.getGenres()) {
+                names.add(moviename.getName());
+            }
+            for (int i = 0; i < names.size(); i++) {
+                sb.append(names.get(i));
+                if (i < detailTvBean.getGenres().size() - 1) {
+                    sb.append(", ");
+                }
+            }
+
+            seriesBinding.tvInfo.setText(sb.toString());
+            seriesBinding.tvDate.setText(detailTvBean.getLast_episode_to_air().getAir_date());
+            seriesBinding.tvRate.setText(String.format("%.2f", detailTvBean.getLast_episode_to_air().getVote_average()));
+            seriesBinding.language.setText(detailTvBean.getOrigin_country().get(0));
+            seriesBinding.tvVote.setText(String.valueOf(detailTvBean.getLast_episode_to_air().getVote_count()));
+            seriesBinding.tvDescription.setText(detailTvBean.getLast_episode_to_air().getOverview());
+            seriesBinding.overView.setVisibility(detailTvBean.getLast_episode_to_air().getOverview().isEmpty() ? View.GONE : View.VISIBLE);
+            seriesBinding.tvOriginal.setText(detailTvBean.getLast_episode_to_air().getName());
+            this.title = detailTvBean.getLast_episode_to_air().getName();
+
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+            params.addRule(RelativeLayout.BELOW, seriesBinding.card.getId());
+            params.setMargins(30, 0, 0, 0);
+            seriesBinding.orig.setLayoutParams(params);
+
+            seriesBinding.status.setVisibility(View.GONE);
+            seriesBinding.tvStatus.setVisibility(View.GONE);
+            seriesBinding.revenue.setVisibility(View.GONE);
+            seriesBinding.tvRevenue.setVisibility(View.GONE);
+            seriesBinding.ivBook.setVisibility(View.GONE);
+            seriesBinding.tvWatch.setVisibility(View.GONE);
+
+            seasonRecycler(detailTvBean.getSeasons());
+
+            Glide.with(this)
+                    .asBitmap()
+                    .load(posterPath)
+                    .into(seriesBinding.ivSmallimg);
+            Glide.with(this)
+                    .asBitmap()
+                    .load(posterPath)
+                    .into(seriesBinding.ivBig);
+
+            setImageData(id);
+        }
+    }
+
+    private void seasonRecycler(List<DetailTvBean.SeasonsBean> seasons) {
+        if (isTv) {
+            seriesBinding.rvSeasons.setVisibility(View.VISIBLE);
+            seasonsAdapter = new SeasonsAdapter();
+            seriesBinding.rvSeasons.setLayoutManager(new LinearLayoutManager(this));
+            seriesBinding.rvSeasons.setAdapter(seasonsAdapter);
+            seasonsAdapter.setNewData(seasons);
         }
     }
 

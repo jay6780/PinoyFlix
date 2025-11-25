@@ -11,13 +11,14 @@ import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
+import com.m.freemovie.mvp.ClassBean.TvSeriesBean;
 
-public class MovieAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, BaseViewHolder> {
-    public MovieAdapter() {
+public class TvSeriesAdapter extends BaseQuickAdapter<TvSeriesBean.ResultsBean, BaseViewHolder> {
+    public TvSeriesAdapter() {
         super(R.layout.movie_item);
     }
     @Override
-    protected void convert(BaseViewHolder helper, MovieBean.ResultsBean item) {
+    protected void convert(BaseViewHolder helper, TvSeriesBean.ResultsBean item) {
         TextView tv_title  = helper.getView(R.id.tv_title);
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
 
@@ -29,14 +30,14 @@ public class MovieAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, BaseVi
                 load(posterPath)
                 .into(iv_thumb);
 
-        tv_title.setText(item.getTitle());
+        tv_title.setText(item.getOriginal_name());
 
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, Details_activity.class);
                 intent.putExtra("id",item.getId());
-                intent.putExtra("isTv",false);
+                intent.putExtra("isTv",true);
                 mContext.startActivity(intent);
             }
         });

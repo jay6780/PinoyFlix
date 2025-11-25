@@ -41,8 +41,8 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/rl_back"
         android:layout_above="@+id/tv_watch"
+        android:layout_below="@+id/rl_back"
         android:layout_marginBottom="5dp">
 
         <RelativeLayout
@@ -84,8 +84,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tv_title"
                 android:layout_marginTop="20dp"
-                android:textSize="20sp"
-                android:layout_toRightOf="@+id/card" />
+                android:layout_toRightOf="@+id/card"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/tv_info"
@@ -296,6 +296,14 @@
                 android:textColor="#7C7C7C"
                 android:textSize="14sp"
                 android:textStyle="bold" />
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_seasons"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/tv_description"
+                android:visibility="gone" />
         </RelativeLayout>
     </androidx.core.widget.NestedScrollView>
 
