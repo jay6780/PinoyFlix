@@ -346,15 +346,19 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
             setImageData(id);
         }
     }
-
     private void seasonRecycler(List<DetailTvBean.SeasonsBean> seasons) {
-        if (isTv) {
-            seriesBinding.rvSeasons.setVisibility(View.VISIBLE);
-            seasonsAdapter = new SeasonsAdapter();
-            seriesBinding.rvSeasons.setLayoutManager(new LinearLayoutManager(this));
-            seriesBinding.rvSeasons.setAdapter(seasonsAdapter);
-            seasonsAdapter.setNewData(seasons);
+        seriesBinding.rvSeasons.setVisibility(View.VISIBLE);
+        seasonsAdapter = new SeasonsAdapter();
+        seriesBinding.rvSeasons.setLayoutManager(new LinearLayoutManager(this));
+        seriesBinding.rvSeasons.setAdapter(seasonsAdapter);
+        List<DetailTvBean.SeasonsBean> specialsSeasons = new ArrayList<>();
+        for (DetailTvBean.SeasonsBean seasonsBean : seasons) {
+            if (!"Specials".equals(seasonsBean.getName())) {
+                specialsSeasons.add(seasonsBean);
+            }
         }
+
+        seasonsAdapter.setNewData(specialsSeasons);
     }
 
     @Override
