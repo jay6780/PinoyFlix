@@ -250,4 +250,5 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
         }
 
     }
+
 }

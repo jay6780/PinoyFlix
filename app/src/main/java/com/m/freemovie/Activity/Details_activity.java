@@ -3,12 +3,9 @@ package com.m.freemovie.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -19,7 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.bumptech.glide.Glide;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
-import com.m.freemovie.Utils.SPUtils;
+import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.SeasonsAdapter;
 import com.m.freemovie.databinding.ActivityDetailsBinding;
@@ -28,9 +25,6 @@ import com.m.freemovie.mvp.ClassBean.DetailBean;
 import com.m.freemovie.mvp.ClassBean.DetailTvBean;
 import com.m.freemovie.mvp.Contract.DetailContract;
 import com.m.freemovie.mvp.Presenter.DetailPresenter;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,12 +37,12 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     private String id;
     private KProgressHUD hud;
     private String title;
-    private SPUtils spUtils;
     private String lastImage;
     private ActivityDetailsBinding binding;
     private ActivityDetailsSeriesBinding seriesBinding;
     private SeasonsAdapter seasonsAdapter;
     private boolean isTv;
+    private BookmarkDbHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +66,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                 .setLabel("Please wait");
 
         detailPresenter = new DetailPresenter(this);
+        dbHelper = new BookmarkDbHelper(this);
 
         if (isTv) {
             seriesBinding.ivBack.setOnClickListener(view -> finish());
@@ -83,7 +78,6 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
             binding.tvWatch.setOnClickListener(view -> watchNow());
         }
 
-        spUtils = SPUtils.getInstance("detailPrefs");
         setImageData(id);
 
         if (isTv) {
@@ -94,95 +88,21 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     }
 
     private void savedBook() {
-        List<DetailBean> detailBeans = getDetailData();
-
-        boolean alreadyBookmarked = false;
-        for (DetailBean bean : detailBeans) {
-            if (bean.getVideoId() != null && bean.getVideoId().equals(id)) {
-                alreadyBookmarked = true;
-                break;
-            }
-        }
-
-        if (alreadyBookmarked) {
-            for (int i = 0; i < detailBeans.size(); i++) {
-                if (detailBeans.get(i).getVideoId().equals(id)) {
-                    detailBeans.remove(i);
-                    break;
-                }
-            }
-            if (isTv) {
-                seriesBinding.ivBook.setImageResource(R.drawable.unbooked);
-            } else {
-                binding.ivBook.setImageResource(R.drawable.unbooked);
-            }
-        } else {
-            String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
-            DetailBean details = new DetailBean(id, timestamp, lastImage, title);
-            details.setVideoId(id);
-            details.setTimeStamp(timestamp);
-            detailBeans.add(0, details);
-            if (isTv) {
-                seriesBinding.ivBook.setImageResource(R.drawable.booked);
-            } else {
-                binding.ivBook.setImageResource(R.drawable.booked);
-            }
-        }
-
-        saveDetailData(detailBeans);
-    }
-
-    private void saveDetailData(List<DetailBean> detailBeans) {
-        try {
-            JSONArray jsonArray = new JSONArray();
-            for (DetailBean detail : detailBeans) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("videoId", detail.getVideoId());
-                jsonObject.put("timeStamp", detail.getTimeStamp());
-                jsonObject.put("tempImage", detail.getTempImage());
-                jsonObject.put("movieName", detail.getMovieName());
-                jsonArray.put(jsonObject);
-            }
-            spUtils.put("detailPrefs", jsonArray.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
+        DetailBean details = new DetailBean(id, timestamp, lastImage, title);
+        details.setVideoId(id);
+        details.setTimeStamp(timestamp);
+        dbHelper.toggleBookmark(details, isTv);
+        setImageData(id);
     }
 
     private void setImageData(String videoId) {
-        boolean isBookmarked = false;
-        List<DetailBean> detailBeans = getDetailData();
-        for (DetailBean bean : detailBeans) {
-            if (bean.getVideoId() != null && bean.getVideoId().equals(videoId)) {
-                isBookmarked = true;
-                break;
-            }
-        }
+        boolean isBookmarked = dbHelper.isBookmarked(videoId);
         if (isTv) {
             seriesBinding.ivBook.setImageResource(isBookmarked ? R.drawable.booked : R.drawable.unbooked);
         } else {
             binding.ivBook.setImageResource(isBookmarked ? R.drawable.booked : R.drawable.unbooked);
         }
-    }
-
-    private List<DetailBean> getDetailData() {
-        String detailJson = spUtils.getString("detailPrefs", "[]");
-        List<DetailBean> detailBeans = new ArrayList<>();
-        try {
-            JSONArray jsonArray = new JSONArray(detailJson);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                DetailBean details = new DetailBean();
-                details.setVideoId(jsonObject.getString("videoId"));
-                details.setTimeStamp(jsonObject.getString("timeStamp"));
-                details.setTempImage(jsonObject.getString("tempImage"));
-                details.setMovieName(jsonObject.getString("movieName"));
-                detailBeans.add(details);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return detailBeans;
     }
 
     private void watchNow() {
@@ -327,7 +247,6 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
             seriesBinding.tvStatus.setVisibility(View.GONE);
             seriesBinding.revenue.setVisibility(View.GONE);
             seriesBinding.tvRevenue.setVisibility(View.GONE);
-            seriesBinding.ivBook.setVisibility(View.GONE);
             seriesBinding.tvWatch.setVisibility(View.GONE);
 
             seasonRecycler(detailTvBean.getSeasons());
@@ -371,5 +290,12 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (dbHelper != null) {
+            dbHelper.close();
+        }
     }
 }

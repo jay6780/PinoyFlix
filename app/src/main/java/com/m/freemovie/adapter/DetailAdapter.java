@@ -12,11 +12,9 @@ import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
 import com.m.freemovie.mvp.ClassBean.DetailBean;
-import com.m.freemovie.mvp.ClassBean.MovieBean;
-
-import java.util.List;
 
 public class DetailAdapter extends BaseQuickAdapter<DetailBean, BaseViewHolder> {
+    private boolean isTv = false;
 
     public DetailAdapter() {
         super(R.layout.view_all_item);
@@ -40,9 +38,14 @@ public class DetailAdapter extends BaseQuickAdapter<DetailBean, BaseViewHolder> 
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, Details_activity.class);
                 intent.putExtra("id",item.getVideoId());
+                intent.putExtra("isTv",isTv);
                 mContext.startActivity(intent);
             }
         });
     }
 
+    public void isTv(boolean isTvSeries) {
+        this.isTv = isTvSeries;
+        notifyDataSetChanged();
+    }
 }

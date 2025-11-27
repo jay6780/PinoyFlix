@@ -50,47 +50,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
         isTvSeries = getIntent().getBooleanExtra("isTvSeries",false);
         findViewById(R.id.btn_back).setOnClickListener(view -> finish());
         viewAllPresenter = new ViewAllPresenter(this);
-        if(isTvSeries) {
-            switch (position) {
-                case 1:
-                    binding.titleName.setText("Airing today");
-                    viewAllPresenter.getSeriesAll(getString(R.string.key), page, 1);
-                    break;
-                case 2:
-                    binding.titleName.setText("On the Air");
-                    viewAllPresenter.getSeriesAll(getString(R.string.key), page, 2);
-                    break;
-                case 3:
-                    binding.titleName.setText("Now Playing");
-                    viewAllPresenter.getSeriesAll(getString(R.string.key), page, 3);
-                    break;
-                case 4:
-                    binding.titleName.setText("Top Rated");
-                    viewAllPresenter.getSeriesAll(getString(R.string.key), page, 4);
-                    break;
-            }
-        }else{
-
-            switch (position){
-                case 1:
-                    binding.titleName.setText("Popular Movies");
-                    viewAllPresenter.getViewAll(getString(R.string.key),page,1);
-                    break;
-                case 2:
-                    binding.titleName.setText("Top Rated Movies");
-                    viewAllPresenter.getViewAll(getString(R.string.key),page,2);
-                    break;
-                case 3:
-                    binding.titleName.setText("Now Playing");
-                    viewAllPresenter.getViewAll(getString(R.string.key),page,3);
-                    break;
-                case 4:
-                    binding.titleName.setText("Upcoming Movies");
-                    viewAllPresenter.getViewAll(getString(R.string.key),page,4);
-                    break;
-            }
-        }
-
+        initStartApi();
         if(isTvSeries){
             binding.rvViewAll.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
             seriesAllAdapter = new SeriesAllAdapter();
@@ -130,7 +90,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
                             isLoading = true;
                             isReload = false;
                             page++;
-                            loadMore();
+                            loadMovie();
                         }
                     }
 
@@ -170,6 +130,49 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
 
     }
 
+    private void initStartApi() {
+        if(isTvSeries) {
+            switch (position) {
+                case 1:
+                    binding.titleName.setText("Airing today");
+                    viewAllPresenter.getSeriesAll(getString(R.string.key), page, 1);
+                    break;
+                case 2:
+                    binding.titleName.setText("On the Air");
+                    viewAllPresenter.getSeriesAll(getString(R.string.key), page, 2);
+                    break;
+                case 3:
+                    binding.titleName.setText("Popular");
+                    viewAllPresenter.getSeriesAll(getString(R.string.key), page, 3);
+                    break;
+                case 4:
+                    binding.titleName.setText("Top Rated");
+                    viewAllPresenter.getSeriesAll(getString(R.string.key), page, 4);
+                    break;
+            }
+        }else{
+            switch (position){
+                case 1:
+                    binding.titleName.setText("Popular Movies");
+                    viewAllPresenter.getViewAll(getString(R.string.key),page,1);
+                    break;
+                case 2:
+                    binding.titleName.setText("Top Rated Movies");
+                    viewAllPresenter.getViewAll(getString(R.string.key),page,2);
+                    break;
+                case 3:
+                    binding.titleName.setText("Now Playing");
+                    viewAllPresenter.getViewAll(getString(R.string.key),page,3);
+                    break;
+                case 4:
+                    binding.titleName.setText("Upcoming Movies");
+                    viewAllPresenter.getViewAll(getString(R.string.key),page,4);
+                    break;
+            }
+        }
+
+    }
+
     private void loadSeries() {
         switch (position){
             case 1:
@@ -187,7 +190,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
         }
     }
 
-    private void loadMore() {
+    private void loadMovie() {
             switch (position){
                 case 1:
                     viewAllPresenter.getViewAll(getString(R.string.key),page,1);

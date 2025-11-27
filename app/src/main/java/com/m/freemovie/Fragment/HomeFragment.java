@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
 
 import com.m.freemovie.R;
 import com.m.freemovie.databinding.FragmentHomeBinding;
@@ -16,7 +17,7 @@ import org.greenrobot.eventbus.EventBus;
 
 public class HomeFragment extends Fragment implements View.OnClickListener {
     private FragmentHomeBinding binding;
-    private Fragment movieFragment, TvSeriesFragment;
+    private Fragment movieFragment, tvSeriesFragment;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -25,13 +26,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         binding.tvMovies.setOnClickListener(this);
         binding.tvSeries.setOnClickListener(this);
         movieFragment = new MovieFragment();
-        TvSeriesFragment = new TvSeriesFragment();
+        tvSeriesFragment = new TvSeriesFragment();
 
         getChildFragmentManager()
                 .beginTransaction()
                 .add(R.id.fragment_container, movieFragment, "movie")
-                .add(R.id.fragment_container, TvSeriesFragment, "tvSeries")
-                .hide(TvSeriesFragment)
+                .add(R.id.fragment_container, tvSeriesFragment, "tvSeries")
+                .hide(tvSeriesFragment)
                 .commit();
         binding.tvMovies.setTextColor(getResources().getColor(R.color.SecondColor));
         binding.tvSeries.setTextColor(getResources().getColor(R.color.white));
@@ -46,13 +47,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         switch (view.getId()) {
             case R.id.tv_movies:
                 transaction.show(movieFragment);
-                transaction.hide(TvSeriesFragment);
+                transaction.hide(tvSeriesFragment);
                 binding.tvMovies.setTextColor(getResources().getColor(R.color.SecondColor));
                 binding.tvSeries.setTextColor(getResources().getColor(R.color.white));
                 EventBus.getDefault().post(new FreeMovieEvent(false));
                 break;
             case R.id.tv_series:
-                transaction.show(TvSeriesFragment);
+                transaction.show(tvSeriesFragment);
                 transaction.hide(movieFragment);
                 binding.tvSeries.setTextColor(getResources().getColor(R.color.SecondColor));
                 binding.tvMovies.setTextColor(getResources().getColor(R.color.white));

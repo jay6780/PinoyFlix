@@ -19,6 +19,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.m.freemovie.Activity.ViewAllActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.adapter.TvSeriesAdapter;
+import com.m.freemovie.adapter.TveSeriesNowAdapter;
 import com.m.freemovie.databinding.FragmentTvseriesBinding;
 import com.m.freemovie.mvp.ClassBean.TvSeriesBean;
 import com.m.freemovie.mvp.Contract.TvSeriesContract;
@@ -31,7 +32,8 @@ public class TvSeriesFragment extends Fragment implements TvSeriesContract.View,
     private FragmentTvseriesBinding binding;
     private TvSeriesPresenter tvSeriesPresenter;
     private int page = 1;
-    private TvSeriesAdapter todayTvAdapter,airingTvAdapter,popularTvAdapter,topRatedTvAdapter;
+    private TvSeriesAdapter todayTvAdapter,airingTvAdapter,topRatedTvAdapter;
+    private TveSeriesNowAdapter tveSeriesNowAdapter;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -96,11 +98,12 @@ public class TvSeriesFragment extends Fragment implements TvSeriesContract.View,
         List<TvSeriesAdapter> tvSeriesAdapterList = new ArrayList<>();
         tvSeriesAdapterList.add(todayTvAdapter);
         tvSeriesAdapterList.add(airingTvAdapter);
-        tvSeriesAdapterList.add(popularTvAdapter);
         tvSeriesAdapterList.add(topRatedTvAdapter);
         for(TvSeriesAdapter tvSeriesAdapter : tvSeriesAdapterList){
             tvSeriesAdapter.setNewData(new ArrayList<>());
         }
+
+        tveSeriesNowAdapter.setNewData(new ArrayList<>());
 
         List<RecyclerView> recyclerViewList = new ArrayList<>();
         recyclerViewList.add(binding.rvToday);
@@ -132,8 +135,8 @@ public class TvSeriesFragment extends Fragment implements TvSeriesContract.View,
         airingTvAdapter = new TvSeriesAdapter();
         binding.rvAir.setAdapter(airingTvAdapter);
 
-        popularTvAdapter = new TvSeriesAdapter();
-        binding.rvPopular.setAdapter(popularTvAdapter);
+        tveSeriesNowAdapter = new TveSeriesNowAdapter();
+        binding.rvPopular.setAdapter(tveSeriesNowAdapter);
 
         topRatedTvAdapter = new TvSeriesAdapter();
         binding.rvTopRated.setAdapter(topRatedTvAdapter);
@@ -193,7 +196,7 @@ public class TvSeriesFragment extends Fragment implements TvSeriesContract.View,
             if(!tvSeriesBean.getResults().isEmpty()) {
                 binding.rvPopular.setVisibility(View.VISIBLE);
                 binding.rlPopular.setVisibility(View.VISIBLE);
-                popularTvAdapter.setNewData(tvSeriesBean.getResults());
+                tveSeriesNowAdapter.setNewData(tvSeriesBean.getResults());
             }
         }else{
             binding.rvPopular.setVisibility(View.GONE);

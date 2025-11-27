@@ -8,28 +8,31 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import com.m.freemovie.Utils.SPUtils;
+import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.adapter.DetailAdapter;
 import com.m.freemovie.databinding.FragmentBookmarkBinding;
 import com.m.freemovie.mvp.ClassBean.DetailBean;
+import com.m.freemovie.mvp.ClassBean.FreeMovieEvent;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
 public class BookmarkFragment extends Fragment {
     private DetailAdapter detailAdapter;
-    private SPUtils spUtils;
     private List<DetailBean> movieBeanList = new ArrayList<>();
     private FragmentBookmarkBinding binding;
-
+    private BookmarkDbHelper dbHelper;
+    private boolean isTvSeries = false;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentBookmarkBinding.inflate(inflater);
-        spUtils = SPUtils.getInstance("detailPrefs");
+        dbHelper = new BookmarkDbHelper(getContext());
         initRecycler();
+        loadBookmarkData();
         return binding.getRoot();
     }
 
@@ -46,29 +49,28 @@ public class BookmarkFragment extends Fragment {
     }
 
     private void loadBookmarkData() {
-        List<DetailBean> bookmarks = getDetails();
+        List<DetailBean> bookmarks = dbHelper.getBookmarksByType(isTvSeries);
         movieBeanList.clear();
         movieBeanList.addAll(bookmarks);
         detailAdapter.setNewData(movieBeanList);
     }
 
-    private List<DetailBean> getDetails() {
-        List<DetailBean> detailBeanArrayList = new ArrayList<>();
-        try {
-            String scoresJson = spUtils.getString("detailPrefs", "[]");
-            JSONArray jsonArray = new JSONArray(scoresJson);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                DetailBean detailBean = new DetailBean();
-                detailBean.setVideoId(jsonObject.getString("videoId"));
-                detailBean.setTimeStamp(jsonObject.getString("timeStamp"));
-                detailBean.setTempImage(jsonObject.getString("tempImage"));
-                detailBean.setMovieName(jsonObject.getString("movieName"));
-                detailBeanArrayList.add(detailBean);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return detailBeanArrayList;
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void changeSearch(FreeMovieEvent event) {
+        this.isTvSeries = event.isChangeSearch();
+        loadBookmarkData();
+        detailAdapter.isTv(isTvSeries);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 }
