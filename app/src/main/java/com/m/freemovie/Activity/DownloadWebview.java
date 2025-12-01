@@ -8,7 +8,6 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
@@ -123,7 +122,7 @@ public class DownloadWebview extends AppCompatActivity {
         binding.webView.setDownloadListener(new DownloadListener() {
             @Override
             public void onDownloadStart(String videoUrl, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-                if (videoUrl.contains("cache.cardfightvanguard.site") || videoUrl.contains("dl.2ae8zric7z.workers.dev")) {
+                if (videoUrl.contains(".mp4")) {
                     if(isFirstTask){
                         Toast.makeText(getApplicationContext(),"Download in progress",Toast.LENGTH_SHORT).show();
                         return;

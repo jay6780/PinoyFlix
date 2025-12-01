@@ -674,6 +674,7 @@ public class DetailTvBean {
         private String poster_path;
         private int season_number;
         private double vote_average;
+        private String videoId;
 
         public String getAir_date() {
             return air_date;
@@ -689,6 +690,15 @@ public class DetailTvBean {
 
         public void setEpisode_count(int episode_count) {
             this.episode_count = episode_count;
+        }
+
+
+        public String getVideoId() {
+            return videoId;
+        }
+
+        public void setVideoId(String videoId) {
+            this.videoId = videoId;
         }
 
         public String getId() {

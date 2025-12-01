@@ -213,7 +213,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
         if (detailTvBean != null && !isFinishing() && !isDestroyed() && isTv) {
             String posterPath = "https://image.tmdb.org/t/p/w500/" + detailTvBean.getPoster_path();
             this.lastImage = posterPath;
-            seriesBinding.tvTitle.setText(detailTvBean.getLast_episode_to_air().getName());
+            seriesBinding.tvTitle.setText(detailTvBean.getName());
 
             StringBuilder sb = new StringBuilder();
             List<String> names = new ArrayList<>();
@@ -235,8 +235,8 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
             seriesBinding.tvVote.setText(String.valueOf(detailTvBean.getLast_episode_to_air().getVote_count()));
             seriesBinding.tvDescription.setText(detailTvBean.getLast_episode_to_air().getOverview());
             seriesBinding.overView.setVisibility(detailTvBean.getLast_episode_to_air().getOverview().isEmpty() ? View.GONE : View.VISIBLE);
-            seriesBinding.tvOriginal.setText(detailTvBean.getLast_episode_to_air().getName());
-            this.title = detailTvBean.getLast_episode_to_air().getName();
+            seriesBinding.tvOriginal.setText(detailTvBean.getName());
+            this.title = detailTvBean.getName();
 
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
             params.addRule(RelativeLayout.BELOW, seriesBinding.card.getId());
@@ -271,7 +271,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
         List<DetailTvBean.SeasonsBean> specialsSeasons = new ArrayList<>();
         for (DetailTvBean.SeasonsBean seasonsBean : seasons) {
             if (!"Specials".equals(seasonsBean.getName())) {
-                seasonsBean.setId(id);
+                seasonsBean.setVideoId(id);
                 specialsSeasons.add(seasonsBean);
             }
         }
@@ -283,6 +283,9 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     protected void onResume() {
         super.onResume();
         new WindowUtils(this);
+        if(seasonsAdapter !=null){
+            seasonsAdapter.recount();
+        }
         setImageData(id);
     }
 

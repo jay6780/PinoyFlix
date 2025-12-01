@@ -6,13 +6,24 @@ public class EpisodeBean {
     private String thumbImage;
     private String id;
     private String title;
+    private boolean isWatched;
+    private String seasonId;
 
-    public EpisodeBean(int episodeNum,String thumbImage,int SeasonNum,String id,String title){
+    public EpisodeBean(int episodeNum, String thumbImage, int SeasonNum, String id, String title,String seasonId){
         this.episodeNum = episodeNum;
         this.thumbImage = thumbImage;
         this.id = id;
         this.SeasonNum = SeasonNum;
         this.title = title;
+        this.isWatched = false;
+        this.seasonId = seasonId;
+    }
+    public boolean isWatched() {
+        return isWatched;
+    }
+
+    public void setWatched(boolean watched) {
+        isWatched = watched;
     }
 
     public int getEpisodeNum() {
@@ -53,5 +64,13 @@ public class EpisodeBean {
 
     public void setSeasonNum(int seasonNum) {
         SeasonNum = seasonNum;
+    }
+
+    public String getSeasonId() {
+        return seasonId;
+    }
+
+    public void setSeasonId(String seasonId) {
+        this.seasonId = seasonId;
     }
 }

@@ -79,7 +79,7 @@ public class DetailBean {
      * vote_average : 7.605
      * vote_count : 10050
      */
-
+    private String name;
     private boolean adult;
     private String backdrop_path;
     private BelongsToCollectionBean belongs_to_collection;
@@ -106,6 +106,14 @@ public class DetailBean {
     private List<ProductionCompaniesBean> production_companies;
     private List<ProductionCountriesBean> production_countries;
     private List<SpokenLanguagesBean> spoken_languages;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public boolean isAdult() {
         return adult;
