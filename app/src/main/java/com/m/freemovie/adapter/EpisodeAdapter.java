@@ -1,9 +1,14 @@
 package com.m.freemovie.adapter;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.bumptech.glide.Glide;
 import com.m.freemovie.Activity.VideoWebviewActivity;
@@ -50,14 +55,48 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
                 item.setWatched(true);
                 notifyItemChanged(helper.getAdapterPosition());
 
-                Intent intent = new Intent(mContext, VideoWebviewActivity.class);
-                intent.putExtra("title", item.getTitle());
-                intent.putExtra("seasonNum", item.getSeasonNum());
-                intent.putExtra("videoPosition", 3);
-                intent.putExtra("videoId", item.getId());
-                intent.putExtra("epNumber", item.getEpisodeNum());
+                showVideoOptions(item,mContext);
+            }
+        });
+    }
+
+    private void showVideoOptions(EpisodeBean item, Context mContext) {
+        String[] videoPlayer = {"Player 1", "Player 2 (With Ad blocker)"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        TextView titleView = new TextView(mContext);
+        titleView.setText("Select player");
+        titleView.setTextColor(Color.BLACK);
+        titleView.setPadding(40, 40, 40, 20);
+        titleView.setTextSize(15);
+
+        builder.setCustomTitle(titleView);
+
+        builder.setItems(videoPlayer, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = null;
+                switch (which) {
+                    case 0:
+                        intent = new Intent(mContext, VideoWebviewActivity.class);
+                        intent.putExtra("title", item.getTitle());
+                        intent.putExtra("seasonNum", item.getSeasonNum());
+                        intent.putExtra("videoPosition", 3);
+                        intent.putExtra("videoId", item.getId());
+                        intent.putExtra("epNumber", item.getEpisodeNum());
+                        break;
+                    case 1:
+                        intent = new Intent(mContext, VideoWebviewActivity.class);
+                        intent.putExtra("title", item.getTitle());
+                        intent.putExtra("seasonNum", item.getSeasonNum());
+                        intent.putExtra("videoPosition", 4);
+                        intent.putExtra("videoId", item.getId());
+                        intent.putExtra("epNumber", item.getEpisodeNum());
+                        break;
+                }
                 mContext.startActivity(intent);
             }
         });
+        builder.show();
     }
 }

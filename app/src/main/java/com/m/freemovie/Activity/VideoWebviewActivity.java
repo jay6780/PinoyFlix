@@ -66,7 +66,9 @@ public class VideoWebviewActivity extends AppCompatActivity {
         }else if(videoPosition == 2) {
             videoUrl = "https://vidrock.net/movie/"+ videoId;
         }else if (videoPosition == 3){
-            videoUrl = "https://vidrock.net/tv/"+videoId+"/"+seasonNum+"/"+epNumber;
+            videoUrl = "https://vidrock.net/tv/"+videoId+"/"+seasonNum+"/"+epNumber+"&download=false";
+        }else if(videoPosition == 4){
+            videoUrl = "https://vidfast.pro/tv/"+videoId+"/"+seasonNum+"/"+epNumber;
         }
 //        Log.d("VideoUrl","value: "+videoUrl);
         binding.rotate.setOnClickListener(view -> rotateScreen());
@@ -97,6 +99,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
         webSettings.setBuiltInZoomControls(false);
         webSettings.setSupportZoom(false);
         webSettings.setDomStorageEnabled(true);
+        webSettings.setUserAgentString("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36");
         binding.webView.setWebChromeClient(new WebChromeClient());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -130,6 +133,8 @@ public class VideoWebviewActivity extends AppCompatActivity {
                     videoDomain = "vidrock.net";
                 }else if(videoPosition == 3){
                     videoDomain = "vidrock.net";
+                }else if(videoPosition == 4){
+                    videoDomain = "vidfast.pro";
                 }
                 if (url.contains(videoDomain)) {
                     return false;
@@ -158,6 +163,8 @@ public class VideoWebviewActivity extends AppCompatActivity {
                     videoDomain = "vidrock.net";
                 }else if(videoPosition == 3){
                     videoDomain = "vidrock.net";
+                }else if(videoPosition == 4){
+                    videoDomain = "vidfast.pro";
                 }
                 if (!url.contains(videoDomain)) {
                     view.stopLoading();
@@ -169,6 +176,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                blockAds(view);
                 if(hud !=null && hud.isShowing()){
                      hud.dismiss();
                 }
@@ -178,6 +186,30 @@ public class VideoWebviewActivity extends AppCompatActivity {
 
         binding.webView.loadUrl(videoUrl);
     }
+    private void blockAds(WebView view) {
+        String tags = view.getUrl();
+        StringBuilder sb = new StringBuilder();
+        sb.append("javascript: ");
+        String[] allTag = tags.split(",");
+        for (String tag : allTag) {
+            String adTag = tag;
+            if (adTag.trim().length() > 0) {
+                adTag = adTag.trim();
+                if (adTag.contains("#")) {
+                    adTag = adTag.substring(adTag.indexOf("#") + 1);
+                    sb.append("document.getElementById(\'").append(adTag).append("\').remove();");
+
+                } else if (adTag.contains(".")) {
+                    adTag = adTag.substring(adTag.indexOf(".") + 1);
+                    sb.append("var esc=document.getElementsByClassName(\'").append(adTag).append("\');for (var i = esc.length - 1; i >= 0; i--){esc[i].remove();};");
+
+                } else {
+                    sb.append("var esc=document.getElementsByTagName(\'").append(adTag).append("\');for (var i = esc.length - 1; i >= 0; i--){esc[i].remove();};");
+                }
+            }
+        }
+    }
+
 
     private void rotateScreen() {
         isRotate = !isRotate;
