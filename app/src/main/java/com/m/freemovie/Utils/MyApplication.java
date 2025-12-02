@@ -66,6 +66,7 @@ public class MyApplication extends Application {
 
         Glide.init(this, new GlideBuilder()
                 .setDefaultRequestOptions(defaultOptions));
+        clearAllGlideCache();
     }
     public static void clearGlideMemoryCache() {
         Glide.get(instance).clearMemory();

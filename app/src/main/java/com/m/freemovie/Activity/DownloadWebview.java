@@ -359,6 +359,20 @@ public class DownloadWebview extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        binding.webView.destroy();
+        binding.webView.stopLoading();
+        binding.webView.clearCache(true);
+        binding.webView.clearHistory();
+        binding.webView.clearFormData();
+        if (hud != null && hud.isShowing()) {
+            hud.dismiss();
+        }
+        hud = null;
+        super.onDestroy();
+    }
+
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
         isFirstTask = false;

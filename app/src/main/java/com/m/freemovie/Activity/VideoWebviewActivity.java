@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
@@ -71,7 +70,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
         }
 //        Log.d("VideoUrl","value: "+videoUrl);
         binding.rotate.setOnClickListener(view -> rotateScreen());
-
+        binding.webView.setWebContentsDebuggingEnabled(false);
         initStart();
     }
     private void initStart(){
@@ -90,20 +89,18 @@ public class VideoWebviewActivity extends AppCompatActivity {
     }
 
     private void setupWebView(String videoUrl) {
-        getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
-                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
-        );
+        binding.webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         WebSettings webSettings = binding.webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
+        webSettings.setEnableSmoothTransition(true);
+        webSettings.setAllowFileAccess(true);
+        webSettings.setAllowContentAccess(true);
         webSettings.setDisplayZoomControls(false);
         webSettings.setBuiltInZoomControls(false);
         webSettings.setSupportZoom(false);
         webSettings.setDomStorageEnabled(true);
-
-        binding.webView.setWebChromeClient(new WebChromeClient());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             binding.webView.setWebContentsDebuggingEnabled(false);
@@ -142,7 +139,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
                 if (url.contains(videoDomain)) {
                     return false;
                 } else if (url.contains("dl.vidsrc.vip")) {
-                    Log.d("VideOUrl", "value: " + url);
+//                    Log.d("VideOUrl", "value: " + url);
                     if (videoPosition == 2) {
                         String downloadUrl = "https://dl.vidsrc.vip/movie/" + videoId;
                         Intent intent  = new Intent(getApplicationContext(), DownloadWebview.class);
@@ -246,6 +243,19 @@ public class VideoWebviewActivity extends AppCompatActivity {
             params.layoutInDisplayCutoutMode = mode;
             getWindow().setAttributes(params);
         }
+    }
+    @Override
+    protected void onDestroy() {
+        binding.webView.destroy();
+        binding.webView.stopLoading();
+        binding.webView.clearCache(true);
+        binding.webView.clearHistory();
+        binding.webView.clearFormData();
+        if (hud != null && hud.isShowing()) {
+            hud.dismiss();
+        }
+        hud = null;
+        super.onDestroy();
     }
 
     @Override
