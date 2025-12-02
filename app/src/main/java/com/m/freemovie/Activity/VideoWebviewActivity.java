@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -14,7 +15,6 @@ import android.os.Looper;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
-import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -34,9 +34,10 @@ public class VideoWebviewActivity extends AppCompatActivity {
     private String videoId;
     private KProgressHUD hud;
     private ActivityVideoWebviewBinding binding;
-    private int videoPosition,epNumber;
+    private int videoPosition, epNumber;
     private String videoUrl;
     private int seasonNum;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,98 +47,108 @@ public class VideoWebviewActivity extends AppCompatActivity {
         binding.btnBack.setOnClickListener(view -> onBackPressed());
         title = getIntent().getStringExtra("title");
         videoId = getIntent().getStringExtra("videoId");
-        videoPosition = getIntent().getIntExtra("videoPosition",0);
-        seasonNum = getIntent().getIntExtra("seasonNum",1);
-        epNumber = getIntent().getIntExtra("epNumber",0);
+        videoPosition = getIntent().getIntExtra("videoPosition", 0);
+        seasonNum = getIntent().getIntExtra("seasonNum", 1);
+        epNumber = getIntent().getIntExtra("epNumber", 0);
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
         hud.show();
         binding.titleName.setText(title);
 
-        if(videoId == null){
+        if (videoId == null) {
             Toast.makeText(getApplicationContext(), "Please try again", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
-        if(videoPosition == 1){
-            videoUrl = "https://vidsrc-embed.ru/embed/movie?tmdb="+videoId;
-        }else if(videoPosition == 2) {
-            videoUrl = "https://vidrock.net/movie/"+ videoId;
-        }else if (videoPosition == 3){
-            videoUrl = "https://vidrock.net/tv/"+videoId+"/"+seasonNum+"/"+epNumber+"&download=false";
-        }else if(videoPosition == 4){
-            videoUrl = "https://vidfast.pro/tv/"+videoId+"/"+seasonNum+"/"+epNumber;
+        if (videoPosition == 1) {
+            videoUrl = "https://vidsrc-embed.ru/embed/movie?tmdb=" + videoId;
+        } else if (videoPosition == 2) {
+            videoUrl = "https://vidrock.net/movie/" + videoId;
+        } else if (videoPosition == 3) {
+            videoUrl = "https://vidrock.net/tv/" + videoId + "/" + seasonNum + "/" + epNumber + "&download=false";
+        } else if (videoPosition == 4) {
+            videoUrl = "https://vidsrc.cc/v2/embed/tv/" + videoId + "/" + seasonNum + "/" + epNumber;
+        }else if (videoPosition == 5){
+            videoUrl = "https://vidsrc.cc/v2/embed/movie/"+videoId;
         }
 //        Log.d("VideoUrl","value: "+videoUrl);
         binding.rotate.setOnClickListener(view -> rotateScreen());
 
         initStart();
     }
-    private void initStart(){
+
+    private void initStart() {
+        if (binding == null) return;
+
         if (!isNetworkAvailable()) {
             binding.webView.setVisibility(View.GONE);
             Toast.makeText(getApplicationContext(), "Please check your internet and try again", Toast.LENGTH_SHORT).show();
         } else {
-            setupWebView(videoUrl);
             binding.webView.setVisibility(View.VISIBLE);
+            setupWebView(videoUrl);
         }
     }
+
     private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     private void setupWebView(String videoUrl) {
-        binding.webView.loadUrl(videoUrl);
+        binding.webView.setWebViewClient(new CustomWebViewClient());
+        binding.webView.setWebChromeClient(new CustomWebChromeClient(){});
         WebSettings webSettings = binding.webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDisplayZoomControls(false);
         webSettings.setBuiltInZoomControls(false);
         webSettings.setSupportZoom(false);
         webSettings.setDomStorageEnabled(true);
-        CookieManager.getInstance().setAcceptThirdPartyCookies(binding.webView, true);
-        webSettings.setUserAgentString("Mozilla/5.0 (Windows     NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36");
-        binding.webView.setWebChromeClient(new WebChromeClient());
-
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
-        binding.webView.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
-                return true;
-            }
-        });
+        binding.webView.loadUrl(videoUrl);
 
-        binding.webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                String url = request.getUrl().toString();
-                return handleUrlLoading(view, url);
-            }
+    }
 
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                return handleUrlLoading(view, url);
-            }
+    private class CustomWebChromeClient extends WebChromeClient {
+        @Override
+        public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+            return true;
+        }
 
-            private boolean handleUrlLoading(WebView view, String url) {
-                String videoDomain = "";
-                if (videoPosition == 1) {
-                    videoDomain = "vidsrc-embed.ru";
-                } else if (videoPosition == 2) {
-                    videoDomain = "vidrock.net";
-                }else if(videoPosition == 3){
-                    videoDomain = "vidrock.net";
-                }else if(videoPosition == 4){
-                    videoDomain = "vidfast.pro";
+        @Override
+        public void onProgressChanged(WebView view, int newProgress) {
+            if (newProgress == 100) {
+                if (hud != null && hud.isShowing()) {
+                    hud.dismiss();
+                    blockAds(view);
                 }
-                if (url.contains(videoDomain)) {
-                    return false;
-                } else if (url.contains("dl.vidsrc.vip")) {
-//                    Log.d("VideOUrl", "value: " + url);
+            }
+        }
+    }
+
+    private class CustomWebViewClient extends WebViewClient{
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            String url = request.getUrl().toString();
+            return handleUrlLoading(view, url);
+        }
+        private boolean handleUrlLoading(WebView view, String url) {
+            String videoDomain = "";
+            if (videoPosition == 1) {
+                videoDomain = "vidsrc-embed.ru";
+            } else if (videoPosition == 2 || videoPosition == 3) {
+                videoDomain = "vidrock.net";
+            }else if(videoPosition == 4 || videoPosition == 5){
+                videoDomain = "vidsrc.cc";
+            }
+            if (url.contains(videoDomain)) {
+                return false;
+            } else if (url.contains("dl.vidsrc.vip")) {
+//                Log.d("VideOUrl", "value: " + url);
                     if (videoPosition == 2) {
                         String downloadUrl = "https://dl.vidsrc.vip/movie/" + videoId;
                         Intent intent  = new Intent(getApplicationContext(), DownloadWebview.class);
@@ -153,35 +164,27 @@ public class VideoWebviewActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 String videoDomain = "";
                 if (videoPosition == 1){
                     videoDomain = "vidsrc-embed.ru";
-                }else if(videoPosition == 2) {
+                } else if (videoPosition == 2 || videoPosition == 3) {
                     videoDomain = "vidrock.net";
-                }else if(videoPosition == 3){
-                    videoDomain = "vidrock.net";
-                }else if(videoPosition == 4){
-                    videoDomain = "vidfast.pro";
+                }else if(videoPosition == 4 || videoPosition == 5){
+                    videoDomain = "vidsrc.cc";
                 }
                 if (!url.contains(videoDomain)) {
                     view.stopLoading();
                 }
                 super.onPageStarted(view, url, favicon);
-
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                blockAds(view);
-                if(hud !=null && hud.isShowing()){
-                    hud.dismiss();
-                }
-
-            }
-        });
+        }
     }
+
     private void blockAds(WebView view) {
         String tags = view.getUrl();
         StringBuilder sb = new StringBuilder();
@@ -240,31 +243,66 @@ public class VideoWebviewActivity extends AppCompatActivity {
             getWindow().setAttributes(params);
         }
     }
-
     @Override
-    protected void onPause() {
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            isRotate = false;
-            binding.rlTitle.setVisibility(View.VISIBLE);
-            binding.rlTitle.setBackgroundColor(Color.parseColor("#313647"));
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            View decorView = getWindow().getDecorView();
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
-            setCutoutMode(WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT);
+    protected void onDestroy() {
+        if (hud != null && hud.isShowing()) {
+            hud.dismiss();
         }
-        super.onPause();
+        hud = null;
+
+        if (binding != null && binding.webView != null) {
+            binding.webView.stopLoading();
+            binding.webView.setWebChromeClient(null);
+            binding.webView.setWebViewClient(null);
+            binding.webView.destroy();
+        }
+
+        binding = null;
+        super.onDestroy();
     }
 
     @Override
+    protected void onPause() {
+        if (binding != null && binding.rlTitle != null) {
+            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                isRotate = false;
+                binding.rlTitle.setVisibility(View.VISIBLE);
+                binding.rlTitle.setBackgroundColor(Color.parseColor("#313647"));
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                View decorView = getWindow().getDecorView();
+                if (decorView != null) {
+                    decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+                }
+                setCutoutMode(WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT);
+            }
+        }
+        super.onPause();
+    }
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        if (binding != null && binding.webView != null) {
+            try {
+                binding.webView.clearCache(true);
+                binding.webView.clearHistory();
+                binding.webView.reload();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    @Override
     public void onBackPressed() {
-        if (isRotate) {
+        if (isRotate && binding != null && binding.rlTitle != null) {
             binding.rlTitle.setVisibility(View.VISIBLE);
             binding.rlTitle.setBackgroundColor(Color.parseColor("#313647"));
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             View decorView = getWindow().getDecorView();
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+            if (decorView != null) {
+                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+            }
             setCutoutMode(WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT);
             isRotate = false;
         } else {

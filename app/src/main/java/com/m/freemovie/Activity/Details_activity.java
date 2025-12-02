@@ -106,7 +106,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     }
 
     private void watchNow() {
-        String[] videoPlayer = {"Player 1", "Player 2 (With download)"};
+        String[] videoPlayer = {"Player 1", "Player 2 (With download)","Player 3"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         TextView titleView = new TextView(this);
@@ -132,6 +132,12 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                         intent = new Intent(Details_activity.this, VideoWebviewActivity.class);
                         intent.putExtra("title", title);
                         intent.putExtra("videoPosition", 2);
+                        intent.putExtra("videoId", id);
+                        break;
+                    case 2:
+                        intent = new Intent(Details_activity.this, VideoWebviewActivity.class);
+                        intent.putExtra("title", title);
+                        intent.putExtra("videoPosition", 5);
                         intent.putExtra("videoId", id);
                         break;
                 }

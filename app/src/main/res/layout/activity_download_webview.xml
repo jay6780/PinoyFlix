@@ -48,9 +48,15 @@
     </RelativeLayout>
 
 
-    <com.m.freemovie.Utils.views.MingWebView
-        android:id="@+id/webView"
+    <FrameLayout
+        android:id="@+id/web_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/rl_title" />
+        android:layout_below="@+id/rl_title">
+        <com.m.freemovie.Utils.views.MingWebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
 </RelativeLayout>
