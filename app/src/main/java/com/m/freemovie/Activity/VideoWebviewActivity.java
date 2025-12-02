@@ -14,6 +14,7 @@ import android.os.Looper;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
+import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -51,6 +52,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
+        hud.show();
         binding.titleName.setText(title);
 
         if(videoId == null){
@@ -69,7 +71,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
         }
 //        Log.d("VideoUrl","value: "+videoUrl);
         binding.rotate.setOnClickListener(view -> rotateScreen());
-        binding.webView.setWebContentsDebuggingEnabled(false);
+
         initStart();
     }
     private void initStart(){
@@ -77,7 +79,6 @@ public class VideoWebviewActivity extends AppCompatActivity {
             binding.webView.setVisibility(View.GONE);
             Toast.makeText(getApplicationContext(), "Please check your internet and try again", Toast.LENGTH_SHORT).show();
         } else {
-            hud.show();
             setupWebView(videoUrl);
             binding.webView.setVisibility(View.VISIBLE);
         }
@@ -89,45 +90,28 @@ public class VideoWebviewActivity extends AppCompatActivity {
     }
 
     private void setupWebView(String videoUrl) {
-        try {
+        binding.webView.loadUrl(videoUrl);
         WebSettings webSettings = binding.webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
-        webSettings.setEnableSmoothTransition(true);
-        webSettings.setAllowFileAccess(true);
-        webSettings.setAllowContentAccess(true);
         webSettings.setDisplayZoomControls(false);
         webSettings.setBuiltInZoomControls(false);
         webSettings.setSupportZoom(false);
         webSettings.setDomStorageEnabled(true);
+        CookieManager.getInstance().setAcceptThirdPartyCookies(binding.webView, true);
+        webSettings.setUserAgentString("Mozilla/5.0 (Windows     NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36");
+        binding.webView.setWebChromeClient(new WebChromeClient());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
-
-
         binding.webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
                 return true;
             }
-            @Override
-            public void onProgressChanged(WebView view, int newProgress) {
-                super.onProgressChanged(view, newProgress);
-                if (newProgress > 80 && hud != null && hud.isShowing()) {
-                    hud.dismiss();
-                }
-            }
         });
+
         binding.webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                super.onReceivedError(view, errorCode, description, failingUrl);
-                if (errorCode == ERROR_TIMEOUT || errorCode == ERROR_CONNECT) {
-                    retryLoading();
-                }
-            }
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
@@ -191,21 +175,13 @@ public class VideoWebviewActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 blockAds(view);
+                if(hud !=null && hud.isShowing()){
+                    hud.dismiss();
+                }
+
             }
         });
-        binding.webView.loadUrl(videoUrl);
-        }catch (Exception e){
-            e.printStackTrace();
-            retryLoading();
-        }
     }
-    private void retryLoading() {
-        hud.show();
-        binding.webView.clearCache(true);
-        binding.webView.clearHistory();
-        binding.webView.reload();
-    }
-
     private void blockAds(WebView view) {
         String tags = view.getUrl();
         StringBuilder sb = new StringBuilder();
@@ -245,8 +221,8 @@ public class VideoWebviewActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     binding.rlTitle.setVisibility(View.GONE);
-                    }
-                }, 300);
+                }
+            }, 300);
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -263,19 +239,6 @@ public class VideoWebviewActivity extends AppCompatActivity {
             params.layoutInDisplayCutoutMode = mode;
             getWindow().setAttributes(params);
         }
-    }
-    @Override
-    protected void onDestroy() {
-        binding.webView.destroy();
-        binding.webView.stopLoading();
-        binding.webView.clearCache(true);
-        binding.webView.clearHistory();
-        binding.webView.clearFormData();
-        if (hud != null && hud.isShowing()) {
-            hud.dismiss();
-        }
-        hud = null;
-        super.onDestroy();
     }
 
     @Override

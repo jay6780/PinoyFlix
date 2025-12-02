@@ -1,17 +1,14 @@
 package com.m.freemovie.Utils;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.webkit.WebView;
-
+import android.webkit.CookieManager;
+import android.webkit.WebStorage;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-
-import java.io.File;
 
 public class MyApplication extends Application {
     private static MyApplication instance;
@@ -26,36 +23,18 @@ public class MyApplication extends Application {
         super.onCreate();
         instance = this;
         initGlide();
-        deleteCache(instance);
+        clearWebViewData();
     }
 
-    public static void deleteCache(Context context) {
-        if(context instanceof Activity){
-            WebViewPool pool = new SingularWebViewPool(((Activity)context));
-            WebView cachedView = pool.obtain(((Activity)context));
-            if(!pool.release(cachedView ,((Activity)context))) {
-            }
+    private void clearWebViewData() {
+        CookieManager cookieManager = CookieManager.getInstance();
+        if (cookieManager != null) {
+            cookieManager.removeAllCookies(null);
+            cookieManager.flush();
         }
-        try {
-            File dir = context.getCacheDir();
-            deleteDir(dir);
-        } catch (Exception e) { e.printStackTrace();}
-    }
-
-    public static boolean deleteDir(File dir) {
-        if (dir != null && dir.isDirectory()) {
-            String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
-                if (!success) {
-                    return false;
-                }
-            }
-            return dir.delete();
-        } else if(dir!= null && dir.isFile()) {
-            return dir.delete();
-        } else {
-            return false;
+        WebStorage webStorage = WebStorage.getInstance();
+        if (webStorage != null) {
+            webStorage.deleteAllData();
         }
     }
 
