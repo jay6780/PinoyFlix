@@ -57,6 +57,7 @@ public class DownloadWebview extends AppCompatActivity {
             binding.webView.setVisibility(View.GONE);
             Toast.makeText(getApplicationContext(),"Please check your internet and try again",Toast.LENGTH_SHORT).show();
         }else{
+            hud.show();
             setupWebView(downloadUrl);
             binding.webView.setVisibility(View.VISIBLE);
         }
@@ -79,22 +80,26 @@ public class DownloadWebview extends AppCompatActivity {
             public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
                 return true;
             }
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                super.onProgressChanged(view, newProgress);
+                if (newProgress > 80 && hud != null && hud.isShowing()) {
+                    hud.dismiss();
+                }
+            }
         });
+
 
         binding.webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-                hud.show();
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 blockAds(view);
-                if (hud != null && hud.isShowing()) {
-                    hud.dismiss();
-                }
             }
 
             @Override

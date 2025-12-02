@@ -51,7 +51,6 @@ public class VideoWebviewActivity extends AppCompatActivity {
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
-        hud.show();
         binding.titleName.setText(title);
 
         if(videoId == null){
@@ -78,6 +77,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
             binding.webView.setVisibility(View.GONE);
             Toast.makeText(getApplicationContext(), "Please check your internet and try again", Toast.LENGTH_SHORT).show();
         } else {
+            hud.show();
             setupWebView(videoUrl);
             binding.webView.setVisibility(View.VISIBLE);
         }
@@ -89,7 +89,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
     }
 
     private void setupWebView(String videoUrl) {
-        binding.webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        try {
         WebSettings webSettings = binding.webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
@@ -106,14 +106,28 @@ public class VideoWebviewActivity extends AppCompatActivity {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
 
+
         binding.webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
                 return true;
             }
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                super.onProgressChanged(view, newProgress);
+                if (newProgress > 80 && hud != null && hud.isShowing()) {
+                    hud.dismiss();
+                }
+            }
         });
-
         binding.webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                super.onReceivedError(view, errorCode, description, failingUrl);
+                if (errorCode == ERROR_TIMEOUT || errorCode == ERROR_CONNECT) {
+                    retryLoading();
+                }
+            }
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
@@ -177,15 +191,21 @@ public class VideoWebviewActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 blockAds(view);
-                if(hud !=null && hud.isShowing()){
-                     hud.dismiss();
-                }
-
             }
         });
-
         binding.webView.loadUrl(videoUrl);
+        }catch (Exception e){
+            e.printStackTrace();
+            retryLoading();
+        }
     }
+    private void retryLoading() {
+        hud.show();
+        binding.webView.clearCache(true);
+        binding.webView.clearHistory();
+        binding.webView.reload();
+    }
+
     private void blockAds(WebView view) {
         String tags = view.getUrl();
         StringBuilder sb = new StringBuilder();
