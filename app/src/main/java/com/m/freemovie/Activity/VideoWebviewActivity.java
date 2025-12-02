@@ -30,7 +30,6 @@ import com.m.freemovie.databinding.ActivityVideoWebviewBinding;
 
 public class VideoWebviewActivity extends AppCompatActivity {
     private boolean isRotate = false;
-    private boolean isVisible = false;
     private String title;
     private String videoId;
     private KProgressHUD hud;
@@ -91,6 +90,10 @@ public class VideoWebviewActivity extends AppCompatActivity {
     }
 
     private void setupWebView(String videoUrl) {
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED
+        );
         WebSettings webSettings = binding.webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
@@ -99,7 +102,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
         webSettings.setBuiltInZoomControls(false);
         webSettings.setSupportZoom(false);
         webSettings.setDomStorageEnabled(true);
-        webSettings.setUserAgentString("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36");
+
         binding.webView.setWebChromeClient(new WebChromeClient());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
