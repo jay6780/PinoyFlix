@@ -49,18 +49,12 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
-                        item.getSeasonNum(), item.getEpisodeNum(),item.getSeasonId());
-
-                item.setWatched(true);
-                notifyItemChanged(helper.getAdapterPosition());
-
-                showVideoOptions(item,mContext);
+                showVideoOptions(item,mContext,helper);
             }
         });
     }
 
-    private void showVideoOptions(EpisodeBean item, Context mContext) {
+    private void showVideoOptions(EpisodeBean item, Context mContext, BaseViewHolder helper) {
         String[] videoPlayer = {"Player 1", "Player 2 (With Ad blocker)"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
@@ -94,6 +88,12 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
                         intent.putExtra("epNumber", item.getEpisodeNum());
                         break;
                 }
+                dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
+                        item.getSeasonNum(), item.getEpisodeNum(),item.getSeasonId());
+
+                item.setWatched(true);
+                notifyItemChanged(helper.getAdapterPosition());
+
                 mContext.startActivity(intent);
             }
         });
