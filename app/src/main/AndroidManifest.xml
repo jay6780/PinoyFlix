@@ -47,7 +47,6 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".Activity.VideoWebviewActivity"
-            android:hardwareAccelerated="true"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="false" />
         <activity

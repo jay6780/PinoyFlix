@@ -55,7 +55,7 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
     }
 
     private void showVideoOptions(EpisodeBean item, Context mContext, BaseViewHolder helper) {
-        String[] videoPlayer = {"Player 1", "Player 2 (With Ad blocker)"};
+        String[] videoPlayer = {"Player 1", "Player 2"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         TextView titleView = new TextView(mContext);
@@ -83,7 +83,7 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
                         intent = new Intent(mContext, VideoWebviewActivity.class);
                         intent.putExtra("title", item.getTitle());
                         intent.putExtra("seasonNum", item.getSeasonNum());
-                        intent.putExtra("videoPosition", 4);
+                        intent.putExtra("videoPosition", 5);
                         intent.putExtra("videoId", item.getId());
                         intent.putExtra("epNumber", item.getEpisodeNum());
                         break;

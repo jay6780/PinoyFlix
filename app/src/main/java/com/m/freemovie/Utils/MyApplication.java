@@ -5,13 +5,14 @@ import android.app.Application;
 import android.content.Context;
 import android.webkit.WebView;
 
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.io.File;
+
+//import leakcanary.LeakCanary;
 
 public class MyApplication extends Application {
     private static MyApplication instance;
@@ -25,6 +26,8 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
+//        LeakCanary.Config config = LeakCanary.getConfig().newBuilder() .retainedVisibleThreshold(3) .build();
+//        LeakCanary.setConfig(config);
         initGlide();
         deleteCache(instance);
     }

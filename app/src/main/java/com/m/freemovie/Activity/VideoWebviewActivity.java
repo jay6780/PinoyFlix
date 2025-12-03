@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
@@ -61,18 +62,26 @@ public class VideoWebviewActivity extends AppCompatActivity {
             finish();
             return;
         }
-        if (videoPosition == 1) {
-            videoUrl = "https://vidsrc-embed.ru/embed/movie?tmdb=" + videoId;
-        } else if (videoPosition == 2) {
-            videoUrl = "https://vidrock.net/movie/" + videoId;
-        } else if (videoPosition == 3) {
-            videoUrl = "https://vidrock.net/tv/" + videoId + "/" + seasonNum + "/" + epNumber + "&download=false";
-        } else if (videoPosition == 4) {
-            videoUrl = "https://vidsrc.cc/v2/embed/tv/" + videoId + "/" + seasonNum + "/" + epNumber;
-        }else if (videoPosition == 5){
-            videoUrl = "https://vidsrc.cc/v2/embed/movie/"+videoId;
+        switch (videoPosition){
+            case 1:
+                videoUrl = "https://vidsrc-embed.ru/embed/movie?tmdb=" + videoId;
+                break;
+            case 2:
+                videoUrl = "https://vidrock.net/movie/"+ videoId;
+                break;
+            case 3:
+                videoUrl = "https://vidlink.pro/tv/"+videoId+"/"+seasonNum+"/"+epNumber;
+                break;
+            case 4:
+                videoUrl = "https://vidlink.pro/movie/"+videoId;
+                break;
+            case 5:
+                videoUrl = "https://vidrock.net/tv/"+videoId+"/"+seasonNum+"/"+epNumber;
+                break;
         }
-//        Log.d("VideoUrl","value: "+videoUrl);
+
+
+        Log.d("VideoUrl","value: "+videoUrl);
         binding.rotate.setOnClickListener(view -> rotateScreen());
 
         initStart();
@@ -101,11 +110,11 @@ public class VideoWebviewActivity extends AppCompatActivity {
         binding.webView.setWebChromeClient(new CustomWebChromeClient(){});
         WebSettings webSettings = binding.webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
         webSettings.setDisplayZoomControls(false);
         webSettings.setBuiltInZoomControls(false);
         webSettings.setSupportZoom(false);
-        webSettings.setDomStorageEnabled(true);
-        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
@@ -118,12 +127,17 @@ public class VideoWebviewActivity extends AppCompatActivity {
         public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
             return true;
         }
+        @Override
+        public Bitmap getDefaultVideoPoster() {
+            return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888);
+        }
 
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
             if (newProgress == 100) {
                 if (hud != null && hud.isShowing()) {
                     hud.dismiss();
+                    hud = null;
                     blockAds(view);
                 }
             }
@@ -138,13 +152,20 @@ public class VideoWebviewActivity extends AppCompatActivity {
         }
         private boolean handleUrlLoading(WebView view, String url) {
             String videoDomain = "";
-            if (videoPosition == 1) {
-                videoDomain = "vidsrc-embed.ru";
-            } else if (videoPosition == 2 || videoPosition == 3) {
-                videoDomain = "vidrock.net";
-            }else if(videoPosition == 4 || videoPosition == 5){
-                videoDomain = "vidsrc.cc";
+            switch (videoPosition){
+                case 1:
+                    videoDomain = "vidsrc-embed.ru";
+                    break;
+                case 2:
+                case 5:
+                    videoDomain = "vidrock.net";
+                    break;
+                case 3:
+                case 4:
+                    videoDomain = "vidlink.pro";
+                    break;
             }
+
             if (url.contains(videoDomain)) {
                 return false;
             } else if (url.contains("dl.vidsrc.vip")) {
@@ -162,28 +183,8 @@ public class VideoWebviewActivity extends AppCompatActivity {
                     return true;
                 }
             }
-
-            @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                String videoDomain = "";
-                if (videoPosition == 1){
-                    videoDomain = "vidsrc-embed.ru";
-                } else if (videoPosition == 2 || videoPosition == 3) {
-                    videoDomain = "vidrock.net";
-                }else if(videoPosition == 4 || videoPosition == 5){
-                    videoDomain = "vidsrc.cc";
-                }
-                if (!url.contains(videoDomain)) {
-                    view.stopLoading();
-                }
-                super.onPageStarted(view, url, favicon);
-            }
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-        }
     }
+
 
     private void blockAds(WebView view) {
         String tags = view.getUrl();
@@ -243,12 +244,32 @@ public class VideoWebviewActivity extends AppCompatActivity {
             getWindow().setAttributes(params);
         }
     }
+
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (videoPosition == 6 && binding != null && binding.webView != null) {
+            new Handler().postDelayed(() -> {
+                if (binding != null && binding.webView != null) {
+                    if (hud != null && hud.isShowing()) {
+                        hud.dismiss();
+                        hud = null;
+                    }
+                    binding.webView.clearCache(true);
+                    binding.webView.stopLoading();
+                }
+            }, 300);
+        }
+    }
+
     @Override
     protected void onDestroy() {
         if (hud != null && hud.isShowing()) {
             hud.dismiss();
+            hud = null;
         }
-        hud = null;
+
 
         if (binding != null && binding.webView != null) {
             binding.webView.stopLoading();
