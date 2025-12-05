@@ -18,7 +18,9 @@ import com.m.freemovie.mvp.ClassBean.DetailTvBean;
 public class SeasonsAdapter extends BaseQuickAdapter<DetailTvBean.SeasonsBean, BaseViewHolder> {
     private WatchHistoryDBHelper dbHelper;
     private Cursor cursor;
-    private int watchedCount;
+    private int watchedCount = 0;
+    private int totalEpisodes = 0;
+    private int progressPercentage = 0;
     private DetailTvBean.SeasonsBean dataItem;
 
     public SeasonsAdapter() {
@@ -44,12 +46,13 @@ public class SeasonsAdapter extends BaseQuickAdapter<DetailTvBean.SeasonsBean, B
 
         cursor = dbHelper.getWatchedEpisodes(item.getId());
         watchedCount = cursor.getCount();
-        int totalEpisodes = item.getEpisode_count();
+        totalEpisodes = item.getEpisode_count();
         tv_episodeCount.setText("Episodes: " + watchedCount + "/" + totalEpisodes + " watched");
 
-        int progressPercentage = (watchedCount * 100) / totalEpisodes;
-        progressBar.setProgress(progressPercentage);
-
+        if (totalEpisodes > 0) {
+            progressPercentage = (watchedCount * 100) / totalEpisodes;
+            progressBar.setProgress(progressPercentage);
+        }
         String posterPath = "https://image.tmdb.org/t/p/w500/" + item.getPoster_path();
         Glide.with(mContext)
                 .asBitmap()
