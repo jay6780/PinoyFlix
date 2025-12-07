@@ -675,7 +675,7 @@ public class DetailTvBean {
         private int season_number;
         private double vote_average;
         private String videoId;
-
+        private String tvSeriesName;
         public String getAir_date() {
             return air_date;
         }
@@ -747,6 +747,14 @@ public class DetailTvBean {
 
         public void setVote_average(double vote_average) {
             this.vote_average = vote_average;
+        }
+
+        public String getTvSeriesName() {
+            return tvSeriesName;
+        }
+
+        public void setTvSeriesName(String tvSeriesName) {
+            this.tvSeriesName = tvSeriesName;
         }
     }
 

@@ -65,6 +65,7 @@ public class SeasonsAdapter extends BaseQuickAdapter<DetailTvBean.SeasonsBean, B
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, SeasonListActivity.class);
                 intent.putExtra("title", item.getName());
+                intent.putExtra("tvSeriesName", item.getTvSeriesName());
                 intent.putExtra("seasonNum", item.getSeason_number());
                 intent.putExtra("id", item.getVideoId());
                 intent.putExtra("seasonId", item.getId());

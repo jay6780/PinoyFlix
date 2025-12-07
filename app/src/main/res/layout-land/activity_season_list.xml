@@ -10,13 +10,14 @@
         android:id="@+id/rl_webview"
         android:layout_width="match_parent"
         android:background="#000000"
-        android:layout_height="300dp">
+        android:layout_height="match_parent">
 
 
         <ImageView
             android:id="@+id/btn_back_finish"
             android:layout_width="25dp"
             android:layout_height="25dp"
+            android:layout_marginTop="10dp"
             android:layout_marginStart="10dp"
             android:elevation="20dp"
             android:src="@mipmap/icon_backwhite" />
@@ -24,7 +25,7 @@
             android:id="@+id/title_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="12dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="10dp"
             android:layout_marginStart="3dp"
@@ -67,6 +68,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_season"
         android:layout_width="match_parent"
+        android:visibility="gone"
         android:layout_height="match_parent"
         android:layout_below="@+id/rl_webview"
         android:layout_marginTop="2dp" />

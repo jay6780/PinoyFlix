@@ -2,16 +2,15 @@ package com.m.freemovie.adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 
 import com.bumptech.glide.Glide;
-import com.m.freemovie.Activity.VideoWebviewActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.DbHelper.WatchHistoryDBHelper;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
@@ -21,9 +20,14 @@ import com.m.freemovie.mvp.ClassBean.EpisodeBean;
 public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder> {
 
     private WatchHistoryDBHelper dbHelper;
-
-    public EpisodeAdapter() {
+    private SourceListener sourceListener;
+    private  int lastPosition = -1;
+    public interface SourceListener{
+        void getId(String id,int position,int seasonNum,int epNumber);
+    }
+    public EpisodeAdapter(SourceListener sourceListener) {
         super(R.layout.episode_item);
+        this.sourceListener = sourceListener;
     }
 
     @Override
@@ -34,6 +38,13 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
         TextView tv_season = helper.getView(R.id.tv_season);
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
         TextView tv_watched = helper.getView(R.id.tv_watched);
+        RelativeLayout rl_select = helper.getView(R.id.rl_select);
+
+        if(lastPosition == (helper.getAdapterPosition())){
+            rl_select.setBackgroundColor(Color.parseColor("#050E3C"));
+        }else{
+            rl_select.setBackgroundColor(Color.parseColor("#313647"));
+        }
 
         tv_season.setText("Episode: " + item.getEpisodeNum());
 
@@ -49,7 +60,13 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showVideoOptions(item,mContext,helper);
+                if(lastPosition == (helper.getAdapterPosition())){
+                    lastPosition = -1;
+                }else{
+                    lastPosition = (helper.getAdapterPosition());
+                    showVideoOptions(item,mContext,helper);
+                }
+                notifyDataSetChanged();
             }
         });
     }
@@ -69,23 +86,12 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
         builder.setItems(videoPlayer, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Intent intent = null;
                 switch (which) {
                     case 0:
-                        intent = new Intent(mContext, VideoWebviewActivity.class);
-                        intent.putExtra("title", item.getTitle());
-                        intent.putExtra("seasonNum", item.getSeasonNum());
-                        intent.putExtra("videoPosition", 3);
-                        intent.putExtra("videoId", item.getId());
-                        intent.putExtra("epNumber", item.getEpisodeNum());
+                        sourceListener.getId(item.getId(),1,item.getSeasonNum(),item.getEpisodeNum());
                         break;
                     case 1:
-                        intent = new Intent(mContext, VideoWebviewActivity.class);
-                        intent.putExtra("title", item.getTitle());
-                        intent.putExtra("seasonNum", item.getSeasonNum());
-                        intent.putExtra("videoPosition", 5);
-                        intent.putExtra("videoId", item.getId());
-                        intent.putExtra("epNumber", item.getEpisodeNum());
+                        sourceListener.getId(item.getId(),2,item.getSeasonNum(),item.getEpisodeNum());
                         break;
                 }
                 dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
@@ -93,8 +99,6 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
 
                 item.setWatched(true);
                 notifyItemChanged(helper.getAdapterPosition());
-
-                mContext.startActivity(intent);
             }
         });
         builder.show();

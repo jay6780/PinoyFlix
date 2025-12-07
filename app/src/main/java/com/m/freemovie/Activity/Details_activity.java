@@ -167,7 +167,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     @Override
     protected void onStart() {
         super.onStart();
-        new WindowUtils(this);
+        new WindowUtils(this,false);
     }
 
     @Override
@@ -213,13 +213,14 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
             setImageData(id);
         }
     }
-
+    private String tvSeriesName;
     @Override
     public void getTvDetailResponse(DetailTvBean detailTvBean) {
         if (detailTvBean != null && !isFinishing() && !isDestroyed() && isTv) {
             String posterPath = "https://image.tmdb.org/t/p/w500/" + detailTvBean.getPoster_path();
             this.lastImage = posterPath;
             seriesBinding.tvTitle.setText(detailTvBean.getName());
+            tvSeriesName = detailTvBean.getName();
 
             StringBuilder sb = new StringBuilder();
             List<String> names = new ArrayList<>();
@@ -277,6 +278,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
         List<DetailTvBean.SeasonsBean> specialsSeasons = new ArrayList<>();
         for (DetailTvBean.SeasonsBean seasonsBean : seasons) {
             if (!"Specials".equals(seasonsBean.getName())) {
+                seasonsBean.setTvSeriesName(tvSeriesName);
                 seasonsBean.setVideoId(id);
                 specialsSeasons.add(seasonsBean);
             }
@@ -288,7 +290,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     @Override
     protected void onResume() {
         super.onResume();
-        new WindowUtils(this);
+        new WindowUtils(this,false);
         if(seasonsAdapter !=null){
             seasonsAdapter.recount();
         }
