@@ -237,7 +237,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
             return handleUrlLoading(view, url);
         }
         private boolean handleUrlLoading(WebView view, String url) {
-            if (url.contains("vidrock.net") || url.contains("vidlink.pro")) {
+            if (url.contains("vidrock") || url.contains("vidlink")) {
                 return false;
             } else {
                 view.stopLoading();

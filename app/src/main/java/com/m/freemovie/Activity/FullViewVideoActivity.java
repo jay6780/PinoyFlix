@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
+import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.Utils.views.FullScreenVideoView;
 
 import java.util.ArrayList;
@@ -211,13 +212,7 @@ public class FullViewVideoActivity extends AppCompatActivity implements View.OnC
     private void initLandScape() {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         relative_video.setLayoutParams(params);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        View decorView = getWindow().getDecorView();
-        int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-        decorView.setSystemUiVisibility(flags);
-        setCutoutMode(WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES);
+        new WindowUtils(this,true);
     }
 
     private void setCutoutMode(int mode) {

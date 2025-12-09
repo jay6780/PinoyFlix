@@ -154,15 +154,15 @@ public class VideoWebviewActivity extends AppCompatActivity {
             String videoDomain = "";
             switch (videoPosition){
                 case 1:
-                    videoDomain = "vidsrc-embed.ru";
+                    videoDomain = "vidsrc";
                     break;
                 case 2:
                 case 5:
-                    videoDomain = "vidrock.net";
+                    videoDomain = "vidrock";
                     break;
                 case 3:
                 case 4:
-                    videoDomain = "vidlink.pro";
+                    videoDomain = "vidlink";
                     break;
             }
 

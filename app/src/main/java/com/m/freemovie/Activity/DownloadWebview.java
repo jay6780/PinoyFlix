@@ -107,14 +107,8 @@ public class DownloadWebview extends AppCompatActivity {
                 String url = request.getUrl().toString();
                 return handleUrlLoading(view, url);
             }
-
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                return handleUrlLoading(view, url);
-            }
-
             private boolean handleUrlLoading(WebView view, String url) {
-                if (url.contains("dl.vidsrc.vip") || url.contains("cache.cardfightvanguard.site") || url.contains("dl.2ae8zric7z.workers.dev")) {
+                if (url.contains("vidsrc") || url.contains("cardfightvanguard") || url.contains("workers.dev")) {
                     return false;
                 } else {
                     view.stopLoading();
@@ -127,7 +121,7 @@ public class DownloadWebview extends AppCompatActivity {
         binding.webView.setDownloadListener(new DownloadListener() {
             @Override
             public void onDownloadStart(String videoUrl, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-                if (videoUrl.contains(".mp4")) {
+                if (videoUrl.contains("vidsrc") || videoUrl.contains("cardfightvanguard") || videoUrl.contains("workers.dev")) {
                     if(isFirstTask){
                         Toast.makeText(getApplicationContext(),"Download in progress",Toast.LENGTH_SHORT).show();
                         return;
