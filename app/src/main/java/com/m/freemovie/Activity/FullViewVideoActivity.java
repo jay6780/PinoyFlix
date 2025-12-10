@@ -212,7 +212,7 @@ public class FullViewVideoActivity extends AppCompatActivity implements View.OnC
     private void initLandScape() {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         relative_video.setLayoutParams(params);
-        new WindowUtils(this,true);
+        new WindowUtils(this,true,false);
     }
 
     private void setCutoutMode(int mode) {

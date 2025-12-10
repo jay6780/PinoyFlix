@@ -167,7 +167,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     @Override
     protected void onStart() {
         super.onStart();
-        new WindowUtils(this,false);
+        new WindowUtils(this,false,false);
     }
 
     @Override
@@ -290,7 +290,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     @Override
     protected void onResume() {
         super.onResume();
-        new WindowUtils(this,false);
+        new WindowUtils(this,false,false);
         if(seasonsAdapter !=null){
             seasonsAdapter.recount();
         }

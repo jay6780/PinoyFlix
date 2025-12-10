@@ -45,7 +45,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
         dbHelper = new WatchHistoryDBHelper(this);;
-        new WindowUtils(this,true);
+        new WindowUtils(this,true,false);
         title = getIntent().getStringExtra("title");
         id = getIntent().getStringExtra("id");
         seasonId = getIntent().getStringExtra("seasonId");
@@ -90,7 +90,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         binding.rlWebview.setLayoutParams(params);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-        new WindowUtils(this,true);
+        new WindowUtils(this,true,false);
     }
 
 
@@ -101,7 +101,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         binding.rvSeason.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(250));
         binding.rlWebview.setLayoutParams(params);
-        new WindowUtils(this,true);
+        new WindowUtils(this,true,false);
     }
     public int dip2px(float dpValue) {
         final float scale = getResources(this).getDisplayMetrics().density;
