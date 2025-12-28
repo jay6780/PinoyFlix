@@ -235,39 +235,43 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                 }
             }
 
-            seriesBinding.tvInfo.setText(sb.toString());
-            seriesBinding.tvDate.setText(detailTvBean.getLast_episode_to_air().getAir_date());
-            seriesBinding.tvRate.setText(String.format("%.2f", detailTvBean.getLast_episode_to_air().getVote_average()));
-            seriesBinding.language.setText(detailTvBean.getOrigin_country().get(0));
-            seriesBinding.tvVote.setText(String.valueOf(detailTvBean.getLast_episode_to_air().getVote_count()));
-            seriesBinding.tvDescription.setText(detailTvBean.getLast_episode_to_air().getOverview());
-            seriesBinding.overView.setVisibility(detailTvBean.getLast_episode_to_air().getOverview().isEmpty() ? View.GONE : View.VISIBLE);
-            seriesBinding.tvOriginal.setText(detailTvBean.getName());
-            this.title = detailTvBean.getName();
+            if(detailTvBean.getLast_episode_to_air() !=null){
+                seriesBinding.tvDate.setText(detailTvBean.getLast_episode_to_air().getAir_date());
 
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-            params.addRule(RelativeLayout.BELOW, seriesBinding.card.getId());
-            params.setMargins(30, 0, 0, 0);
-            seriesBinding.orig.setLayoutParams(params);
+                seriesBinding.tvInfo.setText(sb.toString());
 
-            seriesBinding.status.setVisibility(View.GONE);
-            seriesBinding.tvStatus.setVisibility(View.GONE);
-            seriesBinding.revenue.setVisibility(View.GONE);
-            seriesBinding.tvRevenue.setVisibility(View.GONE);
-            seriesBinding.tvWatch.setVisibility(View.GONE);
+                seriesBinding.tvRate.setText(String.format("%.2f", detailTvBean.getLast_episode_to_air().getVote_average()));
+                seriesBinding.language.setText(detailTvBean.getOrigin_country().get(0));
+                seriesBinding.tvVote.setText(String.valueOf(detailTvBean.getLast_episode_to_air().getVote_count()));
+                seriesBinding.tvDescription.setText(detailTvBean.getLast_episode_to_air().getOverview());
+                seriesBinding.overView.setVisibility(detailTvBean.getLast_episode_to_air().getOverview().isEmpty() ? View.GONE : View.VISIBLE);
+                seriesBinding.tvOriginal.setText(detailTvBean.getName());
+                this.title = detailTvBean.getName();
 
-            seasonRecycler(detailTvBean.getSeasons());
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.BELOW, seriesBinding.card.getId());
+                params.setMargins(30, 0, 0, 0);
+                seriesBinding.orig.setLayoutParams(params);
 
-            Glide.with(this)
-                    .asBitmap()
-                    .load(posterPath)
-                    .into(seriesBinding.ivSmallimg);
-            Glide.with(this)
-                    .asBitmap()
-                    .load(posterPath)
-                    .into(seriesBinding.ivBig);
+                seriesBinding.status.setVisibility(View.GONE);
+                seriesBinding.tvStatus.setVisibility(View.GONE);
+                seriesBinding.revenue.setVisibility(View.GONE);
+                seriesBinding.tvRevenue.setVisibility(View.GONE);
+                seriesBinding.tvWatch.setVisibility(View.GONE);
 
-            setImageData(id);
+                seasonRecycler(detailTvBean.getSeasons());
+
+                Glide.with(this)
+                        .asBitmap()
+                        .load(posterPath)
+                        .into(seriesBinding.ivSmallimg);
+                Glide.with(this)
+                        .asBitmap()
+                        .load(posterPath)
+                        .into(seriesBinding.ivBig);
+
+                setImageData(id);
+            }
         }
     }
     private void seasonRecycler(List<DetailTvBean.SeasonsBean> seasons) {

@@ -246,7 +246,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
 
     @Override
     public void getVideoUrl(String videoUrl) {
-        Log.d("VideoUrl","val: "+videoUrl);
+//        Log.d("VideoUrl","val: "+videoUrl);
         binding.player.setVideoPath(videoUrl);
     }
 
@@ -381,7 +381,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
             new WindowUtils(this,false,false);
             int marginPx = (int) TypedValue.applyDimension(
                     TypedValue.COMPLEX_UNIT_DIP,
-                    250,
+                    330,
                     getResources().getDisplayMetrics()
             );
             int iconspx = (int) TypedValue.applyDimension(
@@ -391,10 +391,10 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
             );
             isLandScape = false;
             RelativeLayout.LayoutParams params1  = new RelativeLayout.LayoutParams(iconspx, iconspx);
-            params1.setMargins(5,50,0,0);
+            params1.setMargins(5,60,0,0);
             RelativeLayout.LayoutParams params2  = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
             params2.addRule(RelativeLayout.RIGHT_OF,binding.btnBack.getId());
-            params2.setMargins(0,60,0,0);
+            params2.setMargins(0,70,0,0);
 
             ViewGroup parent = (ViewGroup) binding.seekBar.getParent();
             parent.removeView(binding.seekBar);

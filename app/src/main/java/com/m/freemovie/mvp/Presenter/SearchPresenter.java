@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
+import com.m.freemovie.mvp.ClassBean.TagalogSearchBean;
 import com.m.freemovie.mvp.Contract.SearchContract;
 import com.m.freemovie.mvp.Model.MovieModel;
 
@@ -64,6 +65,34 @@ public class SearchPresenter implements SearchContract.Presenter {
             public void returnResult(MovieBean apiBean) {
                 view.hideLoading();
                 view.getSearchSeriesResponse(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getTagalogQuery(String query) {
+        view.showLoading();
+        MovieModel.getTagalogSearch(query ,new Callback<TagalogSearchBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(TagalogSearchBean apiBean) {
+                view.hideLoading();
+                view.getTagalogSearch(apiBean);
             }
 
             @Override

@@ -19,9 +19,12 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.m.freemovie.R;
+import com.m.freemovie.adapter.TagalogSearchAdapter;
 import com.m.freemovie.adapter.ViewAllAdapter;
 import com.m.freemovie.mvp.ClassBean.FreeMovieEvent;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
+import com.m.freemovie.mvp.ClassBean.TagalogSearchBean;
+import com.m.freemovie.mvp.ClassBean.TagalogSearchEvent;
 import com.m.freemovie.mvp.Contract.SearchContract;
 import com.m.freemovie.mvp.Presenter.SearchPresenter;
 
@@ -38,26 +41,36 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     private RecyclerView rv_search;
     private SearchPresenter searchPresenter;
     private ViewAllAdapter movieAdapter;
+    private TagalogSearchAdapter tagalogSearchAdapter;
     private boolean isLoading = false;
     private String lastQuery;
     private boolean isNomore = false;
     private ImageView btn_send;
     private List<MovieBean.ResultsBean> movieLists = new ArrayList<>();
+    private List<TagalogSearchBean.ResultsBean> tagaloglist = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
     private boolean isTvSeries = false;
+    private boolean isTagalog = false;
+    private boolean isDefault = true;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         et_search = view.findViewById(R.id.et_search);
-        rv_search =view.findViewById(R.id.rv_search);
-        btn_send= view.findViewById(R.id.btn_send);
+        rv_search = view.findViewById(R.id.rv_search);
+        btn_send = view.findViewById(R.id.btn_send);
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
-        rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        movieAdapter = new ViewAllAdapter();
-        rv_search.setAdapter(movieAdapter);
+
         searchPresenter = new SearchPresenter(this);
         btn_send.setOnClickListener(this);
+
+
+        movieAdapter = new ViewAllAdapter();
+        rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        rv_search.setAdapter(movieAdapter);
+        tagalogSearchAdapter = new TagalogSearchAdapter();
+
         rv_search.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -67,7 +80,10 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
                     int[] lastVisiblePositions = layoutManager.findLastVisibleItemPositions(null);
                     int lastVisiblePosition = getMaxPosition(lastVisiblePositions);
                     if (lastVisiblePosition >= movieLists.size() - 1) {
-                        if(isNomore){
+                        if(isTagalog){
+                            return;
+                        }
+                        if (isNomore) {
                             return;
                         }
                         isLoading = true;
@@ -102,9 +118,36 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void changeSearch(FreeMovieEvent event) {
         this.isTvSeries = event.isChangeSearch();
-//        Log.d("isTvSeries","value: "+isTvSeries);
-        et_search.setHint(isTvSeries? "Enter series name":"Enter movie name");
+//            Log.d("isTvSeries","value: "+isTvSeries);
+        isTagalog = false;
+
+        rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        movieAdapter = new ViewAllAdapter();
+        rv_search.setAdapter(movieAdapter);
+        movieLists.clear();
+        if(isTvSeries){
+            et_search.setHint("Enter series name");
+        }else{
+            et_search.setHint( "Enter movie name");
+        }
+
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void isTagalog(TagalogSearchEvent event) {
+        this.isTagalog = event.isTagalog();
+        Log.d("isTagalog","value: "+isTagalog);
+        tagaloglist.clear();
+        if(isTagalog){
+            et_search.setHint("Enter tagalog series");
+            rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+            tagalogSearchAdapter = new TagalogSearchAdapter();
+            rv_search.setAdapter(tagalogSearchAdapter);
+
+        }
+
+    }
+
 
     @Override
     public void onStart() {
@@ -127,13 +170,30 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
             return;
         }
         String query = et_search.getText().toString().trim();
-        if(query.isEmpty()){
-            Toast.makeText(getContext(),isTvSeries?"Please enter Tv series" :"Please enter movie name" ,Toast.LENGTH_SHORT).show();
-            return;
+
+        if(isTagalog){
+            if(query.isEmpty()){
+                Toast.makeText(getContext(),"Please enter tagalog series",Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
+        if(isTvSeries){
+            if(query.isEmpty()){
+                Toast.makeText(getContext(),"Please enter Tv series"  ,Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }else{
+            if(query.isEmpty()){
+                Toast.makeText(getContext(),"Please enter movie name"  ,Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+
         isNomore = false;
         et_search.setText("");
         movieAdapter.setNewData(new ArrayList<>());
+        tagalogSearchAdapter.setNewData(new ArrayList<>());
         lastQuery ="";
         page = 1;
     }
@@ -204,6 +264,21 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     }
 
     @Override
+    public void getTagalogSearch(TagalogSearchBean tagalogSearchBean) {
+        if(tagalogSearchBean!=null && tagalogSearchBean.getResults() != null){
+            isLoading = false;
+            if(!tagalogSearchBean.getResults().isEmpty()){
+                tagaloglist.addAll(tagalogSearchBean.getResults());
+                tagalogSearchAdapter.setNewData(tagaloglist);
+            }else{
+                Toast.makeText(getContext(),"No more Tv tagalog series",Toast.LENGTH_SHORT).show();
+                isLoading = false;
+                isNomore = true;
+            }
+        }
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btn_send:
@@ -228,7 +303,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         lastQuery = query;
         isNomore = false;
         page = 1;
-        movieLists.clear();
+        tagalogSearchAdapter.setNewData(new ArrayList<>());
         movieAdapter.setNewData(new ArrayList<>());
         if(isTvSeries){
             searchPresenter.getSearchSeries(getString(R.string.key),query,page);
@@ -236,6 +311,10 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         }else{
             searchPresenter.getSearchQuery(getString(R.string.key),query,page);
             movieAdapter.isTvSeries(false);
+        }
+
+        if(isTagalog){
+            searchPresenter.getTagalogQuery(query);
         }
 
     }

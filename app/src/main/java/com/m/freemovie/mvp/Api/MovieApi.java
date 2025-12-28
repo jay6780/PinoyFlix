@@ -5,6 +5,7 @@ import com.m.freemovie.mvp.ClassBean.DetailTvBean;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
 import com.m.freemovie.mvp.ClassBean.TagalogBean;
 import com.m.freemovie.mvp.ClassBean.TagalogEpisodeBean;
+import com.m.freemovie.mvp.ClassBean.TagalogSearchBean;
 import com.m.freemovie.mvp.ClassBean.TvSeriesBean;
 
 import io.reactivex.rxjava3.core.Observable;
@@ -111,5 +112,9 @@ public interface MovieApi {
     @GET("taganime/video")
     Observable<TagalogEpisodeBean> getTagalogEpisode(
             @Query("url") String url);
+
+    @GET("taganime")
+    Observable<TagalogSearchBean> getSearch(
+            @Query("search") String search);
 
 }

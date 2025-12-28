@@ -12,6 +12,7 @@ import androidx.lifecycle.Lifecycle;
 import com.m.freemovie.R;
 import com.m.freemovie.databinding.FragmentHomeBinding;
 import com.m.freemovie.mvp.ClassBean.FreeMovieEvent;
+import com.m.freemovie.mvp.ClassBean.TagalogSearchEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -56,7 +57,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 binding.tvMovies.setTextColor(getResources().getColor(R.color.SecondColor));
                 binding.tvSeries.setTextColor(getResources().getColor(R.color.white));
                 binding.tvTagalog.setTextColor(getResources().getColor(R.color.white));
-                EventBus.getDefault().post(new FreeMovieEvent(true,false));
+                EventBus.getDefault().post(new FreeMovieEvent(false));
                 break;
             case R.id.tv_series:
                 transaction.show(tvSeriesFragment);
@@ -65,7 +66,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 binding.tvSeries.setTextColor(getResources().getColor(R.color.SecondColor));
                 binding.tvMovies.setTextColor(getResources().getColor(R.color.white));
                 binding.tvTagalog.setTextColor(getResources().getColor(R.color.white));
-                EventBus.getDefault().post(new FreeMovieEvent(true,false));
+                EventBus.getDefault().post(new FreeMovieEvent(true));
                 break;
 
             case R.id.tv_tagalog:
@@ -75,7 +76,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 binding.tvTagalog.setTextColor(getResources().getColor(R.color.SecondColor));
                 binding.tvMovies.setTextColor(getResources().getColor(R.color.white));
                 binding.tvSeries.setTextColor(getResources().getColor(R.color.white));
-                EventBus.getDefault().post(new FreeMovieEvent(false,true));
+                EventBus.getDefault().post(new TagalogSearchEvent(true));
                 break;
         }
 
