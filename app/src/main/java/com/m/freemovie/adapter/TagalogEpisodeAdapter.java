@@ -56,6 +56,7 @@ public class TagalogEpisodeAdapter extends BaseQuickAdapter<TagalogEpisode, Base
             public void onClick(View view) {
                 if(lastPosition == (helper.getAdapterPosition())){
                     lastPosition = -1;
+                    videoPlayListerner.getVideoUrl("");
                 }else{
                     lastPosition = (helper.getAdapterPosition());
                     videoPlayListerner.getVideoUrl(item.getVideoUrl());

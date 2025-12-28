@@ -233,7 +233,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
             for(TagalogEpisodeBean.ResultsBean data : tagalogEpisodeBean.getResults()){
                 if(!data.getEpisodes().isEmpty()){
                     for(TagalogEpisodeBean.ResultsBean.EpisodesBean dataEpisode : data.getEpisodes()){
-                        tagalogEpisodeList.add(new TagalogEpisode(dataEpisode.getEpisode(),imageUrl,data.getVideoUrl()));
+                        tagalogEpisodeList.add(new TagalogEpisode(dataEpisode.getEpisode(),imageUrl,dataEpisode.getVideoUrl()));
                     }
                 }else{
                     Toast.makeText(getApplicationContext(),"Episodes not found",Toast.LENGTH_SHORT).show();
@@ -247,7 +247,10 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
     @Override
     public void getVideoUrl(String videoUrl) {
 //        Log.d("VideoUrl","val: "+videoUrl);
-        binding.player.setVideoPath(videoUrl);
+        if(!videoUrl.isEmpty()){
+            binding.player.setVideoPath(videoUrl);
+        }
+
     }
 
 
