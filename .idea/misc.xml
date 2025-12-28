@@ -7,6 +7,22 @@
         <entry key="..\:/Android studio projects/My_project_practice/FreeMovie/app/src/main/res/layout/activity_video_webview.xml" value="0.25104166666666666" />
         <entry key="..\:/Android studio projects/My_project_practice/FreeMovie/app/src/main/res/layout/fragment_movie.xml" value="0.2546875" />
         <entry key="..\:/Android studio projects/My_project_practice/FreeMovie/app/src/main/res/layout/movie_item.xml" value="0.25" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/drawable/ic_baseline_home_24.xml" value="0.2985" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.2985" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/drawable/unbooked.xml" value="0.2985" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout-land/activity_tagalog_episode.xml" value="0.22" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/activity_full_view_video.xml" value="0.22083333333333333" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/activity_main.xml" value="0.24954710144927536" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/activity_tagalog_episode.xml" value="0.25" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/activity_video_webview.xml" value="0.284375" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/activity_view_all.xml" value="0.22" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/episode_item.xml" value="0.18854166666666666" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/fragment_home.xml" value="0.30052083333333335" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/fragment_movie.xml" value="0.30052083333333335" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/fragment_tagalog_series.xml" value="0.34646739130434784" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/fragment_tagalog_series2.xml" value="0.30052083333333335" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/movie_item.xml" value="0.358695652173913" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/rl_title.xml" value="0.358695652173913" />
       </map>
     </option>
   </component>

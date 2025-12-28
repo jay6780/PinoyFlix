@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#313647"
+    android:orientation="vertical">
+
+
+
+    <RelativeLayout
+        android:id="@+id/relative_video"
+        android:layout_width="match_parent"
+        android:layout_height="250dp">
+
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="20dp"
+            android:elevation="20dp"
+            android:padding="5dp"
+            android:src="@mipmap/icon_backwhite" />
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:layout_toRightOf="@+id/btn_back"
+            android:textSize="18sp"
+            android:elevation="20dp"/>
+
+
+        <ImageView
+            android:id="@+id/rotate"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_toLeftOf="@+id/full_wide"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginEnd="40dp"
+            android:layout_alignParentBottom="true"
+            android:elevation="20dp"/>
+
+
+        <com.m.freemovie.Utils.views.FullScreenVideoView
+            android:id="@+id/player"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/ten_negative"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:padding="5dp"
+            android:layout_marginEnd="50dp"
+            android:layout_toLeftOf="@+id/btn_play"
+            android:adjustViewBounds="true"
+            android:src="@mipmap/ten_rotate"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/btn_play"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerInParent="true"
+            android:adjustViewBounds="true"
+            android:padding="5dp"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/ten_positive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="50dp"
+            android:layout_toRightOf="@+id/btn_play"
+            android:adjustViewBounds="true"
+            android:padding="5dp"
+            android:src="@mipmap/ten_positive"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="20dp"
+            android:textColor="@color/white"
+            android:layout_above="@+id/seekBar"
+            android:textSize="16sp"
+            android:layout_alignParentEnd="true"/>
+
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/full_wide"
+
+            android:max="100"
+            android:progress="0"
+            android:progressTint="@android:color/white"
+            android:thumbTint="@android:color/white" />
+
+
+        <ImageView
+            android:id="@+id/full_wide"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="5dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="5dp"
+            android:src="@mipmap/full_screen"
+            android:elevation="20dp" />
+
+
+
+
+    </RelativeLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_episode"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+
+</LinearLayout>

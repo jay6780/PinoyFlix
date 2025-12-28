@@ -21,10 +21,15 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".Activity.SeasonListActivity"
+            android:name=".Activity.TagalogEpisodeActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
             android:screenOrientation="portrait"
             android:exported="false" />
+        <activity
+            android:name=".Activity.SeasonListActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Activity.Download_videoActivity"
             android:exported="false"

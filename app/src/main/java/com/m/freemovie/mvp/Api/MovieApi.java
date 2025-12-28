@@ -3,6 +3,8 @@ package com.m.freemovie.mvp.Api;
 import com.m.freemovie.mvp.ClassBean.DetailBean;
 import com.m.freemovie.mvp.ClassBean.DetailTvBean;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
+import com.m.freemovie.mvp.ClassBean.TagalogBean;
+import com.m.freemovie.mvp.ClassBean.TagalogEpisodeBean;
 import com.m.freemovie.mvp.ClassBean.TvSeriesBean;
 
 import io.reactivex.rxjava3.core.Observable;
@@ -100,4 +102,14 @@ public interface MovieApi {
             @Query("query") String query,
             @Query("page") int page,
             @Query("include_adult") boolean includeAdult);
+
+    // tagalog dub
+
+    @GET("taganime/series")
+    Observable<TagalogBean> getTagalogSeries();
+
+    @GET("taganime/video")
+    Observable<TagalogEpisodeBean> getTagalogEpisode(
+            @Query("url") String url);
+
 }
