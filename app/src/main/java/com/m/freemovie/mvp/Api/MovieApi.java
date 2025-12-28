@@ -4,6 +4,7 @@ import com.m.freemovie.mvp.ClassBean.DetailBean;
 import com.m.freemovie.mvp.ClassBean.DetailDownloadBean;
 import com.m.freemovie.mvp.ClassBean.DetailTvBean;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
+import com.m.freemovie.mvp.ClassBean.RevivalSearchBean;
 import com.m.freemovie.mvp.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.ClassBean.TagalogBean;
 import com.m.freemovie.mvp.ClassBean.TagalogEpisodeBean;
@@ -138,4 +139,9 @@ public interface MovieApi {
     @GET("animerevival/download")
     Observable<DetailDownloadBean> getVideoTrack(
             @Query("url") String url);
+
+
+    @GET("animerevival")
+    Observable<RevivalSearchBean> getSearchRevival(
+            @Query("search") String search);
 }

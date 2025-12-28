@@ -74,6 +74,18 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
                 }
             }
         });
+
+        isMovieVideo();
+
+
+        binding.rvSeason.setLayoutManager(new LinearLayoutManager(this));
+        episodeAdapter = new TagalogDetailAdapter(this);
+        binding.rvSeason.setAdapter(episodeAdapter);
+
+        episodeAdapter.setNewData(episodeBeanList);
+    }
+
+    private void isMovieVideo() {
         if(isMovie){
             revivalTrackPresenter.getTrackUrl(id);
             binding.tvEnjoy.setVisibility(View.VISIBLE);
@@ -91,12 +103,6 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
             binding.rvSeason.setVisibility(View.VISIBLE);
             binding.episodeTxt.setVisibility(View.VISIBLE);
         }
-
-        binding.rvSeason.setLayoutManager(new LinearLayoutManager(this));
-        episodeAdapter = new TagalogDetailAdapter(this);
-        binding.rvSeason.setAdapter(episodeAdapter);
-
-        episodeAdapter.setNewData(episodeBeanList);
     }
 
     private void rotateScreen() {
@@ -214,10 +220,22 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
                 "<html>" +
                 "<head>" +
                 "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
+                "    <style>" +
+                "        .video-player {" +
+                "            position: fixed;" +
+                "            top: 0;" +
+                "            left: 0;" +
+                "            width: 100%;" +
+                "            height: 100%;" +
+                "            border: none;" +
+                "            object-fit: contain; /* Makes video fill while keeping aspect ratio */" +
+                "            background-color: #000; /* Black background for letterboxing */" +
+                "        }" +
+                "    </style>" +
                 "</head>" +
-                "<body style=\"margin:0;padding:0;overflow:hidden;\">" +
-                "    <iframe src="+videoUrl+
-                "            style=\"position:fixed;top:0;left:0;width:100%;height:100%;border:none;\" " +
+                "<body style=\"margin:0;padding:0;overflow:hidden;background:#000;\">" +
+                "    <iframe src=\"" + videoUrl + "\"" +
+                "            class=\"video-player\"" +
                 "            allow=\"autoplay; encrypted-media; fullscreen\" " +
                 "            allowfullscreen>" +
                 "    </iframe>" +

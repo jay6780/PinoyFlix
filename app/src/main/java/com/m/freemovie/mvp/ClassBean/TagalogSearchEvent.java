@@ -1,7 +1,6 @@
 package com.m.freemovie.mvp.ClassBean;
 
 public class TagalogSearchEvent {
-    boolean changeSearch;
     boolean isTagalog;
 
     public boolean isTagalog() {
