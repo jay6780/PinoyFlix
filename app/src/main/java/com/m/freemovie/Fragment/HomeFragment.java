@@ -29,7 +29,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         binding.tvTagalog.setOnClickListener(this);
         movieFragment = new MovieFragment();
         tvSeriesFragment = new TvSeriesFragment();
-        tagalogFragment = new TagalogSeriesFragment();
+        tagalogFragment = new ChooseFragment();
 
         getChildFragmentManager()
                 .beginTransaction()

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#313647">
+
+
+    <RelativeLayout
+        android:id="@+id/rl_webview"
+        android:layout_width="match_parent"
+        android:background="#000000"
+        android:layout_height="300dp">
+
+
+        <ImageView
+            android:id="@+id/btn_back_finish"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginStart="10dp"
+            android:elevation="20dp"
+            android:src="@mipmap/icon_backwhite" />
+
+        <TextView
+            android:id="@+id/title_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="9dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="10dp"
+            android:layout_toRightOf="@+id/btn_back_finish"
+            android:elevation="20dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <WebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tv_select"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Select episode to play" />
+
+        <ImageView
+            android:id="@+id/expand"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:elevation="20dp"
+            android:src="@mipmap/expand" />
+    </RelativeLayout>
+
+    <TextView
+        android:layout_below="@+id/rl_webview"
+        android:id="@+id/episodeTxt"
+        android:layout_width="wrap_content"
+        android:visibility="gone"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Episodes" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_season"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/episodeTxt"
+        android:visibility="gone"
+        android:layout_marginTop="2dp" />
+
+    <TextView
+        android:id="@+id/tv_enjoy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:textSize="20sp"
+        android:padding="5dp"
+        android:text="Enjoy watch movie" />
+
+
+</RelativeLayout>

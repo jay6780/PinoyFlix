@@ -18,9 +18,9 @@ import com.m.freemovie.mvp.Contract.TagalogSeriesContract;
 import com.m.freemovie.mvp.Presenter.TagalogSeriesPresenter;
 
 public class TagalogSeriesFragment extends Fragment implements TagalogSeriesContract.View {
-    FragmentTagalogSeriesBinding binding;
-    TagalogSeriesAdapter tagalogSeriesAdapter;
-    TagalogSeriesPresenter tagalogSeriesPresenter;
+    private FragmentTagalogSeriesBinding binding;
+    private TagalogSeriesAdapter tagalogSeriesAdapter;
+    private TagalogSeriesPresenter tagalogSeriesPresenter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

@@ -51,7 +51,6 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     private SwipeRefreshLayout swipeRefreshLayout;
     private boolean isTvSeries = false;
     private boolean isTagalog = false;
-    private boolean isDefault = true;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -160,6 +159,8 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         super.onStop();
         EventBus.getDefault().unregister(this);
     }
+
+
 
     private void refresh(){
         if (swipeRefreshLayout.isRefreshing()) {
@@ -296,13 +297,31 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
             return;
         }
         String query = et_search.getText().toString().trim();
-        if(query.isEmpty()){
-            Toast.makeText(getContext(),isTvSeries?"Please enter Tv series" :"Please enter movie name" ,Toast.LENGTH_SHORT).show();
-            return;
+
+        if(isTvSeries){
+            if(query.isEmpty()){
+                Toast.makeText(getContext(),"Please enter Tv series"  ,Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }else{
+            if(query.isEmpty()){
+                Toast.makeText(getContext(),"Please enter movie name"  ,Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+
+        if(isTagalog){
+            if(query.isEmpty()){
+                Toast.makeText(getContext(),"Please enter tagalog series",Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
         lastQuery = query;
         isNomore = false;
         page = 1;
+        tagaloglist.clear();
+        movieLists.clear();
         tagalogSearchAdapter.setNewData(new ArrayList<>());
         movieAdapter.setNewData(new ArrayList<>());
         if(isTvSeries){

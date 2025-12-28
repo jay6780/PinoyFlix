@@ -1,10 +1,13 @@
 package com.m.freemovie.mvp.Api;
 
 import com.m.freemovie.mvp.ClassBean.DetailBean;
+import com.m.freemovie.mvp.ClassBean.DetailDownloadBean;
 import com.m.freemovie.mvp.ClassBean.DetailTvBean;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
+import com.m.freemovie.mvp.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.ClassBean.TagalogBean;
 import com.m.freemovie.mvp.ClassBean.TagalogEpisodeBean;
+import com.m.freemovie.mvp.ClassBean.TagalogInfoBean;
 import com.m.freemovie.mvp.ClassBean.TagalogSearchBean;
 import com.m.freemovie.mvp.ClassBean.TvSeriesBean;
 
@@ -104,8 +107,8 @@ public interface MovieApi {
             @Query("page") int page,
             @Query("include_adult") boolean includeAdult);
 
-    // tagalog dub
 
+    // tagalog dub
     @GET("taganime/series")
     Observable<TagalogBean> getTagalogSeries();
 
@@ -117,4 +120,22 @@ public interface MovieApi {
     Observable<TagalogSearchBean> getSearch(
             @Query("search") String search);
 
+
+    //revival
+    @GET("animerevival/tvshows")
+    Observable<RevivalSeriesBean> getRevivalSeries(
+            @Query("page") int page);
+
+    @GET("animerevival/movies")
+    Observable<RevivalSeriesBean> getRevivalMovies(
+            @Query("page") int page);
+
+    @GET("animerevival/info")
+    Observable<TagalogInfoBean> getRevivalInfo(
+            @Query("url") String url);
+
+
+    @GET("animerevival/download")
+    Observable<DetailDownloadBean> getVideoTrack(
+            @Query("url") String url);
 }
