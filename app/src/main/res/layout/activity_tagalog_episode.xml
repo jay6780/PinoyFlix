@@ -12,7 +12,7 @@
     <RelativeLayout
         android:id="@+id/relative_video"
         android:layout_width="match_parent"
-        android:layout_height="330dp">
+        android:layout_height="300dp">
 
         <ImageView
             android:id="@+id/btn_back"
@@ -71,6 +71,17 @@
             android:padding="5dp"
             android:visibility="invisible" />
 
+
+        <ImageView
+            android:id="@+id/btn_refresh"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerInParent="true"
+            android:adjustViewBounds="true"
+            android:src="@mipmap/refresh_white"
+            android:padding="5dp"
+            android:visibility="gone"/>
+
         <ImageView
             android:id="@+id/ten_positive"
             android:layout_width="wrap_content"
@@ -88,18 +99,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginBottom="3dp"
             android:textColor="@color/white"
             android:layout_above="@+id/seekBar"
-            android:textSize="16sp"
-            android:layout_alignParentEnd="true"/>
+            android:textSize="15sp" />
 
         <SeekBar
             android:id="@+id/seekBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/full_wide"
-
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="5dp"
             android:max="100"
             android:progress="0"
             android:progressTint="@android:color/white"
@@ -110,12 +121,12 @@
             android:id="@+id/full_wide"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_marginEnd="5dp"
+            android:layout_above="@+id/seekBar"
+            android:layout_marginBottom="3dp"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="5dp"
-            android:src="@mipmap/full_screen"
-            android:elevation="20dp" />
+            android:layout_marginEnd="20dp"
+            android:elevation="20dp"
+            android:src="@mipmap/full_screen" />
 
 
 

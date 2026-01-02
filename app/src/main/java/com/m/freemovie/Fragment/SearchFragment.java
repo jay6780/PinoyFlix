@@ -22,12 +22,10 @@ import com.m.freemovie.R;
 import com.m.freemovie.adapter.TagalogSearchAdapter;
 import com.m.freemovie.adapter.TvRevivialSearchAdapter;
 import com.m.freemovie.adapter.ViewAllAdapter;
-import com.m.freemovie.mvp.ClassBean.FreeMovieEvent;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
+import com.m.freemovie.mvp.ClassBean.MovieEvent;
 import com.m.freemovie.mvp.ClassBean.RevivalSearchBean;
-import com.m.freemovie.mvp.ClassBean.ServerSearchEvent;
 import com.m.freemovie.mvp.ClassBean.TagalogSearchBean;
-import com.m.freemovie.mvp.ClassBean.TagalogSearchEvent;
 import com.m.freemovie.mvp.Contract.RevivalSearchContract;
 import com.m.freemovie.mvp.Contract.SearchContract;
 import com.m.freemovie.mvp.Presenter.RevivalSearchPresenter;
@@ -56,9 +54,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     private List<TagalogSearchBean.ResultsBean> tagaloglist = new ArrayList<>();
     private List<RevivalSearchBean.ResultsBean> revivalList = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
-    private boolean isTvSeries = false;
-    private boolean isTagalog = false;
-    private boolean isServer = false;
+    private int position = 1;
     private RevivalSearchPresenter revivalSearchPresenter;
 
     @Override
@@ -75,8 +71,6 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
 
 
         movieAdapter = new ViewAllAdapter();
-        rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        rv_search.setAdapter(movieAdapter);
         tagalogSearchAdapter = new TagalogSearchAdapter();
         tvRevivialSearchAdapter = new TvRevivialSearchAdapter();
 
@@ -89,7 +83,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
                     int[] lastVisiblePositions = layoutManager.findLastVisibleItemPositions(null);
                     int lastVisiblePosition = getMaxPosition(lastVisiblePositions);
                     if (lastVisiblePosition >= movieLists.size() - 1) {
-                        if (isTagalog || isServer) {
+                        if (position > 3) {
                             return;
                         }
                         if (isNomore) {
@@ -125,69 +119,46 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    public void changeSearch(FreeMovieEvent event) {
-        this.isTvSeries = event.isChangeSearch();
-//            Log.d("isTvSeries","value: "+isTvSeries);
-        isTagalog = false;
-        isServer = false;
+    public void searchPosition(MovieEvent event) {
+        this.position = event.getPosition();
+//            Log.d("SearchPosition","value: "+position);
+        switch (position){
+            case 1:
+                et_search.setHint("Enter movie name");
+                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+                movieAdapter = new ViewAllAdapter();
+                rv_search.setAdapter(movieAdapter);
+                movieLists.clear();
+                break;
 
-        rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        movieAdapter = new ViewAllAdapter();
-        rv_search.setAdapter(movieAdapter);
-        movieLists.clear();
-        if (isTvSeries) {
-            et_search.setHint("Enter series name");
-        } else {
-            et_search.setHint("Enter movie name");
-        }
+            case 2:
+                et_search.setHint("Enter series name");
+                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+                movieAdapter = new ViewAllAdapter();
+                rv_search.setAdapter(movieAdapter);
+                movieLists.clear();
+                break;
 
-    }
-
-
-    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    public void selectServerSearch(ServerSearchEvent event) {
-        this.isServer = event.isServer();
-//        Log.d("isServer", "value: " + isTagalog);
-        revivalList.clear();
-        if (isServer) {
-            et_search.setHint("Enter tagalog series");
-            rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-            tvRevivialSearchAdapter = new TvRevivialSearchAdapter();
-            rv_search.setAdapter(tvRevivialSearchAdapter);
-
-        }
-
-    }
-
-
-    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    public void isTagalog(TagalogSearchEvent event) {
-        this.isTagalog = event.isTagalog();
-        isServer = false;
-//        Log.d("isTagalog", "value: " + isTagalog);
-        tagaloglist.clear();
-        if (isTagalog) {
-            et_search.setHint("Enter tagalog series");
-            rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-            tagalogSearchAdapter = new TagalogSearchAdapter();
-            rv_search.setAdapter(tagalogSearchAdapter);
+            case 3:
+                et_search.setHint("Enter tagalog series");
+                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+                tagalogSearchAdapter = new TagalogSearchAdapter();
+                rv_search.setAdapter(tagalogSearchAdapter);
+                tagaloglist.clear();
+                break;
+            case 4:
+            case 5:
+                et_search.setHint("Enter tagalog series");
+                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+                tvRevivialSearchAdapter = new TvRevivialSearchAdapter();
+                rv_search.setAdapter(tvRevivialSearchAdapter);
+                revivalList.clear();
+                break;
 
         }
-
     }
 
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
-    }
 
 
     private void refresh() {
@@ -199,32 +170,36 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
             return;
         }
         String query = et_search.getText().toString().trim();
-
-        if (isTagalog) {
-            if (query.isEmpty()) {
-                Toast.makeText(getContext(), "Please enter tagalog series", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
-        if (isTvSeries) {
-            if (query.isEmpty()) {
-                Toast.makeText(getContext(), "Please enter Tv series", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        } else {
-            if (query.isEmpty()) {
-                Toast.makeText(getContext(), "Please enter movie name", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
-
-
         isNomore = false;
         et_search.setText("");
         movieAdapter.setNewData(new ArrayList<>());
         tagalogSearchAdapter.setNewData(new ArrayList<>());
+        tvRevivialSearchAdapter.setNewData(new ArrayList<>());
         lastQuery = "";
         page = 1;
+        switch (position){
+            case 1:
+                if (query.isEmpty()) {
+                    Toast.makeText(getContext(), "Please enter movie name", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                break;
+            case 2:
+                if (query.isEmpty()) {
+                    Toast.makeText(getContext(), "Please enter Tv series", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                break;
+
+            case 3:
+            case 4:
+            case 5:
+                if (query.isEmpty()) {
+                    Toast.makeText(getContext(), "Please enter tagalog series", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                break;
+        }
     }
 
     private boolean isNetworkAvailable() {
@@ -235,12 +210,14 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     }
 
     private void loadSearch() {
-        if (isTvSeries) {
-            searchPresenter.getSearchSeries(getString(R.string.key), lastQuery, page);
-        } else {
-            searchPresenter.getSearchQuery(getString(R.string.key), lastQuery, page);
+        switch (position){
+            case 1:
+                searchPresenter.getSearchQuery(getString(R.string.key), lastQuery, page);
+                break;
+            case 2:
+                searchPresenter.getSearchSeries(getString(R.string.key), lastQuery, page);
+                break;
         }
-
     }
 
     @Override
@@ -341,54 +318,62 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
             return;
         }
         String query = et_search.getText().toString().trim();
-
-        if (isServer) {
-            if (query.isEmpty()) {
-                Toast.makeText(getContext(), "Please enter tagalog asas", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        } else if (isTagalog) {
-            if (query.isEmpty()) {
-                Toast.makeText(getContext(), "Please enter tagalog series", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        } else if (isTvSeries) {
-            if (query.isEmpty()) {
-                Toast.makeText(getContext(), "Please enter Tv series", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        } else {
-            if (query.isEmpty()) {
-                Toast.makeText(getContext(), "Please enter movie name", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
-
         lastQuery = query;
         isNomore = false;
         page = 1;
+        switch (position){
+            case 1:
+                movieLists.clear();
+                movieAdapter.setNewData(new ArrayList<>());
+                if (query.isEmpty()) {
+                    Toast.makeText(getContext(), "Please enter movie name", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                searchPresenter.getSearchQuery(getString(R.string.key), query, page);
+                movieAdapter.isTvSeries(false);
+                break;
+            case 2:
+                movieLists.clear();
+                movieAdapter.setNewData(new ArrayList<>());
+                if (query.isEmpty()) {
+                    Toast.makeText(getContext(), "Please enter Tv series", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                searchPresenter.getSearchSeries(getString(R.string.key), query, page);
+                movieAdapter.isTvSeries(true);
+                break;
 
-        if (isServer) {
-            revivalList.clear();
-            tvRevivialSearchAdapter.setNewData(new ArrayList<>());
-        } else if (isTagalog) {
-            tagaloglist.clear();
-            tagalogSearchAdapter.setNewData(new ArrayList<>());
-        } else {
-            movieLists.clear();
-            movieAdapter.setNewData(new ArrayList<>());
+            case 3:
+                tagaloglist.clear();
+                tagalogSearchAdapter.setNewData(new ArrayList<>());
+                if (query.isEmpty()) {
+                    Toast.makeText(getContext(), "Please enter tagalog series", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                searchPresenter.getTagalogQuery(query);
+                break;
+            case 4:
+            case 5:
+                revivalList.clear();
+                tvRevivialSearchAdapter.setNewData(new ArrayList<>());
+                if (query.isEmpty()) {
+                    Toast.makeText(getContext(), "Please enter tagalog series", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                revivalSearchPresenter.getSearchRevival(query);
+                break;
         }
+    }
 
-        if (isServer) {
-            revivalSearchPresenter.getSearchRevival(query);
-        } else if (isTagalog) {
-            searchPresenter.getTagalogQuery(query);
-        } else if (isTvSeries) {
-            searchPresenter.getSearchSeries(getString(R.string.key), query, page);
-            movieAdapter.isTvSeries(true);
-        } else {
-            searchPresenter.getSearchQuery(getString(R.string.key), query, page);
-            movieAdapter.isTvSeries(false);
-        }
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
@@ -50,9 +52,13 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
     private boolean ispause = false;
     private String title;
     boolean isLandScape = false;
+    boolean isFinish = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
         binding = ActivityTagalogEpisodeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
@@ -109,9 +115,23 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
                 mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
-                        mp.seekTo(0);
-                        mp.start();
+                        binding.btnRefresh.setVisibility(View.VISIBLE);
                         binding.btnPlay.setVisibility(View.INVISIBLE);
+                        binding.tenNegative.setVisibility(View.INVISIBLE);
+                        binding.tenPositive.setVisibility(View.INVISIBLE);
+                        binding.time.setVisibility(View.INVISIBLE);
+                        binding.seekBar.setVisibility(View.INVISIBLE);
+                        binding.fullWide.setVisibility(View.INVISIBLE);
+                        isFinish = true;
+                        binding.btnRefresh.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                binding.btnRefresh.setVisibility(View.GONE);
+                                isFinish = false;
+                                mp.seekTo(0);
+                                mp.start();
+                            }
+                        });
                     }
                 });
 
@@ -247,10 +267,11 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
     @Override
     public void getVideoUrl(String videoUrl) {
 //        Log.d("VideoUrl","val: "+videoUrl);
-        if(!videoUrl.isEmpty()){
-            binding.player.setVideoPath(videoUrl);
+        if(videoUrl.isEmpty() || videoUrl == null){
+            return;
         }
-
+        binding.player.setVideoPath(String.valueOf(Uri.parse(videoUrl)));
+        binding.player.start();
     }
 
 
@@ -264,6 +285,9 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
                 play_pause();
                 break;
             case R.id.player:
+                if(isFinish){
+                    return;
+                }
                 clickPause();
                 break;
             case R.id.full_wide:
@@ -281,12 +305,8 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
                 RelativeLayout.LayoutParams params1  = new RelativeLayout.LayoutParams(marginPx, marginPx);
                 params1.setMargins(5,10,0,0);
                 RelativeLayout.LayoutParams params2  = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                RelativeLayout.LayoutParams params3  = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                 params2.addRule(RelativeLayout.RIGHT_OF,binding.btnBack.getId());
-                params2.setMargins(0,15,0,0);
-                params3.setMargins(0,0,0,20);
-                params3.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                binding.seekBar.setLayoutParams(params3);
+                params2.setMargins(0,20,0,0);
                 binding.title.setLayoutParams(params2);
                 binding.btnBack.setLayoutParams(params1);
                 binding.relativeVideo.setLayoutParams(params);
@@ -384,7 +404,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
             new WindowUtils(this,false,false);
             int marginPx = (int) TypedValue.applyDimension(
                     TypedValue.COMPLEX_UNIT_DIP,
-                    330,
+                    300,
                     getResources().getDisplayMetrics()
             );
             int iconspx = (int) TypedValue.applyDimension(
@@ -398,23 +418,12 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
             RelativeLayout.LayoutParams params2  = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
             params2.addRule(RelativeLayout.RIGHT_OF,binding.btnBack.getId());
             params2.setMargins(0,70,0,0);
-
-            ViewGroup parent = (ViewGroup) binding.seekBar.getParent();
-            parent.removeView(binding.seekBar);
-
-            RelativeLayout.LayoutParams seekbarParams = new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.MATCH_PARENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT
-            );
-            seekbarParams.addRule(RelativeLayout.ABOVE, R.id.full_wide);
-            binding.seekBar.setLayoutParams(seekbarParams);
-            parent.addView(binding.seekBar);
             binding.title.setLayoutParams(params2);
             binding.btnBack.setLayoutParams(params1);
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, marginPx);
             binding.relativeVideo.setLayoutParams(params);
-            binding.fullWide.setVisibility(View.VISIBLE);
+            binding.fullWide.setVisibility(isFinish?View.GONE:View.VISIBLE);
             binding.rvEpisode.setVisibility(View.VISIBLE);
         }else{
             super.onBackPressed();

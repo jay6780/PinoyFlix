@@ -13,8 +13,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.m.freemovie.R;
 import com.m.freemovie.databinding.FragmentChooseBinding;
-import com.m.freemovie.mvp.ClassBean.ServerSearchEvent;
-import com.m.freemovie.mvp.ClassBean.TagalogSearchEvent;
+import com.m.freemovie.mvp.ClassBean.MovieEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -44,15 +43,15 @@ public class ChooseFragment extends Fragment implements AdapterView.OnItemSelect
         switch (position) {
             case 0:
                 selectedFragment = new TagalogSeriesFragment();
-                EventBus.getDefault().post(new TagalogSearchEvent(true));
+                EventBus.getDefault().post(new MovieEvent(3));
                 break;
             case 1:
                 selectedFragment = new TagalogServer2Fragment();
-                EventBus.getDefault().post(new ServerSearchEvent(true));
+                EventBus.getDefault().post(new MovieEvent(4));
                 break;
             case 2:
                 selectedFragment = new TagalogMovieFragment();
-                EventBus.getDefault().post(new ServerSearchEvent(true));
+                EventBus.getDefault().post(new MovieEvent(5));
                 break;
         }
         FragmentManager fragmentManager = getParentFragmentManager();
@@ -60,6 +59,12 @@ public class ChooseFragment extends Fragment implements AdapterView.OnItemSelect
         transaction.replace(R.id.frame_choose, selectedFragment);
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    @Override
+    public void onStart() {
+        EventBus.getDefault().post(new MovieEvent(3));
+        super.onStart();
     }
 
     @Override

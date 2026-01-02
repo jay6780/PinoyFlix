@@ -10,8 +10,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.m.freemovie.R;
 import com.m.freemovie.databinding.FragmentHomeBinding;
-import com.m.freemovie.mvp.ClassBean.FreeMovieEvent;
-import com.m.freemovie.mvp.ClassBean.ServerSearchEvent;
+import com.m.freemovie.mvp.ClassBean.MovieEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -29,7 +28,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         movieFragment = new MovieFragment();
         tvSeriesFragment = new TvSeriesFragment();
         tagalogFragment = new ChooseFragment();
-
         getChildFragmentManager()
                 .beginTransaction()
                 .add(R.id.fragment_container, movieFragment, "movie")
@@ -56,8 +54,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 binding.tvMovies.setTextColor(getResources().getColor(R.color.SecondColor));
                 binding.tvSeries.setTextColor(getResources().getColor(R.color.white));
                 binding.tvTagalog.setTextColor(getResources().getColor(R.color.white));
-                EventBus.getDefault().post(new FreeMovieEvent(false));
-                EventBus.getDefault().post(new ServerSearchEvent(false));
+                EventBus.getDefault().post(new MovieEvent(1));
                 break;
             case R.id.tv_series:
                 transaction.show(tvSeriesFragment);
@@ -66,8 +63,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 binding.tvSeries.setTextColor(getResources().getColor(R.color.SecondColor));
                 binding.tvMovies.setTextColor(getResources().getColor(R.color.white));
                 binding.tvTagalog.setTextColor(getResources().getColor(R.color.white));
-                EventBus.getDefault().post(new FreeMovieEvent(true));
-                EventBus.getDefault().post(new ServerSearchEvent(false));
+                EventBus.getDefault().post(new MovieEvent(2));
                 break;
 
             case R.id.tv_tagalog:
@@ -82,4 +78,5 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
         transaction.commit();
     }
+
 }

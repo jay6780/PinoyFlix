@@ -12,7 +12,7 @@ import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.adapter.DetailAdapter;
 import com.m.freemovie.databinding.FragmentBookmarkBinding;
 import com.m.freemovie.mvp.ClassBean.DetailBean;
-import com.m.freemovie.mvp.ClassBean.FreeMovieEvent;
+import com.m.freemovie.mvp.ClassBean.MovieEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -25,23 +25,30 @@ public class BookmarkFragment extends Fragment {
     private List<DetailBean> movieBeanList = new ArrayList<>();
     private FragmentBookmarkBinding binding;
     private BookmarkDbHelper dbHelper;
-    private boolean isTvSeries = false;
+    private int position = 1;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentBookmarkBinding.inflate(inflater);
         dbHelper = new BookmarkDbHelper(getContext());
-        initRecycler();
-        loadBookmarkData();
+        if(position == 1){
+            initRecycler();
+            loadBookmarkData();
+        }
         return binding.getRoot();
+    }
+
+    private boolean isValidPosition() {
+        return position == 1 || position == 2;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        loadBookmarkData();
+        if (isValidPosition()) {
+            loadBookmarkData();
+        }
     }
-
     private void initRecycler() {
         binding.rvBookmark.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         detailAdapter = new DetailAdapter();
@@ -49,16 +56,37 @@ public class BookmarkFragment extends Fragment {
     }
 
     private void loadBookmarkData() {
+        boolean isTvSeries = false;
+        if(position == 1){
+            isTvSeries = false;
+        }else if (position == 2){
+            isTvSeries = true;
+        }
         List<DetailBean> bookmarks = dbHelper.getBookmarksByType(isTvSeries);
         movieBeanList.clear();
         movieBeanList.addAll(bookmarks);
-        detailAdapter.setNewData(movieBeanList);
+        if(detailAdapter !=null){
+            detailAdapter.setNewData(movieBeanList);
+        }
+
     }
 
+
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    public void changeSearch(FreeMovieEvent event) {
-        this.isTvSeries = event.isChangeSearch();
-        loadBookmarkData();
+    public void changeSearch(MovieEvent event) {
+        this.position = event.getPosition();
+        if(isValidPosition()){
+            initRecycler();
+            loadBookmarkData();
+        }else{
+            detailAdapter.setNewData(new ArrayList<>());
+        }
+        boolean isTvSeries = false;
+        if(position == 1){
+            isTvSeries = false;
+        }else if (position == 2){
+            isTvSeries = true;
+        }
         detailAdapter.isTv(isTvSeries);
     }
 

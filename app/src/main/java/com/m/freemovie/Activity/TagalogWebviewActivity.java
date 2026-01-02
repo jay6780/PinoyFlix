@@ -2,6 +2,7 @@ package com.m.freemovie.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -12,6 +13,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.webkit.ConsoleMessage;
@@ -64,6 +66,19 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
         revivalTrackPresenter = new RevivalTrackPresenter(this);
         revivalInfoDetailPresenter.getListTv(id);
         binding.expand.setOnClickListener(view -> rotateScreen());
+
+
+        binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if(isMovie){
+                    revivalTrackPresenter.getTrackUrl(id);
+                }else{
+                    episodeAdapter.setNewData(new ArrayList<>());
+                    revivalInfoDetailPresenter.getListTv(id);
+                }
+            }
+        });
         binding.btnBackFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -253,22 +268,29 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
 
     @Override
     public void showLoading() {
-
+        binding.swipe.setRefreshing(true);
     }
 
     @Override
     public void showError(String error) {
-
+        new Handler().postDelayed(() -> {
+            Toast.makeText(this,"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
+            binding.swipe.setRefreshing(false);
+        }, 500);
     }
 
     @Override
     public void hideLoading() {
-
+        new Handler().postDelayed(() -> {
+            binding.swipe.setRefreshing(false);
+        }, 500);
     }
+
 
     @Override
     public void getTrack(DetailDownloadBean tagalogInfoBean) {
         if(tagalogInfoBean !=null){
+//            Log.d("VideoUrl","val: "+videoUrl);
             videoUrl = tagalogInfoBean.getMetaframe();
             initStart();
         }
