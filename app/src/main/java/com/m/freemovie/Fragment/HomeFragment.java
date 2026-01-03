@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.m.freemovie.R;
+import com.m.freemovie.Retrofit.AppConstant;
+import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.databinding.FragmentHomeBinding;
 import com.m.freemovie.mvp.ClassBean.MovieEvent;
 
@@ -73,6 +75,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 binding.tvTagalog.setTextColor(getResources().getColor(R.color.SecondColor));
                 binding.tvMovies.setTextColor(getResources().getColor(R.color.white));
                 binding.tvSeries.setTextColor(getResources().getColor(R.color.white));
+                EventBus.getDefault().post(new MovieEvent(SPUtils.getInstance().getInt(AppConstant.lastposition,3)));
                 break;
         }
 

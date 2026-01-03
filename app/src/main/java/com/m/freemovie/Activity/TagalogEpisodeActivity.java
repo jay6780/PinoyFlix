@@ -272,6 +272,8 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
         }
         binding.player.setVideoPath(String.valueOf(Uri.parse(videoUrl)));
         binding.player.start();
+        isFinish = false;
+        binding.btnRefresh.setVisibility(View.GONE);
     }
 
 

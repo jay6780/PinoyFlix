@@ -6,12 +6,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.m.freemovie.R;
+import com.m.freemovie.Retrofit.AppConstant;
+import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.databinding.FragmentChooseBinding;
 import com.m.freemovie.mvp.ClassBean.MovieEvent;
 
@@ -44,14 +47,21 @@ public class ChooseFragment extends Fragment implements AdapterView.OnItemSelect
             case 0:
                 selectedFragment = new TagalogSeriesFragment();
                 EventBus.getDefault().post(new MovieEvent(3));
+                SPUtils.getInstance().put(AppConstant.lastposition,3);
                 break;
             case 1:
                 selectedFragment = new TagalogServer2Fragment();
                 EventBus.getDefault().post(new MovieEvent(4));
+                SPUtils.getInstance().put(AppConstant.lastposition,4);
                 break;
             case 2:
                 selectedFragment = new TagalogMovieFragment();
                 EventBus.getDefault().post(new MovieEvent(5));
+                SPUtils.getInstance().put(AppConstant.lastposition,5);
+                break;
+            case 3:
+                selectedFragment = new NineAnimeFragment();
+                EventBus.getDefault().post(new MovieEvent(6));
                 break;
         }
         FragmentManager fragmentManager = getParentFragmentManager();
