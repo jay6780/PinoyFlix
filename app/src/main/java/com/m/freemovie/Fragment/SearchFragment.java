@@ -186,6 +186,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         movieAdapter.setNewData(new ArrayList<>());
         tagalogSearchAdapter.setNewData(new ArrayList<>());
         tvRevivialSearchAdapter.setNewData(new ArrayList<>());
+        nineAnimeSearchAdapter.setNewData(new ArrayList<>());
         lastQuery = "";
         page = 1;
         switch (position){

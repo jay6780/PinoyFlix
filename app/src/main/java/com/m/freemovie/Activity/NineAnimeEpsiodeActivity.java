@@ -188,7 +188,8 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
         webSettings.setDisplayZoomControls(false);
         webSettings.setBuiltInZoomControls(false);
         webSettings.setSupportZoom(false);
-
+        String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+        webSettings.setUserAgentString(userAgent);
         webSettings.setMediaPlaybackRequiresUserGesture(false);
         binding.webView.requestFocusFromTouch();
 
@@ -198,7 +199,6 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
-
 
         String htmlContent = "<!DOCTYPE html>" +
                 "<html>" +
@@ -227,12 +227,13 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
                 "</html>";
 
         binding.webView.loadDataWithBaseURL(
-                "https://short.icu",
+                "https://my.1anime.site/",
                 htmlContent,
                 "text/html",
                 "UTF-8",
                 null
         );
+
     }
 
     @Override

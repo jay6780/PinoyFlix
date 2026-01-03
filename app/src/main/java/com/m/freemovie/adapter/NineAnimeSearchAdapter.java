@@ -37,7 +37,6 @@ public class NineAnimeSearchAdapter extends BaseQuickAdapter<NineAnimeSearchBean
                 Intent intent = new Intent(mContext, NineAnimeEpsiodeActivity.class);
                 intent.putExtra("videoId",item.getLink());
                 intent.putExtra("title",item.getTitle());
-                intent.putExtra("isMovie",item.getType().equals("Movie")? true:false);
                 mContext.startActivity(intent);
             }
 
