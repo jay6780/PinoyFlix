@@ -74,15 +74,15 @@ public class VideoWebviewActivity extends AppCompatActivity {
                 videoUrl = "https://vidlink.pro/tv/"+videoId+"/"+seasonNum+"/"+epNumber;
                 break;
             case 4:
-                videoUrl = "https://vidlink.pro/movie/"+videoId;
+                videoUrl = "https://vidsrc.cx/embed/movie/"+videoId;
                 break;
             case 5:
-                videoUrl = "https://vidrock.net/tv/"+videoId+"/"+seasonNum+"/"+epNumber;
+                videoUrl = "https://vidrock.net/tv  /"+videoId+"/"+seasonNum+"/"+epNumber;
                 break;
         }
 
 
-        Log.d("VideoUrl","value: "+videoUrl);
+//        Log.d("VideoUrl","value: "+videoUrl);
         binding.rotate.setOnClickListener(view -> rotateScreen());
 
         initStart();
@@ -152,22 +152,7 @@ public class VideoWebviewActivity extends AppCompatActivity {
             return handleUrlLoading(view, url);
         }
         private boolean handleUrlLoading(WebView view, String url) {
-            String videoDomain = "";
-            switch (videoPosition){
-                case 1:
-                    videoDomain = "vidsrc";
-                    break;
-                case 2:
-                case 5:
-                    videoDomain = "vidrock";
-                    break;
-                case 3:
-                case 4:
-                    videoDomain = "vidlink";
-                    break;
-            }
-
-            if (url.contains(videoDomain)) {
+            if (url.contains(videoUrl)) {
                 return false;
             } else if (url.contains("dl.vidsrc.vip")) {
 //                Log.d("VideOUrl", "value: " + url);

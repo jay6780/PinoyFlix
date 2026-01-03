@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
@@ -171,7 +172,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
     public void getId(String id,int position,int seasonNum,int epNumber) {
         switch (position){
             case 1:
-                videoUrl = "https://vidlink.pro/tv/"+id+"/"+seasonNum+"/"+epNumber;
+                videoUrl = "https://vidsrc.cx/embed/tv/"+id+"/"+seasonNum+"/"+epNumber;
                 binding.titleName.setVisibility(View.VISIBLE);
                 initStart();
                 break;
@@ -237,7 +238,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
             return handleUrlLoading(view, url);
         }
         private boolean handleUrlLoading(WebView view, String url) {
-            if (url.contains("vidrock") || url.contains("vidlink")) {
+            if (url.contains(videoUrl)) {
                 return false;
             } else {
                 view.stopLoading();
