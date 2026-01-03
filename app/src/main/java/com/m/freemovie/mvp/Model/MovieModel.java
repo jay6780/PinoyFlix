@@ -3,6 +3,7 @@ package com.m.freemovie.mvp.Model;
 import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.Retrofit.NetworkingUtils;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
+import com.m.freemovie.mvp.ClassBean.NineAnimeSearchBean;
 import com.m.freemovie.mvp.ClassBean.TagalogSearchBean;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -172,6 +173,30 @@ public class MovieModel {
 
                     @Override
                     public void onNext(TagalogSearchBean data) {
+                        callback.returnResult(data);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.returnError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {}
+                });
+    }
+
+    public static void getNineAnime(String query ,final Callback<NineAnimeSearchBean> callback) {
+        NetworkingUtils.getTagalogDub()
+                .getSearchNineAnime(query)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<NineAnimeSearchBean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {}
+
+                    @Override
+                    public void onNext(NineAnimeSearchBean data) {
                         callback.returnResult(data);
                     }
 

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
+import com.m.freemovie.mvp.ClassBean.NineAnimeSearchBean;
 import com.m.freemovie.mvp.ClassBean.TagalogSearchBean;
 import com.m.freemovie.mvp.Contract.SearchContract;
 import com.m.freemovie.mvp.Model.MovieModel;
@@ -93,6 +94,34 @@ public class SearchPresenter implements SearchContract.Presenter {
             public void returnResult(TagalogSearchBean apiBean) {
                 view.hideLoading();
                 view.getTagalogSearch(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getNineAnimeQuery(String query) {
+        view.showLoading();
+        MovieModel.getNineAnime(query ,new Callback<NineAnimeSearchBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(NineAnimeSearchBean apiBean) {
+                view.hideLoading();
+                view.getNineAnime(apiBean);
             }
 
             @Override

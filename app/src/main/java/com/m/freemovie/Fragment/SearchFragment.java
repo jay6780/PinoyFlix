@@ -19,11 +19,13 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.m.freemovie.R;
+import com.m.freemovie.adapter.NineAnimeSearchAdapter;
 import com.m.freemovie.adapter.TagalogSearchAdapter;
 import com.m.freemovie.adapter.TvRevivialSearchAdapter;
 import com.m.freemovie.adapter.ViewAllAdapter;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
 import com.m.freemovie.mvp.ClassBean.MovieEvent;
+import com.m.freemovie.mvp.ClassBean.NineAnimeSearchBean;
 import com.m.freemovie.mvp.ClassBean.RevivalSearchBean;
 import com.m.freemovie.mvp.ClassBean.TagalogSearchBean;
 import com.m.freemovie.mvp.Contract.RevivalSearchContract;
@@ -46,6 +48,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     private ViewAllAdapter movieAdapter;
     private TagalogSearchAdapter tagalogSearchAdapter;
     private TvRevivialSearchAdapter tvRevivialSearchAdapter;
+    private NineAnimeSearchAdapter nineAnimeSearchAdapter;
     private boolean isLoading = false;
     private String lastQuery;
     private boolean isNomore = false;
@@ -53,6 +56,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     private List<MovieBean.ResultsBean> movieLists = new ArrayList<>();
     private List<TagalogSearchBean.ResultsBean> tagaloglist = new ArrayList<>();
     private List<RevivalSearchBean.ResultsBean> revivalList = new ArrayList<>();
+    private List<NineAnimeSearchBean.ResultsBean> nineList = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
     private int position = 1;
     private RevivalSearchPresenter revivalSearchPresenter;
@@ -73,7 +77,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         movieAdapter = new ViewAllAdapter();
         tagalogSearchAdapter = new TagalogSearchAdapter();
         tvRevivialSearchAdapter = new TvRevivialSearchAdapter();
-
+        nineAnimeSearchAdapter = new NineAnimeSearchAdapter();
         rv_search.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -154,6 +158,13 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
                 rv_search.setAdapter(tvRevivialSearchAdapter);
                 revivalList.clear();
                 break;
+            case 6:
+                et_search.setHint("Enter anime series");
+                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+                nineAnimeSearchAdapter = new NineAnimeSearchAdapter();
+                rv_search.setAdapter(nineAnimeSearchAdapter);
+                nineList.clear();
+                break;
 
         }
     }
@@ -196,6 +207,11 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
             case 5:
                 if (query.isEmpty()) {
                     Toast.makeText(getContext(), "Please enter tagalog series", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            case 6:
+                if (query.isEmpty()) {
+                    Toast.makeText(getContext(), "Please enter anime series", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 break;
@@ -301,6 +317,21 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     }
 
     @Override
+    public void getNineAnime(NineAnimeSearchBean nineAnimeSearchBean) {
+        if (nineAnimeSearchBean != null && nineAnimeSearchBean.getResults() != null) {
+            isLoading = false;
+            if (!nineAnimeSearchBean.getResults().isEmpty()) {
+                nineList.addAll(nineAnimeSearchBean.getResults());
+                nineAnimeSearchAdapter.setNewData(nineList);
+            } else {
+                Toast.makeText(getContext(), "No more Anime Series", Toast.LENGTH_SHORT).show();
+                isLoading = false;
+                isNomore = true;
+            }
+        }
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_send:
@@ -361,6 +392,15 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
                     return;
                 }
                 revivalSearchPresenter.getSearchRevival(query);
+                break;
+            case 6:
+                nineList.clear();
+                tvRevivialSearchAdapter.setNewData(new ArrayList<>());
+                if (query.isEmpty()) {
+                    Toast.makeText(getContext(), "Please enter anime series", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                searchPresenter.getNineAnimeQuery(query);
                 break;
         }
     }

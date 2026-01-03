@@ -3,7 +3,11 @@ package com.m.freemovie.mvp.Api;
 import com.m.freemovie.mvp.ClassBean.DetailBean;
 import com.m.freemovie.mvp.ClassBean.DetailDownloadBean;
 import com.m.freemovie.mvp.ClassBean.DetailTvBean;
+import com.m.freemovie.mvp.ClassBean.DownloadNineAnimeBean;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
+import com.m.freemovie.mvp.ClassBean.NineAnimeBean;
+import com.m.freemovie.mvp.ClassBean.NineAnimeEpisodeBean;
+import com.m.freemovie.mvp.ClassBean.NineAnimeSearchBean;
 import com.m.freemovie.mvp.ClassBean.RevivalSearchBean;
 import com.m.freemovie.mvp.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.ClassBean.TagalogBean;
@@ -144,4 +148,27 @@ public interface MovieApi {
     @GET("animerevival")
     Observable<RevivalSearchBean> getSearchRevival(
             @Query("search") String search);
+
+
+    //9anime
+    @GET("9anime/series/ongoing")
+    Observable<NineAnimeBean> getNineOngoing(
+            @Query("page") int page);
+
+    @GET("9anime/series/latest")
+    Observable<NineAnimeBean> getNineLatest(
+            @Query("page") int page);
+
+    @GET("9anime/info")
+    Observable<NineAnimeEpisodeBean> getNineDetails(
+            @Query("url") String url);
+
+    @GET("9anime/download")
+    Observable<DownloadNineAnimeBean> getNineEpisodeVideo(
+            @Query("url") String url);
+
+    @GET("9anime")
+    Observable<NineAnimeSearchBean> getSearchNineAnime(
+            @Query("search") String search);
+
 }
