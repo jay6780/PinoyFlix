@@ -37,7 +37,9 @@ import com.m.freemovie.mvp.Presenter.RevivalInfoDetailPresenter;
 import com.m.freemovie.mvp.Presenter.RevivalTrackPresenter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class TagalogWebviewActivity extends AppCompatActivity implements RevivalContractDetail.View, RevivalContractTrack.View, TagalogDetailAdapter.TagalogVideoPlayListerner {
     private ActivityTagalogWebviewBinding binding;
@@ -49,6 +51,7 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
     private boolean finishing = true;
     private String videoUrl ="";
     private boolean isMovie;
+    private boolean isError =  false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +67,7 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
         binding.titleName.setText(title);
         revivalInfoDetailPresenter = new RevivalInfoDetailPresenter(this);
         revivalTrackPresenter = new RevivalTrackPresenter(this);
+
         revivalInfoDetailPresenter.getListTv(id);
         binding.expand.setOnClickListener(view -> rotateScreen());
 
@@ -74,6 +78,7 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
                 if(isMovie){
                     revivalTrackPresenter.getTrackUrl(id);
                 }else{
+                    episodeBeanList.clear();
                     episodeAdapter.setNewData(new ArrayList<>());
                     revivalInfoDetailPresenter.getListTv(id);
                 }
@@ -220,7 +225,8 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
         webSettings.setDisplayZoomControls(false);
         webSettings.setBuiltInZoomControls(false);
         webSettings.setSupportZoom(false);
-
+//        String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+//        webSettings.setUserAgentString(userAgent);
         webSettings.setMediaPlaybackRequiresUserGesture(false);
         binding.webView.requestFocusFromTouch();
 
@@ -258,7 +264,7 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
                 "</html>";
 
         binding.webView.loadDataWithBaseURL(
-                "https://short.icu",
+                "https://abysscdn.com/",
                 htmlContent,
                 "text/html",
                 "UTF-8",
@@ -291,6 +297,7 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
     public void getTrack(DetailDownloadBean tagalogInfoBean) {
         if(tagalogInfoBean !=null){
 //            Log.d("VideoUrl","val: "+videoUrl);
+            isError = false;
             videoUrl = tagalogInfoBean.getMetaframe();
             initStart();
         }
@@ -313,23 +320,27 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
 
     @Override
     public void getInfoTagalog(TagalogInfoBean tagalogInfoBean) {
-        if(tagalogInfoBean!=null && tagalogInfoBean.getResults() !=null) {
+        if(tagalogInfoBean != null && tagalogInfoBean.getResults() != null) {
+            Set<String> seenEpisodes = new HashSet<>();
+
             for (TagalogInfoBean.ResultsBean.EpisodesBean data : tagalogInfoBean.getResults().getEpisodes()) {
                 if (!tagalogInfoBean.getResults().getEpisodes().isEmpty()) {
-                    episodeBeanList.add(new TagalogDetailBean(data.getEpisodeUrl(), data.getEpisode(), image));
+                    String episode = data.getEpisode();
+                    if (!seenEpisodes.contains(episode)) {
+                        seenEpisodes.add(episode);
+                        episodeBeanList.add(new TagalogDetailBean(data.getEpisodeUrl(), episode, image));
+                    }
                 }
-
             }
             episodeAdapter.setNewData(episodeBeanList);
-
         }
-
     }
 
     @Override
     public void getVideoUrl(String videoUrl) {
 //        Log.e("VideoSelect","val: "+videoUrl);
         if(!videoUrl.isEmpty()){
+            isError = false;
             revivalTrackPresenter.getTrackUrl(videoUrl);
         }
 
@@ -354,16 +365,30 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
             return handleUrlLoading(view, url);
         }
         private boolean handleUrlLoading(WebView view, String url) {
-            if (url.contains(videoUrl)) {
-                return false;
-            } else {
-                view.stopLoading();
-                return true;
+            try {
+                if (url.contains(videoUrl)) {
+                    return false;
+                } else {
+                    view.stopLoading();
+                    return true;
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                isError = true;
+                binding.tvSelect.setVisibility(View.VISIBLE);
+                binding.tvSelect.setText("video can't play");
+                binding.webView.setVisibility(View.GONE);
+                view.clearCache(true);
             }
+            return false;
         }
         @Override
         public void onPageFinished(WebView view, String url) {
             blockAds(view);
+            if(isError){
+                binding.webView.setVisibility(View.GONE);
+                return;
+            }
             binding.webView.setVisibility(View.VISIBLE);
             binding.tvSelect.setVisibility(View.GONE);
             binding.expand.setVisibility(View.VISIBLE);
