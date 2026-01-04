@@ -8,14 +8,14 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.m.freemovie.R;
-import com.m.freemovie.Utils.DbHelper.WatchHistoryDBHelper;
+import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
 import com.m.freemovie.mvp.ClassBean.TagalogEpisode;
 
 public class TagalogEpisodeAdapter extends BaseQuickAdapter<TagalogEpisode, BaseViewHolder> {
 
-    private WatchHistoryDBHelper dbHelper;
+    private PinoyWatchHistoryHelper dbHelper;
     private VideoPlayListerner videoPlayListerner;
     private  int lastPosition = -1;
     public interface VideoPlayListerner{
@@ -29,12 +29,12 @@ public class TagalogEpisodeAdapter extends BaseQuickAdapter<TagalogEpisode, Base
     @Override
     protected void convert(BaseViewHolder helper, TagalogEpisode item) {
         if (dbHelper == null) {
-            dbHelper = new WatchHistoryDBHelper(mContext);
+            dbHelper = new PinoyWatchHistoryHelper(mContext);
         }
         TextView tv_season = helper.getView(R.id.tv_season);
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
         RelativeLayout rl_select = helper.getView(R.id.rl_select);
-
+        TextView tv_watched = helper.getView(R.id.tv_watched);
         if(lastPosition == (helper.getAdapterPosition())){
             rl_select.setBackgroundColor(Color.parseColor("#050E3C"));
         }else{
@@ -49,7 +49,7 @@ public class TagalogEpisodeAdapter extends BaseQuickAdapter<TagalogEpisode, Base
                 .load(item.getImageUrl())
                 .into(iv_thumb);
 
-
+        tv_watched.setVisibility(item.isWatched() ? View.VISIBLE : View.GONE);
 
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,8 +58,11 @@ public class TagalogEpisodeAdapter extends BaseQuickAdapter<TagalogEpisode, Base
                     lastPosition = -1;
                     videoPlayListerner.getVideoUrl("");
                 }else{
+                    dbHelper.markEpisodeAsWatched(item.getVideoUrl(), item.getEpisode());
                     lastPosition = (helper.getAdapterPosition());
                     videoPlayListerner.getVideoUrl(item.getVideoUrl());
+                    item.setWatched(true);
+
                 }
                 notifyDataSetChanged();
             }

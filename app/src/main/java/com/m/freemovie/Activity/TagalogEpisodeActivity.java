@@ -11,7 +11,6 @@ import android.os.Looper;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -25,16 +24,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
+import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
+import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.TagalogEpisodeAdapter;
 import com.m.freemovie.databinding.ActivityTagalogEpisodeBinding;
+import com.m.freemovie.mvp.ClassBean.DetailBean;
 import com.m.freemovie.mvp.ClassBean.TagalogEpisode;
 import com.m.freemovie.mvp.ClassBean.TagalogEpisodeBean;
 import com.m.freemovie.mvp.Contract.TagalogEpisodeContract;
 import com.m.freemovie.mvp.Presenter.TagalogEpisodePresenter;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class TagalogEpisodeActivity extends AppCompatActivity implements TagalogEpisodeContract.View, TagalogEpisodeAdapter.VideoPlayListerner,View.OnClickListener {
     ActivityTagalogEpisodeBinding binding;
@@ -53,6 +58,10 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
     private String title;
     boolean isLandScape = false;
     boolean isFinish = false;
+    boolean isBookMark = false;
+    private PinoyWatchHistoryHelper dbHelper;
+
+    private BookmarkDbHelper bookmarkDbHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +82,8 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
         binding.rvEpisode.setLayoutManager(new LinearLayoutManager(this));
         tagalogEpisodeAdapter = new TagalogEpisodeAdapter(this);
         binding.rvEpisode.setAdapter(tagalogEpisodeAdapter);
+        dbHelper = new PinoyWatchHistoryHelper(this);
+        bookmarkDbHelper = new BookmarkDbHelper(this);
         binding.title.setText(title);
         List<View> viewList = new ArrayList<>();
         viewList.add(binding.fullWide);
@@ -81,9 +92,12 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
         viewList.add(binding.tenPositive);
         viewList.add(binding.btnPlay);
         viewList.add(binding.btnBack);
+        viewList.add(binding.llBookmark);
         for(View v : viewList){
             v.setOnClickListener(this);
         }
+
+        setImageData(url);
 
         binding.player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
@@ -253,7 +267,10 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
             for(TagalogEpisodeBean.ResultsBean data : tagalogEpisodeBean.getResults()){
                 if(!data.getEpisodes().isEmpty()){
                     for(TagalogEpisodeBean.ResultsBean.EpisodesBean dataEpisode : data.getEpisodes()){
-                        tagalogEpisodeList.add(new TagalogEpisode(dataEpisode.getEpisode(),imageUrl,dataEpisode.getVideoUrl()));
+                        TagalogEpisode tagalogEpisode = new TagalogEpisode(dataEpisode.getEpisode(),imageUrl,dataEpisode.getVideoUrl());
+                        boolean isWatched = dbHelper.isEpisodeWatched(dataEpisode.getVideoUrl(), dataEpisode.getEpisode());
+                        tagalogEpisode.setWatched(isWatched);
+                        tagalogEpisodeList.add(tagalogEpisode);
                     }
                 }else{
                     Toast.makeText(getApplicationContext(),"Episodes not found",Toast.LENGTH_SHORT).show();
@@ -280,6 +297,9 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
     @Override
     public void onClick(View view) {
         switch (view.getId()){
+            case R.id.ll_bookmark:
+                savedBook();
+                break;
             case R.id.btn_back:
                 onBackPressed();
                 break;
@@ -312,6 +332,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
                 binding.title.setLayoutParams(params2);
                 binding.btnBack.setLayoutParams(params1);
                 binding.relativeVideo.setLayoutParams(params);
+                binding.llBookmark.setVisibility(View.GONE);
                 break;
             case R.id.ten_negative:
                 if (binding.player == null || mDuration == 0) return;
@@ -339,6 +360,20 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
         }
 
     }
+    private void savedBook() {
+        String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
+        DetailBean details = new DetailBean(url, timestamp, imageUrl, title,"false");
+        details.setVideoId(url);
+        details.setTimeStamp(timestamp);
+        bookmarkDbHelper.toggleBookmark(details, 3);
+        setImageData(url);
+    }
+    private void setImageData(String videoId) {
+        boolean isBookmarked = bookmarkDbHelper.isBookmarked(videoId);
+        binding.ivHeart.setImageResource(!isBookmarked? R.mipmap.heart_no :R.mipmap.heart_yes);
+    }
+
+
     private void play_pause() {
         if(binding.player.isPlaying()){
             binding.player.pause();
@@ -427,6 +462,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
             binding.relativeVideo.setLayoutParams(params);
             binding.fullWide.setVisibility(isFinish?View.GONE:View.VISIBLE);
             binding.rvEpisode.setVisibility(View.VISIBLE);
+            binding.llBookmark.setVisibility(View.VISIBLE);
         }else{
             super.onBackPressed();
             finish();
