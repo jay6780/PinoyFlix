@@ -47,7 +47,7 @@ public class TveSeriesNowAdapter extends BaseQuickAdapter<TvSeriesBean.ResultsBe
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, Details_activity.class);
                 intent.putExtra("id",item.getId());
-                intent.putExtra("isTv",true);
+                intent.putExtra("position",2);
                 mContext.startActivity(intent);
             }
         });

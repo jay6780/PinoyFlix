@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.m.freemovie.mvp.ClassBean.DetailBean;
 
@@ -14,7 +15,7 @@ import java.util.List;
 public class BookmarkDbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "bookmarks.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     // Bookmark table definition
     public static class BookmarkEntry {
@@ -25,9 +26,9 @@ public class BookmarkDbHelper extends SQLiteOpenHelper {
         public static final String COLUMN_IMAGE_URL = "image_url";
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_IS_TV = "is_tv";
+        public static final String COLUMN_IS_MOVIE = "is_movie";
     }
 
-    // Table creation SQL
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + BookmarkEntry.TABLE_NAME + " (" +
                     BookmarkEntry.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -35,7 +36,8 @@ public class BookmarkDbHelper extends SQLiteOpenHelper {
                     BookmarkEntry.COLUMN_TIMESTAMP + " TEXT NOT NULL," +
                     BookmarkEntry.COLUMN_IMAGE_URL + " TEXT," +
                     BookmarkEntry.COLUMN_TITLE + " TEXT," +
-                    BookmarkEntry.COLUMN_IS_TV + " INTEGER DEFAULT 0)";
+                    BookmarkEntry.COLUMN_IS_TV + " INTEGER DEFAULT 0," +
+                    BookmarkEntry.COLUMN_IS_MOVIE + " TEXT)";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + BookmarkEntry.TABLE_NAME;
@@ -63,36 +65,45 @@ public class BookmarkDbHelper extends SQLiteOpenHelper {
     /**
      * Add or remove bookmark
      */
-    public boolean toggleBookmark(DetailBean detailBean, boolean isTv) {
+    public boolean toggleBookmark(DetailBean detailBean,int position) {
         if (isBookmarked(detailBean.getVideoId())) {
             return removeBookmark(detailBean.getVideoId());
         } else {
-            return addBookmark(detailBean, isTv);
+            return addBookmark(detailBean, position);
         }
     }
 
     /**
      * Add a new bookmark
      */
-    public boolean addBookmark(DetailBean detailBean, boolean isTv) {
+    public boolean addBookmark(DetailBean detailBean, int position) {
         SQLiteDatabase db = getWritableDatabase();
-        
+
         ContentValues values = new ContentValues();
         values.put(BookmarkEntry.COLUMN_VIDEO_ID, detailBean.getVideoId());
         values.put(BookmarkEntry.COLUMN_TIMESTAMP, detailBean.getTimeStamp());
         values.put(BookmarkEntry.COLUMN_IMAGE_URL, detailBean.getTempImage());
         values.put(BookmarkEntry.COLUMN_TITLE, detailBean.getMovieName());
-        values.put(BookmarkEntry.COLUMN_IS_TV, isTv ? 1 : 0);
+        values.put(BookmarkEntry.COLUMN_IS_TV, position);
+        values.put(BookmarkEntry.COLUMN_IS_MOVIE, detailBean.getIsMovie());
+
+//        Log.d("DB_DEBUG", "Adding bookmark: " +
+//                "videoId=" + detailBean.getVideoId() +
+//                ", isMovie=" + detailBean.getIsMovie() +
+//                ", position=" + position);
 
         try {
             long result = db.insertWithOnConflict(
-                BookmarkEntry.TABLE_NAME, 
-                null, 
-                values, 
-                SQLiteDatabase.CONFLICT_REPLACE
+                    BookmarkEntry.TABLE_NAME,
+                    null,
+                    values,
+                    SQLiteDatabase.CONFLICT_REPLACE
             );
+//
+//            Log.d("DB_DEBUG", "Insert result: " + result);
             return result != -1;
         } catch (Exception e) {
+//            Log.e("DB_DEBUG", "Error adding bookmark", e);
             return false;
         } finally {
             db.close();
@@ -104,7 +115,7 @@ public class BookmarkDbHelper extends SQLiteOpenHelper {
      */
     public boolean removeBookmark(String videoId) {
         SQLiteDatabase db = getWritableDatabase();
-        
+
         try {
             int result = db.delete(
                 BookmarkEntry.TABLE_NAME,
@@ -126,12 +137,12 @@ public class BookmarkDbHelper extends SQLiteOpenHelper {
     public boolean isBookmarked(String videoId) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = null;
-        
+
         try {
             String[] projection = {BookmarkEntry.COLUMN_ID};
             String selection = BookmarkEntry.COLUMN_VIDEO_ID + " = ?";
             String[] selectionArgs = {videoId};
-            
+
             cursor = db.query(
                 BookmarkEntry.TABLE_NAME,
                 projection,
@@ -141,7 +152,7 @@ public class BookmarkDbHelper extends SQLiteOpenHelper {
                 null,
                 null
             );
-            
+
             return cursor != null && cursor.getCount() > 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -169,7 +180,8 @@ public class BookmarkDbHelper extends SQLiteOpenHelper {
                 BookmarkEntry.COLUMN_TIMESTAMP,
                 BookmarkEntry.COLUMN_IMAGE_URL,
                 BookmarkEntry.COLUMN_TITLE,
-                BookmarkEntry.COLUMN_IS_TV
+                BookmarkEntry.COLUMN_IS_TV,
+                BookmarkEntry.COLUMN_IS_MOVIE
             };
 
             String sortOrder = BookmarkEntry.COLUMN_TIMESTAMP + " DESC";
@@ -190,7 +202,7 @@ public class BookmarkDbHelper extends SQLiteOpenHelper {
                 detail.setTimeStamp(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_TIMESTAMP)));
                 detail.setTempImage(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_IMAGE_URL)));
                 detail.setMovieName(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_TITLE)));
-
+                detail.setMovie(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_IS_MOVIE)));
                 bookmarks.add(detail);
             }
         } catch (Exception e) {
@@ -208,23 +220,23 @@ public class BookmarkDbHelper extends SQLiteOpenHelper {
     /**
      * Get bookmarks by type (TV or Movie)
      */
-    public List<DetailBean> getBookmarksByType(boolean isTv) {
+    public List<DetailBean> getBookmarksByType(int position) {
         List<DetailBean> bookmarks = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = null;
-        
+
         try {
             String[] projection = {
                 BookmarkEntry.COLUMN_VIDEO_ID,
                 BookmarkEntry.COLUMN_TIMESTAMP,
                 BookmarkEntry.COLUMN_IMAGE_URL,
-                BookmarkEntry.COLUMN_TITLE
+                BookmarkEntry.COLUMN_TITLE, BookmarkEntry.COLUMN_IS_MOVIE,
             };
-            
+
             String selection = BookmarkEntry.COLUMN_IS_TV + " = ?";
-            String[] selectionArgs = {isTv ? "1" : "0"};
+            String[] selectionArgs = {String.valueOf(position)};
             String sortOrder = BookmarkEntry.COLUMN_TIMESTAMP + " DESC";
-            
+
             cursor = db.query(
                 BookmarkEntry.TABLE_NAME,
                 projection,
@@ -234,14 +246,14 @@ public class BookmarkDbHelper extends SQLiteOpenHelper {
                 null,
                 sortOrder
             );
-            
+
             while (cursor != null && cursor.moveToNext()) {
                 DetailBean detail = new DetailBean();
                 detail.setVideoId(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_VIDEO_ID)));
                 detail.setTimeStamp(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_TIMESTAMP)));
                 detail.setTempImage(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_IMAGE_URL)));
                 detail.setMovieName(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_TITLE)));
-                
+                detail.setMovie(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_IS_MOVIE)));
                 bookmarks.add(detail);
             }
         } catch (Exception e) {
@@ -252,7 +264,7 @@ public class BookmarkDbHelper extends SQLiteOpenHelper {
             }
             db.close();
         }
-        
+
         return bookmarks;
     }
 }

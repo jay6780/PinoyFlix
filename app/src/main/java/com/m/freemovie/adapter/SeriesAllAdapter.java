@@ -19,7 +19,7 @@ public class SeriesAllAdapter extends BaseQuickAdapter<TvSeriesBean.ResultsBean,
     public SeriesAllAdapter() {
         super(R.layout.view_all_item);
     }
-    private boolean isTv = false;
+    private int position;
 
     @Override
 
@@ -36,21 +36,21 @@ public class SeriesAllAdapter extends BaseQuickAdapter<TvSeriesBean.ResultsBean,
                 .placeholder(R.drawable.noimage)
                 .into(iv_thumb);
 
-        tv_title.setText(isTv? item.getOriginal_name() : item.getOriginal_name());
+        tv_title.setText(position == 2? item.getOriginal_name() : item.getOriginal_name());
 
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, Details_activity.class);
                 intent.putExtra("id",item.getId());
-                intent.putExtra("isTv",isTv);
+                intent.putExtra("position",position);
                 mContext.startActivity(intent);
             }
         });
     }
 
-    public void isTvSeries(boolean isTvSeries) {
-        isTv = isTvSeries;
+    public void isTvSeries(int position) {
+        this.position = position;
         notifyDataSetChanged();
     }
 }

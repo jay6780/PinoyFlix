@@ -238,12 +238,19 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
             return handleUrlLoading(view, url);
         }
         private boolean handleUrlLoading(WebView view, String url) {
-            if (url.contains(videoUrl)) {
-                return false;
-            } else {
+            try {
+                if (url.contains(videoUrl)) {
+                    return false;
+                } else {
+                    view.stopLoading();
+                    return true;
+                }
+            }catch (Exception e){
+                e.printStackTrace();
                 view.stopLoading();
-                return true;
+                view.clearCache(true);
             }
+           return  false;
         }
         @Override
         public void onPageFinished(WebView view, String url) {

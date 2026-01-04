@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
+import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.adapter.DetailAdapter;
 import com.m.freemovie.databinding.FragmentBookmarkBinding;
 import com.m.freemovie.mvp.ClassBean.DetailBean;
@@ -31,23 +33,16 @@ public class BookmarkFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentBookmarkBinding.inflate(inflater);
         dbHelper = new BookmarkDbHelper(getContext());
-        if(position == 1){
-            initRecycler();
-            loadBookmarkData();
-        }
+        initRecycler();
+        loadBookmarkData();
         return binding.getRoot();
-    }
-
-    private boolean isValidPosition() {
-        return position == 1 || position == 2;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (isValidPosition()) {
-            loadBookmarkData();
-        }
+        loadBookmarkData();
+
     }
     private void initRecycler() {
         binding.rvBookmark.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
@@ -56,13 +51,7 @@ public class BookmarkFragment extends Fragment {
     }
 
     private void loadBookmarkData() {
-        boolean isTvSeries = false;
-        if(position == 1){
-            isTvSeries = false;
-        }else if (position == 2){
-            isTvSeries = true;
-        }
-        List<DetailBean> bookmarks = dbHelper.getBookmarksByType(isTvSeries);
+        List<DetailBean> bookmarks = dbHelper.getBookmarksByType(position);
         movieBeanList.clear();
         movieBeanList.addAll(bookmarks);
         if(detailAdapter !=null){
@@ -75,19 +64,8 @@ public class BookmarkFragment extends Fragment {
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void changeSearch(MovieEvent event) {
         this.position = event.getPosition();
-        if(isValidPosition()){
-            initRecycler();
-            loadBookmarkData();
-        }else{
-            detailAdapter.setNewData(new ArrayList<>());
-        }
-        boolean isTvSeries = false;
-        if(position == 1){
-            isTvSeries = false;
-        }else if (position == 2){
-            isTvSeries = true;
-        }
-        detailAdapter.isTv(isTvSeries);
+        loadBookmarkData();
+        detailAdapter.isTv(position);
     }
 
     @Override

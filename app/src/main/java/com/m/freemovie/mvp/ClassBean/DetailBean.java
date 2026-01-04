@@ -8,15 +8,25 @@ public class DetailBean {
     private String timeStamp;
     private String tempImage;
     private String movieName;
+    private String isMovie;
     public DetailBean() {
     }
 
-    public DetailBean(String videoId,String timeStamp,String tempImage,String movieName){
+    public DetailBean(String videoId,String timeStamp,String tempImage,String movieName,String isMovie){
         this.videoId = videoId;
         this.timeStamp = timeStamp;
         this.tempImage = tempImage;
         this.movieName = movieName;
+        this.isMovie = isMovie;
 
+    }
+
+    public void setMovie(String movie) {
+        isMovie = movie;
+    }
+
+    public String getIsMovie() {
+        return isMovie;
     }
 
     public String getMovieName() {

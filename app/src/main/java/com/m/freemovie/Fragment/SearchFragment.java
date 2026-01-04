@@ -362,7 +362,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
                     return;
                 }
                 searchPresenter.getSearchQuery(getString(R.string.key), query, page);
-                movieAdapter.isTvSeries(false);
+                movieAdapter.isTvSeries(1);
                 break;
             case 2:
                 movieLists.clear();
@@ -372,7 +372,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
                     return;
                 }
                 searchPresenter.getSearchSeries(getString(R.string.key), query, page);
-                movieAdapter.isTvSeries(true);
+                movieAdapter.isTvSeries(2);
                 break;
 
             case 3:

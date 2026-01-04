@@ -25,9 +25,13 @@ import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.m.freemovie.R;
+import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
+import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.TagalogDetailAdapter;
 import com.m.freemovie.databinding.ActivityTagalogWebviewBinding;
+import com.m.freemovie.mvp.ClassBean.DetailBean;
 import com.m.freemovie.mvp.ClassBean.DetailDownloadBean;
 import com.m.freemovie.mvp.ClassBean.TagalogDetailBean;
 import com.m.freemovie.mvp.ClassBean.TagalogInfoBean;
@@ -36,9 +40,12 @@ import com.m.freemovie.mvp.Contract.RevivalContractTrack;
 import com.m.freemovie.mvp.Presenter.RevivalInfoDetailPresenter;
 import com.m.freemovie.mvp.Presenter.RevivalTrackPresenter;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class TagalogWebviewActivity extends AppCompatActivity implements RevivalContractDetail.View, RevivalContractTrack.View, TagalogDetailAdapter.TagalogVideoPlayListerner {
@@ -52,6 +59,8 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
     private String videoUrl ="";
     private boolean isMovie;
     private boolean isError =  false;
+    private PinoyWatchHistoryHelper dbHelper;
+    private BookmarkDbHelper bookmarkDbHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,10 +76,12 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
         binding.titleName.setText(title);
         revivalInfoDetailPresenter = new RevivalInfoDetailPresenter(this);
         revivalTrackPresenter = new RevivalTrackPresenter(this);
-
-        revivalInfoDetailPresenter.getListTv(id);
+        bookmarkDbHelper = new BookmarkDbHelper(this);
+        dbHelper = new PinoyWatchHistoryHelper(this);
         binding.expand.setOnClickListener(view -> rotateScreen());
+        binding.llBookmark.setOnClickListener(view -> savedBook());
 
+        setImageData(id);
 
         binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -117,6 +128,7 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
             params.setMargins(0,20,0,0);
             binding.tvEnjoy.setLayoutParams(params);
         }else{
+            revivalInfoDetailPresenter.getListTv(id);
             binding.tvEnjoy.setVisibility(View.GONE);
         }
         if(binding.tvEnjoy.getVisibility() == View.GONE){
@@ -133,6 +145,7 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         binding.rlWebview.setLayoutParams(params);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        binding.llBookmark.setVisibility(View.GONE);
 
         new WindowUtils(this,true,false);
     }
@@ -145,6 +158,7 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
         binding.rvSeason.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(250));
         binding.rlWebview.setLayoutParams(params);
+        binding.llBookmark.setVisibility(View.VISIBLE);
         new WindowUtils(this,true,false);
     }
     public int dip2px(float dpValue) {
@@ -208,6 +222,25 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
         }
     }
 
+
+    private void savedBook() {
+        String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
+        String type;
+        if(isMovie){
+            type = "true";
+        }else{
+            type = "false";
+        }
+        DetailBean details = new DetailBean(id, timestamp, image, title,type);
+        details.setVideoId(id);
+        details.setTimeStamp(timestamp);
+        bookmarkDbHelper.toggleBookmark(details, isMovie? 5:4);
+        setImageData(id);
+    }
+    private void setImageData(String videoId) {
+        boolean isBookmarked = bookmarkDbHelper.isBookmarked(videoId);
+        binding.ivHeart.setImageResource(!isBookmarked? R.mipmap.heart_no :R.mipmap.heart_yes);
+    }
 
 
     private boolean isNetworkAvailable() {
@@ -328,7 +361,10 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
                     String episode = data.getEpisode();
                     if (!seenEpisodes.contains(episode)) {
                         seenEpisodes.add(episode);
-                        episodeBeanList.add(new TagalogDetailBean(data.getEpisodeUrl(), episode, image));
+                        TagalogDetailBean detailBean = new TagalogDetailBean(data.getEpisodeUrl(), episode, image);
+                        boolean isWatched = dbHelper.isEpisodeWatched(data.getEpisodeUrl(), episode);
+                        detailBean.setWatched(isWatched);
+                        episodeBeanList.add(detailBean);
                     }
                 }
             }

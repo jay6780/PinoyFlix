@@ -25,17 +25,24 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.m.freemovie.R;
+import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
+import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.TagalogDetailAdapter;
 import com.m.freemovie.databinding.ActivityNineAnimeEpsiodeBinding;
+import com.m.freemovie.mvp.ClassBean.DetailBean;
 import com.m.freemovie.mvp.ClassBean.DownloadNineAnimeBean;
 import com.m.freemovie.mvp.ClassBean.NineAnimeEpisodeBean;
 import com.m.freemovie.mvp.ClassBean.TagalogDetailBean;
 import com.m.freemovie.mvp.Contract.NineAnimeDetailContract;
 import com.m.freemovie.mvp.Presenter.NineAnimeDetailPresenter;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineAnimeDetailContract.View,TagalogDetailAdapter.TagalogVideoPlayListerner {
     private ActivityNineAnimeEpsiodeBinding binding;
@@ -45,6 +52,9 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
     private String videoUrl ="";
     private TagalogDetailAdapter episodeAdapter;
     private List<TagalogDetailBean> episodeBeanList = new ArrayList<>();
+    private PinoyWatchHistoryHelper dbHelper;
+    private String tempImage;
+    private BookmarkDbHelper bookmarkDbHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,10 +67,12 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
 //        Log.d("SeasonList","ids"+" videoId: "+id + " SeasonId: "+seasonId);
         binding.titleName.setText(title);
         presenter = new NineAnimeDetailPresenter(this);
+        dbHelper = new PinoyWatchHistoryHelper(this);
+        bookmarkDbHelper = new BookmarkDbHelper(this);
         presenter.getDetails(videoId);
         binding.expand.setOnClickListener(view -> rotateScreen());
-
-
+        setImageData(videoId);
+        binding.llBookmark.setOnClickListener(view -> savedBook());
         binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -96,7 +108,7 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         binding.rlWebview.setLayoutParams(params);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
+        binding.llBookmark.setVisibility(View.GONE);
         new WindowUtils(this,true,false);
     }
 
@@ -108,6 +120,7 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
         binding.rvSeason.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(250));
         binding.rlWebview.setLayoutParams(params);
+        binding.llBookmark.setVisibility(View.VISIBLE);
         new WindowUtils(this,true,false);
     }
     public int dip2px(float dpValue) {
@@ -172,6 +185,18 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
     }
 
 
+    private void savedBook() {
+        String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
+        DetailBean details = new DetailBean(videoId, timestamp, tempImage, title,"false");
+        details.setVideoId(videoId);
+        details.setTimeStamp(timestamp);
+        bookmarkDbHelper.toggleBookmark(details, 6);
+        setImageData(videoId);
+    }
+    private void setImageData(String videoId) {
+        boolean isBookmarked = bookmarkDbHelper.isBookmarked(videoId);
+        binding.ivHeart.setImageResource(!isBookmarked? R.mipmap.heart_no :R.mipmap.heart_yes);
+    }
 
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -246,14 +271,19 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
         Log.e("RetrofitError","val: "+error);
         new Handler().postDelayed(() -> {
             Toast.makeText(this,"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
-            binding.swipe.setRefreshing(false);
+            if(binding.swipe !=null){
+                binding.swipe.setRefreshing(false);
+            }
+
         }, 500);
     }
 
     @Override
     public void hideLoading() {
         new Handler().postDelayed(() -> {
-            binding.swipe.setRefreshing(false);
+            if(binding.swipe !=null){
+                binding.swipe.setRefreshing(false);
+            }
         }, 500);
     }
 
@@ -286,7 +316,11 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
             for (NineAnimeEpisodeBean.ResultsBean.EpisodesBean data : episodeBean.getResults().getEpisodes()) {
                 if (!episodeBean.getResults().getEpisodes().isEmpty()) {
                     binding.rvSeason.setVisibility(View.VISIBLE);
-                    episodeBeanList.add(new TagalogDetailBean(data.getLink(), data.getEpisode(),episodeBean.getResults().getImage()));
+                    TagalogDetailBean detailBean = new TagalogDetailBean(data.getLink(), data.getEpisode(),episodeBean.getResults().getImage());
+                    boolean isWatched = dbHelper.isEpisodeWatched(data.getLink(), data.getEpisode());
+                    tempImage = episodeBean.getResults().getImage();
+                    detailBean.setWatched(isWatched);
+                    episodeBeanList.add(detailBean);
                 }else{
                     Toast.makeText(getApplicationContext(),"No episode available",Toast.LENGTH_SHORT).show();
                     finish();

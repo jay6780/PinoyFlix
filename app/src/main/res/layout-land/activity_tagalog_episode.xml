@@ -128,6 +128,24 @@
 
 
 
+        <LinearLayout
+            android:id="@+id/ll_bookmark"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:visibility="gone"
+            android:background="@drawable/circle_floating"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_alignParentEnd="true"
+            android:gravity="center"
+            android:layout_alignParentBottom="true">
+
+            <ImageView
+                android:id="@+id/iv_heart"
+                android:layout_width="30dp"
+                android:layout_height="30dp"/>
+
+        </LinearLayout>
 
 
     </RelativeLayout>
@@ -138,6 +156,8 @@
         android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+
+
 
 
 </LinearLayout>

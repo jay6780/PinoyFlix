@@ -51,6 +51,8 @@ public class NineAnimeFragment extends Fragment  implements NineAnimeContract.Vi
                 binding.rvOngoing.setVisibility(View.GONE);
                 binding.rlLatest.setVisibility(View.GONE);
                 binding.rvLatest.setVisibility(View.GONE);
+                binding.rvLatest.scrollToPosition(0);
+                binding.rvOngoing.scrollToPosition(0);
                 OngoingAdapter.setNewData(new ArrayList<>());
                 LatestAdapter.setNewData(new ArrayList<>());
                 initFetch();

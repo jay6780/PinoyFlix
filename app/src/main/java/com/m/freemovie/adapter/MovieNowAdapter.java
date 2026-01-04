@@ -46,7 +46,7 @@ public class MovieNowAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Bas
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, Details_activity.class);
                 intent.putExtra("id",item.getId());
-                intent.putExtra("isTv",false);
+                intent.putExtra("position",1);
                 mContext.startActivity(intent);
             }
         });

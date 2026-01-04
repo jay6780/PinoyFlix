@@ -55,12 +55,12 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
             binding.rvViewAll.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
             seriesAllAdapter = new SeriesAllAdapter();
             binding.rvViewAll.setAdapter(seriesAllAdapter);
-            seriesAllAdapter.isTvSeries(true);
+            seriesAllAdapter.isTvSeries(2);
         }else{
             binding.rvViewAll.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
             viewAllAdapter = new ViewAllAdapter();
             binding.rvViewAll.setAdapter(viewAllAdapter);
-            viewAllAdapter.isTvSeries(false);
+            viewAllAdapter.isTvSeries(1);
         }
         binding.rvViewAll.setHasFixedSize(true);
         binding.rvViewAll.addOnScrollListener(new RecyclerView.OnScrollListener() {

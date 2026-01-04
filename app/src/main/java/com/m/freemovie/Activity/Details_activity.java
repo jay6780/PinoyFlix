@@ -41,18 +41,18 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     private ActivityDetailsBinding binding;
     private ActivityDetailsSeriesBinding seriesBinding;
     private SeasonsAdapter seasonsAdapter;
-    private boolean isTv;
     private BookmarkDbHelper dbHelper;
+    private int position = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        isTv = getIntent().getBooleanExtra("isTv", false);
         id = getIntent().getStringExtra("id");
+        position = getIntent().getIntExtra("position",2);
 //        Log.d("IsTv", "value: " + isTv + " id: " + id);
 
-        if (isTv) {
+        if (position == 2) {
             seriesBinding = ActivityDetailsSeriesBinding.inflate(getLayoutInflater());
             setContentView(seriesBinding.getRoot());
         } else {
@@ -68,7 +68,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
         detailPresenter = new DetailPresenter(this);
         dbHelper = new BookmarkDbHelper(this);
 
-        if (isTv) {
+        if (position == 2) {
             seriesBinding.ivBack.setOnClickListener(view -> finish());
             seriesBinding.ivBook.setOnClickListener(view -> savedBook());
             seriesBinding.tvWatch.setOnClickListener(view -> watchNow());
@@ -80,7 +80,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
         setImageData(id);
 
-        if (isTv) {
+        if (position == 2) {
             detailPresenter.getTvDetail(id, getString(R.string.key));
         } else {
             detailPresenter.getDetail(id, getString(R.string.key));
@@ -89,16 +89,16 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
     private void savedBook() {
         String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
-        DetailBean details = new DetailBean(id, timestamp, lastImage, title);
+        DetailBean details = new DetailBean(id, timestamp, lastImage, title,"false");
         details.setVideoId(id);
         details.setTimeStamp(timestamp);
-        dbHelper.toggleBookmark(details, isTv);
+        dbHelper.toggleBookmark(details, position);
         setImageData(id);
     }
 
     private void setImageData(String videoId) {
         boolean isBookmarked = dbHelper.isBookmarked(videoId);
-        if (isTv) {
+        if (position == 2) {
             seriesBinding.ivBook.setImageResource(isBookmarked ? R.drawable.booked : R.drawable.unbooked);
         } else {
             binding.ivBook.setImageResource(isBookmarked ? R.drawable.booked : R.drawable.unbooked);
@@ -166,7 +166,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
     @Override
     public void getDetailResponse(DetailBean movieBean) {
-        if (movieBean != null && !isFinishing() && !isDestroyed() && !isTv) {
+        if (movieBean != null && !isFinishing() && !isDestroyed()) {
             String posterPath = "https://image.tmdb.org/t/p/w500/" + movieBean.getPoster_path();
             this.lastImage = posterPath;
             binding.tvTitle.setText(movieBean.getOriginal_title());
@@ -210,7 +210,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     private String tvSeriesName;
     @Override
     public void getTvDetailResponse(DetailTvBean detailTvBean) {
-        if (detailTvBean != null && !isFinishing() && !isDestroyed() && isTv) {
+        if (detailTvBean != null && !isFinishing() && !isDestroyed()) {
             String posterPath = "https://image.tmdb.org/t/p/w500/" + detailTvBean.getPoster_path();
             this.lastImage = posterPath;
             seriesBinding.tvTitle.setText(detailTvBean.getName());
