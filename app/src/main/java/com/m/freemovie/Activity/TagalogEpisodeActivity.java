@@ -58,8 +58,8 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
     private String title;
     boolean isLandScape = false;
     boolean isFinish = false;
-    boolean isBookMark = false;
     private PinoyWatchHistoryHelper dbHelper;
+    private int currentPosition = 0;
 
     private BookmarkDbHelper bookmarkDbHelper;
     @Override
@@ -137,6 +137,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
                         binding.seekBar.setVisibility(View.INVISIBLE);
                         binding.fullWide.setVisibility(View.INVISIBLE);
                         isFinish = true;
+                        binding.player.pause();
                         binding.btnRefresh.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -418,19 +419,25 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
     @Override
     protected void onPause() {
         super.onPause();
-        if (binding.player != null) {
+        if (binding.player != null && binding.player.isPlaying()) {
+            currentPosition = binding.player.getCurrentPosition();
             binding.player.pause();
         }
         if (mSeekRunnable != null) {
             mSeekHandler.removeCallbacks(mSeekRunnable);
         }
     }
-
     @Override
     protected void onResume() {
         super.onResume();
-        if (binding.player != null && binding.player.isPlaying()) {
-            startSeekUpdates();
+        if (binding.player != null) {
+            if (currentPosition > 0) {
+                binding.player.seekTo(currentPosition);
+            }
+            if (!binding.player.isPlaying() && currentPosition > 0) {
+                binding.player.start();
+                startSeekUpdates();
+            }
         }
     }
 

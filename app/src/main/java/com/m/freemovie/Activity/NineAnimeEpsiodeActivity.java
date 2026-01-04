@@ -281,9 +281,14 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
     @Override
     public void hideLoading() {
         new Handler().postDelayed(() -> {
-            if(binding.swipe !=null){
-                binding.swipe.setRefreshing(false);
+            try {
+                if(binding.swipe !=null){
+                    binding.swipe.setRefreshing(false);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
             }
+
         }, 500);
     }
 

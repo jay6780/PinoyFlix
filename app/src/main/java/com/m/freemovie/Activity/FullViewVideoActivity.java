@@ -48,7 +48,7 @@ public class FullViewVideoActivity extends AppCompatActivity implements View.OnC
     private ImageView rotate;
     private  Animation animRotate;
     private String videoTitle;
-
+    private int currentPosition = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -364,11 +364,25 @@ public class FullViewVideoActivity extends AppCompatActivity implements View.OnC
     @Override
     protected void onPause() {
         super.onPause();
-        if (mPlayerView != null && mPlayerView.isPlaying()) {
-            mPlayerView.stopPlayback();
+        if (mPlayerView!= null && mPlayerView.isPlaying()) {
+            currentPosition = mPlayerView.getCurrentPosition();
+            mPlayerView.pause();
         }
         if (mSeekRunnable != null) {
             mSeekHandler.removeCallbacks(mSeekRunnable);
+        }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mPlayerView != null) {
+            if (currentPosition > 0) {
+                mPlayerView.seekTo(currentPosition);
+            }
+            if (!mPlayerView.isPlaying() && currentPosition > 0) {
+                mPlayerView.start();
+                startSeekUpdates();
+            }
         }
     }
 
