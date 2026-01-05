@@ -26,6 +26,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.m.freemovie.R;
@@ -67,6 +68,9 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
     private AnimePaheDetailPresenter detailPresenter;
     private String url = "";
     private List<AnimePaheDownloadBean.ResultsBean.StreamingBean> streamingBeanList = new ArrayList<>();
+    private int page = 1;
+    private boolean isNomore = false;
+    private boolean isLoading = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +95,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
         binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                page = 1;
                 detailPresenter.getDetailQuery(url);
                 episodeBeanList.clear();
                 episodeAdapter.setNewData(new ArrayList<>());
@@ -113,6 +118,32 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
         episodeAdapter = new AnimePaheDetailAdapter(this);
         binding.rvSeason.setAdapter(episodeAdapter);
         episodeAdapter.setNewData(episodeBeanList);
+
+        binding.rvSeason.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (!isLoading && layoutManager != null) {
+                    int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+                    int totalItemCount = layoutManager.getItemCount();
+                    if (!episodeBeanList.isEmpty()) {
+                        if (lastVisibleItemPosition >= totalItemCount - 1) {
+                            if (isNomore || animeId == null || animeId.isEmpty()) {
+                                return;
+                            }
+                            isLoading = true;
+                            page++;
+                            loadmore();
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private void loadmore() {
+        detailPresenter.getEpisodeQuery(animeId,page);
     }
 
 
@@ -270,7 +301,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
                 "</html>";
 
         binding.webView.loadDataWithBaseURL(
-                "https://abysscdn.com/",
+                null,
                 htmlContent,
                 "text/html",
                 "UTF-8",
@@ -303,24 +334,27 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
         if(detailBean!=null && detailBean.getResults()!=null){
             animeId = detailBean.getResults().getId();
             image = detailBean.getResults().getPoster();
-            detailPresenter.getEpisodeQuery(animeId,1);
+            detailPresenter.getEpisodeQuery(animeId,page);
         }
     }
 
     @Override
     public void getEpisodes(AnimePaheEpisodeBean episodeBean) {
         if (episodeBean != null && episodeBean.getResults() != null) {
-            if (!episodeBean.getResults().getData().isEmpty()) {
+            isLoading = false;
+            if (episodeBean.getResults().getData() != null) {
                 for (AnimePaheEpisodeBean.ResultsBean.DataBean dataBean : episodeBean.getResults().getData()) {
-                    AnimePaheBeanList detailBean = new AnimePaheBeanList(String.valueOf(dataBean.getId()), String.valueOf(dataBean.getEpisode()), dataBean.getSnapshot(),dataBean.getSession());
-                    boolean isWatched = dbHelper.isEpisodeWatched(String.valueOf(dataBean.getId()),String.valueOf(dataBean.getEpisode()));
+                    AnimePaheBeanList detailBean = new AnimePaheBeanList(String.valueOf(dataBean.getId()), String.valueOf(dataBean.getEpisode()), dataBean.getSnapshot(), dataBean.getSession());
+                    boolean isWatched = dbHelper.isEpisodeWatched(String.valueOf(dataBean.getId()), String.valueOf(dataBean.getEpisode()));
                     detailBean.setWatched(isWatched);
                     episodeBeanList.add(detailBean);
                 }
+                episodeAdapter.setNewData(episodeBeanList);
+            } else {
+                isNomore = true;
+                Toast.makeText(getApplicationContext(), "No more episodes", Toast.LENGTH_SHORT).show();
             }
         }
-        episodeAdapter.setNewData(episodeBeanList);
-
     }
 
 
