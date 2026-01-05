@@ -35,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_height="wrap_content"
-            android:text="Tagalog Series"
+            android:text="Anime series"
             android:textSize="15sp"/>
 
     </LinearLayout>

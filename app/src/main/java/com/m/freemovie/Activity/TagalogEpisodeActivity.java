@@ -419,6 +419,9 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
     @Override
     protected void onPause() {
         super.onPause();
+        if(binding.btnRefresh !=null){
+            binding.btnRefresh.setVisibility(View.GONE);
+        }
         if (binding.player != null && binding.player.isPlaying()) {
             currentPosition = binding.player.getCurrentPosition();
             binding.player.pause();
@@ -430,6 +433,9 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
     @Override
     protected void onResume() {
         super.onResume();
+        if(binding.btnRefresh !=null){
+            binding.btnRefresh.setVisibility(View.GONE);
+        }
         if (binding.player != null) {
             if (currentPosition > 0) {
                 binding.player.seekTo(currentPosition);

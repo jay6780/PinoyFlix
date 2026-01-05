@@ -1,5 +1,8 @@
 package com.m.freemovie.mvp.Api;
 
+import com.m.freemovie.mvp.ClassBean.AnimePaheDetailBean;
+import com.m.freemovie.mvp.ClassBean.AnimePaheDownloadBean;
+import com.m.freemovie.mvp.ClassBean.AnimePaheEpisodeBean;
 import com.m.freemovie.mvp.ClassBean.DetailBean;
 import com.m.freemovie.mvp.ClassBean.DetailDownloadBean;
 import com.m.freemovie.mvp.ClassBean.DetailTvBean;
@@ -8,6 +11,7 @@ import com.m.freemovie.mvp.ClassBean.MovieBean;
 import com.m.freemovie.mvp.ClassBean.NineAnimeBean;
 import com.m.freemovie.mvp.ClassBean.NineAnimeEpisodeBean;
 import com.m.freemovie.mvp.ClassBean.NineAnimeSearchBean;
+import com.m.freemovie.mvp.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.ClassBean.RevivalSearchBean;
 import com.m.freemovie.mvp.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.ClassBean.TagalogBean;
@@ -170,5 +174,25 @@ public interface MovieApi {
     @GET("9anime")
     Observable<NineAnimeSearchBean> getSearchNineAnime(
             @Query("search") String search);
+
+
+    //animepahe
+    @GET("animepahe/latest_release")
+    Observable<PaheLatestBean> getLatestAnimePahe(
+            @Query("page") int page);
+
+    @GET("animepahe/info")
+    Observable<AnimePaheDetailBean> getInfoPahe(
+            @Query("url") String url);
+
+    @GET("animepahe/episodes")
+    Observable<AnimePaheEpisodeBean> getPaheEpisode(
+            @Query("id") String id,
+            @Query("page") int page);
+
+
+    @GET("animepahe/download")
+    Observable<AnimePaheDownloadBean> getPaheTrack(
+            @Query("url") String url);
 
 }

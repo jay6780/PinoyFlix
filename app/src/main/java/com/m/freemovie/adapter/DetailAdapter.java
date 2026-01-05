@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.m.freemovie.Activity.AnimePaheWebviewActivity;
 import com.m.freemovie.Activity.Details_activity;
 import com.m.freemovie.Activity.NineAnimeEpsiodeActivity;
 import com.m.freemovie.Activity.TagalogEpisodeActivity;
@@ -59,7 +60,7 @@ public class DetailAdapter extends BaseQuickAdapter<DetailBean, BaseViewHolder> 
                     case 5:
                         intent = new Intent(mContext, TagalogWebviewActivity.class);
                         intent.putExtra("id",item.getVideoId());
-                        intent.putExtra("title",item.getTitle());
+                        intent.putExtra("title",item.getMovieName());
                         intent.putExtra("image",item.getTempImage());
                         intent.putExtra("isMovie",item.getIsMovie().equals("true")? true:false);
                         break;
@@ -67,7 +68,12 @@ public class DetailAdapter extends BaseQuickAdapter<DetailBean, BaseViewHolder> 
                     case 6:
                         intent = new Intent(mContext, NineAnimeEpsiodeActivity.class);
                         intent.putExtra("videoId",item.getVideoId());
-                        intent.putExtra("title",item.getTitle());
+                        intent.putExtra("title",item.getMovieName());
+                        break;
+                    case 7:
+                        intent = new Intent(mContext, AnimePaheWebviewActivity.class);
+                        intent.putExtra("id",item.getVideoId());
+                        intent.putExtra("title",item.getMovieName());
                         break;
 
                 }
