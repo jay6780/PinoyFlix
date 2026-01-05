@@ -3,6 +3,7 @@ package com.m.freemovie.mvp.Presenter;
 import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
+import com.m.freemovie.mvp.ClassBean.AnimePaheSearchBean;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
 import com.m.freemovie.mvp.ClassBean.NineAnimeSearchBean;
 import com.m.freemovie.mvp.ClassBean.TagalogSearchBean;
@@ -122,6 +123,34 @@ public class SearchPresenter implements SearchContract.Presenter {
             public void returnResult(NineAnimeSearchBean apiBean) {
                 view.hideLoading();
                 view.getNineAnime(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getAnimePaheQuery(String search) {
+        view.showLoading();
+        MovieModel.getSearchPahe(search ,new Callback<AnimePaheSearchBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(AnimePaheSearchBean apiBean) {
+                view.hideLoading();
+                view.getSearchPahe(apiBean);
             }
 
             @Override

@@ -3,6 +3,7 @@ package com.m.freemovie.mvp.Api;
 import com.m.freemovie.mvp.ClassBean.AnimePaheDetailBean;
 import com.m.freemovie.mvp.ClassBean.AnimePaheDownloadBean;
 import com.m.freemovie.mvp.ClassBean.AnimePaheEpisodeBean;
+import com.m.freemovie.mvp.ClassBean.AnimePaheSearchBean;
 import com.m.freemovie.mvp.ClassBean.DetailBean;
 import com.m.freemovie.mvp.ClassBean.DetailDownloadBean;
 import com.m.freemovie.mvp.ClassBean.DetailTvBean;
@@ -194,5 +195,11 @@ public interface MovieApi {
     @GET("animepahe/download")
     Observable<AnimePaheDownloadBean> getPaheTrack(
             @Query("url") String url);
+
+    @GET("animepahe/api")
+    Observable<AnimePaheSearchBean> getPaheSearch(
+            @Query("search") String search);
+
+
 
 }

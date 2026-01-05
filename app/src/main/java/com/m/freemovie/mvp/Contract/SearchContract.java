@@ -1,6 +1,7 @@
 package com.m.freemovie.mvp.Contract;
 
 
+import com.m.freemovie.mvp.ClassBean.AnimePaheSearchBean;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
 import com.m.freemovie.mvp.ClassBean.NineAnimeSearchBean;
 import com.m.freemovie.mvp.ClassBean.TagalogSearchBean;
@@ -14,6 +15,7 @@ public interface SearchContract {
         void getSearchSeriesResponse(MovieBean movieBean);
         void getTagalogSearch(TagalogSearchBean tagalogSearchBean);
         void getNineAnime(NineAnimeSearchBean nineAnimeSearchBean);
+        void getSearchPahe(AnimePaheSearchBean animePaheSearchBean);
     }
 
     interface Presenter {
@@ -21,5 +23,6 @@ public interface SearchContract {
         void getSearchSeries(String apiKey,String query,int page);
         void getTagalogQuery(String query);
         void getNineAnimeQuery(String query);
+        void getAnimePaheQuery(String search);
     }
 }
