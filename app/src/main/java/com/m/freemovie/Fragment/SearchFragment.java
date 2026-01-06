@@ -447,7 +447,10 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
-        EventBus.getDefault().post(new MovieEvent(1));
+        if(position == 1){
+            EventBus.getDefault().post(new MovieEvent(1));
+        }
+
     }
 
     @Override
