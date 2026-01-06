@@ -3,6 +3,7 @@ package com.m.freemovie.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,16 +75,22 @@ public class NineAnimeFragment extends Fragment  implements NineAnimeContract.Vi
 
     @Override
     public void showError(String error) {
-        new Handler().postDelayed(() -> {
-            Toast.makeText(getContext(),"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
-            binding.swipeRefreshLayout.setRefreshing(false);
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getContext(),"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
+                binding.swipeRefreshLayout.setRefreshing(false);
+            }
         }, 500);
     }
 
     @Override
     public void hideLoading() {
-        new Handler().postDelayed(() -> {
-            binding.swipeRefreshLayout.setRefreshing(false);
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                binding.swipeRefreshLayout.setRefreshing(false);
+            }
         }, 500);
     }
 

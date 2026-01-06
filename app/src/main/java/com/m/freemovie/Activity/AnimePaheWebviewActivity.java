@@ -96,6 +96,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
             @Override
             public void onRefresh() {
                 page = 1;
+                isNomore = false;
                 detailPresenter.getDetailQuery(url);
                 episodeBeanList.clear();
                 episodeAdapter.setNewData(new ArrayList<>());
@@ -129,7 +130,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
                     int totalItemCount = layoutManager.getItemCount();
                     if (!episodeBeanList.isEmpty()) {
                         if (lastVisibleItemPosition >= totalItemCount - 1) {
-                            if (isNomore || animeId == null || animeId.isEmpty()) {
+                            if (isNomore) {
                                 return;
                             }
                             isLoading = true;

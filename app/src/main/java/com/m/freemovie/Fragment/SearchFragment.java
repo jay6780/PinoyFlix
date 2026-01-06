@@ -75,8 +75,6 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         revivalSearchPresenter = new RevivalSearchPresenter(this);
         searchPresenter = new SearchPresenter(this);
         btn_send.setOnClickListener(this);
-
-
         movieAdapter = new ViewAllAdapter();
         tagalogSearchAdapter = new TagalogSearchAdapter();
         tvRevivialSearchAdapter = new TvRevivialSearchAdapter();
@@ -449,6 +447,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
+        EventBus.getDefault().post(new MovieEvent(1));
     }
 
     @Override

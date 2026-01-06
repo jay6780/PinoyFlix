@@ -322,7 +322,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
                 int marginPx = (int) TypedValue.applyDimension(
                         TypedValue.COMPLEX_UNIT_DIP,
-                        30,
+                        35,
                         getResources().getDisplayMetrics()
                 );
                 RelativeLayout.LayoutParams params1  = new RelativeLayout.LayoutParams(marginPx, marginPx);
@@ -459,7 +459,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
             );
             int iconspx = (int) TypedValue.applyDimension(
                     TypedValue.COMPLEX_UNIT_DIP,
-                    30,
+                    35,
                     getResources().getDisplayMetrics()
             );
             isLandScape = false;
