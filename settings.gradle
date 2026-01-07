@@ -19,5 +19,3 @@ rootProject.name = "FreeMovie"
 include ':app'
 include ':kprogresshud'
 include ':MeowBottomNavigation'
-include ':ijkplayer-java'
-include ':giraffeplayer'
