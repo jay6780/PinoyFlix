@@ -157,6 +157,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
         binding.rlWebview.setLayoutParams(params);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         binding.llBookmark.setVisibility(View.GONE);
+        binding.swipe.setEnabled(false);
 
         new WindowUtils(this,true,false);
     }
@@ -170,6 +171,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(250));
         binding.rlWebview.setLayoutParams(params);
         binding.llBookmark.setVisibility(View.VISIBLE);
+        binding.swipe.setEnabled(true);
         new WindowUtils(this,true,false);
     }
     public int dip2px(float dpValue) {
@@ -470,7 +472,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
         }
         @Override
         public void onPageFinished(WebView view, String url) {
-            blockAds(view);
             if(isError){
                 binding.webView.setVisibility(View.GONE);
                 return;
@@ -481,30 +482,5 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
             super.onPageFinished(view, url);
         }
 
-    }
-
-
-    private void blockAds(WebView view) {
-        String tags = view.getUrl();
-        StringBuilder sb = new StringBuilder();
-        sb.append("javascript: ");
-        String[] allTag = tags.split(",");
-        for (String tag : allTag) {
-            String adTag = tag;
-            if (adTag.trim().length() > 0) {
-                adTag = adTag.trim();
-                if (adTag.contains("#")) {
-                    adTag = adTag.substring(adTag.indexOf("#") + 1);
-                    sb.append("document.getElementById(\'").append(adTag).append("\').remove();");
-
-                } else if (adTag.contains(".")) {
-                    adTag = adTag.substring(adTag.indexOf(".") + 1);
-                    sb.append("var esc=document.getElementsByClassName(\'").append(adTag).append("\');for (var i = esc.length - 1; i >= 0; i--){esc[i].remove();};");
-
-                } else {
-                    sb.append("var esc=document.getElementsByTagName(\'").append(adTag).append("\');for (var i = esc.length - 1; i >= 0; i--){esc[i].remove();};");
-                }
-            }
-        }
     }
 }

@@ -1,6 +1,8 @@
 package com.m.freemovie.Activity;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.media.MediaPlayer;
@@ -30,18 +32,24 @@ import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.TagalogEpisodeAdapter;
 import com.m.freemovie.databinding.ActivityTagalogEpisodeBinding;
 import com.m.freemovie.mvp.ClassBean.DetailBean;
+import com.m.freemovie.mvp.ClassBean.DownloadPlayerListerner;
 import com.m.freemovie.mvp.ClassBean.TagalogEpisode;
 import com.m.freemovie.mvp.ClassBean.TagalogEpisodeBean;
 import com.m.freemovie.mvp.Contract.TagalogEpisodeContract;
 import com.m.freemovie.mvp.Presenter.TagalogEpisodePresenter;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class TagalogEpisodeActivity extends AppCompatActivity implements TagalogEpisodeContract.View, TagalogEpisodeAdapter.VideoPlayListerner,View.OnClickListener {
+public class TagalogEpisodeActivity extends AppCompatActivity implements TagalogEpisodeContract.View, TagalogEpisodeAdapter.VideoPlayListerner,View.OnClickListener, DownloadPlayerListerner {
     ActivityTagalogEpisodeBinding binding;
     private KProgressHUD hud;
     private TagalogEpisodePresenter tagalogEpisodePresenter;
@@ -60,7 +68,8 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
     boolean isFinish = false;
     private PinoyWatchHistoryHelper dbHelper;
     private int currentPosition = 0;
-
+    private KProgressHUD downloadHud;
+    private boolean isFirstTask = false;
     private BookmarkDbHelper bookmarkDbHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +89,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
         tagalogEpisodePresenter = new TagalogEpisodePresenter(this);
         tagalogEpisodePresenter.getUrl(url);
         binding.rvEpisode.setLayoutManager(new LinearLayoutManager(this));
-        tagalogEpisodeAdapter = new TagalogEpisodeAdapter(this);
+        tagalogEpisodeAdapter = new TagalogEpisodeAdapter(this,this);
         binding.rvEpisode.setAdapter(tagalogEpisodeAdapter);
         dbHelper = new PinoyWatchHistoryHelper(this);
         bookmarkDbHelper = new BookmarkDbHelper(this);
@@ -422,6 +431,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
         if(binding.btnRefresh !=null){
             binding.btnRefresh.setVisibility(View.GONE);
         }
+        isFirstTask = false;
         if (binding.player != null && binding.player.isPlaying()) {
             currentPosition = binding.player.getCurrentPosition();
             binding.player.pause();
@@ -433,6 +443,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
     @Override
     protected void onResume() {
         super.onResume();
+        isFirstTask = false;
         if(binding.btnRefresh !=null){
             binding.btnRefresh.setVisibility(View.GONE);
         }
@@ -476,9 +487,175 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
             binding.fullWide.setVisibility(isFinish?View.GONE:View.VISIBLE);
             binding.rvEpisode.setVisibility(View.VISIBLE);
             binding.llBookmark.setVisibility(View.VISIBLE);
+            isFirstTask = false;
         }else{
+            isFirstTask = false;
             super.onBackPressed();
             finish();
         }
     }
+
+    @Override
+    public void getDownloadData(String videoUrl, String episode) {
+        if(videoUrl == null || episode == null){
+            return;
+        }
+        if(binding.player!=null){
+            if(binding.player.isPlaying()){
+                binding.player.pause();
+            }
+        }
+        isContinue = true;
+        binding.btnPlay.setImageResource(isContinue? R.mipmap.play_white:R.mipmap.pause_white);
+        downloadVideo(videoUrl,episode);
+    }
+
+    private File getLocalFile(String episode) {
+        String safeTitle = title.replaceAll("[^a-zA-Z0-9.-]", "_");
+        String fileName = safeTitle +"_Episode_"+episode+"_"+".mp4";
+        String dirName = safeTitle;
+
+        File freeMovieDir = new File(getFilesDir(), "FreeMovie");
+        if (!freeMovieDir.exists()) {
+            freeMovieDir.mkdirs();
+        }
+
+        File movieDir = new File(freeMovieDir, dirName);
+        if (!movieDir.exists()) {
+            movieDir.mkdirs();
+        }
+        return new File(movieDir, fileName);
+    }
+
+    private void downloadVideo(String videoUrl,String episode) {
+        isFirstTask = true;
+        File outputFile = getLocalFile(episode);
+        downloadHud = KProgressHUD.create(this)
+                .setStyle(KProgressHUD.Style.ANNULAR_DETERMINATE)
+                .setLabel("Downloading...")
+                .setMaxProgress(100)
+                .setCancellable(true);
+        downloadHud.show();
+
+        downloadHud.setCancellable(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                isFirstTask = false;
+                if (outputFile.exists()) {
+                    outputFile.delete();
+                    Toast.makeText(getApplicationContext(), "Download cancelled", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        new Thread(() -> {
+            FileOutputStream outputStream = null;
+            InputStream inputStream = null;
+            HttpURLConnection connection = null;
+
+            try {
+                URL url = new URL(videoUrl);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(60000);
+                connection.setReadTimeout(60000);
+                connection.setInstanceFollowRedirects(true);
+
+
+                long existingLength = 0;
+                if (outputFile.exists()) {
+                    existingLength = outputFile.length();
+                    connection.setRequestProperty("Range", "bytes=" + existingLength + "-");
+                }
+
+                connection.connect();
+                int responseCode = connection.getResponseCode();
+
+                boolean isResume = (responseCode == HttpURLConnection.HTTP_PARTIAL);
+                if (responseCode == HttpURLConnection.HTTP_OK || isResume) {
+                    inputStream = connection.getInputStream();
+
+                    if (isResume) {
+                        outputStream = new FileOutputStream(outputFile, true);
+                    } else {
+                        outputStream = new FileOutputStream(outputFile);
+                    }
+
+                    int contentLength = connection.getContentLength();
+                    if (isResume) {
+                        contentLength += existingLength;
+                    }
+
+                    byte[] buffer = new byte[8192];
+                    int bytesRead;
+                    long totalBytesRead = existingLength;
+
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        // Check if download was cancelled
+                        if (!isFirstTask) {
+                            break;
+                        }
+
+                        outputStream.write(buffer, 0, bytesRead);
+                        totalBytesRead += bytesRead;
+
+                        if (contentLength > 0) {
+                            final int progress = (int) ((totalBytesRead * 100) / contentLength);
+                            runOnUiThread(() -> downloadHud.setProgress(progress));
+                        }
+                    }
+
+                    outputStream.close();
+                    inputStream.close();
+
+                    if (isFirstTask) {
+                        runOnUiThread(() -> {
+                            if (downloadHud != null && downloadHud.isShowing()) {
+                                downloadHud.dismiss();
+                            }
+                            isFirstTask = false;
+                            Toast.makeText(getApplicationContext(),
+                                    "Download Complete! Saved to: " + outputFile.getAbsolutePath(),
+                                    Toast.LENGTH_LONG).show();
+                            startActivity(new Intent(getApplicationContext(), Download_videoActivity.class));
+                        });
+                    }
+
+                } else {
+                    runOnUiThread(() -> {
+                        if (downloadHud != null && downloadHud.isShowing()) {
+                            downloadHud.dismiss();
+                        }
+                        isFirstTask = false;
+                        Toast.makeText(getApplicationContext(), "Download Failed: HTTP " + responseCode,
+                                Toast.LENGTH_SHORT).show();
+                    });
+                }
+
+            } catch (Exception e) {
+                // Only show error if not cancelled
+                if (isFirstTask) {
+                    e.printStackTrace();
+                    runOnUiThread(() -> {
+                        if (downloadHud != null && downloadHud.isShowing()) {
+                            downloadHud.dismiss();
+                        }
+                        isFirstTask = false;
+                        Toast.makeText(getApplicationContext(),
+                                "Download Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+                }
+            } finally {
+                try {
+                    if (outputStream != null) outputStream.close();
+                    if (inputStream != null) inputStream.close();
+                    if (connection != null) connection.disconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+
 }

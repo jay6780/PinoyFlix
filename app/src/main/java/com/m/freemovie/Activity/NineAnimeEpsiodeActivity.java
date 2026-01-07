@@ -109,6 +109,7 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
         binding.rlWebview.setLayoutParams(params);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         binding.llBookmark.setVisibility(View.GONE);
+        binding.swipe.setEnabled(false);
         new WindowUtils(this,true,false);
     }
 
@@ -121,6 +122,7 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(250));
         binding.rlWebview.setLayoutParams(params);
         binding.llBookmark.setVisibility(View.VISIBLE);
+        binding.swipe.setEnabled(true);
         new WindowUtils(this,true,false);
     }
     public int dip2px(float dpValue) {
@@ -320,7 +322,6 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
         if(episodeBean!=null && episodeBean.getResults() !=null) {
             for (NineAnimeEpisodeBean.ResultsBean.EpisodesBean data : episodeBean.getResults().getEpisodes()) {
                 if (!episodeBean.getResults().getEpisodes().isEmpty()) {
-                    binding.rvSeason.setVisibility(View.VISIBLE);
                     TagalogDetailBean detailBean = new TagalogDetailBean(data.getLink(), data.getEpisode(),episodeBean.getResults().getImage());
                     boolean isWatched = dbHelper.isEpisodeWatched(data.getLink(), data.getEpisode());
                     tempImage = episodeBean.getResults().getImage();
@@ -384,38 +385,12 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
         }
         @Override
         public void onPageFinished(WebView view, String url) {
-            blockAds(view);
             binding.webView.setVisibility(View.VISIBLE);
             binding.tvSelect.setVisibility(View.GONE);
             binding.expand.setVisibility(View.VISIBLE);
             super.onPageFinished(view, url);
         }
 
-    }
-
-
-    private void blockAds(WebView view) {
-        String tags = view.getUrl();
-        StringBuilder sb = new StringBuilder();
-        sb.append("javascript: ");
-        String[] allTag = tags.split(",");
-        for (String tag : allTag) {
-            String adTag = tag;
-            if (adTag.trim().length() > 0) {
-                adTag = adTag.trim();
-                if (adTag.contains("#")) {
-                    adTag = adTag.substring(adTag.indexOf("#") + 1);
-                    sb.append("document.getElementById(\'").append(adTag).append("\').remove();");
-
-                } else if (adTag.contains(".")) {
-                    adTag = adTag.substring(adTag.indexOf(".") + 1);
-                    sb.append("var esc=document.getElementsByClassName(\'").append(adTag).append("\');for (var i = esc.length - 1; i >= 0; i--){esc[i].remove();};");
-
-                } else {
-                    sb.append("var esc=document.getElementsByTagName(\'").append(adTag).append("\');for (var i = esc.length - 1; i >= 0; i--){esc[i].remove();};");
-                }
-            }
-        }
     }
 
 }

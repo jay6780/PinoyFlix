@@ -11,6 +11,7 @@ import com.m.freemovie.R;
 import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
+import com.m.freemovie.mvp.ClassBean.DownloadPlayerListerner;
 import com.m.freemovie.mvp.ClassBean.TagalogEpisode;
 
 public class TagalogEpisodeAdapter extends BaseQuickAdapter<TagalogEpisode, BaseViewHolder> {
@@ -18,12 +19,16 @@ public class TagalogEpisodeAdapter extends BaseQuickAdapter<TagalogEpisode, Base
     private PinoyWatchHistoryHelper dbHelper;
     private VideoPlayListerner videoPlayListerner;
     private  int lastPosition = -1;
+    private DownloadPlayerListerner downloadPlayerListerner;
+
+
     public interface VideoPlayListerner{
         void getVideoUrl(String videoUrl);
     }
-    public TagalogEpisodeAdapter(VideoPlayListerner videoPlayListerner) {
+    public TagalogEpisodeAdapter(VideoPlayListerner videoPlayListerner,DownloadPlayerListerner downloadPlayerListerner) {
         super(R.layout.episode_item);
         this.videoPlayListerner = videoPlayListerner;
+        this.downloadPlayerListerner = downloadPlayerListerner;
     }
 
     @Override
@@ -33,6 +38,8 @@ public class TagalogEpisodeAdapter extends BaseQuickAdapter<TagalogEpisode, Base
         }
         TextView tv_season = helper.getView(R.id.tv_season);
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
+        ImageView iv_download = helper.getView(R.id.iv_download);
+        iv_download.setVisibility(View.VISIBLE);
         RelativeLayout rl_select = helper.getView(R.id.rl_select);
         TextView tv_watched = helper.getView(R.id.tv_watched);
         if(lastPosition == (helper.getAdapterPosition())){
@@ -50,6 +57,12 @@ public class TagalogEpisodeAdapter extends BaseQuickAdapter<TagalogEpisode, Base
                 .into(iv_thumb);
 
         tv_watched.setVisibility(item.isWatched() ? View.VISIBLE : View.GONE);
+        iv_download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                downloadPlayerListerner.getDownloadData(item.getVideoUrl(), item.getEpisode());
+            }
+        });
 
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override

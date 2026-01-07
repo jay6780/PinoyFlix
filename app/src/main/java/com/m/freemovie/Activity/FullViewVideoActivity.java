@@ -256,20 +256,6 @@ public class FullViewVideoActivity extends AppCompatActivity implements View.OnC
             btn_play.setVisibility(View.VISIBLE);
             rotate.setVisibility(View.VISIBLE);
             btn_play.setImageResource(isContinue? R.mipmap.play_white:R.mipmap.pause_white);
-            new Handler().postDelayed(() -> {
-                if (btn_play.getVisibility() == View.VISIBLE) {
-                    download.setVisibility(View.GONE);
-                    btn_back.setVisibility(View.GONE);
-                    time.setVisibility(View.INVISIBLE);
-                    rotate.setVisibility(View.INVISIBLE);
-                    seekBar.setVisibility(View.INVISIBLE);
-                    btn_play.setVisibility(View.INVISIBLE);
-                    title.setVisibility(View.INVISIBLE);
-                    ten_positive.setVisibility(View.INVISIBLE);
-                    ten_negative.setVisibility(View.INVISIBLE);
-                    ispause = false;
-                }
-            }, 5000);
         } else {
             download.setVisibility(View.GONE);
             btn_back.setVisibility(View.GONE);

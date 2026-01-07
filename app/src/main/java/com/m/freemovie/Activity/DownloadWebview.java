@@ -174,6 +174,7 @@ public class DownloadWebview extends AppCompatActivity {
         }
         return new File(movieDir, fileName);
     }
+
     private void downloadVideo(String videoUrl) {
         isFirstTask = true;
         File outputFile = getLocalFile();
