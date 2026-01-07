@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">GiraffePlayer</string>
+    <string name="giraffe_player_url_empty">Please specify the address of the video playback</string>
+    <string name="small_problem">播放遇到点小问题</string>
+    <string name="small_problem1">直播资源加载中</string>
+    <string name="can_not_play">无法播放此视频</string>
+    <string name="not_support">设备不支持</string>
+</resources>
