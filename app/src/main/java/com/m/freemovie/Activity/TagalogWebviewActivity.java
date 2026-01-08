@@ -174,6 +174,9 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(binding.swipe != null &&binding.swipe.isRefreshing()){
+            binding.swipe.setRefreshing(false);
+        }
         if (binding != null && binding.webView != null) {
             binding.webView.stopLoading();
             binding.webView.setWebChromeClient(null);
@@ -314,17 +317,13 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
 
     @Override
     public void showError(String error) {
-        new Handler().postDelayed(() -> {
-            Toast.makeText(this,"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
-            binding.swipe.setRefreshing(false);
-        }, 500);
+        Toast.makeText(this,"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
+        binding.swipe.setRefreshing(false);
     }
 
     @Override
     public void hideLoading() {
-        new Handler().postDelayed(() -> {
-            binding.swipe.setRefreshing(false);
-        }, 500);
+        binding.swipe.setRefreshing(false);
     }
 
 

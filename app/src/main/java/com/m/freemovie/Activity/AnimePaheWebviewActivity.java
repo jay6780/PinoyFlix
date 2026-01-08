@@ -71,6 +71,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
     private int page = 1;
     private boolean isNomore = false;
     private boolean isLoading = false;
+    private boolean isInit = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,12 +92,15 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
         url = "https://animepahe.si/anime/"+id;
         detailPresenter.getDetailQuery(url);
         setImageData(id);
-
+        if(isInit){
+            binding.swipe.setRefreshing(true);
+        }
         binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 page = 1;
                 isNomore = false;
+                isInit = true;
                 detailPresenter.getDetailQuery(url);
                 episodeBeanList.clear();
                 episodeAdapter.setNewData(new ArrayList<>());
@@ -134,6 +138,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
                                 return;
                             }
                             isLoading = true;
+                            isInit = false;
                             page++;
                             loadmore();
                         }
@@ -314,22 +319,25 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
 
     @Override
     public void showLoading() {
-        binding.swipe.setRefreshing(true);
+        if(!isInit){
+            binding.swipe.setRefreshing(true);
+        }
     }
 
     @Override
     public void showError(String error) {
-        new Handler().postDelayed(() -> {
-            Toast.makeText(this,"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
+        if(binding.swipe.isRefreshing()){
             binding.swipe.setRefreshing(false);
-        }, 500);
+        }
     }
 
     @Override
     public void hideLoading() {
-        new Handler().postDelayed(() -> {
+        if(binding.swipe.isRefreshing()){
             binding.swipe.setRefreshing(false);
-        }, 500);
+        }
+
     }
 
     @Override
@@ -345,6 +353,10 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
     public void getEpisodes(AnimePaheEpisodeBean episodeBean) {
         if (episodeBean != null && episodeBean.getResults() != null) {
             isLoading = false;
+            isInit = false;
+            if(binding.swipe.isRefreshing()){
+                binding.swipe.setRefreshing(false);
+            }
             if (episodeBean.getResults().getData() != null) {
                 for (AnimePaheEpisodeBean.ResultsBean.DataBean dataBean : episodeBean.getResults().getData()) {
                     AnimePaheBeanList detailBean = new AnimePaheBeanList(String.valueOf(dataBean.getId()), String.valueOf(dataBean.getEpisode()), dataBean.getSnapshot(), dataBean.getSession());

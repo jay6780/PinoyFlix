@@ -270,28 +270,17 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
 
     @Override
     public void showError(String error) {
-        Log.e("RetrofitError","val: "+error);
-        new Handler().postDelayed(() -> {
-            Toast.makeText(this,"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
-            if(binding.swipe !=null){
-                binding.swipe.setRefreshing(false);
-            }
-
-        }, 500);
+        Toast.makeText(this,"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
+        if(binding.swipe !=null){
+            binding.swipe.setRefreshing(false);
+        }
     }
 
     @Override
     public void hideLoading() {
-        new Handler().postDelayed(() -> {
-            try {
-                if(binding.swipe !=null){
-                    binding.swipe.setRefreshing(false);
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-
-        }, 500);
+        if(binding.swipe !=null){
+            binding.swipe.setRefreshing(false);
+        }
     }
 
 
