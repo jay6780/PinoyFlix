@@ -62,6 +62,7 @@ public class ChooseFragment extends Fragment implements AdapterView.OnItemSelect
             case 3:
                 selectedFragment = new AnimePaheFragment();
                 EventBus.getDefault().post(new MovieEvent(7));
+                SPUtils.getInstance().put(AppConstant.lastposition,7);
                 break;
         }
         FragmentManager fragmentManager = getParentFragmentManager();

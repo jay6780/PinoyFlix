@@ -298,7 +298,6 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
             return;
         }
         binding.player.setVideoPath(String.valueOf(Uri.parse(videoUrl)));
-        binding.player.start();
         isFinish = false;
         binding.btnRefresh.setVisibility(View.GONE);
     }

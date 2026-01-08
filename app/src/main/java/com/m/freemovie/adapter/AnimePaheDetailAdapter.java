@@ -19,7 +19,7 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
     private EpisodeListener videoPlayListerner;
     private  int lastPosition = -1;
     public interface EpisodeListener{
-        void getVideoUrl(String videoUrl);
+        void getVideoUrl(String videoUrl,boolean isDownload);
     }
     public AnimePaheDetailAdapter(EpisodeListener videoPlayListerner) {
         super(R.layout.episode_item);
@@ -33,6 +33,9 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
         }
         TextView tv_season = helper.getView(R.id.tv_season);
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
+        ImageView iv_download = helper.getView(R.id.iv_download);
+        iv_download.setVisibility(View.GONE);
+
         RelativeLayout rl_select = helper.getView(R.id.rl_select);
         TextView tv_watched = helper.getView(R.id.tv_watched);
 
@@ -52,16 +55,23 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
 
 
 
+        iv_download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                videoPlayListerner.getVideoUrl(item.getSession(),true);
+            }
+        });
+
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(lastPosition == (helper.getAdapterPosition())){
                     lastPosition = -1;
-                    videoPlayListerner.getVideoUrl("");
+                    videoPlayListerner.getVideoUrl("",false);
                 }else{
                     dbHelper.markEpisodeAsWatched(item.getEpisodeUrl(), item.getEpisode());
                     lastPosition = (helper.getAdapterPosition());
-                    videoPlayListerner.getVideoUrl(item.getSession());
+                    videoPlayListerner.getVideoUrl(item.getSession(),false);
                     item.setWatched(true);
                 }
                 notifyDataSetChanged();

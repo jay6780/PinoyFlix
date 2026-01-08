@@ -1,6 +1,7 @@
 package com.m.freemovie.Activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -35,6 +36,7 @@ import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.adapter.AnimePaheDetailAdapter;
+import com.m.freemovie.adapter.DownloadAdapter;
 import com.m.freemovie.adapter.QualityAdapter;
 import com.m.freemovie.databinding.ActivityAnimePaheWebviewBinding;
 import com.m.freemovie.mvp.ClassBean.AnimePaheBeanList;
@@ -53,7 +55,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class AnimePaheWebviewActivity extends AppCompatActivity implements AnimePaheDetailContract.View, AnimePaheDetailAdapter.EpisodeListener, QualityAdapter.SrcListener {
+public class AnimePaheWebviewActivity extends AppCompatActivity
+        implements AnimePaheDetailContract.View, AnimePaheDetailAdapter.EpisodeListener, QualityAdapter.SrcListener, DownloadAdapter.DownListerner {
     private ActivityAnimePaheWebviewBinding binding;
     private String id,title;
     private AnimePaheDetailAdapter episodeAdapter;
@@ -68,10 +71,12 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
     private AnimePaheDetailPresenter detailPresenter;
     private String url = "";
     private List<AnimePaheDownloadBean.ResultsBean.StreamingBean> streamingBeanList = new ArrayList<>();
+    private List<AnimePaheDownloadBean.ResultsBean.DownloadBean> downloadBeanList = new ArrayList<>();
     private int page = 1;
     private boolean isNomore = false;
     private boolean isLoading = false;
     private boolean isInit = true;
+    private boolean isDownload = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -378,14 +383,24 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
         if(downloadBean !=null && downloadBean.getResults()!=null ){
             if(!downloadBean.getResults().getStreaming().isEmpty()){
                 streamingBeanList.clear();
+                downloadBeanList.clear();
                 for(AnimePaheDownloadBean.ResultsBean.StreamingBean streamingBean : downloadBean.getResults().getStreaming()){
                     streamingBeanList.add(streamingBean);
                 }
-                ShowDialog(streamingBeanList);
+                for(AnimePaheDownloadBean.ResultsBean.DownloadBean downloadBean1 : downloadBean.getResults().getDownload()){
+                    downloadBeanList.add(downloadBean1);
+                }
+                if(isDownload){
+                    showDownloadList(downloadBeanList);
+                }else{
+                    ShowDialog(streamingBeanList);
+                }
+
             }
         }
     }
-    private DialogPlus dialog;
+
+    private DialogPlus dialog,dldialog;
     private void ShowDialog(List<AnimePaheDownloadBean.ResultsBean.StreamingBean> streamingBeanList){
         dialog = DialogPlus.newDialog(this)
                 .setContentHolder(new ViewHolder(R.layout.dialog_select_quality))
@@ -407,6 +422,28 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
 
         dialog.show();
     }
+
+    private void showDownloadList(List<AnimePaheDownloadBean.ResultsBean.DownloadBean> downloadBeanList){
+        dldialog = DialogPlus.newDialog(this)
+                .setContentHolder(new ViewHolder(R.layout.dialog_select_quality))
+                .setContentWidth(ViewGroup.LayoutParams.MATCH_PARENT)
+                .setContentHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
+                .setGravity(Gravity.CENTER)
+                .setCancelable(true)
+                .setPadding(10,10,10,10)
+                .create();
+
+        View dialogView = dldialog.getHolderView();
+        RecyclerView recyclerView = dialogView.findViewById(R.id.rv_quality);
+        DownloadAdapter adapter = new DownloadAdapter(this);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
+        adapter.setNewData(downloadBeanList);
+
+        dldialog.show();
+    }
     @Override
     public void getSrc(String videoUrl) {
         this.videoUrl = videoUrl;
@@ -414,6 +451,17 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
             dialog.dismiss();
         }
         initStart();
+    }
+    @Override
+    public void getDownloadLink(String videoUrl) {
+        if(dldialog !=null){
+            isDownload = false;
+            dldialog.dismiss();
+        }
+        Intent intent  = new Intent(getApplicationContext(), DownloadWebview.class);
+        intent.putExtra("DownloadUrl", videoUrl);
+        intent.putExtra("title", title);
+        startActivity(intent);
     }
 
     private void initStart() {
@@ -431,7 +479,8 @@ public class AnimePaheWebviewActivity extends AppCompatActivity implements Anime
 
 
     @Override
-    public void getVideoUrl(String videoUrl) {
+    public void getVideoUrl(String videoUrl,boolean isDownload) {
+        this.isDownload = isDownload;
         Log.e("VideoSelect","val: "+videoUrl);
         if(!videoUrl.isEmpty()){
             isError = false;
