@@ -38,7 +38,6 @@ public class VideoWebviewActivity extends AppCompatActivity {
     private ActivityVideoWebviewBinding binding;
     private int videoPosition, epNumber;
     private String videoUrl;
-    private int seasonNum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +49,6 @@ public class VideoWebviewActivity extends AppCompatActivity {
         title = getIntent().getStringExtra("title");
         videoId = getIntent().getStringExtra("videoId");
         videoPosition = getIntent().getIntExtra("videoPosition", 0);
-        seasonNum = getIntent().getIntExtra("seasonNum", 1);
         epNumber = getIntent().getIntExtra("epNumber", 0);
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
@@ -65,19 +63,10 @@ public class VideoWebviewActivity extends AppCompatActivity {
         }
         switch (videoPosition){
             case 1:
-                videoUrl = "https://vidsrc-embed.ru/embed/movie?tmdb=" + videoId;
-                break;
-            case 2:
                 videoUrl = "https://vidrock.net/movie/"+ videoId;
                 break;
-            case 3:
-                videoUrl = "https://vidlink.pro/tv/"+videoId+"/"+seasonNum+"/"+epNumber;
-                break;
-            case 4:
-                videoUrl = "https://vidsrc.cx/embed/movie/"+videoId;
-                break;
-            case 5:
-                videoUrl = "https://vidrock.net/tv  /"+videoId+"/"+seasonNum+"/"+epNumber;
+            case 2:
+                videoUrl = "https://vidlink.pro/movie/"+videoId;
                 break;
         }
 
@@ -152,9 +141,10 @@ public class VideoWebviewActivity extends AppCompatActivity {
             return handleUrlLoading(view, url);
         }
         private boolean handleUrlLoading(WebView view, String url) {
-            if (url.contains(videoUrl)) {
-                return false;
-            } else if (url.contains("dl.vidsrc.vip")) {
+            try {
+                if (url.contains(videoUrl)) {
+                    return false;
+                } else if (url.contains("dl.vidsrc.vip")) {
 //                Log.d("VideOUrl", "value: " + url);
                     if (videoPosition == 2) {
                         String downloadUrl = "https://dl.vidsrc.vip/movie/" + videoId;
@@ -168,6 +158,12 @@ public class VideoWebviewActivity extends AppCompatActivity {
                     view.stopLoading();
                     return true;
                 }
+            }catch (Exception e){
+                e.printStackTrace();
+                view.stopLoading();
+                view.clearCache(true);
+            }
+                return false;
             }
     }
 

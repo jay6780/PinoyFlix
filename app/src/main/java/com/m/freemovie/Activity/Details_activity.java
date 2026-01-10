@@ -125,13 +125,13 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                     case 0:
                         intent = new Intent(Details_activity.this, VideoWebviewActivity.class);
                         intent.putExtra("title", title);
-                        intent.putExtra("videoPosition", 2);
+                        intent.putExtra("videoPosition", 1);
                         intent.putExtra("videoId", id);
                         break;
                     case 1:
                         intent = new Intent(Details_activity.this, VideoWebviewActivity.class);
                         intent.putExtra("title", title);
-                        intent.putExtra("videoPosition", 4);
+                        intent.putExtra("videoPosition", 2);
                         intent.putExtra("videoId", id);
                         break;
                 }

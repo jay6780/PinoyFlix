@@ -172,7 +172,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
     public void getId(String id,int position,int seasonNum,int epNumber) {
         switch (position){
             case 1:
-                videoUrl = "https://vidsrc.cx/embed/tv/"+id+"/"+seasonNum+"/"+epNumber;
+                videoUrl = "https://vidlink.pro/tv/"+id+"/"+seasonNum+"/"+epNumber;
                 binding.titleName.setVisibility(View.VISIBLE);
                 initStart();
                 break;
