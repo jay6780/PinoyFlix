@@ -64,7 +64,9 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
                     lastPosition = -1;
                 }else{
                     lastPosition = (helper.getAdapterPosition());
-                    showVideoOptions(item,mContext,helper);
+                    sourceListener.getId(item.getId(),2,item.getSeasonNum(),item.getEpisodeNum());
+                    item.setWatched(true);
+                    notifyItemChanged(helper.getAdapterPosition());
                 }
                 notifyDataSetChanged();
             }
@@ -88,7 +90,7 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case 0:
-                        sourceListener.getId(item.getId(),1,item.getSeasonNum(),item.getEpisodeNum());
+
                         break;
                     case 1:
                         sourceListener.getId(item.getId(),2,item.getSeasonNum(),item.getEpisodeNum());
@@ -97,8 +99,7 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
                 dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
                         item.getSeasonNum(), item.getEpisodeNum(),item.getSeasonId());
 
-                item.setWatched(true);
-                notifyItemChanged(helper.getAdapterPosition());
+
             }
         });
         builder.show();

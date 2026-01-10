@@ -61,16 +61,8 @@ public class VideoWebviewActivity extends AppCompatActivity {
             finish();
             return;
         }
-        switch (videoPosition){
-            case 1:
-                videoUrl = "https://vidrock.net/movie/"+ videoId;
-                break;
-            case 2:
-                videoUrl = "https://vidlink.pro/movie/"+videoId;
-                break;
-        }
 
-
+        videoUrl = "https://vidrock.net/movie/"+ videoId;
 //        Log.d("VideoUrl","value: "+videoUrl);
         binding.rotate.setOnClickListener(view -> rotateScreen());
 
@@ -109,7 +101,6 @@ public class VideoWebviewActivity extends AppCompatActivity {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
         binding.webView.loadUrl(videoUrl);
-
     }
 
     private class CustomWebChromeClient extends WebChromeClient {
@@ -141,30 +132,21 @@ public class VideoWebviewActivity extends AppCompatActivity {
             return handleUrlLoading(view, url);
         }
         private boolean handleUrlLoading(WebView view, String url) {
-            try {
-                if (url.contains(videoUrl)) {
-                    return false;
-                } else if (url.contains("dl.vidsrc.vip")) {
-//                Log.d("VideOUrl", "value: " + url);
-                    if (videoPosition == 2) {
-                        String downloadUrl = "https://dl.vidsrc.vip/movie/" + videoId;
-                        Intent intent  = new Intent(getApplicationContext(), DownloadWebview.class);
-                        intent.putExtra("DownloadUrl", downloadUrl);
-                        intent.putExtra("title", title);
-                        startActivity(intent);
-                    }
-                    return true;
-                } else {
-                    view.stopLoading();
-                    return true;
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-                view.stopLoading();
-                view.clearCache(true);
-            }
+            if (url.contains(videoUrl)) {
                 return false;
+            } else if (url.contains("dl.vidsrc.vip")) {
+//                Log.d("VideOUrl", "value: " + url);
+                String downloadUrl = "https://dl.vidsrc.vip/movie/" + videoId;
+                Intent intent = new Intent(getApplicationContext(), DownloadWebview.class);
+                intent.putExtra("DownloadUrl", downloadUrl);
+                intent.putExtra("title", title);
+                startActivity(intent);
+                return true;
+            } else {
+                view.stopLoading();
+                return true;
             }
+        }
     }
 
 

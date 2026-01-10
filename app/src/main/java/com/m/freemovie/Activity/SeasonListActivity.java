@@ -172,7 +172,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
     public void getId(String id,int position,int seasonNum,int epNumber) {
         switch (position){
             case 1:
-                videoUrl = "https://vidlink.pro/tv/"+id+"/"+seasonNum+"/"+epNumber;
+                videoUrl = "https://111movies.com/tv/"+id+"/"+seasonNum+"/"+epNumber;
                 binding.titleName.setVisibility(View.VISIBLE);
                 initStart();
                 break;
@@ -216,7 +216,39 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
-        binding.webView.loadUrl(videoUrl);
+        String htmlContent = "<!DOCTYPE html>" +
+                "<html>" +
+                "<head>" +
+                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
+                "    <style>" +
+                "        .video-player {" +
+                "            position: fixed;" +
+                "            top: 0;" +
+                "            left: 0;" +
+                "            width: 100%;" +
+                "            height: 100%;" +
+                "            border: none;" +
+                "            object-fit: contain; /* Makes video fill while keeping aspect ratio */" +
+                "            background-color: #000; /* Black background for letterboxing */" +
+                "        }" +
+                "    </style>" +
+                "</head>" +
+                "<body style=\"margin:0;padding:0;overflow:hidden;background:#000;\">" +
+                "    <iframe src=\"" + videoUrl + "\"" +
+                "            class=\"video-player\"" +
+                "            allow=\"autoplay; encrypted-media; fullscreen\" " +
+                "            allowfullscreen>" +
+                "    </iframe>" +
+                "</body>" +
+                "</html>";
+
+        binding.webView.loadDataWithBaseURL(
+                null,
+                htmlContent,
+                "text/html",
+                "UTF-8",
+                null
+        );
 
     }
 

@@ -106,39 +106,40 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     }
 
     private void watchNow() {
-        String[] videoPlayer = {"Player 1", "Player 2"};
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        TextView titleView = new TextView(this);
-        titleView.setText("Select player");
-        titleView.setTextColor(Color.BLACK);
-        titleView.setPadding(40, 40, 40, 20);
-        titleView.setTextSize(15);
-
-        builder.setCustomTitle(titleView);
-
-        builder.setItems(videoPlayer, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent intent = null;
-                switch (which) {
-                    case 0:
-                        intent = new Intent(Details_activity.this, VideoWebviewActivity.class);
-                        intent.putExtra("title", title);
-                        intent.putExtra("videoPosition", 1);
-                        intent.putExtra("videoId", id);
-                        break;
-                    case 1:
-                        intent = new Intent(Details_activity.this, VideoWebviewActivity.class);
-                        intent.putExtra("title", title);
-                        intent.putExtra("videoPosition", 2);
-                        intent.putExtra("videoId", id);
-                        break;
-                }
-                startActivity(intent);
-            }
-        });
-        builder.show();
+        Intent intent  = new Intent(Details_activity.this, VideoWebviewActivity.class);
+        intent.putExtra("title", title);
+        intent.putExtra("videoPosition", 1);
+        intent.putExtra("videoId", id);
+        startActivity(intent);
+//        String[] videoPlayer = {"Player 1", "Player 2"};
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        TextView titleView = new TextView(this);
+//        titleView.setText("Select player");
+//        titleView.setTextColor(Color.BLACK);
+//        titleView.setPadding(40, 40, 40, 20);
+//        titleView.setTextSize(15);
+//
+//        builder.setCustomTitle(titleView);
+//
+//        builder.setItems(videoPlayer, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                switch (which) {
+//                    case 0:
+//
+//                        break;
+//                    case 1:
+//                        intent = new Intent(Details_activity.this, VideoWebviewActivity.class);
+//                        intent.putExtra("title", title);
+//                        intent.putExtra("videoPosition", 2);
+//                        intent.putExtra("videoId", id);
+//                        break;
+//                }
+//                startActivity(intent);
+//            }
+//        });
+//        builder.show();
     }
 
     @Override
