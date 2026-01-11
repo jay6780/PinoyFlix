@@ -178,7 +178,8 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(binding.llBookmark, HighLight.Shape.ROUND_RECTANGLE, 1)
                         .setLayoutRes(R.layout.bookmark_highlight)
-                );
+                )
+                .show();
 
     }
 

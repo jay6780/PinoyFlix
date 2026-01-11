@@ -198,7 +198,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
         });
     }
     private void initGuide() {
-        NewbieGuide.with(this)
+        NewbieGuide.with(TagalogEpisodeActivity.this)
                 .setLabel("tagalog_bookmark")
                 .setOnGuideChangedListener(new OnGuideChangedListener() {
                     @Override
@@ -213,7 +213,9 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(binding.llBookmark, HighLight.Shape.ROUND_RECTANGLE, 1)
                         .setLayoutRes(R.layout.bookmark_highlight)
-                );
+                )
+                .show();
+
 
     }
 
