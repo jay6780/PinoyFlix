@@ -12,6 +12,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.app.hubert.guide.NewbieGuide;
+import com.app.hubert.guide.core.Controller;
+import com.app.hubert.guide.listener.OnGuideChangedListener;
+import com.app.hubert.guide.model.GuidePage;
+import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.SPUtils;
@@ -35,8 +40,28 @@ public class ChooseFragment extends Fragment implements AdapterView.OnItemSelect
         binding.fragmentSpinner.setAdapter(adapter);
         binding.fragmentSpinner.setOnItemSelectedListener(this);
         binding.fragmentSpinner.setSelection(0);
-
         return binding.getRoot();
+
+    }
+
+    private void initGuide() {
+        NewbieGuide.with(getActivity())
+                .setLabel("choose_guide")
+                .setOnGuideChangedListener(new OnGuideChangedListener() {
+                    @Override
+                    public void onShowed(Controller controller) {
+
+                    }
+
+                    @Override
+                    public void onRemoved(Controller controller) {
+                    }
+                })
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(binding.fragmentSpinner, HighLight.Shape.ROUND_RECTANGLE, 1)
+                        .setLayoutRes(R.layout.spinner_highlight)
+                )
+                .show();
     }
 
     @Override
@@ -45,6 +70,7 @@ public class ChooseFragment extends Fragment implements AdapterView.OnItemSelect
         
         switch (position) {
             case 0:
+                initGuide();
                 selectedFragment = new TagalogSeriesFragment();
                 EventBus.getDefault().post(new MovieEvent(3));
                 SPUtils.getInstance().put(AppConstant.lastposition,3);

@@ -1,5 +1,6 @@
 package com.m.freemovie.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -12,8 +13,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.app.hubert.guide.NewbieGuide;
+import com.app.hubert.guide.core.Controller;
+import com.app.hubert.guide.listener.OnGuideChangedListener;
+import com.app.hubert.guide.model.GuidePage;
+import com.app.hubert.guide.model.HighLight;
 import com.bumptech.glide.Glide;
 import com.m.freemovie.Activity.Download_videoActivity;
 import com.m.freemovie.Activity.FullViewVideoActivity;
@@ -54,12 +61,14 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         ImageView image_thumb;
         TextView file_name;
         CheckBox checkBox;
+        CardView highlight_card;
 
         public ViewHolder(View view) {
             super(view);
             checkBox = view.findViewById(R.id.checkbox_delete);
             image_thumb = view.findViewById(R.id.image_thumb);
             file_name = view.findViewById(R.id.file_name);
+            highlight_card = view.findViewById(R.id.highlight_card);
         }
     }
 
@@ -91,6 +100,23 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
 
         holder.checkBox.setOnCheckedChangeListener(null);
         holder.checkBox.setChecked(data.isSelected());
+
+        if(context instanceof Activity && position == 0){
+            NewbieGuide.with((Activity) context)
+                    .setLabel("long_press")
+                    .setOnGuideChangedListener(new OnGuideChangedListener() {
+                        @Override
+                        public void onShowed(Controller controller) {}
+
+                        @Override
+                        public void onRemoved(Controller controller) {}
+                    })
+                    .addGuidePage(GuidePage.newInstance()
+                            .addHighLight(holder.highlight_card, HighLight.Shape.ROUND_RECTANGLE, 1)
+                            .setLayoutRes(R.layout.long_press)
+                    )
+                    .show();
+        }
 
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             data.setSelected(isChecked);

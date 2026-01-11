@@ -34,6 +34,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -65,11 +67,12 @@
         </RelativeLayout>
 
         <TextView
+            android:layout_below="@+id/rl_webview"
             android:id="@+id/episodeTxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/rl_webview"
-            android:padding="5dp"/>
+            android:padding="5dp"
+            android:text="Episodes" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_season"

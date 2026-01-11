@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -13,6 +14,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.app.hubert.guide.NewbieGuide;
+import com.app.hubert.guide.core.Controller;
+import com.app.hubert.guide.listener.OnGuideChangedListener;
+import com.app.hubert.guide.model.GuidePage;
+import com.app.hubert.guide.model.HighLight;
 import com.bumptech.glide.Glide;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
@@ -69,10 +75,12 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
         dbHelper = new BookmarkDbHelper(this);
 
         if (position == 2) {
+            initGuide("Tv_series");
             seriesBinding.ivBack.setOnClickListener(view -> finish());
             seriesBinding.ivBook.setOnClickListener(view -> savedBook());
             seriesBinding.tvWatch.setOnClickListener(view -> watchNow());
         } else {
+            initGuide("indie_movies");
             binding.ivBack.setOnClickListener(view -> finish());
             binding.ivBook.setOnClickListener(view -> savedBook());
             binding.tvWatch.setOnClickListener(view -> watchNow());
@@ -85,6 +93,31 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
         } else {
             detailPresenter.getDetail(id, getString(R.string.key));
         }
+    }
+
+    private void initGuide(String label) {
+        ImageView bookmarkImageView;
+
+        if (position == 2) {
+            bookmarkImageView = seriesBinding.ivBook;
+        } else {
+            bookmarkImageView = binding.ivBook;
+        }
+
+        NewbieGuide.with(this)
+                .setLabel(label)
+                .setOnGuideChangedListener(new OnGuideChangedListener() {
+                    @Override
+                    public void onShowed(Controller controller) {}
+
+                    @Override
+                    public void onRemoved(Controller controller) {}
+                })
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(bookmarkImageView, HighLight.Shape.ROUND_RECTANGLE, 1)
+                        .setLayoutRes(R.layout.bookmark_highlight)
+                )
+                .show();
     }
 
     private void savedBook() {

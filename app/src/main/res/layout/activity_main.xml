@@ -28,17 +28,17 @@
         android:layout_below="@+id/ll_title"
         android:layout_above="@id/nav" />
 
-    <meow.bottomnavigation.MeowBottomNavigation
-        android:id="@+id/nav"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        app:mbn_backgroundBottomColor="#262626"
-        app:mbn_circleColor="#262626"
-        app:mbn_countTextColor="@color/white"
-        app:mbn_defaultIconColor="@color/white"
-        app:mbn_selectedIconColor="@color/white"
-        app:mbn_shadowColor="#313647" />
+        <meow.bottomnavigation.MeowBottomNavigation
+            android:id="@+id/nav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            app:mbn_backgroundBottomColor="#262626"
+            app:mbn_circleColor="#262626"
+            app:mbn_countTextColor="@color/white"
+            app:mbn_defaultIconColor="@color/white"
+            app:mbn_selectedIconColor="@color/white"
+            app:mbn_shadowColor="#313647" />
     </RelativeLayout>
 
     <include

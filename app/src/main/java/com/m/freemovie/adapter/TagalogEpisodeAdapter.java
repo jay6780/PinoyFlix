@@ -1,10 +1,13 @@
 package com.m.freemovie.adapter;
 
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.bumptech.glide.Glide;
 import com.m.freemovie.R;
@@ -38,8 +41,6 @@ public class TagalogEpisodeAdapter extends BaseQuickAdapter<TagalogEpisode, Base
         }
         TextView tv_season = helper.getView(R.id.tv_season);
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
-        ImageView iv_download = helper.getView(R.id.iv_download);
-        iv_download.setVisibility(View.VISIBLE);
         RelativeLayout rl_select = helper.getView(R.id.rl_select);
         TextView tv_watched = helper.getView(R.id.tv_watched);
         if(lastPosition == (helper.getAdapterPosition())){
@@ -57,12 +58,7 @@ public class TagalogEpisodeAdapter extends BaseQuickAdapter<TagalogEpisode, Base
                 .into(iv_thumb);
 
         tv_watched.setVisibility(item.isWatched() ? View.VISIBLE : View.GONE);
-        iv_download.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                downloadPlayerListerner.getDownloadData(item.getVideoUrl(), item.getEpisode());
-            }
-        });
+
 
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,15 +67,34 @@ public class TagalogEpisodeAdapter extends BaseQuickAdapter<TagalogEpisode, Base
                     lastPosition = -1;
                     videoPlayListerner.getVideoUrl("");
                 }else{
-                    dbHelper.markEpisodeAsWatched(item.getVideoUrl(), item.getEpisode());
                     lastPosition = (helper.getAdapterPosition());
-                    videoPlayListerner.getVideoUrl(item.getVideoUrl());
-                    item.setWatched(true);
-
+                    showOption(item);
                 }
-                notifyDataSetChanged();
             }
         });
+    }
+
+    private void showOption(TagalogEpisode item) {
+        String[] colors = {"Watch", "Download"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setItems(colors, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+               switch (which){
+                   case 0:
+                       dbHelper.markEpisodeAsWatched(item.getVideoUrl(), item.getEpisode());
+                       item.setWatched(true);
+                       videoPlayListerner.getVideoUrl(item.getVideoUrl());
+                       notifyDataSetChanged();
+                       break;
+                   case 1:
+                       downloadPlayerListerner.getDownloadData(item.getVideoUrl(), item.getEpisode());
+                       break;
+               }
+            }
+
+        });
+        builder.show();
     }
 
 }

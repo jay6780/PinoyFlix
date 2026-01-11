@@ -25,6 +25,11 @@ import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.app.hubert.guide.NewbieGuide;
+import com.app.hubert.guide.core.Controller;
+import com.app.hubert.guide.listener.OnGuideChangedListener;
+import com.app.hubert.guide.model.GuidePage;
+import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
@@ -114,8 +119,28 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
         binding.rvSeason.setAdapter(episodeAdapter);
 
         episodeAdapter.setNewData(episodeBeanList);
+
     }
 
+    private void initGuide(String label) {
+        NewbieGuide.with(this)
+                .setLabel(label)
+                .setOnGuideChangedListener(new OnGuideChangedListener() {
+                    @Override
+                    public void onShowed(Controller controller) {
+
+                    }
+
+                    @Override
+                    public void onRemoved(Controller controller) {
+                    }
+                })
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(binding.llBookmark, HighLight.Shape.ROUND_RECTANGLE, 1)
+                        .setLayoutRes(R.layout.bookmark_highlight)
+                )
+                .show();
+    }
     private void isMovieVideo() {
         if(isMovie){
             revivalTrackPresenter.getTrackUrl(id);
@@ -127,7 +152,9 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
             params.addRule(RelativeLayout.BELOW,binding.rlWebview.getId());
             params.setMargins(0,20,0,0);
             binding.tvEnjoy.setLayoutParams(params);
+            initGuide("tagalog_movie");
         }else{
+                initGuide("tagalog_series");
             revivalInfoDetailPresenter.getListTv(id);
             binding.tvEnjoy.setVisibility(View.GONE);
         }

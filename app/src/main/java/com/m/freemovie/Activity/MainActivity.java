@@ -1,7 +1,10 @@
 package com.m.freemovie.Activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -15,17 +18,21 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.app.hubert.guide.NewbieGuide;
 import com.m.freemovie.Fragment.BookmarkFragment;
 import com.m.freemovie.Fragment.HomeFragment;
 import com.m.freemovie.Fragment.SearchFragment;
 import com.m.freemovie.R;
 import com.m.freemovie.databinding.ActivityMainBinding;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import meow.bottomnavigation.MeowBottomNavigation;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private ActivityMainBinding binding;
-    private LinearLayout ll_file;
+    private LinearLayout ll_file,ll_guide;
     private DrawerLayout drawerLayout;
     private LinearLayout navigationView;
     private ImageView btn_back5;
@@ -41,8 +48,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_back5 = findViewById(R.id.btn_back5);
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
+        ll_guide = findViewById(R.id.ll_guide);
         ll_file.setOnClickListener(this);
         btn_back5.setOnClickListener(this);
+        ll_guide.setOnClickListener(this);
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
@@ -62,7 +71,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onDrawerStateChanged(int newState) {}
         });
+
+        if (getIntent().getBooleanExtra("resetGuide", false)) {
+            List<String> guideString = new ArrayList<>();
+                guideString.add("animepahe_bookmark");
+                guideString.add("Tv_series");
+                guideString.add("indie_movies");
+                guideString.add("tagalog_bookmark");
+                guideString.add("tagalog_movie");
+                guideString.add("tagalog_series");
+                guideString.add("long_press");
+                guideString.add("home_guide");
+                guideString.add("choose_guide");
+            for(String reset : guideString){
+                NewbieGuide.resetLabel(getApplicationContext(), reset);
+            }
+        }
     }
+
     private void initPermission() {
         ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE,android.Manifest.permission.READ_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
     }
@@ -123,6 +149,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.ll_file:
                 startActivity(new Intent(getApplicationContext(),Download_videoActivity.class));
                 break;
+            case R.id.ll_guide:
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
+                builder.setTitle("Are you sure want to reset?");
+                builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = getIntent();
+                        intent.putExtra("resetGuide", true);
+                        finish();
+                        startActivity(intent);
+                        overridePendingTransition(0, 0);
+                        dialog.dismiss();
+                    }
+                });
+                builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                AlertDialog alert = builder.create();
+                alert.setOnShowListener(dialog -> {
+                    alert.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK);
+                    alert.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
+                });
+                alert.show();
+                break;
+
         }
 
     }

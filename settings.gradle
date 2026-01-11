@@ -19,3 +19,4 @@ rootProject.name = "FreeMovie"
 include ':app'
 include ':kprogresshud'
 include ':MeowBottomNavigation'
+include ':guide'
