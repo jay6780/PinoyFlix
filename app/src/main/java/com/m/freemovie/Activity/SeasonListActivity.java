@@ -79,6 +79,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
             episode.setWatched(isWatched);
             episodeBeanList.add(episode);
         }
+        binding.episodeTxt.setText(episodeCount > 1? "Episode's" : "Episode");
         episodeAdapter.setNewData(episodeBeanList);
     }
 
@@ -90,6 +91,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         binding.rlWebview.setLayoutParams(params);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        binding.episodeTxt.setVisibility(View.GONE);
 
         new WindowUtils(this,true,false);
     }
@@ -100,7 +102,8 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         binding.expand.setVisibility(View.VISIBLE);
         binding.rvSeason.setVisibility(View.VISIBLE);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(250));
+        binding.episodeTxt.setVisibility(View.VISIBLE);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(300));
         binding.rlWebview.setLayoutParams(params);
         new WindowUtils(this,true,false);
     }

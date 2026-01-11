@@ -1,14 +1,10 @@
 package com.m.freemovie.adapter;
 
-import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import androidx.appcompat.app.AlertDialog;
 
 import com.bumptech.glide.Glide;
 import com.m.freemovie.R;
@@ -65,43 +61,14 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
                 }else{
                     lastPosition = (helper.getAdapterPosition());
                     sourceListener.getId(item.getId(),2,item.getSeasonNum(),item.getEpisodeNum());
+                    dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
+                            item.getSeasonNum(), item.getEpisodeNum(),item.getSeasonId());
                     item.setWatched(true);
                     notifyItemChanged(helper.getAdapterPosition());
+
                 }
                 notifyDataSetChanged();
             }
         });
-    }
-
-    private void showVideoOptions(EpisodeBean item, Context mContext, BaseViewHolder helper) {
-        String[] videoPlayer = {"Player 1", "Player 2"};
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        TextView titleView = new TextView(mContext);
-        titleView.setText("Select player");
-        titleView.setTextColor(Color.BLACK);
-        titleView.setPadding(40, 40, 40, 20);
-        titleView.setTextSize(15);
-
-        builder.setCustomTitle(titleView);
-
-        builder.setItems(videoPlayer, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0:
-
-                        break;
-                    case 1:
-                        sourceListener.getId(item.getId(),2,item.getSeasonNum(),item.getEpisodeNum());
-                        break;
-                }
-                dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
-                        item.getSeasonNum(), item.getEpisodeNum(),item.getSeasonId());
-
-
-            }
-        });
-        builder.show();
     }
 }

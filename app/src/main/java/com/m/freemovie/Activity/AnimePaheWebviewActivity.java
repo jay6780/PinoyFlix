@@ -151,6 +151,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 }
             }
         });
+
     }
 
     private void loadmore() {
@@ -178,7 +179,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         binding.expand.setVisibility(View.VISIBLE);
         binding.rvSeason.setVisibility(View.VISIBLE);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(250));
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(300));
         binding.rlWebview.setLayoutParams(params);
         binding.llBookmark.setVisibility(View.VISIBLE);
         binding.swipe.setEnabled(true);
@@ -368,6 +369,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                     boolean isWatched = dbHelper.isEpisodeWatched(String.valueOf(dataBean.getId()), String.valueOf(dataBean.getEpisode()));
                     detailBean.setWatched(isWatched);
                     episodeBeanList.add(detailBean);
+                    binding.episodeTxt.setText(episodeBeanList.size() > 1? "Episode's" : "Episode");
                 }
                 episodeAdapter.setNewData(episodeBeanList);
             } else {

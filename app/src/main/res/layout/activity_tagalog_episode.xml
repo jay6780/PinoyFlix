@@ -16,24 +16,26 @@
         android:layout_width="match_parent"
         android:layout_height="300dp">
 
-        <ImageView
-            android:id="@+id/btn_back"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+        <LinearLayout
+            android:id="@+id/ll_root"
+            android:layout_width="match_parent"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="30dp"
             android:elevation="20dp"
-            android:padding="5dp"
-            android:src="@mipmap/icon_backwhite" />
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="35dp"
-            android:layout_toRightOf="@+id/btn_back"
-            android:textSize="18sp"
-            android:elevation="20dp"/>
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/btn_back"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@mipmap/icon_backwhite" />
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textSize="16sp"/>
 
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/rotate"

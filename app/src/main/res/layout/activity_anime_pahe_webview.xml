@@ -16,31 +16,26 @@
             android:layout_height="300dp"
             android:background="#000000">
 
-
-            <ImageView
-                android:id="@+id/btn_back_finish"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+            <LinearLayout
+                android:id="@+id/ll_root"
+                android:layout_width="match_parent"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="7dp"
                 android:elevation="20dp"
-                android:src="@mipmap/icon_backwhite" />
-
-            <TextView
-                android:id="@+id/title_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="3dp"
-                android:layout_marginTop="9dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="10dp"
-                android:layout_toRightOf="@+id/btn_back_finish"
-                android:elevation="20dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:id="@+id/btn_back_finish"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@mipmap/icon_backwhite" />
+                <TextView
+                    android:id="@+id/title_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textSize="16sp"/>
+            </LinearLayout>
 
             <WebView
                 android:id="@+id/webView"
@@ -70,12 +65,11 @@
         </RelativeLayout>
 
         <TextView
-            android:layout_below="@+id/rl_webview"
             android:id="@+id/episodeTxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="Episodes" />
+            android:layout_below="@+id/rl_webview"
+            android:padding="5dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_season"

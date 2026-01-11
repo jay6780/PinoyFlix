@@ -157,7 +157,7 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         binding.expand.setVisibility(View.VISIBLE);
         binding.rvSeason.setVisibility(View.VISIBLE);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(250));
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(300));
         binding.rlWebview.setLayoutParams(params);
         binding.llBookmark.setVisibility(View.VISIBLE);
         binding.swipe.setEnabled(true);
@@ -365,7 +365,11 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
                         TagalogDetailBean detailBean = new TagalogDetailBean(data.getEpisodeUrl(), episode, image);
                         boolean isWatched = dbHelper.isEpisodeWatched(data.getEpisodeUrl(), episode);
                         detailBean.setWatched(isWatched);
+
                         episodeBeanList.add(detailBean);
+                        if(!isMovie){
+                            binding.episodeTxt.setText(episodeBeanList.size() > 1? "Episode's" : "Episode");
+                        }
                     }
                 }
             }
