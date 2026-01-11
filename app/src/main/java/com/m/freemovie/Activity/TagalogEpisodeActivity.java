@@ -13,6 +13,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -22,7 +23,6 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -114,6 +114,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
             v.setOnClickListener(this);
         }
 
+        initGuide();
         setImageData(url);
 
         binding.player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -186,11 +187,38 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
             }
         });
 
+        initTopPadding(70);
+    }
+    private void initTopPadding(int topPadding) {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.llRoot, (v, windowInsets) -> {
+            ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+            mlp.topMargin = topPadding;
+            v.setLayoutParams(mlp);
+            return WindowInsetsCompat.CONSUMED;
+        });
+    }
+    private void initGuide() {
+        NewbieGuide.with(this)
+                .setLabel("tagalog_bookmark")
+                .setOnGuideChangedListener(new OnGuideChangedListener() {
+                    @Override
+                    public void onShowed(Controller controller) {
+
+                    }
+
+                    @Override
+                    public void onRemoved(Controller controller) {
+                    }
+                })
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(binding.llBookmark, HighLight.Shape.ROUND_RECTANGLE, 1)
+                        .setLayoutRes(R.layout.bookmark_highlight)
+                );
+
     }
 
 
-
-    @SuppressLint("ClickableViewAccessibility")
+        @SuppressLint("ClickableViewAccessibility")
     private void setupSeekBar() {
         binding.player.setOnTouchListener(null);
 
@@ -341,13 +369,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
                         35,
                         getResources().getDisplayMetrics()
                 );
-                RelativeLayout.LayoutParams params1  = new RelativeLayout.LayoutParams(marginPx, marginPx);
-                params1.setMargins(5,10,0,0);
-                RelativeLayout.LayoutParams params2  = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                params2.addRule(RelativeLayout.RIGHT_OF,binding.btnBack.getId());
-                params2.setMargins(0,20,0,0);
-                binding.title.setLayoutParams(params2);
-                binding.btnBack.setLayoutParams(params1);
+                initTopPadding(10);
                 binding.relativeVideo.setLayoutParams(params);
                 binding.llBookmark.setVisibility(View.GONE);
                 break;
@@ -475,20 +497,9 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
                     300,
                     getResources().getDisplayMetrics()
             );
-            int iconspx = (int) TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP,
-                    35,
-                    getResources().getDisplayMetrics()
-            );
-            isLandScape = false;
-            RelativeLayout.LayoutParams params1  = new RelativeLayout.LayoutParams(iconspx, iconspx);
-            params1.setMargins(5,60,0,0);
-            RelativeLayout.LayoutParams params2  = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-            params2.addRule(RelativeLayout.RIGHT_OF,binding.btnBack.getId());
-            params2.setMargins(0,70,0,0);
-            binding.title.setLayoutParams(params2);
-            binding.btnBack.setLayoutParams(params1);
 
+            isLandScape = false;
+            initTopPadding(70);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, marginPx);
             binding.relativeVideo.setLayoutParams(params);
             binding.fullWide.setVisibility(isFinish?View.GONE:View.VISIBLE);

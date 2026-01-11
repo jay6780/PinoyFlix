@@ -154,7 +154,7 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
             binding.tvEnjoy.setLayoutParams(params);
             initGuide("tagalog_movie");
         }else{
-                initGuide("tagalog_series");
+            initGuide("tagalog_series");
             revivalInfoDetailPresenter.getListTv(id);
             binding.tvEnjoy.setVisibility(View.GONE);
         }
