@@ -36,6 +36,7 @@ import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
+import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.TagalogEpisodeAdapter;
 import com.m.freemovie.databinding.ActivityTagalogEpisodeBinding;
@@ -99,7 +100,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
                 .setLabel("Please wait");
         tagalogEpisodePresenter = new TagalogEpisodePresenter(this);
         tagalogEpisodePresenter.getUrl(url);
-        binding.rvEpisode.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvEpisode.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(this));
         tagalogEpisodeAdapter = new TagalogEpisodeAdapter(this,this);
         binding.rvEpisode.setAdapter(tagalogEpisodeAdapter);
         dbHelper = new PinoyWatchHistoryHelper(this);

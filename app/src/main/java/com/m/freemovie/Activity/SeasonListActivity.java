@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.m.freemovie.Utils.DbHelper.WatchHistoryDBHelper;
+import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.EpisodeAdapter;
 import com.m.freemovie.databinding.ActivitySeasonListBinding;
@@ -70,7 +71,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
             }
         });
 
-        binding.rvSeason.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvSeason.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(this));
         episodeAdapter = new EpisodeAdapter(this);
         binding.rvSeason.setAdapter(episodeAdapter);
         String lastWatchedEpisodeNumber = null;

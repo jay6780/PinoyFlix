@@ -33,6 +33,7 @@ import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
+import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.TagalogDetailAdapter;
 import com.m.freemovie.databinding.ActivityTagalogWebviewBinding;
@@ -114,7 +115,7 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
         isMovieVideo();
 
 
-        binding.rvSeason.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvSeason.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(this));
         episodeAdapter = new TagalogDetailAdapter(this);
         binding.rvSeason.setAdapter(episodeAdapter);
 

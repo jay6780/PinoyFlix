@@ -10,7 +10,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -27,7 +26,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.app.hubert.guide.NewbieGuide;
@@ -36,10 +34,12 @@ import com.app.hubert.guide.listener.OnGuideChangedListener;
 import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
+import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
+import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
+import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.WindowUtils;
-import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.adapter.AnimePaheDetailAdapter;
 import com.m.freemovie.adapter.DownloadAdapter;
 import com.m.freemovie.adapter.QualityAdapter;
@@ -103,6 +103,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         url = "https://animepahe.si/anime/"+id;
         detailPresenter.getDetailQuery(url);
         setImageData(id);
+        SPUtils.getInstance().put(AppConstant.isShow, false);
         if(isInit){
             binding.swipe.setRefreshing(true);
         }
@@ -112,6 +113,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 page = 1;
                 isNomore = false;
                 isInit = true;
+                SPUtils.getInstance().put(AppConstant.isShow, false);
                 detailPresenter.getDetailQuery(url);
                 episodeBeanList.clear();
                 episodeAdapter.setNewData(new ArrayList<>());
@@ -128,37 +130,10 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             }
         });
 
-
-
-        binding.rvSeason.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvSeason.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(this));
         episodeAdapter = new AnimePaheDetailAdapter(this);
         binding.rvSeason.setAdapter(episodeAdapter);
         episodeAdapter.setNewData(episodeBeanList);
-
-        binding.rvSeason.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                if (!isLoading && layoutManager != null) {
-                    int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
-                    int totalItemCount = layoutManager.getItemCount();
-                    if (!episodeBeanList.isEmpty()) {
-                        if (lastVisibleItemPosition >= totalItemCount - 1) {
-                            if (isNomore) {
-                                return;
-                            }
-                            isLoading = true;
-                            isInit = false;
-                            page++;
-                            loadmore();
-                        }
-                    }
-                }
-            }
-        });
-
-
     }
 
 
@@ -376,23 +351,56 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         }
 
     }
-
+    int pageSize = 0;
     @Override
     public void getDetailData(AnimePaheDetailBean detailBean) {
         if(detailBean!=null && detailBean.getResults()!=null){
             animeId = detailBean.getResults().getId();
             image = detailBean.getResults().getPoster();
             detailPresenter.getEpisodeQuery(animeId,page);
+            try {
+                pageSize = Integer.parseInt(detailBean.getResults().getEpisodes());
+            }catch (Exception e){
+                e.printStackTrace();
+                pageSize = 1;
+                page = 1;
+                openScroll();
+            }
         }
     }
 
+
+    private void openScroll(){
+        binding.rvSeason.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (!isLoading && layoutManager != null) {
+                    int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+                    int totalItemCount = layoutManager.getItemCount();
+                    if (!episodeBeanList.isEmpty()) {
+                        if (lastVisibleItemPosition >= totalItemCount - 1) {
+                            if (isNomore) {
+                                return;
+                            }
+                            isLoading = true;
+                            isInit = false;
+                            page++;
+                            loadmore();
+                        }
+                    }
+                }
+            }
+        });
+
+    }
+    int lastWatchedPosition = -1;
     @Override
     public void getEpisodes(AnimePaheEpisodeBean episodeBean) {
         if (episodeBean != null && episodeBean.getResults() != null) {
             isLoading = false;
             isInit = false;
-            String lastWatchedEpisodeNumber = null;
-            int lastWatchedPosition = -1;
             if(binding.swipe.isRefreshing()){
                 binding.swipe.setRefreshing(false);
             }
@@ -402,31 +410,33 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                     boolean isWatched = dbHelper.isEpisodeWatched(String.valueOf(dataBean.getId()), String.valueOf(dataBean.getEpisode()));
                     detailBean.setWatched(isWatched);
                     episodeBeanList.add(detailBean);
-
-                    binding.episodeTxt.setText(episodeBeanList.size() > 1? "Episode's" : "Episode");
-
+                    binding.episodeTxt.setText(episodeBeanList.size() > 1 ? "Episode's" : "Episode");
                     if(isWatched){
                         lastWatchedPosition = episodeBeanList.size() - 1;
-                        lastWatchedEpisodeNumber = String.valueOf(dataBean.getEpisode());
                     }
                 }
                 episodeAdapter.setNewData(episodeBeanList);
-
-                if(lastWatchedPosition != -1 && lastWatchedEpisodeNumber != null){
-                    binding.rvSeason.smoothScrollToPosition(lastWatchedPosition);
-                    Toast.makeText(getApplicationContext(),
-                            "Last Episode watched: Episode " + lastWatchedEpisodeNumber,
-                            Toast.LENGTH_SHORT).show();
+                if (episodeBeanList.size() < pageSize) {
+                    page++;
+                    isInit = true;
+                    detailPresenter.getEpisodeQuery(animeId, page);
                 }
+                if (lastWatchedPosition != -1) {
+                    if(!SPUtils.getInstance().getBoolean(AppConstant.isShow)){
+                        Toast.makeText(getApplicationContext(), "Continuing from last watched episode", Toast.LENGTH_SHORT).show();
+                        SPUtils.getInstance().put(AppConstant.isShow, true);
+                    }
+                    binding.rvSeason.postDelayed(() -> {
+                        binding.rvSeason.smoothScrollToPosition(lastWatchedPosition);
 
+                    }, 300);
+                }
             } else {
                 isNomore = true;
-                Toast.makeText(getApplicationContext(), "No more episodes", Toast.LENGTH_SHORT).show();
+
             }
         }
     }
-
-
     @Override
     public void getTrack(AnimePaheDownloadBean downloadBean) {
         if(downloadBean !=null && downloadBean.getResults()!=null ){
