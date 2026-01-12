@@ -383,7 +383,8 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
     public void getInfoTagalog(TagalogInfoBean tagalogInfoBean) {
         if(tagalogInfoBean != null && tagalogInfoBean.getResults() != null) {
             Set<String> seenEpisodes = new HashSet<>();
-
+            String lastWatchedEpisodeNumber = null;
+            int lastWatchedPosition = -1;
             for (TagalogInfoBean.ResultsBean.EpisodesBean data : tagalogInfoBean.getResults().getEpisodes()) {
                 if (!tagalogInfoBean.getResults().getEpisodes().isEmpty()) {
                     String episode = data.getEpisode();
@@ -397,10 +398,22 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
                         if(!isMovie){
                             binding.episodeTxt.setText(episodeBeanList.size() > 1? "Episode's" : "Episode");
                         }
+
+                        if(isWatched){
+                            lastWatchedPosition = episodeBeanList.size() - 1;
+                            lastWatchedEpisodeNumber = episode;
+                        }
                     }
                 }
             }
             episodeAdapter.setNewData(episodeBeanList);
+
+            if(lastWatchedPosition != -1 && lastWatchedEpisodeNumber != null){
+                binding.rvSeason.smoothScrollToPosition(lastWatchedPosition);
+                Toast.makeText(getApplicationContext(),
+                        "Last Episode watched: Episode " + lastWatchedEpisodeNumber,
+                        Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

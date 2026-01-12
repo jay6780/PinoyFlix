@@ -18,6 +18,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -72,15 +73,28 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         binding.rvSeason.setLayoutManager(new LinearLayoutManager(this));
         episodeAdapter = new EpisodeAdapter(this);
         binding.rvSeason.setAdapter(episodeAdapter);
-
+        String lastWatchedEpisodeNumber = null;
+        int lastWatchedPosition = -1;
         for (int i = 1; i <= episodeCount; i++) {
             EpisodeBean episode = new EpisodeBean(i,thumbImage,seasonNum,id,title,seasonId);
             boolean isWatched = dbHelper.isEpisodeWatched(id, seasonNum, i);
             episode.setWatched(isWatched);
             episodeBeanList.add(episode);
+            if(isWatched){
+                lastWatchedPosition = episodeBeanList.size() - 1;
+                lastWatchedEpisodeNumber = String.valueOf(i);
+            }
         }
+
         binding.episodeTxt.setText(episodeCount > 1? "Episode's" : "Episode");
         episodeAdapter.setNewData(episodeBeanList);
+
+        if(lastWatchedPosition != -1 && lastWatchedEpisodeNumber != null){
+            binding.rvSeason.smoothScrollToPosition(lastWatchedPosition);
+            Toast.makeText(getApplicationContext(),
+                    "Last Episode watched: Episode " + lastWatchedEpisodeNumber,
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void rotateScreen() {

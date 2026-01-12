@@ -54,8 +54,10 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class TagalogEpisodeActivity extends AppCompatActivity implements TagalogEpisodeContract.View, TagalogEpisodeAdapter.VideoPlayListerner,View.OnClickListener, DownloadPlayerListerner {
     ActivityTagalogEpisodeBinding binding;
@@ -79,6 +81,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
     private KProgressHUD downloadHud;
     private boolean isFirstTask = false;
     private BookmarkDbHelper bookmarkDbHelper;
+    private String lastVideoUrl = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -171,8 +174,10 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
                 mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                     @Override
                     public boolean onError(MediaPlayer mp, int what, int extra) {
-                        Toast.makeText(getApplicationContext(),"Can't play video",Toast.LENGTH_SHORT).show();
-                        finish();
+                        Toast.makeText(getApplicationContext(),"Can't play video restarting",Toast.LENGTH_SHORT).show();
+                        if(!lastVideoUrl.isEmpty()){
+                            binding.player.setVideoPath(String.valueOf(Uri.parse(lastVideoUrl)));
+                        }
                         return true;
                     }
                 });
@@ -312,13 +317,26 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
     @Override
     public void getTagalogEpisode(TagalogEpisodeBean tagalogEpisodeBean) {
         if(tagalogEpisodeBean !=null && tagalogEpisodeBean.getResults() !=null){
+            Set<String> seenEpisodes = new HashSet<>();
+            String lastWatchedEpisodeNumber = null;
+            int lastWatchedPosition = -1;
             for(TagalogEpisodeBean.ResultsBean data : tagalogEpisodeBean.getResults()){
                 if(!data.getEpisodes().isEmpty()){
                     for(TagalogEpisodeBean.ResultsBean.EpisodesBean dataEpisode : data.getEpisodes()){
                         TagalogEpisode tagalogEpisode = new TagalogEpisode(dataEpisode.getEpisode(),imageUrl,dataEpisode.getVideoUrl());
-                        boolean isWatched = dbHelper.isEpisodeWatched(dataEpisode.getVideoUrl(), dataEpisode.getEpisode());
-                        tagalogEpisode.setWatched(isWatched);
-                        tagalogEpisodeList.add(tagalogEpisode);
+                        String episode = dataEpisode.getEpisode();
+                        if (!seenEpisodes.contains(episode)) {
+                            seenEpisodes.add(episode);
+                            boolean isWatched = dbHelper.isEpisodeWatched(dataEpisode.getVideoUrl(),episode);
+                            tagalogEpisode.setWatched(isWatched);
+                            tagalogEpisodeList.add(tagalogEpisode);
+
+                            binding.episodeTxt.setText(tagalogEpisodeList.size() > 1? "Episode's" : "Episode");
+                            if(isWatched){
+                                lastWatchedPosition = tagalogEpisodeList.size() - 1;
+                                lastWatchedEpisodeNumber = String.valueOf(episode);
+                            }
+                        }
                     }
                 }else{
                     Toast.makeText(getApplicationContext(),"Episodes not found",Toast.LENGTH_SHORT).show();
@@ -326,6 +344,14 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
                 }
             }
             tagalogEpisodeAdapter.setNewData(tagalogEpisodeList);
+
+            if(lastWatchedPosition != -1 && lastWatchedEpisodeNumber != null){
+                binding.rvEpisode.smoothScrollToPosition(lastWatchedPosition);
+                Toast.makeText(getApplicationContext(),
+                        "Last Episode watched: Episode " + lastWatchedEpisodeNumber,
+                        Toast.LENGTH_SHORT).show();
+            }
+
         }
     }
 
@@ -335,6 +361,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
         if(videoUrl.isEmpty() || videoUrl == null){
             return;
         }
+        lastVideoUrl = videoUrl;
         binding.player.setVideoPath(String.valueOf(Uri.parse(videoUrl)));
         isFinish = false;
         binding.btnRefresh.setVisibility(View.GONE);
@@ -366,11 +393,6 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 binding.rvEpisode.setVisibility(View.GONE);
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-                int marginPx = (int) TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP,
-                        35,
-                        getResources().getDisplayMetrics()
-                );
                 initTopPadding(10);
                 binding.relativeVideo.setLayoutParams(params);
                 binding.llBookmark.setVisibility(View.GONE);
@@ -552,7 +574,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
         File outputFile = getLocalFile(episode);
         downloadHud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.ANNULAR_DETERMINATE)
-                .setLabel("Downloading...")
+                .setLabel("Downloading: "+title+" Ep: "+episode)
                 .setMaxProgress(100)
                 .setCancellable(true);
         downloadHud.show();

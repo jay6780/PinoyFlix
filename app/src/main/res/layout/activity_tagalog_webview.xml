@@ -74,8 +74,7 @@
         android:layout_width="wrap_content"
         android:visibility="gone"
         android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:text="Episodes" />
+        android:padding="5dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_season"

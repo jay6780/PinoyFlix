@@ -391,6 +391,8 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         if (episodeBean != null && episodeBean.getResults() != null) {
             isLoading = false;
             isInit = false;
+            String lastWatchedEpisodeNumber = null;
+            int lastWatchedPosition = -1;
             if(binding.swipe.isRefreshing()){
                 binding.swipe.setRefreshing(false);
             }
@@ -400,8 +402,23 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                     boolean isWatched = dbHelper.isEpisodeWatched(String.valueOf(dataBean.getId()), String.valueOf(dataBean.getEpisode()));
                     detailBean.setWatched(isWatched);
                     episodeBeanList.add(detailBean);
+
+                    binding.episodeTxt.setText(episodeBeanList.size() > 1? "Episode's" : "Episode");
+
+                    if(isWatched){
+                        lastWatchedPosition = episodeBeanList.size() - 1;
+                        lastWatchedEpisodeNumber = String.valueOf(dataBean.getEpisode());
+                    }
                 }
                 episodeAdapter.setNewData(episodeBeanList);
+
+                if(lastWatchedPosition != -1 && lastWatchedEpisodeNumber != null){
+                    binding.rvSeason.smoothScrollToPosition(lastWatchedPosition);
+                    Toast.makeText(getApplicationContext(),
+                            "Last Episode watched: Episode " + lastWatchedEpisodeNumber,
+                            Toast.LENGTH_SHORT).show();
+                }
+
             } else {
                 isNomore = true;
                 Toast.makeText(getApplicationContext(), "No more episodes", Toast.LENGTH_SHORT).show();
