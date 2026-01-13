@@ -69,17 +69,12 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
     private void setupFileList() {
         FilesExtractor filesExtractor = new FilesExtractor(Download_videoActivity.this);
         ArrayList<VideoFile> videoFiles = filesExtractor.listVideos();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            videoFiles.sort((v1, v2) -> Long.compare(v2.getLastModified(), v1.getLastModified()));
-        } else {
-            Collections.sort(videoFiles, new Comparator<VideoFile>() {
+        Collections.sort(videoFiles, new Comparator<VideoFile>() {
                 @Override
                 public int compare(VideoFile v1, VideoFile v2) {
                     return Long.compare(v2.getLastModified(), v1.getLastModified());
                 }
             });
-        }
-
         file_recycler.setLayoutManager(new GridLayoutManager(this, 2));
         fileAdapter = new FileAdapter(this, videoFiles, this,this);
         file_recycler.setAdapter(fileAdapter);
@@ -140,7 +135,12 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
                             if (allDeleted) {
                                 FilesExtractor filesExtractor = new FilesExtractor(Download_videoActivity.this);
                                 ArrayList<VideoFile> updatedVideoFiles = filesExtractor.listVideos();
-                                updatedVideoFiles.sort((v1, v2) -> Long.compare(v2.getLastModified(), v1.getLastModified()));
+                                Collections.sort(updatedVideoFiles, new Comparator<VideoFile>() {
+                                    @Override
+                                    public int compare(VideoFile v1, VideoFile v2) {
+                                        return Long.compare(v2.getLastModified(), v1.getLastModified());
+                                    }
+                                });
                                 fileAdapter.updateVideoFiles(updatedVideoFiles);
                                 reSyncUi();
                             } else {
