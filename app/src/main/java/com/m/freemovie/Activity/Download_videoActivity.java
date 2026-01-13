@@ -24,6 +24,8 @@ import com.m.freemovie.fileUtils.VideoFile;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class Download_videoActivity extends AppCompatActivity implements FileAdapter.DeleteListerner, FileAdapter.MoveFileListerner {
@@ -67,7 +69,17 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
     private void setupFileList() {
         FilesExtractor filesExtractor = new FilesExtractor(Download_videoActivity.this);
         ArrayList<VideoFile> videoFiles = filesExtractor.listVideos();
-        videoFiles.sort((v1, v2) -> Long.compare(v2.getLastModified(), v1.getLastModified()));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            videoFiles.sort((v1, v2) -> Long.compare(v2.getLastModified(), v1.getLastModified()));
+        } else {
+            Collections.sort(videoFiles, new Comparator<VideoFile>() {
+                @Override
+                public int compare(VideoFile v1, VideoFile v2) {
+                    return Long.compare(v2.getLastModified(), v1.getLastModified());
+                }
+            });
+        }
+
         file_recycler.setLayoutManager(new GridLayoutManager(this, 2));
         fileAdapter = new FileAdapter(this, videoFiles, this,this);
         file_recycler.setAdapter(fileAdapter);

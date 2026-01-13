@@ -352,6 +352,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
     }
     int pageSize = 0;
+    boolean isPaging = false;
     @Override
     public void getDetailData(AnimePaheDetailBean detailBean) {
         if(detailBean!=null && detailBean.getResults()!=null){
@@ -364,6 +365,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 e.printStackTrace();
                 pageSize = 1;
                 page = 1;
+                isPaging = true;
                 openScroll();
             }
         }
@@ -416,21 +418,24 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                     }
                 }
                 episodeAdapter.setNewData(episodeBeanList);
-                if (episodeBeanList.size() < pageSize) {
-                    page++;
-                    isInit = true;
-                    detailPresenter.getEpisodeQuery(animeId, page);
-                }
-                if (lastWatchedPosition != -1) {
-                    if(!SPUtils.getInstance().getBoolean(AppConstant.isShow)){
-                        Toast.makeText(getApplicationContext(), "Continuing from last watched episode", Toast.LENGTH_SHORT).show();
-                        SPUtils.getInstance().put(AppConstant.isShow, true);
+                if(!isPaging){
+                    if (episodeBeanList.size() < pageSize) {
+                        page++;
+                        isInit = true;
+                        detailPresenter.getEpisodeQuery(animeId, page);
                     }
-                    binding.rvSeason.postDelayed(() -> {
-                        binding.rvSeason.smoothScrollToPosition(lastWatchedPosition);
+                    if (lastWatchedPosition != -1) {
+                        if(!SPUtils.getInstance().getBoolean(AppConstant.isShow)){
+                            Toast.makeText(getApplicationContext(), "Continuing from last watched episode", Toast.LENGTH_SHORT).show();
+                            SPUtils.getInstance().put(AppConstant.isShow, true);
+                        }
+                        binding.rvSeason.postDelayed(() -> {
+                            binding.rvSeason.smoothScrollToPosition(lastWatchedPosition);
 
-                    }, 300);
+                        }, 300);
+                    }
                 }
+
             } else {
                 isNomore = true;
 
