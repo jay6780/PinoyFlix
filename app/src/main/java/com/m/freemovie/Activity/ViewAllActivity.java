@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Toast;
 
@@ -72,7 +73,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
                     int[] lastVisiblePositions = layoutManager.findLastVisibleItemPositions(null);
                     int lastVisiblePosition = getMaxPosition(lastVisiblePositions);
 
-                    if(!tvSeriesList.isEmpty()){
+                    if(isTvSeries){
                         if (lastVisiblePosition >= tvSeriesList.size() - 1) {
                             if (isNomore) {
                                 return;
@@ -212,8 +213,9 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
             return;
         }
         page = 1;
-        movieLists.clear();
+        tvSeriesList.clear();
         isReload = true;
+        isNomore = false;
         seriesAllAdapter.setNewData(new ArrayList<>());
             switch (position){
                 case 1:
@@ -241,6 +243,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
         page = 1;
         movieLists.clear();
         isReload = true;
+        isNomore = false;
         viewAllAdapter.setNewData(new ArrayList<>());
             switch (position){
                 case 1:
@@ -277,17 +280,23 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
 
     @Override
     public void showError(String error) {
-        new Handler().postDelayed(() -> {
-            Toast.makeText(getApplicationContext(),"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
-            swipeRefreshLayout.setRefreshing(false);
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(),"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false);
+            }
         }, 500);
         isReload = false;
 }
 
     @Override
     public void hideLoading() {
-        new Handler().postDelayed(() -> {
-            swipeRefreshLayout.setRefreshing(false);
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(false);
+            }
         }, 500);
     }
 
@@ -304,8 +313,8 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
                 }
             }else{
                 Toast.makeText(this,"No more movies",Toast.LENGTH_SHORT).show();
-                isLoading = false;
                 isNomore = true;
+                isLoading = false;
             }
         }
     }
@@ -322,8 +331,8 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
                 }
             }else{
                 Toast.makeText(this,"No more tv Series",Toast.LENGTH_SHORT).show();
-                isLoading = false;
                 isNomore = true;
+                isLoading = false;
             }
         }
     }
