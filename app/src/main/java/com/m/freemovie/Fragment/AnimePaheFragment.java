@@ -14,6 +14,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.app.hubert.guide.NewbieGuide;
+import com.app.hubert.guide.core.Controller;
+import com.app.hubert.guide.listener.OnGuideChangedListener;
+import com.app.hubert.guide.model.GuidePage;
+import com.app.hubert.guide.model.HighLight;
+import com.m.freemovie.R;
 import com.m.freemovie.adapter.AnimePaheAdapter;
 import com.m.freemovie.databinding.FragmentAnimePaheBinding;
 import com.m.freemovie.mvp.ClassBean.PaheLatestBean;
@@ -41,7 +47,8 @@ public class AnimePaheFragment extends Fragment implements AnimePaheContract.Vie
         animePaheAdapter = new AnimePaheAdapter();
         binding.rvAnimepahe.setAdapter(animePaheAdapter);
         presenter.getLatest(page);
-
+        binding.llReset.setVisibility(View.GONE);
+        binding.llReset.setOnClickListener(view -> reset());
         binding.rvAnimepahe.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -49,6 +56,12 @@ public class AnimePaheFragment extends Fragment implements AnimePaheContract.Vie
                 StaggeredGridLayoutManager layoutManager = (StaggeredGridLayoutManager) recyclerView.getLayoutManager();
                 if (!isLoading && layoutManager != null) {
                     int[] lastVisiblePositions = layoutManager.findLastVisibleItemPositions(null);
+                    if (lastVisiblePositions[0] > 5) {
+                        binding.llReset.setVisibility(View.VISIBLE);
+                        initGuide();
+                    } else if (lastVisiblePositions[0] == 0) {
+                        binding.llReset.setVisibility(View.GONE);
+                    }
                     int lastVisiblePosition = getMaxPosition(lastVisiblePositions);
                     if (lastVisiblePosition >= dataBeanList.size() - 1) {
                         if (isNomore) {
@@ -83,6 +96,29 @@ public class AnimePaheFragment extends Fragment implements AnimePaheContract.Vie
         return binding.getRoot();
     }
 
+    private void initGuide() {
+        NewbieGuide.with(getActivity())
+                .setLabel("pahe_reset")
+                .setOnGuideChangedListener(new OnGuideChangedListener() {
+                    @Override
+                    public void onShowed(Controller controller) {
+
+                    }
+
+                    @Override
+                    public void onRemoved(Controller controller) {
+                    }
+                })
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(binding.llReset, HighLight.Shape.ROUND_RECTANGLE, 1)
+                        .setLayoutRes(R.layout.ll_reset_guide)
+                )
+                .show();
+    }
+    private void reset(){
+        binding.rvAnimepahe.scrollToPosition(0);
+        binding.llReset.setVisibility(View.GONE);
+    }
     private void refresh() {
         page = 1;
         dataBeanList.clear();

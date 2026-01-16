@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -17,6 +18,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.app.hubert.guide.NewbieGuide;
+import com.app.hubert.guide.core.Controller;
+import com.app.hubert.guide.listener.OnGuideChangedListener;
+import com.app.hubert.guide.model.GuidePage;
+import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
 import com.m.freemovie.adapter.AnimePaheSearchAdapter;
 import com.m.freemovie.adapter.NineAnimeSearchAdapter;
@@ -63,6 +69,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     private SwipeRefreshLayout swipeRefreshLayout;
     private int position = 1;
     private RevivalSearchPresenter revivalSearchPresenter;
+    private LinearLayout ll_reset;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,6 +78,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         et_search = view.findViewById(R.id.et_search);
         rv_search = view.findViewById(R.id.rv_search);
         btn_send = view.findViewById(R.id.btn_send);
+        ll_reset = view.findViewById(R.id.ll_reset);
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
         revivalSearchPresenter = new RevivalSearchPresenter(this);
         searchPresenter = new SearchPresenter(this);
@@ -80,6 +88,9 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         tvRevivialSearchAdapter = new TvRevivialSearchAdapter();
         nineAnimeSearchAdapter = new NineAnimeSearchAdapter();
         animePaheSearchAdapter = new AnimePaheSearchAdapter();
+
+        ll_reset.setVisibility(View.GONE);
+        ll_reset.setOnClickListener(v -> reset());
         rv_search.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -88,6 +99,12 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
                 if (!isLoading && layoutManager != null) {
                     int[] lastVisiblePositions = layoutManager.findLastVisibleItemPositions(null);
                     int lastVisiblePosition = getMaxPosition(lastVisiblePositions);
+                    if (lastVisiblePositions[0] > 5) {
+                        ll_reset.setVisibility(View.VISIBLE);
+                        initGuide();
+                    } else if (lastVisiblePositions[0] == 0) {
+                        ll_reset.setVisibility(View.GONE);
+                    }
                     if (lastVisiblePosition >= movieLists.size() - 1) {
                         if (position > 3) {
                             return;
@@ -123,7 +140,31 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
 
         return view;
     }
+    private void initGuide() {
+        NewbieGuide.with(getActivity())
+                .setLabel("Search_reset")
+                .setOnGuideChangedListener(new OnGuideChangedListener() {
+                    @Override
+                    public void onShowed(Controller controller) {
 
+                    }
+
+                    @Override
+                    public void onRemoved(Controller controller) {
+                    }
+                })
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(ll_reset, HighLight.Shape.ROUND_RECTANGLE, 1)
+                        .setLayoutRes(R.layout.ll_reset_guide)
+                )
+                .show();
+    }
+
+
+    private void reset(){
+        rv_search.scrollToPosition(0);
+        ll_reset.setVisibility(View.GONE);
+    }
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void searchPosition(MovieEvent event) {
         this.position = event.getPosition();

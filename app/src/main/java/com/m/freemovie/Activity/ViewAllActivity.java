@@ -14,6 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.app.hubert.guide.NewbieGuide;
+import com.app.hubert.guide.core.Controller;
+import com.app.hubert.guide.listener.OnGuideChangedListener;
+import com.app.hubert.guide.model.GuidePage;
+import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
 import com.m.freemovie.adapter.SeriesAllAdapter;
 import com.m.freemovie.adapter.ViewAllAdapter;
@@ -63,6 +68,8 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
             binding.rvViewAll.setAdapter(viewAllAdapter);
             viewAllAdapter.isTvSeries(1);
         }
+        binding.llReset.setVisibility(View.GONE);
+        binding.llReset.setOnClickListener(view -> reset());
         binding.rvViewAll.setHasFixedSize(true);
         binding.rvViewAll.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -71,6 +78,12 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
                 StaggeredGridLayoutManager layoutManager = (StaggeredGridLayoutManager) recyclerView.getLayoutManager();
                 if (!isLoading && layoutManager != null) {
                     int[] lastVisiblePositions = layoutManager.findLastVisibleItemPositions(null);
+                    if (lastVisiblePositions[0] > 5) {
+                        binding.llReset.setVisibility(View.VISIBLE);
+                        initGuide();
+                    } else if (lastVisiblePositions[0] == 0) {
+                        binding.llReset.setVisibility(View.GONE);
+                    }
                     int lastVisiblePosition = getMaxPosition(lastVisiblePositions);
 
                     if(isTvSeries){
@@ -107,6 +120,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
                 return max;
             }
         });
+
         findViewById(R.id.rotate).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -129,6 +143,31 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
             }
         });
 
+    }
+
+    private void initGuide() {
+        NewbieGuide.with(this)
+                .setLabel("view_all_reset")
+                .setOnGuideChangedListener(new OnGuideChangedListener() {
+                    @Override
+                    public void onShowed(Controller controller) {
+
+                    }
+
+                    @Override
+                    public void onRemoved(Controller controller) {
+                    }
+                })
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(binding.llReset, HighLight.Shape.ROUND_RECTANGLE, 1)
+                        .setLayoutRes(R.layout.ll_reset_guide)
+                )
+                .show();
+    }
+
+    private void reset(){
+        binding.rvViewAll.scrollToPosition(0);
+        binding.llReset.setVisibility(View.GONE);
     }
 
     private void initStartApi() {

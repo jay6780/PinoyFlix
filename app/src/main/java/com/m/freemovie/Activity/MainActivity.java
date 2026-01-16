@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private DrawerLayout drawerLayout;
     private LinearLayout navigationView;
     private ImageView btn_back5;
+    private static final int RESET_GUIDE_REQUEST_CODE = 100;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,19 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         if (getIntent().getBooleanExtra("resetGuide", false)) {
-            List<String> guideString = new ArrayList<>();
-                guideString.add("animepahe_bookmark");
-                guideString.add("Tv_series");
-                guideString.add("indie_movies");
-                guideString.add("tagalog_bookmark");
-                guideString.add("tagalog_movie");
-                guideString.add("tagalog_series");
-                guideString.add("long_press");
-                guideString.add("home_guide");
-                guideString.add("choose_guide");
-            for(String reset : guideString){
-                NewbieGuide.resetLabel(getApplicationContext(), reset);
-            }
+            resetGuideLabels();
         }
     }
 
@@ -155,11 +145,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 builder.setTitle("Are you sure want to reset?");
                 builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = getIntent();
+                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
                         intent.putExtra("resetGuide", true);
-                        finish();
-                        startActivity(intent);
-                        overridePendingTransition(0, 0);
+                        startActivityForResult(intent, RESET_GUIDE_REQUEST_CODE);
                         dialog.dismiss();
                     }
                 });
@@ -182,6 +170,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RESET_GUIDE_REQUEST_CODE && resultCode == RESULT_OK) {
+            if (data != null && data.getBooleanExtra("resetGuide", false)) {
+                resetGuideLabels();
+            }
+        }
+    }
+
+    private void resetGuideLabels() {
+        List<String> guideString = new ArrayList<>();
+        guideString.add("animepahe_bookmark");
+        guideString.add("Tv_series");
+        guideString.add("indie_movies");
+        guideString.add("tagalog_bookmark");
+        guideString.add("tagalog_movie");
+        guideString.add("tagalog_series");
+        guideString.add("long_press");
+        guideString.add("home_guide");
+        guideString.add("choose_guide");
+        guideString.add("view_all_reset");
+        guideString.add("book_reset");
+        guideString.add("tagalog_movie_reset");
+        guideString.add("tagalog1_reset");
+        guideString.add("tagalog2_reset");
+        guideString.add("pahe_reset");
+        guideString.add("Search_reset");
+        for (String reset : guideString) {
+            NewbieGuide.resetLabel(getApplicationContext(), reset);
+        }
+    }
+
+
     @Override
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
