@@ -10,7 +10,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -545,7 +544,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     @Override
     public void getVideoUrl(String videoUrl,boolean isDownload) {
         this.isDownload = isDownload;
-        Log.e("VideoSelect","val: "+videoUrl);
         if(!videoUrl.isEmpty()){
             isError = false;
             if(!streamingBeanList.isEmpty()){

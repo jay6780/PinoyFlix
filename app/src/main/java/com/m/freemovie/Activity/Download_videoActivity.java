@@ -65,7 +65,6 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
         btn_back5.setImageResource(R.mipmap.back_white);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void setupFileList() {
         FilesExtractor filesExtractor = new FilesExtractor(Download_videoActivity.this);
         ArrayList<VideoFile> videoFiles = filesExtractor.listVideos();
@@ -114,7 +113,6 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
         finish();
     }
     private List<VideoFile> selectedFiles = new ArrayList<>();
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void deletefiles(List<VideoFile> videoFiles) {
         this.selectedFiles = videoFiles;

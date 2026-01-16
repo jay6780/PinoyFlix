@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
@@ -22,11 +21,9 @@ import com.app.hubert.guide.listener.OnGuideChangedListener;
 import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
 import com.bumptech.glide.Glide;
-import com.m.freemovie.Activity.Download_videoActivity;
-import com.m.freemovie.Activity.FullViewVideoActivity;
+import com.m.freemovie.Activity.DownloadVideoViewActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.MoveFileUtils;
-import com.m.freemovie.fileUtils.FilesExtractor;
 import com.m.freemovie.fileUtils.VideoFile;
 
 import java.io.File;
@@ -168,10 +165,9 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
                 deleteListerner.deletefiles(selectedFiles);
 
             } else {
-                Intent viewFullvideo = new Intent(context, FullViewVideoActivity.class);
-                viewFullvideo.putExtra("videoURl", data.getPath());
-                viewFullvideo.putExtra("isVisible", false);
-                viewFullvideo.putExtra("videoTitle",data.getName());
+                Intent viewFullvideo = new Intent(context, DownloadVideoViewActivity.class);
+                viewFullvideo.putExtra("videopath", data.getPath());
+                viewFullvideo.putExtra("title",data.getName());
                 context.startActivity(viewFullvideo);
             }
         });

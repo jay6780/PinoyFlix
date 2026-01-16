@@ -1,10 +1,13 @@
 package com.m.freemovie.adapter;
 
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.bumptech.glide.Glide;
 import com.m.freemovie.R;
@@ -58,7 +61,7 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
         iv_download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                videoPlayListerner.getVideoUrl(item.getSession(),true);
+
             }
         });
 
@@ -69,14 +72,35 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
                     lastPosition = -1;
                     videoPlayListerner.getVideoUrl("",false);
                 }else{
-                    dbHelper.markEpisodeAsWatched(item.getEpisodeUrl(), item.getEpisode());
-                    lastPosition = (helper.getAdapterPosition());
-                    videoPlayListerner.getVideoUrl(item.getSession(),false);
-                    item.setWatched(true);
+                    showOption(item,helper);
                 }
                 notifyDataSetChanged();
             }
         });
+    }
+
+    private void showOption(AnimePaheBeanList item,BaseViewHolder helper) {
+        String[] colors = {"Watch", "Download"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setItems(colors, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case 0:
+                        dbHelper.markEpisodeAsWatched(item.getEpisodeUrl(), item.getEpisode());
+                        lastPosition = (helper.getAdapterPosition());
+                        videoPlayListerner.getVideoUrl(item.getSession(),false);
+                        item.setWatched(true);
+                        notifyDataSetChanged();
+                        break;
+                    case 1:
+                        videoPlayListerner.getVideoUrl(item.getSession(),true);
+                        break;
+                }
+            }
+
+        });
+        builder.show();
     }
 
 }

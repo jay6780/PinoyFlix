@@ -9,10 +9,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
-import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
-import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -75,21 +73,6 @@ public class DownloadWebview extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
-        binding.webView.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
-                return true;
-            }
-            @Override
-            public void onProgressChanged(WebView view, int newProgress) {
-                super.onProgressChanged(view, newProgress);
-                if (newProgress > 80 && hud != null && hud.isShowing()) {
-                    hud.dismiss();
-                }
-            }
-        });
-
-
         binding.webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
@@ -100,6 +83,7 @@ public class DownloadWebview extends AppCompatActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 blockAds(view);
+                hud.dismiss();
             }
 
             @Override
@@ -107,33 +91,59 @@ public class DownloadWebview extends AppCompatActivity {
                 String url = request.getUrl().toString();
                 return handleUrlLoading(view, url);
             }
+
             private boolean handleUrlLoading(WebView view, String url) {
-                if (url.contains("vidsrc") || url.contains("cardfightvanguard") || url.contains("workers.dev")) {
+//                Log.e("VideoSelect","val: "+url);
+                if (isAllowedUrl(url)) {
                     return false;
                 } else {
                     view.stopLoading();
                     return true;
                 }
             }
-
         });
 
         binding.webView.setDownloadListener(new DownloadListener() {
             @Override
             public void onDownloadStart(String videoUrl, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-                if (videoUrl.contains("vidsrc") || videoUrl.contains("cardfightvanguard") || videoUrl.contains("workers.dev")) {
+//                Log.e("VideoSelect","val: "+videoUrl);
+                if (isAllowedUrl(videoUrl)) {
                     if(isFirstTask){
                         Toast.makeText(getApplicationContext(),"Download in progress",Toast.LENGTH_SHORT).show();
                         return;
                     }
                     downloadVideo(videoUrl);
+                }else{
+                    Toast.makeText(getApplicationContext(),"Video can't be downloaded",Toast.LENGTH_SHORT).show();
+                    finish();
                 }
             }
         });
+
         binding.webView.loadUrl(videoUrl);
 
     }
 
+    private boolean isAllowedUrl(String url) {
+        String[] allowedPatterns = {
+                "^https?://vidsrc\\..*",
+                "^https?://cardfightvanguard\\..*",
+                "^https?://workers\\.dev.*",
+                "^https?://pahe\\.win.*",
+                "^https?://kwik\\.cx/f/.*",
+                "^https?://vault-.*\\.kwik\\.cx.*",
+                "^https?://vault-.*\\.uwucdn\\.top.*",
+                "^https?://.*\\.mp4.*",
+                "^https?://.*/mp4/.*",
+        };
+
+        for (String pattern : allowedPatterns) {
+            if (url.matches(pattern)) {
+                return true;
+            }
+        }
+        return false;
+    }
     private void blockAds(WebView view) {
         String tags = view.getUrl();
         StringBuilder sb = new StringBuilder();

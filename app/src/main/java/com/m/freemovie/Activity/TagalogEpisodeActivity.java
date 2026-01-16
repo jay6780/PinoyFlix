@@ -31,8 +31,6 @@ import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
-import com.m.freemovie.Retrofit.AppConstant;
-import com.m.freemovie.Retrofit.PrettyLoggingInterceptor;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
 import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
@@ -731,9 +729,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
                     return true;
                 }
             });
-            if (AppConstant.isDev) {
-                builder.addInterceptor(new PrettyLoggingInterceptor());
-            }
+
             return builder;
         } catch (Exception e) {
             throw new RuntimeException(e);
