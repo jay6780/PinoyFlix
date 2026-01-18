@@ -129,6 +129,7 @@ public class TagalogSeriesFragment extends Fragment implements TagalogSeriesCont
 
     @Override
     public void getTagalogSeries(TagalogBean tagalogBean) {
+        if (binding == null) return;
         if(tagalogBean!=null && tagalogBean.getResults()!=null){
             tagalogSeriesAdapter.setNewData(tagalogBean.getResults());
         }

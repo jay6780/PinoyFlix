@@ -176,6 +176,9 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
                 movieAdapter = new ViewAllAdapter();
                 rv_search.setAdapter(movieAdapter);
                 movieLists.clear();
+                if(ll_reset !=null){
+                    ll_reset.setVisibility(View.GONE);
+                }
                 break;
 
             case 2:
@@ -184,6 +187,9 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
                 movieAdapter = new ViewAllAdapter();
                 rv_search.setAdapter(movieAdapter);
                 movieLists.clear();
+                if(ll_reset !=null){
+                    ll_reset.setVisibility(View.GONE);
+                }
                 break;
 
             case 3:
@@ -192,6 +198,9 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
                 tagalogSearchAdapter = new TagalogSearchAdapter();
                 rv_search.setAdapter(tagalogSearchAdapter);
                 tagaloglist.clear();
+                if(ll_reset !=null){
+                    ll_reset.setVisibility(View.GONE);
+                }
                 break;
             case 4:
             case 5:
@@ -200,6 +209,9 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
                 tvRevivialSearchAdapter = new TvRevivialSearchAdapter();
                 rv_search.setAdapter(tvRevivialSearchAdapter);
                 revivalList.clear();
+                if(ll_reset !=null){
+                    ll_reset.setVisibility(View.GONE);
+                }
                 break;
             case 6:
                 et_search.setHint("Enter anime series");
@@ -207,6 +219,9 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
                 nineAnimeSearchAdapter = new NineAnimeSearchAdapter();
                 rv_search.setAdapter(nineAnimeSearchAdapter);
                 nineList.clear();
+                if(ll_reset !=null){
+                    ll_reset.setVisibility(View.GONE);
+                }
                 break;
             case 7:
                 et_search.setHint("Enter anime series");
@@ -214,6 +229,9 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
                 animePaheSearchAdapter = new AnimePaheSearchAdapter();
                 rv_search.setAdapter(animePaheSearchAdapter);
                 animePaheList.clear();
+                if(ll_reset !=null){
+                    ll_reset.setVisibility(View.GONE);
+                }
                 break;
 
         }
@@ -233,6 +251,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         String query = et_search.getText().toString().trim();
         isNomore = false;
         et_search.setText("");
+        ll_reset.setVisibility(View.GONE);
         movieAdapter.setNewData(new ArrayList<>());
         tagalogSearchAdapter.setNewData(new ArrayList<>());
         tvRevivialSearchAdapter.setNewData(new ArrayList<>());
@@ -489,9 +508,10 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         super.onStart();
         EventBus.getDefault().register(this);
         if(position == 1){
-            EventBus.getDefault().post(new MovieEvent(1));
+            if(movieLists.isEmpty()){
+                EventBus.getDefault().post(new MovieEvent(1));
+            }
         }
-
     }
 
     @Override

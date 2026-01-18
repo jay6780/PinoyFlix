@@ -22,7 +22,7 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
     private EpisodeListener videoPlayListerner;
     private  int lastPosition = -1;
     public interface EpisodeListener{
-        void getVideoUrl(String videoUrl,boolean isDownload);
+        void getVideoUrl(String videoUrl,boolean isDownload,String episodeNum);
     }
     public AnimePaheDetailAdapter(EpisodeListener videoPlayListerner) {
         super(R.layout.episode_item);
@@ -70,7 +70,7 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
             public void onClick(View view) {
                 if(lastPosition == (helper.getAdapterPosition())){
                     lastPosition = -1;
-                    videoPlayListerner.getVideoUrl("",false);
+                    videoPlayListerner.getVideoUrl("",false,"");
                 }else{
                     showOption(item,helper);
                 }
@@ -89,12 +89,12 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
                     case 0:
                         dbHelper.markEpisodeAsWatched(item.getEpisodeUrl(), item.getEpisode());
                         lastPosition = (helper.getAdapterPosition());
-                        videoPlayListerner.getVideoUrl(item.getSession(),false);
+                        videoPlayListerner.getVideoUrl(item.getSession(),false,"");
                         item.setWatched(true);
                         notifyDataSetChanged();
                         break;
                     case 1:
-                        videoPlayListerner.getVideoUrl(item.getSession(),true);
+                        videoPlayListerner.getVideoUrl(item.getSession(),true,item.getEpisode());
                         break;
                 }
             }

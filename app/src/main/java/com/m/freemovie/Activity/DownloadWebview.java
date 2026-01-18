@@ -1,7 +1,6 @@
 package com.m.freemovie.Activity;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -24,18 +23,27 @@ import com.m.freemovie.databinding.ActivityDownloadWebviewBinding;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.security.cert.CertificateException;
+import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import okhttp3.OkHttpClient;
 
 public class DownloadWebview extends AppCompatActivity {
     private String downloadUrl;
     private ActivityDownloadWebviewBinding binding;
     private KProgressHUD hud;
     private KProgressHUD downloadHud;
-    private String title;
+    private String title,EpisodeNum;
     private boolean isFirstTask = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +55,7 @@ public class DownloadWebview extends AppCompatActivity {
         binding.rotate.setVisibility(View.GONE);
         downloadUrl = getIntent().getStringExtra("DownloadUrl");
         title = getIntent().getStringExtra("title");
+        EpisodeNum = getIntent().getStringExtra("EpisodeNum");
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
@@ -170,7 +179,8 @@ public class DownloadWebview extends AppCompatActivity {
 
     private File getLocalFile() {
         String safeTitle = title.replaceAll("[^a-zA-Z0-9.-]", "_");
-        String fileName = safeTitle + ".mp4";
+        String Episode = EpisodeNum == null? "":" Ep_" + EpisodeNum;
+        String fileName = safeTitle +"_Episode_"+Episode+"_"+".mp4";
         String dirName = safeTitle;
 
         File freeMovieDir = new File(getFilesDir(), "FreeMovie");
@@ -188,58 +198,54 @@ public class DownloadWebview extends AppCompatActivity {
     private void downloadVideo(String videoUrl) {
         isFirstTask = true;
         File outputFile = getLocalFile();
+
+        String Episode = EpisodeNum == null? "":" Ep: " + EpisodeNum;
+
         downloadHud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.ANNULAR_DETERMINATE)
-                .setLabel("Downloading...")
+                .setLabel("Downloading: " + title + Episode)
                 .setMaxProgress(100)
                 .setCancellable(true);
         downloadHud.show();
 
-        downloadHud.setCancellable(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                isFirstTask = false;
-                if (outputFile.exists()) {
-                    outputFile.delete();
-                    Toast.makeText(getApplicationContext(), "Download cancelled", Toast.LENGTH_SHORT).show();
-                }
+        downloadHud.setCancellable(dialog -> {
+            isFirstTask = false;
+            if (outputFile.exists()) {
+                outputFile.delete();
+                Toast.makeText(getApplicationContext(), "Download cancelled", Toast.LENGTH_SHORT).show();
             }
         });
 
         new Thread(() -> {
             FileOutputStream outputStream = null;
             InputStream inputStream = null;
-            HttpURLConnection connection = null;
+            okhttp3.Response response = null;
 
             try {
-                URL url = new URL(videoUrl);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.setConnectTimeout(60000);
-                connection.setReadTimeout(60000);
-                connection.setInstanceFollowRedirects(true);
-
+                OkHttpClient client = getUnsafeOkHttpClient().build();
 
                 long existingLength = 0;
                 if (outputFile.exists()) {
                     existingLength = outputFile.length();
-                    connection.setRequestProperty("Range", "bytes=" + existingLength + "-");
                 }
 
-                connection.connect();
-                int responseCode = connection.getResponseCode();
+                okhttp3.Request.Builder requestBuilder = new okhttp3.Request.Builder()
+                        .url(videoUrl)
+                        .get();
 
-                boolean isResume = (responseCode == HttpURLConnection.HTTP_PARTIAL);
-                if (responseCode == HttpURLConnection.HTTP_OK || isResume) {
-                    inputStream = connection.getInputStream();
+                if (existingLength > 0) {
+                    requestBuilder.addHeader("Range", "bytes=" + existingLength + "-");
+                }
 
-                    if (isResume) {
-                        outputStream = new FileOutputStream(outputFile, true);
-                    } else {
-                        outputStream = new FileOutputStream(outputFile);
-                    }
+                response = client.newCall(requestBuilder.build()).execute();
+                int responseCode = response.code();
+                boolean isResume = (responseCode == 206);
 
-                    int contentLength = connection.getContentLength();
+                if (response.isSuccessful() || isResume) {
+                    inputStream = response.body().byteStream();
+                    outputStream = new FileOutputStream(outputFile, isResume);
+
+                    long contentLength = response.body().contentLength();
                     if (isResume) {
                         contentLength += existingLength;
                     }
@@ -249,10 +255,7 @@ public class DownloadWebview extends AppCompatActivity {
                     long totalBytesRead = existingLength;
 
                     while ((bytesRead = inputStream.read(buffer)) != -1) {
-                        // Check if download was cancelled
-                        if (!isFirstTask) {
-                            break;
-                        }
+                        if (!isFirstTask) break;
 
                         outputStream.write(buffer, 0, bytesRead);
                         totalBytesRead += bytesRead;
@@ -263,8 +266,7 @@ public class DownloadWebview extends AppCompatActivity {
                         }
                     }
 
-                    outputStream.close();
-                    inputStream.close();
+                    outputStream.flush();
 
                     if (isFirstTask) {
                         runOnUiThread(() -> {
@@ -273,25 +275,15 @@ public class DownloadWebview extends AppCompatActivity {
                             }
                             isFirstTask = false;
                             Toast.makeText(getApplicationContext(),
-                                    "Download Complete! Saved to: " + outputFile.getAbsolutePath(),
-                                    Toast.LENGTH_LONG).show();
+                                    "Download Complete!", Toast.LENGTH_LONG).show();
                             startActivity(new Intent(getApplicationContext(), Download_videoActivity.class));
                         });
                     }
-
                 } else {
-                    runOnUiThread(() -> {
-                        if (downloadHud != null && downloadHud.isShowing()) {
-                            downloadHud.dismiss();
-                        }
-                        isFirstTask = false;
-                        Toast.makeText(getApplicationContext(), "Download Failed: HTTP " + responseCode,
-                                Toast.LENGTH_SHORT).show();
-                    });
+                    throw new IOException("Server returned code: " + responseCode);
                 }
 
             } catch (Exception e) {
-                // Only show error if not cancelled
                 if (isFirstTask) {
                     e.printStackTrace();
                     runOnUiThread(() -> {
@@ -299,21 +291,69 @@ public class DownloadWebview extends AppCompatActivity {
                             downloadHud.dismiss();
                         }
                         isFirstTask = false;
-                        Toast.makeText(getApplicationContext(),
-                                "Download Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
                 }
             } finally {
                 try {
+                    if (response != null) response.close();
                     if (outputStream != null) outputStream.close();
                     if (inputStream != null) inputStream.close();
-                    if (connection != null) connection.disconnect();
-                } catch (Exception e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }).start();
     }
+
+    public static OkHttpClient.Builder getUnsafeOkHttpClient() {
+
+        try {
+            // Create a trust manager that does not validate certificate chains
+            final TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        @Override
+                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String
+                                authType) throws CertificateException {
+                        }
+
+                        @Override
+                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String
+                                authType) throws CertificateException {
+                        }
+
+                        @Override
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return new java.security.cert.X509Certificate[]{};
+                        }
+                    }
+            };
+
+            // Install the all-trusting trust manager
+            final SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+
+            // Create an ssl socket factory with our all-trusting manager
+            final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+
+
+            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            builder.connectTimeout(60, TimeUnit.SECONDS);
+            builder.writeTimeout(60, TimeUnit.SECONDS);
+            builder.readTimeout(120, TimeUnit.SECONDS);
+            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
+            builder.hostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+
+            return builder;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } }
 
 
     @Override

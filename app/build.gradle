@@ -8,7 +8,7 @@ android {
     defaultConfig {
         applicationId "com.m.freemovie"
         minSdk 21
-        targetSdk 35
+        targetSdk 34
         versionCode 38
         versionName "3.8"
 

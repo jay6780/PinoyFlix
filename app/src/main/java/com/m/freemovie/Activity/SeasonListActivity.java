@@ -9,7 +9,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
@@ -21,7 +20,6 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.m.freemovie.Utils.DbHelper.WatchHistoryDBHelper;
 import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
@@ -145,8 +143,6 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
             binding.webView.clearHistory();
             binding.webView.reload();
         }
-
-        binding = null;
     }
 
     @Override

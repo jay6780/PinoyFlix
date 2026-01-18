@@ -160,6 +160,7 @@ public class AnimePaheFragment extends Fragment implements AnimePaheContract.Vie
 
     @Override
     public void getLatestData(PaheLatestBean paheLatestBean) {
+        if (binding == null) return;
         if(paheLatestBean !=null && paheLatestBean.getResults()!=null){
             isLoading = false;
             if(!paheLatestBean.getResults().getData().isEmpty()){

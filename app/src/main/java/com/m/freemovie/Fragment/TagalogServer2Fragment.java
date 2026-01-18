@@ -162,6 +162,7 @@ public class TagalogServer2Fragment extends Fragment implements RevivalContractS
 
     @Override
     public void getTvSeries(RevivalSeriesBean revivalSeriesBean) {
+        if (binding == null) return;
         if(revivalSeriesBean!=null && revivalSeriesBean.getResults() !=null){
             isLoading = false;
             resultsBeanList.addAll(revivalSeriesBean.getResults());

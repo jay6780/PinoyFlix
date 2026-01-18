@@ -10,6 +10,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,6 +83,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     private boolean isLoading = false;
     private boolean isInit = true;
     private boolean isDownload = false;
+    private String episode = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,6 +106,9 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         detailPresenter.getDetailQuery(url);
         setImageData(id);
         SPUtils.getInstance().put(AppConstant.isShow, false);
+
+
+
         if(isInit){
             binding.swipe.setRefreshing(true);
         }
@@ -201,6 +207,9 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(binding.swipe != null &&binding.swipe.isRefreshing()){
+            binding.swipe.setRefreshing(false);
+        }
         if (binding != null && binding.webView != null) {
             binding.webView.stopLoading();
             binding.webView.setWebChromeClient(null);
@@ -210,8 +219,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             binding.webView.clearHistory();
             binding.webView.reload();
         }
-
-        binding = null;
     }
 
     @Override
@@ -345,11 +352,21 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
     @Override
     public void hideLoading() {
-        if(binding.swipe.isRefreshing()){
-            binding.swipe.setRefreshing(false);
+        try {
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    binding.swipe.setRefreshing(false);
+                }
+            }, 500);
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
     }
+
+
+
     int pageSize = 0;
     boolean isPaging = false;
     @Override
@@ -399,19 +416,16 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     int lastWatchedPosition = -1;
     @Override
     public void getEpisodes(AnimePaheEpisodeBean episodeBean) {
+        if (binding == null) return;
         if (episodeBean != null && episodeBean.getResults() != null) {
             isLoading = false;
             isInit = false;
-            if(binding.swipe.isRefreshing()){
-                binding.swipe.setRefreshing(false);
-            }
             if (episodeBean.getResults().getData() != null) {
                 for (AnimePaheEpisodeBean.ResultsBean.DataBean dataBean : episodeBean.getResults().getData()) {
                     AnimePaheBeanList detailBean = new AnimePaheBeanList(String.valueOf(dataBean.getId()), String.valueOf(dataBean.getEpisode()), dataBean.getSnapshot(), dataBean.getSession());
                     boolean isWatched = dbHelper.isEpisodeWatched(String.valueOf(dataBean.getId()), String.valueOf(dataBean.getEpisode()));
                     detailBean.setWatched(isWatched);
                     episodeBeanList.add(detailBean);
-                    binding.episodeTxt.setText(episodeBeanList.size() > 1 ? "Episode's" : "Episode");
                     if(isWatched){
                         lastWatchedPosition = episodeBeanList.size() - 1;
                     }
@@ -434,6 +448,8 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                         }, 300);
                     }
                 }
+
+                binding.episodeTxt.setText(episodeBeanList.size() > 1 ? "Episode's" : "Episode");
 
             } else {
                 isNomore = true;
@@ -524,6 +540,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         Intent intent  = new Intent(getApplicationContext(), DownloadWebview.class);
         intent.putExtra("DownloadUrl", videoUrl);
         intent.putExtra("title", title);
+        intent.putExtra("EpisodeNum",episode);
         startActivity(intent);
     }
 
@@ -542,8 +559,9 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
 
     @Override
-    public void getVideoUrl(String videoUrl,boolean isDownload) {
+    public void getVideoUrl(String videoUrl,boolean isDownload,String episode) {
         this.isDownload = isDownload;
+        this.episode = episode;
         if(!videoUrl.isEmpty()){
             isError = false;
             if(!streamingBeanList.isEmpty()){

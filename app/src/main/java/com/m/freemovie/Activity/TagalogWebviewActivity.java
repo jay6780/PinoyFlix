@@ -1,9 +1,5 @@
 package com.m.freemovie.Activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -14,7 +10,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
+import android.os.Looper;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
@@ -24,6 +20,9 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.app.hubert.guide.NewbieGuide;
 import com.app.hubert.guide.core.Controller;
@@ -214,8 +213,6 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
             binding.webView.clearHistory();
             binding.webView.reload();
         }
-
-        binding = null;
     }
 
     @Override
@@ -349,11 +346,21 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
         binding.swipe.setRefreshing(false);
     }
 
+
     @Override
     public void hideLoading() {
-        binding.swipe.setRefreshing(false);
-    }
+        try {
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    binding.swipe.setRefreshing(false);
+                }
+            }, 500);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
+    }
 
     @Override
     public void getTrack(DetailDownloadBean tagalogInfoBean) {
@@ -382,6 +389,7 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
 
     @Override
     public void getInfoTagalog(TagalogInfoBean tagalogInfoBean) {
+        if (binding == null) return;
         if(tagalogInfoBean != null && tagalogInfoBean.getResults() != null) {
             Set<String> seenEpisodes = new HashSet<>();
             String lastWatchedEpisodeNumber = null;
@@ -396,9 +404,6 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
                         detailBean.setWatched(isWatched);
 
                         episodeBeanList.add(detailBean);
-                        if(!isMovie){
-                            binding.episodeTxt.setText(episodeBeanList.size() > 1? "Episode's" : "Episode");
-                        }
 
                         if(isWatched){
                             lastWatchedPosition = episodeBeanList.size() - 1;
@@ -409,6 +414,9 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
             }
             episodeAdapter.setNewData(episodeBeanList);
 
+            if(!isMovie){
+                binding.episodeTxt.setText(episodeBeanList.size() > 1? "Episode's" : "Episode");
+            }
             if(lastWatchedPosition != -1 && lastWatchedEpisodeNumber != null){
                 binding.rvSeason.smoothScrollToPosition(lastWatchedPosition);
                 Toast.makeText(getApplicationContext(),

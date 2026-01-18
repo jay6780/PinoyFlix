@@ -162,6 +162,7 @@ public class TagalogMovieFragment extends Fragment implements RevivalContractMov
 
     @Override
     public void getMovies(RevivalSeriesBean revivalSeriesBean) {
+        if (binding == null) return;
         if(revivalSeriesBean!=null && revivalSeriesBean.getResults() !=null){
             isLoading = false;
             resultsBeanList.addAll(revivalSeriesBean.getResults());
