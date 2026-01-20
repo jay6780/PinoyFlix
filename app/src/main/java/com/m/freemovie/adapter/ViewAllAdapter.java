@@ -14,7 +14,7 @@ import com.m.freemovie.Utils.base.BaseViewHolder;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
 
 public class ViewAllAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, BaseViewHolder> {
-
+    int apiPosition;
     public ViewAllAdapter() {
         super(R.layout.view_all_item);
     }
@@ -43,6 +43,7 @@ public class ViewAllAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Base
                 Intent intent = new Intent(mContext, Details_activity.class);
                 intent.putExtra("id",item.getId());
                 intent.putExtra("position",position);
+                intent.putExtra("apiPosition",apiPosition);
                 mContext.startActivity(intent);
             }
         });
@@ -50,6 +51,11 @@ public class ViewAllAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Base
 
     public void isTvSeries(int position ) {
         this.position = position;
+        notifyDataSetChanged();
+    }
+
+    public void setApiPosition(int type) {
+        this.apiPosition = type;
         notifyDataSetChanged();
     }
 }

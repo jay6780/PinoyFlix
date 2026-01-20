@@ -66,6 +66,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
             binding.rvViewAll.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
             viewAllAdapter = new ViewAllAdapter();
             binding.rvViewAll.setAdapter(viewAllAdapter);
+            viewAllAdapter.setApiPosition(position);
             viewAllAdapter.isTvSeries(1);
         }
         binding.llReset.setVisibility(View.GONE);

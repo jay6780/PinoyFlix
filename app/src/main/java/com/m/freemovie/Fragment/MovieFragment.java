@@ -10,8 +10,6 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -141,6 +139,12 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
 
         upcommingAdapter = new MovieAdapter();
         binding.rvUpComing.setAdapter(upcommingAdapter);
+
+        popularAdapter.setPosition(1);
+        topRatedAdapter.setPosition(2);
+        movieNowAdapter.setPosition(3);
+        upcommingAdapter.setPosition(4);
+
     }
 
     @Override

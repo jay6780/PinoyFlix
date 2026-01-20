@@ -13,7 +13,7 @@ import com.m.freemovie.Utils.base.BaseViewHolder;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
 
 public class MovieNowAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, BaseViewHolder> {
-
+    private int apiPosition;
     public MovieNowAdapter() {
         super(R.layout.item_movie_now);
     }
@@ -30,12 +30,14 @@ public class MovieNowAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Bas
         Glide.with(mContext)
                 .asBitmap().
                 load(posterPath)
+                .placeholder(R.drawable.noimage)
                 .into(iv_thumb);
 
 
         Glide.with(mContext)
                 .asBitmap().
                 load(posterPath)
+                .placeholder(R.drawable.noimage)
                 .into(smallimg);
 
         tv_title.setText(item.getTitle());
@@ -47,9 +49,13 @@ public class MovieNowAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Bas
                 Intent intent = new Intent(mContext, Details_activity.class);
                 intent.putExtra("id",item.getId());
                 intent.putExtra("position",1);
+                intent.putExtra("apiPosition",apiPosition);
                 mContext.startActivity(intent);
             }
         });
     }
-
+    public void setPosition(int type) {
+        this.apiPosition = type;
+        notifyDataSetChanged();
+    }
 }

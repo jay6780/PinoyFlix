@@ -46,6 +46,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class SearchFragment extends Fragment implements SearchContract.View,View.OnClickListener, RevivalSearchContract.View {
     private EditText et_search;
@@ -70,7 +71,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     private int position = 1;
     private RevivalSearchPresenter revivalSearchPresenter;
     private LinearLayout ll_reset;
-
+    private Random random;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -88,6 +89,11 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         tvRevivialSearchAdapter = new TvRevivialSearchAdapter();
         nineAnimeSearchAdapter = new NineAnimeSearchAdapter();
         animePaheSearchAdapter = new AnimePaheSearchAdapter();
+        random = new Random();
+        if(position == 1){
+            int roll = random.nextInt(4) + 1;
+            movieAdapter.setApiPosition(roll);
+        }
 
         ll_reset.setVisibility(View.GONE);
         ll_reset.setOnClickListener(v -> reset());
@@ -175,6 +181,8 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
                 rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
                 movieAdapter = new ViewAllAdapter();
                 rv_search.setAdapter(movieAdapter);
+                int roll = random.nextInt(4) + 1;
+                movieAdapter.setApiPosition(roll);
                 movieLists.clear();
                 if(ll_reset !=null){
                     ll_reset.setVisibility(View.GONE);

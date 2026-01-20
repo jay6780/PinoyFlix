@@ -45,6 +45,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     private SeasonsAdapter seasonsAdapter;
     private BookmarkDbHelper dbHelper;
     private int position = 2;
+    private int apiPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
         id = getIntent().getStringExtra("id");
         position = getIntent().getIntExtra("position",2);
+        apiPosition = getIntent().getIntExtra("apiPosition",1);
 //        Log.d("IsTv", "value: " + isTv + " id: " + id);
 
         if (position == 2) {
@@ -139,6 +141,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
         intent.putExtra("title", title);
         intent.putExtra("videoPosition", 1);
         intent.putExtra("videoId", id);
+        intent.putExtra("apiPosition", apiPosition);
         startActivity(intent);
 //        String[] videoPlayer = {"Player 1", "Player 2"};
 //

@@ -10,7 +10,6 @@ import com.m.freemovie.Activity.Details_activity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.ClassBean.MovieBean;
 import com.m.freemovie.mvp.ClassBean.TvSeriesBean;
 
 public class TveSeriesNowAdapter extends BaseQuickAdapter<TvSeriesBean.ResultsBean, BaseViewHolder> {
@@ -31,12 +30,14 @@ public class TveSeriesNowAdapter extends BaseQuickAdapter<TvSeriesBean.ResultsBe
         Glide.with(mContext)
                 .asBitmap().
                 load(posterPath)
+                .placeholder(R.drawable.noimage)
                 .into(iv_thumb);
 
 
         Glide.with(mContext)
                 .asBitmap().
                 load(posterPath)
+                .placeholder(R.drawable.noimage)
                 .into(smallimg);
 
         tv_title.setText(item.getOriginal_name());
