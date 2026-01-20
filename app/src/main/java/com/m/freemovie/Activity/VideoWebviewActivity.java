@@ -61,6 +61,8 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
     private List<MovieBean.ResultsBean> movieList = new ArrayList<>();
     private boolean isNomore = false;
     private boolean isLoading = false;
+    private int lastScroll;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -157,6 +159,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
                 if (!isLoading && layoutManager != null) {
                     int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+                    lastScroll = lastVisibleItemPosition;
                     int totalItemCount = layoutManager.getItemCount();
                     if (lastVisibleItemPosition > 5) {
                         binding.llReset.setVisibility(View.VISIBLE);
@@ -401,6 +404,14 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        int orientation = getResources().getConfiguration().orientation;
+        if(orientation == Configuration.ORIENTATION_LANDSCAPE){
+            binding.llReset.setVisibility(View.GONE);
+        }else{
+            if(lastScroll > 5){
+                binding.llReset.setVisibility(View.VISIBLE);
+            }
+        }
         if (videoPosition == 6 && binding != null && binding.webView != null) {
             new Handler().postDelayed(() -> {
                 if (binding != null && binding.webView != null) {
