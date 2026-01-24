@@ -165,7 +165,6 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void reSyncUi(){
         selectedFiles.clear();
         delete_now.setText("Delete");
@@ -178,7 +177,6 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
         setupFileList();
     }
     private boolean isSuccess = false;
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void movefiles(boolean isMove) {
         isSuccess = isMove;

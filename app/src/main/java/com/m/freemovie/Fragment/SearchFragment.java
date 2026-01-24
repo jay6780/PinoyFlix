@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -72,6 +73,8 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     private RevivalSearchPresenter revivalSearchPresenter;
     private LinearLayout ll_reset;
     private Random random;
+    private InputMethodManager mInputManager;
+    private String toast;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -95,6 +98,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
             movieAdapter.setApiPosition(roll);
         }
 
+        mInputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         ll_reset.setVisibility(View.GONE);
         ll_reset.setOnClickListener(v -> reset());
         rv_search.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -256,7 +260,6 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
             Toast.makeText(getContext(), "Please check network and try again", Toast.LENGTH_SHORT).show();
             return;
         }
-        String query = et_search.getText().toString().trim();
         isNomore = false;
         et_search.setText("");
         ll_reset.setVisibility(View.GONE);
@@ -267,35 +270,10 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         animePaheSearchAdapter.setNewData(new ArrayList<>());
         lastQuery = "";
         page = 1;
-        switch (position){
-            case 1:
-                if (query.isEmpty()) {
-                    Toast.makeText(getContext(), "Please enter movie name", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                break;
-            case 2:
-                if (query.isEmpty()) {
-                    Toast.makeText(getContext(), "Please enter Tv series", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                break;
+        String query = et_search.getText().toString().trim();
 
-            case 3:
-            case 4:
-            case 5:
-                if (query.isEmpty()) {
-                    Toast.makeText(getContext(), "Please enter tagalog series", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-            case 6:
-            case 7:
-                if (query.isEmpty()) {
-                    Toast.makeText(getContext(), "Please enter anime series", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                break;
+        if(query.isEmpty()){
+            showToast();
         }
     }
 
@@ -444,7 +422,15 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
             Toast.makeText(getContext(), "Please check network and try again", Toast.LENGTH_SHORT).show();
             return;
         }
+
         String query = et_search.getText().toString().trim();
+
+        if (query.isEmpty()) {
+            showToast();
+            return;
+        }
+
+        mInputManager.hideSoftInputFromWindow(et_search.getWindowToken(), 0);
         lastQuery = query;
         isNomore = false;
         page = 1;
@@ -452,20 +438,12 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
             case 1:
                 movieLists.clear();
                 movieAdapter.setNewData(new ArrayList<>());
-                if (query.isEmpty()) {
-                    Toast.makeText(getContext(), "Please enter movie name", Toast.LENGTH_SHORT).show();
-                    return;
-                }
                 searchPresenter.getSearchQuery(getString(R.string.key), query, page);
                 movieAdapter.isTvSeries(1);
                 break;
             case 2:
                 movieLists.clear();
                 movieAdapter.setNewData(new ArrayList<>());
-                if (query.isEmpty()) {
-                    Toast.makeText(getContext(), "Please enter Tv series", Toast.LENGTH_SHORT).show();
-                    return;
-                }
                 searchPresenter.getSearchSeries(getString(R.string.key), query, page);
                 movieAdapter.isTvSeries(2);
                 break;
@@ -473,43 +451,50 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
             case 3:
                 tagaloglist.clear();
                 tagalogSearchAdapter.setNewData(new ArrayList<>());
-                if (query.isEmpty()) {
-                    Toast.makeText(getContext(), "Please enter tagalog series", Toast.LENGTH_SHORT).show();
-                    return;
-                }
                 searchPresenter.getTagalogQuery(query);
                 break;
             case 4:
             case 5:
                 revivalList.clear();
                 tvRevivialSearchAdapter.setNewData(new ArrayList<>());
-                if (query.isEmpty()) {
-                    Toast.makeText(getContext(), "Please enter tagalog series", Toast.LENGTH_SHORT).show();
-                    return;
-                }
                 revivalSearchPresenter.getSearchRevival(query);
                 break;
             case 6:
                 nineList.clear();
                 tvRevivialSearchAdapter.setNewData(new ArrayList<>());
-                if (query.isEmpty()) {
-                    Toast.makeText(getContext(), "Please enter anime series", Toast.LENGTH_SHORT).show();
-                    return;
-                }
                 searchPresenter.getNineAnimeQuery(query);
                 break;
 
             case 7:
                 animePaheList.clear();
                 animePaheSearchAdapter.setNewData(new ArrayList<>());
-                if (query.isEmpty()) {
-                    Toast.makeText(getContext(), "Please enter anime series", Toast.LENGTH_SHORT).show();
-                    return;
-                }
                 searchPresenter.getAnimePaheQuery(query);
                 break;
         }
     }
+
+    private void showToast() {
+        switch (position){
+            case 1:
+                toast = "Please enter movie name";
+                break;
+            case 2:
+                toast = "Please enter Tv series";
+                break;
+
+            case 3:
+            case 4:
+            case 5:
+                toast = "Please enter tagalog series";
+                break;
+            case 6:
+            case 7:
+                toast = "Please enter anime series";
+                break;
+        }
+        Toast.makeText(getContext(),toast, Toast.LENGTH_SHORT).show();
+    }
+
 
     @Override
     public void onStart() {

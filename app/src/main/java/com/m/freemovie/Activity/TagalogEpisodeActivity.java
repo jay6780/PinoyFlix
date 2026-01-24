@@ -1,16 +1,17 @@
 package com.m.freemovie.Activity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -524,15 +525,9 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             new WindowUtils(this,false,false);
-            int marginPx = (int) TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP,
-                    300,
-                    getResources().getDisplayMetrics()
-            );
-
             isLandScape = false;
             initTopPadding(70);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, marginPx);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dip2px(250));
             binding.relativeVideo.setLayoutParams(params);
             binding.fullWide.setVisibility(isFinish?View.GONE:View.VISIBLE);
             binding.rvEpisode.setVisibility(View.VISIBLE);
@@ -543,6 +538,14 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
             super.onBackPressed();
             finish();
         }
+    }
+
+    public int dip2px(float dpValue) {
+        final float scale = getResources(this).getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+    public static Resources getResources(Context context) {
+        return context.getResources();
     }
 
     @Override

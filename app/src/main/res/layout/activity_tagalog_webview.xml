@@ -13,7 +13,7 @@
         <RelativeLayout
             android:id="@+id/rl_webview"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="250dp"
             android:background="#000000">
 
             <LinearLayout
@@ -41,34 +41,34 @@
                     android:textSize="16sp" />
             </LinearLayout>
 
-        <WebView
-            android:id="@+id/webView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
+            <WebView
+                android:id="@+id/webView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_select"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Select episode to play" />
+
+            <ImageView
+                android:id="@+id/expand"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:elevation="20dp"
+                android:src="@mipmap/expand"
+                android:visibility="gone" />
+        </RelativeLayout>
 
         <TextView
-            android:id="@+id/tv_select"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Select episode to play" />
-
-        <ImageView
-            android:id="@+id/expand"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:elevation="20dp"
-            android:src="@mipmap/expand"
-            android:visibility="gone" />
-    </RelativeLayout>
-
-    <TextView
         android:layout_below="@+id/rl_webview"
         android:id="@+id/episodeTxt"
         android:layout_width="wrap_content"

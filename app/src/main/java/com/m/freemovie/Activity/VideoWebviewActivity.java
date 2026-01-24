@@ -12,7 +12,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
@@ -75,7 +74,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         videoPosition = getIntent().getIntExtra("videoPosition", 0);
         epNumber = getIntent().getIntExtra("epNumber", 0);
         apiPosition = getIntent().getIntExtra("apiPosition",1);
-        Log.d("ApiPosition","val: "+apiPosition);
+//        Log.d("ApiPosition","val: "+apiPosition);
         movieWatchListPresenter = new MovieWatchListPresenter(this);
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
@@ -151,6 +150,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         movieListAdapter = new MovieListAdapter(this);
         binding.rvMovielist.setLayoutManager(new LinearLayoutManager(this));
         binding.rvMovielist.setAdapter(movieListAdapter);
+        movieListAdapter.setPosition(apiPosition);
 
         binding.rvMovielist.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -161,7 +161,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                     int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
                     lastScroll = lastVisibleItemPosition;
                     int totalItemCount = layoutManager.getItemCount();
-                    if (lastVisibleItemPosition > 5) {
+                    if (lastVisibleItemPosition > 10) {
                         binding.llReset.setVisibility(View.VISIBLE);
                         initGuide();
                     } else if (lastVisibleItemPosition == 0) {
@@ -218,7 +218,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         binding.expand.setVisibility(View.VISIBLE);
         binding.rvMovielist.setVisibility(View.VISIBLE);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(300));
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(250));
         binding.rlWebview.setLayoutParams(params);
         binding.swipe.setEnabled(true);
         new WindowUtils(this,true,false);
@@ -321,11 +321,14 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
     }
 
     @Override
-    public void getMovieId(String id) {
+    public void getMovieId(String id,String title) {
         if(id.isEmpty() || id == null){
             return;
         }
-        videoUrl = "https://vidrock.net/movie/"+ id;
+        binding.webView.clearHistory();
+        this.videoUrl = "https://vidrock.net/movie/"+ id;
+        this.videoId = id;
+        this.title = title;
         initStart();
     }
 
@@ -366,6 +369,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 String downloadUrl = "https://dl.vidsrc.vip/movie/" + videoId;
                 Intent intent = new Intent(getApplicationContext(), DownloadWebview.class);
                 intent.putExtra("DownloadUrl", downloadUrl);
+                intent.putExtra("EpisodeNum", "");
                 intent.putExtra("title", title);
                 startActivity(intent);
                 return true;

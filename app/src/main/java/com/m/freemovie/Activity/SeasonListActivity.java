@@ -116,7 +116,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         binding.expand.setVisibility(View.VISIBLE);
         binding.rvSeason.setVisibility(View.VISIBLE);
         binding.episodeTxt.setVisibility(View.VISIBLE);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(300));
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(250));
         binding.rlWebview.setLayoutParams(params);
         new WindowUtils(this,true,false);
     }
@@ -191,6 +191,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                 initStart();
                 break;
             case 2:
+                binding.webView.clearHistory();
                 videoUrl = "https://vidrock.net/tv/"+id+"/"+seasonNum+"/"+epNumber+"&download=false";
                 binding.titleName.setVisibility(View.GONE);
                 initStart();

@@ -22,7 +22,7 @@ public class MovieListAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Ba
     private MovieIdListener movieIdListener;
     private  int lastPosition = -1;
     public interface MovieIdListener{
-        void getMovieId(String id);
+        void getMovieId(String id,String title);
     }
     public MovieListAdapter(MovieIdListener movieIdListener) {
         super(R.layout.movie_watch_item);
@@ -74,9 +74,8 @@ public class MovieListAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Ba
                     case 0:
                         if(lastPosition == (helper.getAdapterPosition())){
                             lastPosition = -1;
-                            movieIdListener.getMovieId("");
                         }else{
-                            movieIdListener.getMovieId(item.getId());
+                            movieIdListener.getMovieId(item.getId(),item.getTitle());
                             lastPosition = (helper.getAdapterPosition());
                             notifyItemChanged(helper.getAdapterPosition());
                         }

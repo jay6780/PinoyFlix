@@ -59,6 +59,7 @@ public class DownloadWebview extends AppCompatActivity {
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
+        hud.show();
 
         if(!isNetworkAvailable()){
             binding.webView.setVisibility(View.GONE);
@@ -179,10 +180,9 @@ public class DownloadWebview extends AppCompatActivity {
 
     private File getLocalFile() {
         String safeTitle = title.replaceAll("[^a-zA-Z0-9.-]", "_");
-        String Episode = EpisodeNum == null? "":" Ep_" + EpisodeNum;
-        String fileName = safeTitle +"_Episode_"+Episode+"_"+".mp4";
-        String dirName = safeTitle;
-
+        String Episode = EpisodeNum.isEmpty()? safeTitle +".mp4" :safeTitle +"_Episode_"+EpisodeNum+"_"+".mp4";
+        String fileName = Episode;
+        String dirName = fileName;
         File freeMovieDir = new File(getFilesDir(), "FreeMovie");
         if (!freeMovieDir.exists()) {
             freeMovieDir.mkdirs();
@@ -192,14 +192,13 @@ public class DownloadWebview extends AppCompatActivity {
         if (!movieDir.exists()) {
             movieDir.mkdirs();
         }
-        return new File(movieDir, fileName);
+        return new File(movieDir, dirName);
     }
 
     private void downloadVideo(String videoUrl) {
         isFirstTask = true;
         File outputFile = getLocalFile();
-
-        String Episode = EpisodeNum == null? "":" Ep: " + EpisodeNum;
+        String Episode = EpisodeNum.isEmpty()? "":" Ep: " + EpisodeNum ;
 
         downloadHud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.ANNULAR_DETERMINATE)

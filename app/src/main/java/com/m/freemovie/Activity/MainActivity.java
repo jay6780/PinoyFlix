@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private LinearLayout navigationView;
     private ImageView btn_back5;
     private static final int RESET_GUIDE_REQUEST_CODE = 100;
+    private long pressedTime;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -213,8 +215,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             binding.fragmentContainer.setVisibility(View.GONE);
             drawerLayout.requestDisallowInterceptTouchEvent(true);
         } else {
-            super.onBackPressed();
-            finish();
+            if (pressedTime + 2000 > System.currentTimeMillis()) {
+                super.onBackPressed();
+                finish();
+            } else {
+                Toast.makeText(getBaseContext(), "Press back again to exit", Toast.LENGTH_SHORT).show();
+            }
+            pressedTime = System.currentTimeMillis();
         }
     }
 
