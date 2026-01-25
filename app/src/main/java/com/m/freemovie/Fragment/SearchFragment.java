@@ -9,9 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -42,14 +45,12 @@ import com.m.freemovie.mvp.Presenter.RevivalSearchPresenter;
 import com.m.freemovie.mvp.Presenter.SearchPresenter;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class SearchFragment extends Fragment implements SearchContract.View,View.OnClickListener, RevivalSearchContract.View {
+public class SearchFragment extends Fragment implements SearchContract.View, View.OnClickListener, RevivalSearchContract.View, AdapterView.OnItemSelectedListener {
     private EditText et_search;
     private int page = 1;
     private RecyclerView rv_search;
@@ -75,6 +76,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     private Random random;
     private InputMethodManager mInputManager;
     private String toast;
+    private Spinner fragmentSpinner;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -83,6 +85,7 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         rv_search = view.findViewById(R.id.rv_search);
         btn_send = view.findViewById(R.id.btn_send);
         ll_reset = view.findViewById(R.id.ll_reset);
+        fragmentSpinner = view.findViewById(R.id.fragmentSpinner);
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
         revivalSearchPresenter = new RevivalSearchPresenter(this);
         searchPresenter = new SearchPresenter(this);
@@ -92,6 +95,14 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         tvRevivialSearchAdapter = new TvRevivialSearchAdapter();
         nineAnimeSearchAdapter = new NineAnimeSearchAdapter();
         animePaheSearchAdapter = new AnimePaheSearchAdapter();
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.Select_bookmark, R.layout.spinner_item);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        fragmentSpinner.setAdapter(adapter);
+        fragmentSpinner.setOnItemSelectedListener(this);
+        fragmentSpinner.setSelection(0);
+
         random = new Random();
         if(position == 1){
             int roll = random.nextInt(4) + 1;
@@ -175,82 +186,6 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
         rv_search.scrollToPosition(0);
         ll_reset.setVisibility(View.GONE);
     }
-    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    public void searchPosition(MovieEvent event) {
-        this.position = event.getPosition();
-//            Log.d("SearchPosition","value: "+position);
-        switch (position){
-            case 1:
-                et_search.setHint("Enter movie name");
-                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-                movieAdapter = new ViewAllAdapter();
-                rv_search.setAdapter(movieAdapter);
-                int roll = random.nextInt(4) + 1;
-                movieAdapter.setApiPosition(roll);
-                movieLists.clear();
-                if(ll_reset !=null){
-                    ll_reset.setVisibility(View.GONE);
-                }
-                break;
-
-            case 2:
-                et_search.setHint("Enter series name");
-                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-                movieAdapter = new ViewAllAdapter();
-                rv_search.setAdapter(movieAdapter);
-                movieLists.clear();
-                if(ll_reset !=null){
-                    ll_reset.setVisibility(View.GONE);
-                }
-                break;
-
-            case 3:
-                et_search.setHint("Enter tagalog series");
-                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-                tagalogSearchAdapter = new TagalogSearchAdapter();
-                rv_search.setAdapter(tagalogSearchAdapter);
-                tagaloglist.clear();
-                if(ll_reset !=null){
-                    ll_reset.setVisibility(View.GONE);
-                }
-                break;
-            case 4:
-            case 5:
-                et_search.setHint("Enter tagalog series");
-                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-                tvRevivialSearchAdapter = new TvRevivialSearchAdapter();
-                rv_search.setAdapter(tvRevivialSearchAdapter);
-                revivalList.clear();
-                if(ll_reset !=null){
-                    ll_reset.setVisibility(View.GONE);
-                }
-                break;
-            case 6:
-                et_search.setHint("Enter anime series");
-                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-                nineAnimeSearchAdapter = new NineAnimeSearchAdapter();
-                rv_search.setAdapter(nineAnimeSearchAdapter);
-                nineList.clear();
-                if(ll_reset !=null){
-                    ll_reset.setVisibility(View.GONE);
-                }
-                break;
-            case 7:
-                et_search.setHint("Enter anime series");
-                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-                animePaheSearchAdapter = new AnimePaheSearchAdapter();
-                rv_search.setAdapter(animePaheSearchAdapter);
-                animePaheList.clear();
-                if(ll_reset !=null){
-                    ll_reset.setVisibility(View.GONE);
-                }
-                break;
-
-        }
-    }
-
-
-
 
     private void refresh() {
         if (swipeRefreshLayout.isRefreshing()) {
@@ -499,7 +434,6 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
         if(position == 1){
             if(movieLists.isEmpty()){
                 EventBus.getDefault().post(new MovieEvent(1));
@@ -508,8 +442,109 @@ public class SearchFragment extends Fragment implements SearchContract.View,View
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
+    public void onItemSelected(AdapterView<?> adapterView, View view, int index, long l) {
+
+        switch (index){
+            case 0:
+                position = 1;
+                break;
+            case 1:
+                position = 2;
+                break;
+            case 2:
+                position = 7;
+                break;
+            case 3:
+                position = 3;
+                break;
+            case 4:
+                position = 4;
+                break;
+            case 5:
+                position = 5;
+                break;
+        }
+
+        searchAll();
+        if(et_search.getText().toString().isEmpty()) {
+            return;
+        }
+        searchData();
     }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
+    }
+    private void searchAll() {
+        switch (position){
+            case 1:
+                et_search.setHint("Enter movie name");
+                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+                movieAdapter = new ViewAllAdapter();
+                rv_search.setAdapter(movieAdapter);
+                int roll = random.nextInt(4) + 1;
+                movieAdapter.setApiPosition(roll);
+                movieLists.clear();
+                if(ll_reset !=null){
+                    ll_reset.setVisibility(View.GONE);
+                }
+                break;
+
+            case 2:
+                et_search.setHint("Enter series name");
+                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+                movieAdapter = new ViewAllAdapter();
+                rv_search.setAdapter(movieAdapter);
+                movieLists.clear();
+                if(ll_reset !=null){
+                    ll_reset.setVisibility(View.GONE);
+                }
+                break;
+
+            case 3:
+                et_search.setHint("Enter tagalog series");
+                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+                tagalogSearchAdapter = new TagalogSearchAdapter();
+                rv_search.setAdapter(tagalogSearchAdapter);
+                tagaloglist.clear();
+                if(ll_reset !=null){
+                    ll_reset.setVisibility(View.GONE);
+                }
+                break;
+            case 4:
+            case 5:
+                et_search.setHint("Enter tagalog series");
+                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+                tvRevivialSearchAdapter = new TvRevivialSearchAdapter();
+                rv_search.setAdapter(tvRevivialSearchAdapter);
+                revivalList.clear();
+                if(ll_reset !=null){
+                    ll_reset.setVisibility(View.GONE);
+                }
+                break;
+            case 6:
+                et_search.setHint("Enter anime series");
+                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+                nineAnimeSearchAdapter = new NineAnimeSearchAdapter();
+                rv_search.setAdapter(nineAnimeSearchAdapter);
+                nineList.clear();
+                if(ll_reset !=null){
+                    ll_reset.setVisibility(View.GONE);
+                }
+                break;
+            case 7:
+                et_search.setHint("Enter anime series");
+                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+                animePaheSearchAdapter = new AnimePaheSearchAdapter();
+                rv_search.setAdapter(animePaheSearchAdapter);
+                animePaheList.clear();
+                if(ll_reset !=null){
+                    ll_reset.setVisibility(View.GONE);
+                }
+                break;
+
+        }
+    }
+
 }

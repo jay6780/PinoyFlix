@@ -3,25 +3,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#313647">
-
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:textSize="18sp"
-        android:textColor="#ffffff"
-        android:text="Bookmark"/>
-
+        <Spinner
+            android:id="@+id/fragmentSpinner"
+            style="@style/CustomSpinnerStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="3dp" />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_bookmark"
         android:layout_width="match_parent"
+        android:layout_marginTop="3dp"
         android:layout_height="match_parent"/>
     </LinearLayout>
     <LinearLayout
@@ -35,11 +33,9 @@
         android:layout_alignParentEnd="true"
         android:gravity="center"
         android:layout_alignParentBottom="true">
-
         <ImageView
             android:layout_width="30dp"
             android:src="@mipmap/up_reset"
             android:layout_height="30dp"/>
-
     </LinearLayout>
 </RelativeLayout>

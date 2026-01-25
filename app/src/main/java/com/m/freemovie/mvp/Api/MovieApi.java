@@ -199,7 +199,4 @@ public interface MovieApi {
     @GET("animepahe/api")
     Observable<AnimePaheSearchBean> getPaheSearch(
             @Query("search") String search);
-
-
-
 }

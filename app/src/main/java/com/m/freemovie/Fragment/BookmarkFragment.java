@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,20 +21,15 @@ import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.adapter.DetailAdapter;
 import com.m.freemovie.databinding.FragmentBookmarkBinding;
 import com.m.freemovie.mvp.ClassBean.DetailBean;
-import com.m.freemovie.mvp.ClassBean.MovieEvent;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
-public class BookmarkFragment extends Fragment {
+public class BookmarkFragment extends Fragment implements AdapterView.OnItemSelectedListener {
     private DetailAdapter detailAdapter;
     private List<DetailBean> movieBeanList = new ArrayList<>();
     private FragmentBookmarkBinding binding;
     private BookmarkDbHelper dbHelper;
-    private int position = 1;
+    private int bookmarkposition = 1;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -40,6 +37,14 @@ public class BookmarkFragment extends Fragment {
         dbHelper = new BookmarkDbHelper(getContext());
         initRecycler();
         loadBookmarkData();
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.Select_bookmark, R.layout.spinner_item);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        binding.fragmentSpinner.setAdapter(adapter);
+        binding.fragmentSpinner.setOnItemSelectedListener(this);
+        binding.fragmentSpinner.setSelection(0);
+
         return binding.getRoot();
     }
 
@@ -96,7 +101,7 @@ public class BookmarkFragment extends Fragment {
         binding.llReset.setVisibility(View.GONE);
     }
     private void loadBookmarkData() {
-        List<DetailBean> bookmarks = dbHelper.getBookmarksByType(position);
+        List<DetailBean> bookmarks = dbHelper.getBookmarksByType(bookmarkposition);
         movieBeanList.clear();
         movieBeanList.addAll(bookmarks);
         if(detailAdapter !=null){
@@ -105,23 +110,35 @@ public class BookmarkFragment extends Fragment {
 
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
 
-    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    public void changeSearch(MovieEvent event) {
-        this.position = event.getPosition();
+        switch (position){
+            case 0:
+                bookmarkposition = 1;
+                break;
+            case 1:
+                bookmarkposition = 2;
+                break;
+            case 2:
+                bookmarkposition = 7;
+                break;
+            case 3:
+                bookmarkposition = 3;
+                break;
+            case 4:
+                bookmarkposition = 4;
+                break;
+            case 5:
+                bookmarkposition = 5;
+                break;
+        }
         loadBookmarkData();
-        detailAdapter.isTv(position);
+        detailAdapter.isTv(bookmarkposition);
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
+    public void onNothingSelected(AdapterView<?> adapterView) {
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
     }
 }

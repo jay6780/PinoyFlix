@@ -202,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         guideString.add("pahe_reset");
         guideString.add("Search_reset");
         guideString.add("MovieListReset");
+        guideString.add("view_all_reset_anime");
         for (String reset : guideString) {
             NewbieGuide.resetLabel(getApplicationContext(), reset);
         }

@@ -11,7 +11,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class TagalogEpisodeModel {
     public static void getTagalogEpisode(String url,final Callback<TagalogEpisodeBean> callback) {
-
         NetworkingUtils.getTagalogDub()
                 .getTagalogEpisode(url)
                 .observeOn(AndroidSchedulers.mainThread())
