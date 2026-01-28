@@ -321,14 +321,23 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
     }
 
     @Override
-    public void getMovieId(String id,String title) {
+    public void getMovieId(String id,String title, int position) {
         if(id.isEmpty() || id == null){
             return;
         }
         binding.webView.clearHistory();
-        this.videoUrl = "https://vidrock.net/movie/"+ id;
+
         this.videoId = id;
         this.title = title;
+
+        switch (position){
+            case 1:
+                this.videoUrl = "https://111movies.com/movie/"+ id;
+                break;
+            case 2:
+                this.videoUrl = "https://vidrock.net/movie/"+ id;
+                break;
+        }
         initStart();
     }
 
@@ -349,7 +358,6 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 if (hud != null && hud.isShowing()) {
                     hud.dismiss();
                     hud = null;
-                    blockAds(view);
                 }
             }
         }
@@ -376,31 +384,6 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
             } else {
                 view.stopLoading();
                 return true;
-            }
-        }
-    }
-
-
-    private void blockAds(WebView view) {
-        String tags = view.getUrl();
-        StringBuilder sb = new StringBuilder();
-        sb.append("javascript: ");
-        String[] allTag = tags.split(",");
-        for (String tag : allTag) {
-            String adTag = tag;
-            if (adTag.trim().length() > 0) {
-                adTag = adTag.trim();
-                if (adTag.contains("#")) {
-                    adTag = adTag.substring(adTag.indexOf("#") + 1);
-                    sb.append("document.getElementById(\'").append(adTag).append("\').remove();");
-
-                } else if (adTag.contains(".")) {
-                    adTag = adTag.substring(adTag.indexOf(".") + 1);
-                    sb.append("var esc=document.getElementsByClassName(\'").append(adTag).append("\');for (var i = esc.length - 1; i >= 0; i--){esc[i].remove();};");
-
-                } else {
-                    sb.append("var esc=document.getElementsByTagName(\'").append(adTag).append("\');for (var i = esc.length - 1; i >= 0; i--){esc[i].remove();};");
-                }
             }
         }
     }

@@ -32,28 +32,30 @@ import java.util.ArrayList;
 import java.util.List;
 public class SeasonListActivity extends AppCompatActivity implements EpisodeAdapter.SourceListener {
     private ActivitySeasonListBinding binding;
-    private String title,id,thumbImage,seasonId,tvSeriesName;
-    private int episodeCount,seasonNum;
+    private String title, id, thumbImage, seasonId, tvSeriesName;
+    private int episodeCount, seasonNum;
     private EpisodeAdapter episodeAdapter;
     private List<EpisodeBean> episodeBeanList = new ArrayList<>();
     private WatchHistoryDBHelper dbHelper;
     private boolean finishing = true;
     private String videoUrl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivitySeasonListBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
-        dbHelper = new WatchHistoryDBHelper(this);;
-        new WindowUtils(this,true,false);
+        dbHelper = new WatchHistoryDBHelper(this);
+        ;
+        new WindowUtils(this, true, false);
         title = getIntent().getStringExtra("title");
         id = getIntent().getStringExtra("id");
         seasonId = getIntent().getStringExtra("seasonId");
         thumbImage = getIntent().getStringExtra("thumbImage");
         tvSeriesName = getIntent().getStringExtra("tvSeriesName");
-        episodeCount = getIntent().getIntExtra("episodeCount",0);
-        seasonNum = getIntent().getIntExtra("seasonNum",0);
+        episodeCount = getIntent().getIntExtra("episodeCount", 0);
+        seasonNum = getIntent().getIntExtra("seasonNum", 0);
 //        Log.d("SeasonList","ids"+" videoId: "+id + " SeasonId: "+seasonId);
         binding.titleName.setText(tvSeriesName);
 
@@ -61,9 +63,9 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         binding.btnBackFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(finishing){
+                if (finishing) {
                     finish();
-                }else{
+                } else {
                     defaultScreen();
                 }
             }
@@ -75,20 +77,20 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         String lastWatchedEpisodeNumber = null;
         int lastWatchedPosition = -1;
         for (int i = 1; i <= episodeCount; i++) {
-            EpisodeBean episode = new EpisodeBean(i,thumbImage,seasonNum,id,title,seasonId);
+            EpisodeBean episode = new EpisodeBean(i, thumbImage, seasonNum, id, title, seasonId);
             boolean isWatched = dbHelper.isEpisodeWatched(id, seasonNum, i);
             episode.setWatched(isWatched);
             episodeBeanList.add(episode);
-            if(isWatched){
+            if (isWatched) {
                 lastWatchedPosition = episodeBeanList.size() - 1;
                 lastWatchedEpisodeNumber = String.valueOf(i);
             }
         }
 
-        binding.episodeTxt.setText(episodeCount > 1? "Episode's" : "Episode");
+        binding.episodeTxt.setText(episodeCount > 1 ? "Episode's" : "Episode");
         episodeAdapter.setNewData(episodeBeanList);
 
-        if(lastWatchedPosition != -1 && lastWatchedEpisodeNumber != null){
+        if (lastWatchedPosition != -1 && lastWatchedEpisodeNumber != null) {
             binding.rvSeason.smoothScrollToPosition(lastWatchedPosition);
             Toast.makeText(getApplicationContext(),
                     "Last Episode watched: Episode " + lastWatchedEpisodeNumber,
@@ -106,11 +108,11 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         binding.episodeTxt.setVisibility(View.GONE);
 
-        new WindowUtils(this,true,false);
+        new WindowUtils(this, true, false);
     }
 
 
-    private void defaultScreen(){
+    private void defaultScreen() {
         finishing = true;
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         binding.expand.setVisibility(View.VISIBLE);
@@ -118,12 +120,14 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         binding.episodeTxt.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(250));
         binding.rlWebview.setLayoutParams(params);
-        new WindowUtils(this,true,false);
+        new WindowUtils(this, true, false);
     }
+
     public int dip2px(float dpValue) {
         final float scale = getResources(this).getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
     }
+
     public static Resources getResources(Context context) {
         return context.getResources();
     }
@@ -150,6 +154,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onPause();
     }
+
     @Override
     public void onLowMemory() {
         super.onLowMemory();
@@ -174,25 +179,26 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
 
     @Override
     public void onBackPressed() {
-        if(!finishing){
+        if (!finishing) {
             defaultScreen();
-        }else{
+        } else {
             super.onBackPressed();
             finish();
         }
     }
 
     @Override
-    public void getId(String id,int position,int seasonNum,int epNumber) {
-        switch (position){
+    public void getId(String id, int position, int seasonNum, int epNumber) {
+        switch (position) {
             case 1:
-                videoUrl = "https://111movies.com/tv/"+id+"/"+seasonNum+"/"+epNumber;
+                binding.webView.clearHistory();
+                videoUrl = "https://111movies.com/tv/" + id + "/" + seasonNum + "/" + epNumber;
                 binding.titleName.setVisibility(View.VISIBLE);
                 initStart();
                 break;
             case 2:
                 binding.webView.clearHistory();
-                videoUrl = "https://vidrock.net/tv/"+id+"/"+seasonNum+"/"+epNumber+"&download=false";
+                videoUrl = "https://vidrock.net/tv/" + id + "/" + seasonNum + "/" + epNumber + "&download=false";
                 binding.titleName.setVisibility(View.GONE);
                 initStart();
                 break;
@@ -220,7 +226,8 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
 
     private void setupWebView(String videoUrl) {
         binding.webView.setWebViewClient(new CustomWebViewClient());
-        binding.webView.setWebChromeClient(new CustomWebChromeClient(){});
+        binding.webView.setWebChromeClient(new CustomWebChromeClient() {
+        });
         WebSettings webSettings = binding.webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
@@ -231,39 +238,8 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
-        String htmlContent = "<!DOCTYPE html>" +
-                "<html>" +
-                "<head>" +
-                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
-                "    <style>" +
-                "        .video-player {" +
-                "            position: fixed;" +
-                "            top: 0;" +
-                "            left: 0;" +
-                "            width: 100%;" +
-                "            height: 100%;" +
-                "            border: none;" +
-                "            object-fit: contain; /* Makes video fill while keeping aspect ratio */" +
-                "            background-color: #000; /* Black background for letterboxing */" +
-                "        }" +
-                "    </style>" +
-                "</head>" +
-                "<body style=\"margin:0;padding:0;overflow:hidden;background:#000;\">" +
-                "    <iframe src=\"" + videoUrl + "\"" +
-                "            class=\"video-player\"" +
-                "            allow=\"autoplay; encrypted-media; fullscreen\" " +
-                "            allowfullscreen>" +
-                "    </iframe>" +
-                "</body>" +
-                "</html>";
 
-        binding.webView.loadDataWithBaseURL(
-                null,
-                htmlContent,
-                "text/html",
-                "UTF-8",
-                null
-        );
+        binding.webView.loadUrl(videoUrl);
 
     }
 
@@ -272,6 +248,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
             return true;
         }
+
         @Override
         public Bitmap getDefaultVideoPoster() {
             return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888);
@@ -284,6 +261,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
             String url = request.getUrl().toString();
             return handleUrlLoading(view, url);
         }
+
         private boolean handleUrlLoading(WebView view, String url) {
             try {
                 if (url.contains(videoUrl)) {
@@ -292,16 +270,16 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                     view.stopLoading();
                     return true;
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 view.stopLoading();
                 view.clearCache(true);
             }
-           return  false;
+            return false;
         }
+
         @Override
         public void onPageFinished(WebView view, String url) {
-            blockAds(view);
             binding.webView.setVisibility(View.VISIBLE);
             binding.tvSelect.setVisibility(View.GONE);
             binding.expand.setVisibility(View.VISIBLE);
@@ -310,28 +288,4 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
 
     }
 
-
-    private void blockAds(WebView view) {
-        String tags = view.getUrl();
-        StringBuilder sb = new StringBuilder();
-        sb.append("javascript: ");
-        String[] allTag = tags.split(",");
-        for (String tag : allTag) {
-            String adTag = tag;
-            if (adTag.trim().length() > 0) {
-                adTag = adTag.trim();
-                if (adTag.contains("#")) {
-                    adTag = adTag.substring(adTag.indexOf("#") + 1);
-                    sb.append("document.getElementById(\'").append(adTag).append("\').remove();");
-
-                } else if (adTag.contains(".")) {
-                    adTag = adTag.substring(adTag.indexOf(".") + 1);
-                    sb.append("var esc=document.getElementsByClassName(\'").append(adTag).append("\');for (var i = esc.length - 1; i >= 0; i--){esc[i].remove();};");
-
-                } else {
-                    sb.append("var esc=document.getElementsByTagName(\'").append(adTag).append("\');for (var i = esc.length - 1; i >= 0; i--){esc[i].remove();};");
-                }
-            }
-        }
-    }
 }

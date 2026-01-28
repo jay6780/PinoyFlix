@@ -11,7 +11,7 @@
 
     <string-array name="Select_bookmark">
         <item>Movies</item>
-        <item>TvSeries</item>
+        <item>Tv Series</item>
         <item>Newest anime</item>
         <item>Hot anime</item>
         <item>Popular anime</item>

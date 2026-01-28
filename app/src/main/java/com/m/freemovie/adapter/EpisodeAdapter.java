@@ -1,5 +1,8 @@
 package com.m.freemovie.adapter;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageView;
@@ -60,15 +63,48 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
                     lastPosition = -1;
                 }else{
                     lastPosition = (helper.getAdapterPosition());
-                    sourceListener.getId(item.getId(),2,item.getSeasonNum(),item.getEpisodeNum());
-                    dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
-                            item.getSeasonNum(), item.getEpisodeNum(),item.getSeasonId());
-                    item.setWatched(true);
-                    notifyItemChanged(helper.getAdapterPosition());
-
+                    showVideoOptions(item,mContext,helper);
                 }
+
+            }
+        });
+    }
+
+    private void showVideoOptions(EpisodeBean item, Context mContext, BaseViewHolder helper) {
+        String[] videoPlayer = {"Player 1 (contains pop-up ads)", "Player 2"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        TextView titleView = new TextView(mContext);
+        titleView.setText("Select player");
+        titleView.setTextColor(Color.BLACK);
+        titleView.setPadding(40, 40, 40, 20);
+        titleView.setTextSize(15);
+        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
+                        item.getSeasonNum(), item.getEpisodeNum(),item.getSeasonId());
+                item.setWatched(true);
                 notifyDataSetChanged();
             }
         });
+
+        builder.setCustomTitle(titleView);
+
+        builder.setItems(videoPlayer, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case 0:
+                        sourceListener.getId(item.getId(),1,item.getSeasonNum(),item.getEpisodeNum());
+                        break;
+                    case 1:
+                        sourceListener.getId(item.getId(),2,item.getSeasonNum(),item.getEpisodeNum());
+                        break;
+                }
+
+            }
+        });
+        builder.show();
     }
 }
