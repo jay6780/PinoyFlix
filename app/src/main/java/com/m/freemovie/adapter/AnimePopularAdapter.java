@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.m.freemovie.Activity.AnimeDetailsActivity;
 import com.m.freemovie.Activity.TagalogWebviewActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
@@ -44,11 +45,9 @@ public class AnimePopularAdapter extends BaseQuickAdapter<RevivalSeriesBean.Resu
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view   ) {
-                Intent intent = new Intent(mContext, TagalogWebviewActivity.class);
+                Intent intent = new Intent(mContext, AnimeDetailsActivity.class);
                 intent.putExtra("id",item.getLink());
-                intent.putExtra("title",item.getTitle());
-                intent.putExtra("image",item.getPoster());
-                intent.putExtra("isMovie",isMovie);
+                intent.putExtra("apiPosition",3);
                 mContext.startActivity(intent);
             }
 

@@ -63,7 +63,12 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
                     lastPosition = -1;
                 }else{
                     lastPosition = (helper.getAdapterPosition());
-                    showVideoOptions(item,mContext,helper);
+                    sourceListener.getId(item.getId(),2,item.getSeasonNum(),item.getEpisodeNum());
+                    dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
+                            item.getSeasonNum(), item.getEpisodeNum(),item.getSeasonId());
+                    item.setWatched(true);
+                    notifyDataSetChanged();
+
                 }
 
             }
@@ -82,10 +87,7 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
-                        item.getSeasonNum(), item.getEpisodeNum(),item.getSeasonId());
-                item.setWatched(true);
-                notifyDataSetChanged();
+
             }
         });
 
@@ -99,7 +101,7 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
                         sourceListener.getId(item.getId(),1,item.getSeasonNum(),item.getEpisodeNum());
                         break;
                     case 1:
-                        sourceListener.getId(item.getId(),2,item.getSeasonNum(),item.getEpisodeNum());
+
                         break;
                 }
 

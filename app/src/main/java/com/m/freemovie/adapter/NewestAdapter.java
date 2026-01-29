@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.m.freemovie.Activity.AnimeDetailsActivity;
 import com.m.freemovie.Activity.AnimePaheWebviewActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
@@ -32,9 +33,10 @@ public class NewestAdapter extends BaseQuickAdapter<PaheLatestBean.ResultsBean.D
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mContext, AnimePaheWebviewActivity.class);
+                Intent intent = new Intent(mContext, AnimeDetailsActivity.class);
                 intent.putExtra("id",item.getAnime_session());
                 intent.putExtra("title",item.getAnime_title());
+                intent.putExtra("ApiPosition",1);
                 mContext.startActivity(intent);
             }
         });

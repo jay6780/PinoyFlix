@@ -39,11 +39,12 @@
                         android:src="@drawable/ic_baseline_arrow_back_24" />
 
                     <ImageView
+                        android:id="@+id/iv_book"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/iv_book"
-                        android:background="@drawable/unbooked"
-                        android:layout_alignParentEnd="true" />
+                        android:layout_alignParentEnd="true"
+                        android:visibility="gone"
+                        android:background="@drawable/unbooked" />
                 </RelativeLayout>
 
 
@@ -54,14 +55,10 @@
                     android:alpha="0.4"
                     android:scaleType="fitXY"
                     android:src="@drawable/noimage" />
-
-
-
                 <androidx.core.widget.NestedScrollView
                     android:id="@+id/nested"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_above="@+id/tv_watch"
                     android:layout_below="@+id/rl_back"
                     android:layout_marginBottom="5dp">
 
@@ -75,6 +72,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="20dp"
+                            android:maxLines="1"
+                            android:ellipsize="end"
                             android:textSize="20sp" />
 
 
@@ -217,65 +216,15 @@
                             android:textStyle="bold" />
 
 
-                        <TextView
-                            android:id="@+id/status"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/tv_vote"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginTop="5dp"
-                            android:layout_toRightOf="@+id/card"
-                            android:text="Status"
-                            android:textColor="#7C7C7C"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tv_status"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/status"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginTop="5dp"
-                            android:layout_toRightOf="@+id/card"
-                            android:text="0"
-                            android:textColor="@color/SecondColor"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
 
 
-                        <TextView
-                            android:id="@+id/revenue"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/tv_status"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginTop="5dp"
-                            android:layout_toRightOf="@+id/card"
-                            android:text="Revenue"
-                            android:textColor="#7C7C7C"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tv_revenue"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/revenue"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginTop="5dp"
-                            android:layout_toRightOf="@+id/card"
-                            android:text="0"
-                            android:textColor="@color/SecondColor"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
 
 
                         <TextView
                             android:id="@+id/orig"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_below="@+id/tv_revenue"
+                            android:layout_below="@+id/card"
                             android:layout_marginStart="15dp"
                             android:text="Orinal Title"
                             android:textColor="#7C7C7C"
@@ -318,20 +267,6 @@
                             android:textStyle="bold" />
                     </RelativeLayout>
                 </androidx.core.widget.NestedScrollView>
-
-                <TextView
-                    android:id="@+id/tv_watch"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginStart="50dp"
-                    android:layout_marginEnd="50dp"
-                    android:layout_marginBottom="10dp"
-                    android:background="@drawable/bg_button"
-                    android:gravity="center"
-                    android:padding="15dp"
-                    android:text="Watch now"
-                    android:textSize="18sp" />
             </RelativeLayout>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
@@ -343,6 +278,5 @@
         android:layout_height="match_parent"
         android:layout_marginTop="30dp"
         android:fillViewport="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:visibility="gone" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -6,7 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.m.freemovie.Activity.TagalogEpisodeActivity;
+import com.m.freemovie.Activity.AnimeDetailsActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
@@ -32,10 +32,11 @@ public class HotAdapter extends BaseQuickAdapter<TagalogBean.ResultsBean, BaseVi
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mContext, TagalogEpisodeActivity.class);
+                Intent intent = new Intent(mContext, AnimeDetailsActivity.class);
                 intent.putExtra("imageUrl",item.getImage());
                 intent.putExtra("url",item.getLink().trim());
                 intent.putExtra("title",item.getTitle());
+                intent.putExtra("apiPosition",2);
                 mContext.startActivity(intent);
             }
         });

@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.m.freemovie.Activity.AnimeDetailsActivity;
 import com.m.freemovie.Activity.TagalogEpisodeActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
@@ -38,10 +39,11 @@ public class TagalogSearchAdapter extends BaseQuickAdapter<TagalogSearchBean.Res
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mContext, TagalogEpisodeActivity.class);
+                Intent intent = new Intent(mContext, AnimeDetailsActivity.class);
                 intent.putExtra("imageUrl",item.getCoverImage());
                 intent.putExtra("url",item.getLink().trim());
                 intent.putExtra("title",item.getTitle());
+                intent.putExtra("apiPosition",2);
                 mContext.startActivity(intent);
             }
         });

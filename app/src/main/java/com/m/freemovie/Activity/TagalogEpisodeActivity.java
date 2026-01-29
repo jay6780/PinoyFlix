@@ -336,9 +336,11 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
                         String episode = dataEpisode.getEpisode();
                         if (!seenEpisodes.contains(episode)) {
                             seenEpisodes.add(episode);
-                            boolean isWatched = dbHelper.isEpisodeWatched(dataEpisode.getVideoUrl(),episode);
+                            boolean isWatched = dbHelper.isEpisodeWatched(url,episode);
                             tagalogEpisode.setWatched(isWatched);
+
                             tagalogEpisodeList.add(tagalogEpisode);
+                            tagalogEpisode.setVideoId(url);
 
                             binding.episodeTxt.setText(tagalogEpisodeList.size() > 1? "Episode's" : "Episode");
                             if(isWatched){

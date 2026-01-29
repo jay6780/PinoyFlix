@@ -321,24 +321,20 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
     }
 
     @Override
-    public void getMovieId(String id,String title, int position) {
+    public void getMovieId(String id,String title) {
         if(id.isEmpty() || id == null){
             return;
         }
         binding.webView.clearHistory();
-
-        this.videoId = id;
         this.title = title;
-
-        switch (position){
-            case 1:
-                this.videoUrl = "https://111movies.com/movie/"+ id;
-                break;
-            case 2:
-                this.videoUrl = "https://vidrock.net/movie/"+ id;
-                break;
-        }
-        initStart();
+        this.videoId = id;
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+             videoUrl = "https://vidrock.net/movie/"+ id;
+             initStart();
+            }
+        }, 500);
     }
 
     private class CustomWebChromeClient extends WebChromeClient {
@@ -400,16 +396,19 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
             }
         }
         if (videoPosition == 6 && binding != null && binding.webView != null) {
-            new Handler().postDelayed(() -> {
-                if (binding != null && binding.webView != null) {
-                    if (hud != null && hud.isShowing()) {
-                        hud.dismiss();
-                        hud = null;
+            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (binding != null && binding.webView != null) {
+                        if (hud != null && hud.isShowing()) {
+                            hud.dismiss();
+                            hud = null;
+                        }
+                        binding.webView.clearCache(true);
+                        binding.webView.stopLoading();
                     }
-                    binding.webView.clearCache(true);
-                    binding.webView.stopLoading();
                 }
-            }, 300);
+            }, 500);
         }
     }
 

@@ -6,12 +6,21 @@ public class AnimePaheBeanList {
     String imageUrl;
     String session;
     boolean isWatched;
+    private String videoId;
 
     public AnimePaheBeanList(String EpisodeUrl, String Episode, String imageUrl,String session){
         this.EpisodeUrl = EpisodeUrl;
         this.Episode = Episode;
         this.imageUrl = imageUrl;
         this.session = session;
+    }
+
+    public String getVideoId() {
+        return videoId;
+    }
+
+    public void setVideoId(String videoId) {
+        this.videoId = videoId;
     }
 
     public String getSession() {

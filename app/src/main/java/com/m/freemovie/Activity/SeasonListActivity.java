@@ -9,6 +9,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
@@ -198,9 +200,14 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                 break;
             case 2:
                 binding.webView.clearHistory();
-                videoUrl = "https://vidrock.net/tv/" + id + "/" + seasonNum + "/" + epNumber + "&download=false";
-                binding.titleName.setVisibility(View.GONE);
-                initStart();
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        videoUrl = "https://vidrock.net/tv/" + id + "/" + seasonNum + "/" + epNumber + "&download=false";
+                        binding.titleName.setVisibility(View.GONE);
+                        initStart();
+                    }
+                }, 500);
                 break;
         }
     }

@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.m.freemovie.Activity.AnimeDetailsActivity;
 import com.m.freemovie.Activity.TagalogWebviewActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
@@ -34,11 +35,9 @@ public class TvRevivialSearchAdapter extends BaseQuickAdapter<RevivalSearchBean.
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mContext, TagalogWebviewActivity.class);
+                Intent intent = new Intent(mContext, AnimeDetailsActivity.class);
                 intent.putExtra("id",item.getLink());
-                intent.putExtra("title",item.getTitle());
-                intent.putExtra("image",item.getImage());
-                intent.putExtra("isMovie",item.getType().equals("Movie")? true:false);
+                intent.putExtra("apiPosition",item.getType().equals("Movie")? 4:3);
                 mContext.startActivity(intent);
             }
 

@@ -423,7 +423,8 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             if (episodeBean.getResults().getData() != null) {
                 for (AnimePaheEpisodeBean.ResultsBean.DataBean dataBean : episodeBean.getResults().getData()) {
                     AnimePaheBeanList detailBean = new AnimePaheBeanList(String.valueOf(dataBean.getId()), String.valueOf(dataBean.getEpisode()), dataBean.getSnapshot(), dataBean.getSession());
-                    boolean isWatched = dbHelper.isEpisodeWatched(String.valueOf(dataBean.getId()), String.valueOf(dataBean.getEpisode()));
+                    boolean isWatched = dbHelper.isEpisodeWatched(id, String.valueOf(dataBean.getEpisode()));
+                    detailBean.setVideoId(id);
                     detailBean.setWatched(isWatched);
                     episodeBeanList.add(detailBean);
                     if(isWatched){

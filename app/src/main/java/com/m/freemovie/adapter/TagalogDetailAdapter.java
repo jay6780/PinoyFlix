@@ -59,7 +59,7 @@ public class TagalogDetailAdapter extends BaseQuickAdapter<TagalogDetailBean, Ba
                     lastPosition = -1;
                     videoPlayListerner.getVideoUrl("");
                 }else{
-                    dbHelper.markEpisodeAsWatched(item.getEpisodeUrl(), item.getEpisode());
+                    dbHelper.markEpisodeAsWatched(item.getVideoId(), item.getEpisode());
                     lastPosition = (helper.getAdapterPosition());
                     videoPlayListerner.getVideoUrl(item.getEpisodeUrl());
                     item.setWatched(true);

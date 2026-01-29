@@ -404,7 +404,7 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
                         detailBean.setWatched(isWatched);
 
                         episodeBeanList.add(detailBean);
-
+                        detailBean.setVideoId(id);
                         if(isWatched){
                             lastWatchedPosition = episodeBeanList.size() - 1;
                             lastWatchedEpisodeNumber = episode;

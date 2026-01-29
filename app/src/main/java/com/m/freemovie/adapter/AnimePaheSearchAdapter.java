@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.m.freemovie.Activity.AnimeDetailsActivity;
 import com.m.freemovie.Activity.AnimePaheWebviewActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
@@ -35,9 +36,9 @@ public class AnimePaheSearchAdapter extends BaseQuickAdapter<AnimePaheSearchBean
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mContext, AnimePaheWebviewActivity.class);
+                Intent intent = new Intent(mContext, AnimeDetailsActivity.class);
                 intent.putExtra("id",item.getSession());
-                intent.putExtra("title",item.getTitle());
+                intent.putExtra("apiPosition",1);
                 mContext.startActivity(intent);
             }
 

@@ -87,7 +87,7 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case 0:
-                        dbHelper.markEpisodeAsWatched(item.getEpisodeUrl(), item.getEpisode());
+                        dbHelper.markEpisodeAsWatched(item.getVideoId(), item.getEpisode());
                         lastPosition = (helper.getAdapterPosition());
                         videoPlayListerner.getVideoUrl(item.getSession(),false,"");
                         item.setWatched(true);

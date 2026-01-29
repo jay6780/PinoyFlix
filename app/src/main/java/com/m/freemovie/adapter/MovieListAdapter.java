@@ -22,7 +22,7 @@ public class MovieListAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Ba
     private MovieIdListener movieIdListener;
     private  int lastPosition = -1;
     public interface MovieIdListener{
-        void getMovieId(String id,String title,int position);
+        void getMovieId(String id,String title);
     }
     public MovieListAdapter(MovieIdListener movieIdListener) {
         super(R.layout.movie_watch_item);
@@ -68,37 +68,20 @@ public class MovieListAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Ba
 
     private void showDialog(MovieBean.ResultsBean item, BaseViewHolder helper) {
 
-        String[] option = {"Player 1 (contains pop-up ads)","Player 2" ,"View Details"};
+        String[] option = {"Watch" ,"View Details"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        TextView titleView = new TextView(mContext);
-        titleView.setText("Options");
-        titleView.setTextColor(Color.BLACK);
-        titleView.setPadding(40, 40, 40, 20);
-        titleView.setTextSize(15);
-
-        builder.setCustomTitle(titleView);
-
-        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                lastPosition = (helper.getAdapterPosition());
-                notifyItemChanged(helper.getAdapterPosition());
-                notifyDataSetChanged();
-            }
-        });
-
         builder.setItems(option, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case 0:
-                        movieIdListener.getMovieId(item.getId(),item.getTitle(),1);
+                        movieIdListener.getMovieId(item.getId(),item.getTitle());
+                        lastPosition = (helper.getAdapterPosition());
+                        notifyItemChanged(helper.getAdapterPosition());
+                        notifyDataSetChanged();
                         break;
                     case 1:
-                        movieIdListener.getMovieId(item.getId(),item.getTitle(),2);
-                        break;
-                    case 2:
                         Intent intent = new Intent(mContext, Details_activity.class);
                         intent.putExtra("id",item.getId());
                         intent.putExtra("position",1);

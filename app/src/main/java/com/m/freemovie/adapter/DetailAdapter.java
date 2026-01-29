@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.m.freemovie.Activity.AnimeDetailsActivity;
 import com.m.freemovie.Activity.AnimePaheWebviewActivity;
 import com.m.freemovie.Activity.Details_activity;
 import com.m.freemovie.Activity.NineAnimeEpsiodeActivity;
@@ -51,29 +52,31 @@ public class DetailAdapter extends BaseQuickAdapter<DetailBean, BaseViewHolder> 
                         intent.putExtra("position",position);
                         break;
                     case 3:
-                        intent = new Intent(mContext, TagalogEpisodeActivity.class);
+                        intent = new Intent(mContext, AnimeDetailsActivity.class);
                         intent.putExtra("imageUrl",item.getTempImage());
                         intent.putExtra("url",item.getVideoId());
                         intent.putExtra("title",item.getMovieName());
+                        intent.putExtra("apiPosition",2);
                         break;
                     case 4:
-                    case 5:
-                        intent = new Intent(mContext, TagalogWebviewActivity.class);
+                        intent = new Intent(mContext, AnimeDetailsActivity.class);
+                        intent.putExtra("apiPosition",3);
                         intent.putExtra("id",item.getVideoId());
-                        intent.putExtra("title",item.getMovieName());
-                        intent.putExtra("image",item.getTempImage());
-                        intent.putExtra("isMovie",item.getIsMovie().equals("true")? true:false);
+                        break;
+                    case 5:
+                        intent = new Intent(mContext, AnimeDetailsActivity.class);
+                        intent.putExtra("apiPosition",4);
+                        intent.putExtra("id",item.getVideoId());
                         break;
 
                     case 6:
-                        intent = new Intent(mContext, NineAnimeEpsiodeActivity.class);
+                        intent = new Intent(mContext, AnimeDetailsActivity.class);
                         intent.putExtra("videoId",item.getVideoId());
-                        intent.putExtra("title",item.getMovieName());
                         break;
                     case 7:
-                        intent = new Intent(mContext, AnimePaheWebviewActivity.class);
+                        intent = new Intent(mContext, AnimeDetailsActivity.class);
                         intent.putExtra("id",item.getVideoId());
-                        intent.putExtra("title",item.getMovieName());
+                        intent.putExtra("apiPosition",1);
                         break;
 
                 }

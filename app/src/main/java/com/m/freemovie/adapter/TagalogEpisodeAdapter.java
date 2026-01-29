@@ -82,7 +82,7 @@ public class TagalogEpisodeAdapter extends BaseQuickAdapter<TagalogEpisode, Base
             public void onClick(DialogInterface dialog, int which) {
                switch (which){
                    case 0:
-                       dbHelper.markEpisodeAsWatched(item.getVideoUrl(), item.getEpisode());
+                       dbHelper.markEpisodeAsWatched(item.getVideoId(), item.getEpisode());
                        item.setWatched(true);
                        videoPlayListerner.getVideoUrl(item.getVideoUrl());
                        notifyDataSetChanged();
