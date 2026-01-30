@@ -400,7 +400,7 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
                     if (!seenEpisodes.contains(episode)) {
                         seenEpisodes.add(episode);
                         TagalogDetailBean detailBean = new TagalogDetailBean(data.getEpisodeUrl(), episode, image);
-                        boolean isWatched = dbHelper.isEpisodeWatched(data.getEpisodeUrl(), episode);
+                        boolean isWatched = dbHelper.isEpisodeWatched(id, episode);
                         detailBean.setWatched(isWatched);
 
                         episodeBeanList.add(detailBean);
