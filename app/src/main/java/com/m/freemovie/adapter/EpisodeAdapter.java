@@ -61,22 +61,15 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
             public void onClick(View view) {
                 if(lastPosition == (helper.getAdapterPosition())){
                     lastPosition = -1;
-                }else{
-                    lastPosition = (helper.getAdapterPosition());
-                    sourceListener.getId(item.getId(),2,item.getSeasonNum(),item.getEpisodeNum());
-                    dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
-                            item.getSeasonNum(), item.getEpisodeNum(),item.getSeasonId());
-                    item.setWatched(true);
-                    notifyDataSetChanged();
-
+                }else {
+                    showVideoOptions(item,mContext,helper);
                 }
-
             }
         });
     }
 
     private void showVideoOptions(EpisodeBean item, Context mContext, BaseViewHolder helper) {
-        String[] videoPlayer = {"Player 1 (contains pop-up ads)", "Player 2"};
+        String[] videoPlayer = {"Player 1 ( Click again if not load )", "Player 2"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         TextView titleView = new TextView(mContext);
@@ -98,13 +91,22 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case 0:
-                        sourceListener.getId(item.getId(),1,item.getSeasonNum(),item.getEpisodeNum());
+                        lastPosition = (helper.getAdapterPosition());
+                        sourceListener.getId(item.getId(), 1, item.getSeasonNum(), item.getEpisodeNum());
+                        dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
+                                item.getSeasonNum(), item.getEpisodeNum(), item.getSeasonId());
+                        item.setWatched(true);
+                        notifyDataSetChanged();
                         break;
                     case 1:
-
+                        lastPosition = (helper.getAdapterPosition());
+                        sourceListener.getId(item.getId(), 2, item.getSeasonNum(), item.getEpisodeNum());
+                        dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
+                                item.getSeasonNum(), item.getEpisodeNum(), item.getSeasonId());
+                        item.setWatched(true);
+                        notifyDataSetChanged();
                         break;
                 }
-
             }
         });
         builder.show();

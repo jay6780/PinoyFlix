@@ -9,8 +9,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
@@ -49,7 +47,6 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
         dbHelper = new WatchHistoryDBHelper(this);
-        ;
         new WindowUtils(this, true, false);
         title = getIntent().getStringExtra("title");
         id = getIntent().getStringExtra("id");
@@ -191,30 +188,26 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
 
     @Override
     public void getId(String id, int position, int seasonNum, int epNumber) {
+        if(!isNetworkAvailable()){
+            Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        binding.webView.clearCache(true);
         switch (position) {
             case 1:
-                binding.webView.clearHistory();
-                videoUrl = "https://111movies.com/tv/" + id + "/" + seasonNum + "/" + epNumber;
+                videoUrl = "https://player.videasy.net/tv/"+id+"/"+seasonNum+"/"+ epNumber;
                 binding.titleName.setVisibility(View.VISIBLE);
-                initStart();
+                setupWebView(videoUrl);
                 break;
             case 2:
-                binding.webView.clearHistory();
-                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        videoUrl = "https://vidrock.net/tv/" + id + "/" + seasonNum + "/" + epNumber + "&download=false";
-                        binding.titleName.setVisibility(View.GONE);
-                        initStart();
-                    }
-                }, 500);
+                videoUrl = "https://vidrock.net/tv/" + id + "/" + seasonNum + "/" + epNumber + "&download=false";
+                binding.titleName.setVisibility(View.GONE);
+                setupWebView(videoUrl);
                 break;
         }
     }
 
     private void initStart() {
-        if (binding == null) return;
-
         if (!isNetworkAvailable()) {
             binding.webView.setVisibility(View.GONE);
             binding.tvSelect.setVisibility(View.VISIBLE);
@@ -242,10 +235,10 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         webSettings.setBuiltInZoomControls(false);
         webSettings.setSupportZoom(false);
 
+        webSettings.setMediaPlaybackRequiresUserGesture(false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
-
         binding.webView.loadUrl(videoUrl);
 
     }
@@ -279,8 +272,6 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                view.stopLoading();
-                view.clearCache(true);
             }
             return false;
         }
@@ -294,5 +285,4 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         }
 
     }
-
 }

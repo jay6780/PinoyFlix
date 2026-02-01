@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -251,18 +250,20 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
 
     private void setupWebView(String videoUrl) {
         binding.webView.setWebViewClient(new CustomWebViewClient());
-        binding.webView.setWebChromeClient(new CustomWebChromeClient(){});
+        binding.webView.setWebChromeClient(new CustomWebChromeClient() {
+        });
         WebSettings webSettings = binding.webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
         webSettings.setDisplayZoomControls(false);
         webSettings.setBuiltInZoomControls(false);
         webSettings.setSupportZoom(false);
-
+        webSettings.setMediaPlaybackRequiresUserGesture(false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
         binding.webView.loadUrl(videoUrl);
+
     }
 
     @Override
@@ -319,32 +320,35 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
             Toast.makeText(getApplicationContext(),"No more movies",Toast.LENGTH_SHORT).show();
         }
     }
-
     @Override
-    public void getMovieId(String id,String title) {
-        if(id.isEmpty() || id == null){
+    public void getMovieId(String id,String title, int position) {
+        if(!isNetworkAvailable()){
+            Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
             return;
         }
-        binding.webView.clearHistory();
         this.title = title;
         this.videoId = id;
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-             videoUrl = "https://vidrock.net/movie/"+ id;
-             initStart();
-            }
-        }, 500);
+        binding.webView.clearCache(true);
+        switch (position){
+            case 1:
+                binding.titleName.setVisibility(View.VISIBLE);
+                binding.titleName.setText(title);
+                videoUrl ="https://player.videasy.net/movie/"+id;
+                setupWebView(videoUrl);
+                break;
+            case 2:
+                binding.titleName.setVisibility(View.GONE);
+                videoUrl = "https://vidrock.net/movie/"+ id;
+                setupWebView(videoUrl);
+                break;
+        }
+
     }
 
     private class CustomWebChromeClient extends WebChromeClient {
         @Override
         public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
             return true;
-        }
-        @Override
-        public Bitmap getDefaultVideoPoster() {
-            return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888);
         }
 
         @Override
@@ -382,6 +386,11 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 return true;
             }
         }
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+        }
+
     }
 
     @Override

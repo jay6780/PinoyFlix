@@ -22,7 +22,7 @@ public class MovieListAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Ba
     private MovieIdListener movieIdListener;
     private  int lastPosition = -1;
     public interface MovieIdListener{
-        void getMovieId(String id,String title);
+        void getMovieId(String id,String title,int position);
     }
     public MovieListAdapter(MovieIdListener movieIdListener) {
         super(R.layout.movie_watch_item);
@@ -68,7 +68,7 @@ public class MovieListAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Ba
 
     private void showDialog(MovieBean.ResultsBean item, BaseViewHolder helper) {
 
-        String[] option = {"Watch" ,"View Details"};
+        String[] option = {"Player 1 ( Click again if not load )","Player 2" ,"View Details"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setItems(option, new DialogInterface.OnClickListener() {
@@ -76,12 +76,17 @@ public class MovieListAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Ba
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case 0:
-                        movieIdListener.getMovieId(item.getId(),item.getTitle());
+                        movieIdListener.getMovieId(item.getId(),item.getTitle(),1);
+                        lastPosition = (helper.getAdapterPosition());
+                        notifyDataSetChanged();
+                        break;
+                    case 1:
+                        movieIdListener.getMovieId(item.getId(),item.getTitle(),2);
                         lastPosition = (helper.getAdapterPosition());
                         notifyItemChanged(helper.getAdapterPosition());
                         notifyDataSetChanged();
                         break;
-                    case 1:
+                    case 2:
                         Intent intent = new Intent(mContext, Details_activity.class);
                         intent.putExtra("id",item.getId());
                         intent.putExtra("position",1);
