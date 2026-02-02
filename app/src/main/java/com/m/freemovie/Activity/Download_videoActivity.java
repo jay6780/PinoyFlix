@@ -62,7 +62,7 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
         btn_back5.setOnClickListener(view -> onBackPressed());
         delete_btn.setImageResource(R.mipmap.delete_white);
         ll_bg.setBackgroundColor(Color.parseColor("#313647"));
-        btn_back5.setImageResource(R.mipmap.back_white);
+        btn_back5.setImageResource(R.mipmap.icon_backwhite);
     }
 
     private void setupFileList() {

@@ -300,7 +300,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
                     break;
             }
     }
-
+    @SuppressWarnings("deprecation")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;

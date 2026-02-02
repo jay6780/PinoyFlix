@@ -24,8 +24,8 @@ public class MovieAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, BaseVi
         String posterPath = "https://image.tmdb.org/t/p/w500/"+item.getPoster_path();
 
         Glide.with(mContext)
-                .asBitmap().
-                load(posterPath)
+                .asBitmap()
+                .load(posterPath)
                 .placeholder(R.drawable.noimage)
                 .into(iv_thumb);
 

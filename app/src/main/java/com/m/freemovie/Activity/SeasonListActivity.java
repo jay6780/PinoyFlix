@@ -217,7 +217,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
             setupWebView(videoUrl);
         }
     }
-
+    @SuppressWarnings("deprecation")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;

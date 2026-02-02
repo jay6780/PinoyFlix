@@ -141,7 +141,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         movieAdapter.isMovie(true);
 
     }
-
+    @SuppressWarnings("deprecation")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);

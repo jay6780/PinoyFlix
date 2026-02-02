@@ -199,7 +199,7 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
         boolean isBookmarked = bookmarkDbHelper.isBookmarked(videoId);
         binding.ivHeart.setImageResource(!isBookmarked? R.mipmap.heart_no :R.mipmap.heart_yes);
     }
-
+    @SuppressWarnings("deprecation")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;

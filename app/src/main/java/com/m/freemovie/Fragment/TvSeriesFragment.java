@@ -116,7 +116,7 @@ public class TvSeriesFragment extends Fragment implements TvSeriesContract.View,
             recyclerView.scrollToPosition(0);
         }
     }
-
+    @SuppressWarnings("deprecation")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);

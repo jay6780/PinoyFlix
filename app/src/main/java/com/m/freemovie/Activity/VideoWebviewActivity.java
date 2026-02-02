@@ -88,7 +88,18 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         }
         initRecyclerMovie();
 
-        videoUrl = "https://vidrock.net/movie/"+ videoId;
+        switch (videoPosition){
+            case 1:
+                binding.titleName.setVisibility(View.VISIBLE);
+                binding.titleName.setText(title);
+                videoUrl ="https://player.videasy.net/movie/"+videoId;
+                break;
+            case 2:
+                binding.titleName.setVisibility(View.GONE);
+                videoUrl = "https://vidrock.net/movie/"+ videoId;
+                break;
+        }
+
 //        Log.d("VideoUrl","value: "+videoUrl);
 
         binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -241,7 +252,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
             setupWebView(videoUrl);
         }
     }
-
+    @SuppressWarnings("deprecation")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;

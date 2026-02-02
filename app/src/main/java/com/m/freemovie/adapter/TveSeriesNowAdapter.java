@@ -15,15 +15,14 @@ import com.m.freemovie.mvp.ClassBean.TvSeriesBean;
 public class TveSeriesNowAdapter extends BaseQuickAdapter<TvSeriesBean.ResultsBean, BaseViewHolder> {
 
     public TveSeriesNowAdapter() {
-        super(R.layout.item_movie_now);
+        super(R.layout.movie_item);
     }
 
     @Override
     protected void convert(BaseViewHolder helper, TvSeriesBean.ResultsBean item) {
-        TextView tv_title = helper.getView(R.id.tv_title);
-        TextView tv_description = helper.getView(R.id.tv_description);
+        TextView tv_title  = helper.getView(R.id.tv_title);
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
-        ImageView smallimg = helper.getView(R.id.smallimg);
+
 
         String posterPath = "https://image.tmdb.org/t/p/w500/"+item.getPoster_path();
 
@@ -33,15 +32,7 @@ public class TveSeriesNowAdapter extends BaseQuickAdapter<TvSeriesBean.ResultsBe
                 .placeholder(R.drawable.noimage)
                 .into(iv_thumb);
 
-
-        Glide.with(mContext)
-                .asBitmap().
-                load(posterPath)
-                .placeholder(R.drawable.noimage)
-                .into(smallimg);
-
         tv_title.setText(item.getOriginal_name());
-        tv_description.setText(item.getOverview());
 
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override

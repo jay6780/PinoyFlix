@@ -1,5 +1,7 @@
 package com.m.freemovie.Fragment;
 
+import static com.zhpan.bannerview.utils.BannerUtils.dp2px;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -20,11 +22,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.m.freemovie.Activity.ViewAllActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.adapter.MovieAdapter;
-import com.m.freemovie.adapter.MovieNowAdapter;
+import com.m.freemovie.adapter.MovieCarouselAdapter;
 import com.m.freemovie.databinding.FragmentMovieBinding;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Contract.MovieContract;
 import com.m.freemovie.mvp.Presenter.MoviePresenter;
+import com.zhpan.bannerview.BannerViewPager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +37,6 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
     private MoviePresenter moviePresenter;
     private int page = 1;
     private MovieAdapter popularAdapter,topRatedAdapter,upcommingAdapter;
-    private MovieNowAdapter movieNowAdapter;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -43,7 +45,6 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
         List<View> viewsList = new ArrayList<>();
         viewsList.add(binding.tvPopular);
         viewsList.add(binding.tvTopRated);
-        viewsList.add(binding.tvNowPlaying);
         viewsList.add(binding.tvUpComing);
 
         for(View v : viewsList){
@@ -89,12 +90,10 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
     private void clearAllData() {
         binding.rlUpcoming.setVisibility(View.GONE);
         binding.rlTopRated.setVisibility(View.GONE);
-        binding.rlNow.setVisibility(View.GONE);
         binding.rlPopular.setVisibility(View.GONE);
         binding.rvPopular.setVisibility(View.GONE);
         binding.rvTopRated.setVisibility(View.GONE);
         binding.rvUpComing.setVisibility(View.GONE);
-        binding.rvNowPlaying.setVisibility(View.GONE);
         List<MovieAdapter> movieAdapters = new ArrayList<>();
         movieAdapters.add(popularAdapter);
         movieAdapters.add(upcommingAdapter);
@@ -102,10 +101,8 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
         for(MovieAdapter movieAdapter : movieAdapters){
             movieAdapter.setNewData(new ArrayList<>());
         }
-        movieNowAdapter.setNewData(new ArrayList<>());
 
         List<RecyclerView> recyclerViewList = new ArrayList<>();
-        recyclerViewList.add(binding.rvNowPlaying);
         recyclerViewList.add(binding.rvPopular);
         recyclerViewList.add(binding.rvTopRated);
         recyclerViewList.add(binding.rvUpComing);
@@ -114,7 +111,7 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
             recyclerView.scrollToPosition(0);
         }
     }
-
+    @SuppressWarnings("deprecation")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -125,7 +122,6 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
     private void initRecycler() {
         binding.rvPopular.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.rvTopRated.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        binding.rvNowPlaying.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.rvUpComing.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
         popularAdapter = new MovieAdapter();
@@ -134,15 +130,11 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
         topRatedAdapter = new MovieAdapter();
         binding.rvTopRated.setAdapter(topRatedAdapter);
 
-        movieNowAdapter = new MovieNowAdapter();
-        binding.rvNowPlaying.setAdapter(movieNowAdapter);
-
         upcommingAdapter = new MovieAdapter();
         binding.rvUpComing.setAdapter(upcommingAdapter);
 
         popularAdapter.setPosition(1);
         topRatedAdapter.setPosition(2);
-        movieNowAdapter.setPosition(3);
         upcommingAdapter.setPosition(4);
 
     }
@@ -218,15 +210,15 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
 
     @Override
     public void getNowResponse(MovieBean movieBean) {
-        if(movieBean!=null && movieBean.getResults() != null){
-            if(!movieBean.getResults().isEmpty()) {
-                binding.rvNowPlaying.setVisibility(View.VISIBLE);
-                binding.rlNow.setVisibility(View.VISIBLE);
-                movieNowAdapter.setNewData(movieBean.getResults());
+        if(movieBean!=null && movieBean.getResults() != null) {
+            if (!movieBean.getResults().isEmpty()) {
+                binding.bannerView
+                        .setAdapter(new MovieCarouselAdapter(getContext()))
+                        .setRevealWidth(dp2px(5))
+                        .setCanLoop(true)
+                        .setAutoPlay(true)
+                        .create(movieBean.getResults());
             }
-        }else{
-            binding.rvNowPlaying.setVisibility(View.GONE);
-            binding.rlNow.setVisibility(View.GONE);
         }
     }
 
@@ -246,12 +238,7 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
                 intent.putExtra("isTvSeries",false);
                 startActivity(intent);
                 break;
-            case R.id.tv_nowPlaying:
-                intent = new Intent(getContext(), ViewAllActivity.class);
-                intent.putExtra("position",3);
-                intent.putExtra("isTvSeries",false);
-                startActivity(intent);
-                break;
+
             case R.id.tv_upComing:
                 intent = new Intent(getContext(), ViewAllActivity.class);
                 intent.putExtra("position",4);

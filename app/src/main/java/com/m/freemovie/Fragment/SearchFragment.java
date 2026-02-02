@@ -211,7 +211,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             showToast();
         }
     }
-
+    @SuppressWarnings("deprecation")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);

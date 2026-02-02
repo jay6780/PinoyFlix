@@ -70,6 +70,7 @@ public class DownloadWebview extends AppCompatActivity {
             binding.webView.setVisibility(View.VISIBLE);
         }
     }
+    @SuppressWarnings("deprecation")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
