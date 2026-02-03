@@ -434,6 +434,14 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                         .setTitle("Clear history")
                         .setMessage("Are you sure want to clear all? ")
                         .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                            ArrayList<String> loadedList = SharedPreferencesHelper.loadStringList(getContext(), "recent_search");
+                            if (loadedList == null) {
+                                loadedList = new ArrayList<>();
+                            }
+                            if(loadedList.isEmpty()){
+                                Toast.makeText(getContext(),"No history available to delete",Toast.LENGTH_SHORT).show();
+                                return;
+                            }
                             Toast.makeText(getContext(),"Delete history success",Toast.LENGTH_SHORT).show();
                             ArrayList<String> emptyList = new ArrayList<>();
                             SharedPreferencesHelper.saveStringList(getContext(), "recent_search", emptyList);
