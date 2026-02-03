@@ -11,7 +11,7 @@ import com.m.freemovie.Activity.TagalogWebviewActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.ClassBean.RevivalSeriesBean;
+import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
 
 public class TvRevivalAdapter extends BaseQuickAdapter<RevivalSeriesBean.ResultsBean, BaseViewHolder> {
     boolean isMovie = false;

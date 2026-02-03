@@ -11,7 +11,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.m.freemovie.adapter.NineAllAdapter;
 import com.m.freemovie.databinding.ActivityViewAllNineAnimeBinding;
-import com.m.freemovie.mvp.ClassBean.NineAnimeBean;
+import com.m.freemovie.mvp.Model.ClassBean.NineAnimeBean;
 import com.m.freemovie.mvp.Contract.NineAnimeContract;
 import com.m.freemovie.mvp.Presenter.NineAminePresenter;
 

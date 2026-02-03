@@ -8,11 +8,10 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.m.freemovie.Activity.AnimeDetailsActivity;
-import com.m.freemovie.Activity.AnimePaheWebviewActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.ClassBean.AnimePaheSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
 
 public class AnimePaheSearchAdapter extends BaseQuickAdapter<AnimePaheSearchBean.ResultsBean.DataBean, BaseViewHolder> {
     public AnimePaheSearchAdapter() {

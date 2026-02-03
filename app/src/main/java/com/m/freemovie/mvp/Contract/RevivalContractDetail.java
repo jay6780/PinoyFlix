@@ -1,7 +1,7 @@
 package com.m.freemovie.mvp.Contract;
 
 
-import com.m.freemovie.mvp.ClassBean.TagalogInfoBean;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogInfoBean;
 
 public interface RevivalContractDetail {
     interface View {

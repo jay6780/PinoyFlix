@@ -16,7 +16,7 @@ import com.m.freemovie.R;
 import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.ClassBean.TagalogDetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogDetailBean;
 
 public class TagalogDetailAdapter extends BaseQuickAdapter<TagalogDetailBean, BaseViewHolder> {
 

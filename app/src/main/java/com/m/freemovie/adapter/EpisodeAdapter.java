@@ -18,7 +18,7 @@ import com.m.freemovie.R;
 import com.m.freemovie.Utils.DbHelper.WatchHistoryDBHelper;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.ClassBean.EpisodeBean;
+import com.m.freemovie.mvp.Model.ClassBean.EpisodeBean;
 
 public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder> {
 

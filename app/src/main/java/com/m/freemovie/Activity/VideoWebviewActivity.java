@@ -37,7 +37,7 @@ import com.m.freemovie.R;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.MovieListAdapter;
 import com.m.freemovie.databinding.ActivityVideoWebviewBinding;
-import com.m.freemovie.mvp.ClassBean.MovieBean;
+import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Contract.MovieWatchListContract;
 import com.m.freemovie.mvp.Presenter.MovieWatchListPresenter;
 

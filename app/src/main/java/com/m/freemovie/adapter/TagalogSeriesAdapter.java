@@ -11,7 +11,7 @@ import com.m.freemovie.Activity.TagalogEpisodeActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.ClassBean.TagalogBean;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
 
 public class TagalogSeriesAdapter extends BaseQuickAdapter<TagalogBean.ResultsBean, BaseViewHolder> {
 

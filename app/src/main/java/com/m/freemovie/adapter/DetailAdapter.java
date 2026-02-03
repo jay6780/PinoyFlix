@@ -8,17 +8,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.m.freemovie.Activity.AnimeDetailsActivity;
-import com.m.freemovie.Activity.AnimePaheWebviewActivity;
 import com.m.freemovie.Activity.Details_activity;
-import com.m.freemovie.Activity.NineAnimeEpsiodeActivity;
-import com.m.freemovie.Activity.TagalogEpisodeActivity;
-import com.m.freemovie.Activity.TagalogWebviewActivity;
 import com.m.freemovie.R;
-import com.m.freemovie.Retrofit.AppConstant;
-import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.ClassBean.DetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
 
 public class DetailAdapter extends BaseQuickAdapter<DetailBean, BaseViewHolder> {
     private int position = 1;

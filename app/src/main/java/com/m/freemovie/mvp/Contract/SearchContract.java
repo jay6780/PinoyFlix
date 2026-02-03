@@ -1,10 +1,10 @@
 package com.m.freemovie.mvp.Contract;
 
 
-import com.m.freemovie.mvp.ClassBean.AnimePaheSearchBean;
-import com.m.freemovie.mvp.ClassBean.MovieBean;
-import com.m.freemovie.mvp.ClassBean.NineAnimeSearchBean;
-import com.m.freemovie.mvp.ClassBean.TagalogSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
+import com.m.freemovie.mvp.Model.ClassBean.NineAnimeSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogSearchBean;
 
 public interface SearchContract {
     interface View {

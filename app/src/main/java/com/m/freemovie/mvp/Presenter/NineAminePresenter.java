@@ -3,7 +3,7 @@ package com.m.freemovie.mvp.Presenter;
 import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
-import com.m.freemovie.mvp.ClassBean.NineAnimeBean;
+import com.m.freemovie.mvp.Model.ClassBean.NineAnimeBean;
 import com.m.freemovie.mvp.Contract.NineAnimeContract;
 import com.m.freemovie.mvp.Model.NineAnimeModel;
 

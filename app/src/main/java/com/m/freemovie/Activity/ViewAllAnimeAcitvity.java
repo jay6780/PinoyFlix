@@ -23,10 +23,10 @@ import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
 import com.m.freemovie.adapter.ViewAllAnimeAdapter;
 import com.m.freemovie.databinding.ActivityViewAllAnimeAcitvityBinding;
-import com.m.freemovie.mvp.ClassBean.AnimeItemBean;
-import com.m.freemovie.mvp.ClassBean.PaheLatestBean;
-import com.m.freemovie.mvp.ClassBean.RevivalSeriesBean;
-import com.m.freemovie.mvp.ClassBean.TagalogBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimeItemBean;
+import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
+import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
 import com.m.freemovie.mvp.Contract.AnimeContract;
 import com.m.freemovie.mvp.Presenter.AnimePresenter;
 

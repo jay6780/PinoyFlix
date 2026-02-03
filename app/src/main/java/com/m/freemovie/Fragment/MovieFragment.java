@@ -25,7 +25,7 @@ import com.m.freemovie.R;
 import com.m.freemovie.adapter.MovieAdapter;
 import com.m.freemovie.adapter.MovieCarouselAdapter;
 import com.m.freemovie.databinding.FragmentMovieBinding;
-import com.m.freemovie.mvp.ClassBean.MovieBean;
+import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Contract.MovieContract;
 import com.m.freemovie.mvp.Presenter.MoviePresenter;
 

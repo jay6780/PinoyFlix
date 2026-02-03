@@ -1,7 +1,7 @@
 package com.m.freemovie.mvp.Contract;
 
 
-import com.m.freemovie.mvp.ClassBean.PaheLatestBean;
+import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 
 public interface AnimePaheContract {
     interface View {

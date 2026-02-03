@@ -11,7 +11,7 @@ import com.m.freemovie.Activity.NineAnimeEpsiodeActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.ClassBean.NineAnimeBean;
+import com.m.freemovie.mvp.Model.ClassBean.NineAnimeBean;
 
 public class NineAllAdapter extends BaseQuickAdapter<NineAnimeBean.ResultsBean, BaseViewHolder> {
 

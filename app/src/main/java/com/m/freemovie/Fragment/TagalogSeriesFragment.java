@@ -21,7 +21,7 @@ import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
 import com.m.freemovie.adapter.TagalogSeriesAdapter;
 import com.m.freemovie.databinding.FragmentTagalogSeriesBinding;
-import com.m.freemovie.mvp.ClassBean.TagalogBean;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
 import com.m.freemovie.mvp.Contract.TagalogSeriesContract;
 import com.m.freemovie.mvp.Presenter.TagalogSeriesPresenter;
 

@@ -25,9 +25,9 @@ import com.m.freemovie.adapter.AnimePopularAdapter;
 import com.m.freemovie.adapter.HotAdapter;
 import com.m.freemovie.adapter.NewestAdapter;
 import com.m.freemovie.databinding.FragmentAnimeBinding;
-import com.m.freemovie.mvp.ClassBean.PaheLatestBean;
-import com.m.freemovie.mvp.ClassBean.RevivalSeriesBean;
-import com.m.freemovie.mvp.ClassBean.TagalogBean;
+import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
+import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
 import com.m.freemovie.mvp.Contract.AnimeContract;
 import com.m.freemovie.mvp.Presenter.AnimePresenter;
 

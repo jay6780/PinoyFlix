@@ -40,10 +40,10 @@ import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.TagalogEpisodeAdapter;
 import com.m.freemovie.databinding.ActivityTagalogEpisodeBinding;
-import com.m.freemovie.mvp.ClassBean.DetailBean;
-import com.m.freemovie.mvp.ClassBean.DownloadPlayerListerner;
-import com.m.freemovie.mvp.ClassBean.TagalogEpisode;
-import com.m.freemovie.mvp.ClassBean.TagalogEpisodeBean;
+import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.DownloadPlayerListerner;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogEpisode;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogEpisodeBean;
 import com.m.freemovie.mvp.Contract.TagalogEpisodeContract;
 import com.m.freemovie.mvp.Presenter.TagalogEpisodePresenter;
 

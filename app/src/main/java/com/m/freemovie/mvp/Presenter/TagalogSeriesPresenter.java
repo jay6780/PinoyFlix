@@ -3,7 +3,7 @@ package com.m.freemovie.mvp.Presenter;
 import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
-import com.m.freemovie.mvp.ClassBean.TagalogBean;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
 import com.m.freemovie.mvp.Contract.TagalogSeriesContract;
 import com.m.freemovie.mvp.Model.TagalogSeriesModel;
 

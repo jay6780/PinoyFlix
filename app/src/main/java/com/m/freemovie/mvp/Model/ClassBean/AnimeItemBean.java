@@ -1,4 +1,4 @@
-package com.m.freemovie.mvp.ClassBean;
+package com.m.freemovie.mvp.Model.ClassBean;
 
 public class AnimeItemBean {
     private String id;

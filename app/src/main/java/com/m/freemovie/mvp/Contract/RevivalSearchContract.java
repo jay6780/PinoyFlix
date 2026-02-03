@@ -1,7 +1,7 @@
 package com.m.freemovie.mvp.Contract;
 
 
-import com.m.freemovie.mvp.ClassBean.RevivalSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.RevivalSearchBean;
 
 public interface RevivalSearchContract {
     interface View {

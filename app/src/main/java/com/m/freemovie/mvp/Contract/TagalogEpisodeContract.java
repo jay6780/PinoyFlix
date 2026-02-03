@@ -1,7 +1,7 @@
 package com.m.freemovie.mvp.Contract;
 
 
-import com.m.freemovie.mvp.ClassBean.TagalogEpisodeBean;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogEpisodeBean;
 
 public interface TagalogEpisodeContract {
     interface View {

@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -21,7 +20,7 @@ import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.databinding.FragmentChooseBinding;
-import com.m.freemovie.mvp.ClassBean.MovieEvent;
+import com.m.freemovie.mvp.Model.ClassBean.MovieEvent;
 
 import org.greenrobot.eventbus.EventBus;
 

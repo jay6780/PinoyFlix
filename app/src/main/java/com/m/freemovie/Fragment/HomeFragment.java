@@ -18,7 +18,7 @@ import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.databinding.FragmentHomeBinding;
-import com.m.freemovie.mvp.ClassBean.MovieEvent;
+import com.m.freemovie.mvp.Model.ClassBean.MovieEvent;
 
 import org.greenrobot.eventbus.EventBus;
 

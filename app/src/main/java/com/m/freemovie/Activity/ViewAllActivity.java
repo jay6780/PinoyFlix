@@ -24,8 +24,8 @@ import com.m.freemovie.R;
 import com.m.freemovie.adapter.SeriesAllAdapter;
 import com.m.freemovie.adapter.ViewAllAdapter;
 import com.m.freemovie.databinding.ActivityViewAllBinding;
-import com.m.freemovie.mvp.ClassBean.MovieBean;
-import com.m.freemovie.mvp.ClassBean.TvSeriesBean;
+import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
+import com.m.freemovie.mvp.Model.ClassBean.TvSeriesBean;
 import com.m.freemovie.mvp.Contract.MovieAllContract;
 import com.m.freemovie.mvp.Presenter.ViewAllPresenter;
 

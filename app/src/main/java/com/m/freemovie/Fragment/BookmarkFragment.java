@@ -20,7 +20,7 @@ import com.m.freemovie.R;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.adapter.DetailAdapter;
 import com.m.freemovie.databinding.FragmentBookmarkBinding;
-import com.m.freemovie.mvp.ClassBean.DetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
 
 import java.util.ArrayList;
 import java.util.List;

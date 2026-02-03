@@ -3,7 +3,7 @@ package com.m.freemovie.mvp.Presenter;
 import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
-import com.m.freemovie.mvp.ClassBean.DetailDownloadBean;
+import com.m.freemovie.mvp.Model.ClassBean.DetailDownloadBean;
 import com.m.freemovie.mvp.Contract.RevivalContractTrack;
 import com.m.freemovie.mvp.Model.RevivalTrackModel;
 

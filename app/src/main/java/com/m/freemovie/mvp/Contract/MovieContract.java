@@ -1,9 +1,7 @@
 package com.m.freemovie.mvp.Contract;
 
 
-import com.m.freemovie.mvp.ClassBean.MovieBean;
-
-import java.util.List;
+import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
 
 public interface MovieContract {
     interface View {

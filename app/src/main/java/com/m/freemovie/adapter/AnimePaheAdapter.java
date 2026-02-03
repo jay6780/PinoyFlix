@@ -11,7 +11,7 @@ import com.m.freemovie.Activity.AnimePaheWebviewActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.ClassBean.PaheLatestBean;
+import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 
 public class AnimePaheAdapter extends BaseQuickAdapter<PaheLatestBean.ResultsBean.DataBean, BaseViewHolder> {
     public AnimePaheAdapter() {

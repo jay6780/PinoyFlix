@@ -21,7 +21,7 @@ import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
 import com.m.freemovie.adapter.TvRevivalAdapter;
 import com.m.freemovie.databinding.FragmentTagalogServer2Binding;
-import com.m.freemovie.mvp.ClassBean.RevivalSeriesBean;
+import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.Contract.RevivalContractMovies;
 import com.m.freemovie.mvp.Presenter.RevivalMoviesPresenter;
 

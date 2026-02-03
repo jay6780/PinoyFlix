@@ -13,7 +13,7 @@ import com.m.freemovie.R;
 import com.m.freemovie.Utils.DbHelper.WatchHistoryDBHelper;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.ClassBean.DetailTvBean;
+import com.m.freemovie.mvp.Model.ClassBean.DetailTvBean;
 
 public class SeasonsAdapter extends BaseQuickAdapter<DetailTvBean.SeasonsBean, BaseViewHolder> {
     private WatchHistoryDBHelper dbHelper;

@@ -23,7 +23,7 @@ import com.m.freemovie.R;
 import com.m.freemovie.adapter.TvSeriesAdapter;
 import com.m.freemovie.adapter.TveSeriesNowAdapter;
 import com.m.freemovie.databinding.FragmentTvseriesBinding;
-import com.m.freemovie.mvp.ClassBean.TvSeriesBean;
+import com.m.freemovie.mvp.Model.ClassBean.TvSeriesBean;
 import com.m.freemovie.mvp.Contract.TvSeriesContract;
 import com.m.freemovie.mvp.Presenter.TvSeriesPresenter;
 

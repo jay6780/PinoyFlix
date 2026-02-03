@@ -3,7 +3,7 @@ package com.m.freemovie.mvp.Presenter;
 import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
-import com.m.freemovie.mvp.ClassBean.RevivalSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.RevivalSearchBean;
 import com.m.freemovie.mvp.Contract.RevivalSearchContract;
 import com.m.freemovie.mvp.Model.RevivalSearchModel;
 

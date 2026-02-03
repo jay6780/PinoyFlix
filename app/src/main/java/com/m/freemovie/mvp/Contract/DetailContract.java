@@ -1,8 +1,8 @@
 package com.m.freemovie.mvp.Contract;
 
 
-import com.m.freemovie.mvp.ClassBean.DetailBean;
-import com.m.freemovie.mvp.ClassBean.DetailTvBean;
+import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.DetailTvBean;
 
 public interface DetailContract {
     interface View {

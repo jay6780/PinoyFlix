@@ -10,7 +10,7 @@ import com.m.freemovie.Activity.AnimeDetailsActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.ClassBean.TagalogBean;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
 
 public class HotAdapter extends BaseQuickAdapter<TagalogBean.ResultsBean, BaseViewHolder> {
     public HotAdapter() {

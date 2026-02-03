@@ -22,7 +22,7 @@ import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
 import com.m.freemovie.adapter.AnimePaheAdapter;
 import com.m.freemovie.databinding.FragmentAnimePaheBinding;
-import com.m.freemovie.mvp.ClassBean.PaheLatestBean;
+import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Contract.AnimePaheContract;
 import com.m.freemovie.mvp.Presenter.AnimePahePresenter;
 

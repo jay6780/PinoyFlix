@@ -2,10 +2,13 @@ package com.m.freemovie.Fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +19,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -29,23 +35,23 @@ import com.app.hubert.guide.listener.OnGuideChangedListener;
 import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
+import com.m.freemovie.Utils.SharedPreferencesHelper;
+import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.adapter.AnimePaheSearchAdapter;
 import com.m.freemovie.adapter.NineAnimeSearchAdapter;
+import com.m.freemovie.adapter.RecentAdapter;
 import com.m.freemovie.adapter.TagalogSearchAdapter;
 import com.m.freemovie.adapter.TvRevivialSearchAdapter;
 import com.m.freemovie.adapter.ViewAllAdapter;
-import com.m.freemovie.mvp.ClassBean.AnimePaheSearchBean;
-import com.m.freemovie.mvp.ClassBean.MovieBean;
-import com.m.freemovie.mvp.ClassBean.MovieEvent;
-import com.m.freemovie.mvp.ClassBean.NineAnimeSearchBean;
-import com.m.freemovie.mvp.ClassBean.RevivalSearchBean;
-import com.m.freemovie.mvp.ClassBean.TagalogSearchBean;
 import com.m.freemovie.mvp.Contract.RevivalSearchContract;
 import com.m.freemovie.mvp.Contract.SearchContract;
+import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
+import com.m.freemovie.mvp.Model.ClassBean.NineAnimeSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.RevivalSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogSearchBean;
 import com.m.freemovie.mvp.Presenter.RevivalSearchPresenter;
 import com.m.freemovie.mvp.Presenter.SearchPresenter;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +60,7 @@ import java.util.Random;
 public class SearchFragment extends Fragment implements SearchContract.View, View.OnClickListener, RevivalSearchContract.View, AdapterView.OnItemSelectedListener {
     private EditText et_search;
     private int page = 1;
-    private RecyclerView rv_search;
+    private RecyclerView rv_search,rv_recent;
     private SearchPresenter searchPresenter;
     private ViewAllAdapter movieAdapter;
     private TagalogSearchAdapter tagalogSearchAdapter;
@@ -78,6 +84,11 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
     private InputMethodManager mInputManager;
     private String toast;
     private Spinner fragmentSpinner;
+    private RecentAdapter recentAdapter;
+    private TextView tv_recent,tv_clear;
+    private boolean isSelect = false;
+    private LinearLayout ll_empty;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -86,11 +97,16 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
         rv_search = view.findViewById(R.id.rv_search);
         btn_send = view.findViewById(R.id.btn_send);
         ll_reset = view.findViewById(R.id.ll_reset);
+        rv_recent = view.findViewById(R.id.rv_recent);
+        tv_recent = view.findViewById(R.id.tv_recent);
+        ll_empty = view.findViewById(R.id.ll_empty);
         fragmentSpinner = view.findViewById(R.id.fragmentSpinner);
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        tv_clear = view.findViewById(R.id.tv_clear);
         revivalSearchPresenter = new RevivalSearchPresenter(this);
         searchPresenter = new SearchPresenter(this);
         btn_send.setOnClickListener(this);
+        tv_clear.setOnClickListener(this);
         movieAdapter = new ViewAllAdapter();
         tagalogSearchAdapter = new TagalogSearchAdapter();
         tvRevivialSearchAdapter = new TvRevivialSearchAdapter();
@@ -109,6 +125,8 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             int roll = random.nextInt(4) + 1;
             movieAdapter.setApiPosition(roll);
         }
+
+        initRecent(et_search.getText().toString());
 
         mInputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         ll_reset.setVisibility(View.GONE);
@@ -160,8 +178,70 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             }
         });
 
+        et_search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                String recentSearch = s.toString();
+                tv_recent.setVisibility(recentSearch.isEmpty()? View.VISIBLE : View.GONE);
+                tv_clear.setVisibility(recentSearch.isEmpty()? View.VISIBLE : View.GONE);
+                fragmentSpinner.setVisibility(!recentSearch.isEmpty()? View.VISIBLE : View.GONE);
+                rv_search.setVisibility(!recentSearch.isEmpty()? View.VISIBLE : View.GONE);
+                rv_recent.setVisibility(recentSearch.isEmpty()? View.VISIBLE : View.GONE);
+                fragmentSpinner.setEnabled(rv_recent.getVisibility() == View.VISIBLE? false : true);
+
+                if(rv_recent.getVisibility() == View.VISIBLE){
+                    ll_reset.setVisibility(View.GONE);
+                }
+                initRecent(recentSearch);
+                isSelect = false;
+                if(recentSearch.isEmpty()){
+                    animePaheList.clear();
+                    movieLists.clear();
+                    nineList.clear();
+                    tagaloglist.clear();
+                    revivalList.clear();
+
+                }
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+        });
+
         return view;
     }
+
+    private void initRecent(String data){
+        if(data.isEmpty()){
+            ArrayList<String> loadedList = SharedPreferencesHelper.loadStringList(getContext(), "recent_search");
+            if (loadedList == null) {
+                loadedList = new ArrayList<>();
+            }
+            ll_empty.setVisibility(loadedList.isEmpty()? View.VISIBLE : View.GONE);
+            rv_recent.setVisibility(!loadedList.isEmpty()? View.VISIBLE : View.GONE);
+            recentAdapter = new RecentAdapter();
+            rv_recent.setLayoutManager(new LinearLayoutManager(getContext()));
+            rv_recent.setAdapter(recentAdapter);
+            recentAdapter.setNewData(loadedList);
+            recentAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+                @Override
+                public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                    if(view.getId() == R.id.ll_select){
+                        String data = recentAdapter.getData().get(position);
+                        et_search.setText(data);
+                        searchData();
+                    }
+                }
+            });
+        }
+    }
+
     private void initGuide() {
         NewbieGuide.with(getActivity())
                 .setLabel("Search_reset")
@@ -342,12 +422,37 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             }
         }
     }
-
+    @SuppressWarnings("deprecation")
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_send:
                 searchData();
+                break;
+            case R.id.tv_clear:
+                AlertDialog alertDialog = new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme)
+                        .setTitle("Clear history")
+                        .setMessage("Are you sure want to clear all? ")
+                        .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                            Toast.makeText(getContext(),"Delete history success",Toast.LENGTH_SHORT).show();
+                            ArrayList<String> emptyList = new ArrayList<>();
+                            SharedPreferencesHelper.saveStringList(getContext(), "recent_search", emptyList);
+                            initRecent("");
+                            dialog.dismiss();
+
+                        })
+                        .setNegativeButton(android.R.string.no, (dialog, which) -> {
+                            dialog.dismiss();
+                        })
+                        .create();
+
+                alertDialog.setOnShowListener(dialog -> {
+                    alertDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK);
+                    alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
+                });
+
+                alertDialog.show();
+
                 break;
         }
     }
@@ -360,13 +465,27 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             Toast.makeText(getContext(), "Please check network and try again", Toast.LENGTH_SHORT).show();
             return;
         }
-
         String query = et_search.getText().toString().trim();
-
         if (query.isEmpty()) {
             showToast();
             return;
         }
+        ll_empty.setVisibility(View.GONE);
+        isSelect = true;
+        ArrayList<String> existingList = SharedPreferencesHelper.loadStringList(getContext(), "recent_search");
+        if (existingList == null) {
+            existingList = new ArrayList<>();
+        }
+
+        existingList.remove(query);
+        existingList.add(0, query);
+        if (existingList.size() > 10) {
+            existingList = new ArrayList<>(existingList.subList(0, 10));
+        }
+
+        SharedPreferencesHelper.saveStringList(getContext(), "recent_search", existingList);
+
+
 
         mInputManager.hideSoftInputFromWindow(et_search.getWindowToken(), 0);
         lastQuery = query;
@@ -434,15 +553,6 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
     }
 
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        if(position == 1){
-            if(movieLists.isEmpty()){
-                EventBus.getDefault().post(new MovieEvent(1));
-            }
-        }
-    }
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int index, long l) {
@@ -472,7 +582,10 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
         if(et_search.getText().toString().isEmpty()) {
             return;
         }
-        searchData();
+        if(isSelect){
+            searchData();
+        }
+
     }
 
     @Override

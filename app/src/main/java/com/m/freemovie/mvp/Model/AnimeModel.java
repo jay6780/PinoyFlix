@@ -2,9 +2,9 @@ package com.m.freemovie.mvp.Model;
 
 import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.Retrofit.NetworkingUtils;
-import com.m.freemovie.mvp.ClassBean.PaheLatestBean;
-import com.m.freemovie.mvp.ClassBean.RevivalSeriesBean;
-import com.m.freemovie.mvp.ClassBean.TagalogBean;
+import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
+import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observer;

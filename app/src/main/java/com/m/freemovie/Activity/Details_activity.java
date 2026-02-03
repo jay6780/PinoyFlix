@@ -32,8 +32,8 @@ import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.SeasonsAdapter;
 import com.m.freemovie.databinding.ActivityDetailsBinding;
 import com.m.freemovie.databinding.ActivityDetailsSeriesBinding;
-import com.m.freemovie.mvp.ClassBean.DetailBean;
-import com.m.freemovie.mvp.ClassBean.DetailTvBean;
+import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.DetailTvBean;
 import com.m.freemovie.mvp.Contract.DetailContract;
 import com.m.freemovie.mvp.Presenter.DetailPresenter;
 

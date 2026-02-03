@@ -1,8 +1,7 @@
 package com.m.freemovie.mvp.Contract;
 
 
-import com.m.freemovie.mvp.ClassBean.MovieBean;
-import com.m.freemovie.mvp.ClassBean.TvSeriesBean;
+import com.m.freemovie.mvp.Model.ClassBean.TvSeriesBean;
 
 public interface TvSeriesContract {
     interface View {

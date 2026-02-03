@@ -8,11 +8,10 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.m.freemovie.Activity.AnimeDetailsActivity;
-import com.m.freemovie.Activity.TagalogWebviewActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.ClassBean.RevivalSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.RevivalSearchBean;
 
 public class TvRevivialSearchAdapter extends BaseQuickAdapter<RevivalSearchBean.ResultsBean, BaseViewHolder> {
     public TvRevivialSearchAdapter() {

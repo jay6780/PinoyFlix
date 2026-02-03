@@ -113,6 +113,7 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
         finish();
     }
     private List<VideoFile> selectedFiles = new ArrayList<>();
+    @SuppressWarnings("deprecation")
     @Override
     public void deletefiles(List<VideoFile> videoFiles) {
         this.selectedFiles = videoFiles;

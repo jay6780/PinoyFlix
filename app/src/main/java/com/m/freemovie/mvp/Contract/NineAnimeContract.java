@@ -1,7 +1,7 @@
 package com.m.freemovie.mvp.Contract;
 
 
-import com.m.freemovie.mvp.ClassBean.NineAnimeBean;
+import com.m.freemovie.mvp.Model.ClassBean.NineAnimeBean;
 
 public interface NineAnimeContract {
     interface View {

@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.m.freemovie.Activity.ViewAllActivity;
 import com.m.freemovie.R;
-import com.m.freemovie.mvp.ClassBean.TvSeriesBean;
+import com.m.freemovie.mvp.Model.ClassBean.TvSeriesBean;
 import com.zhpan.bannerview.BaseBannerAdapter;
 import com.zhpan.bannerview.BaseViewHolder;
 

@@ -15,7 +15,7 @@ import com.m.freemovie.Activity.Details_activity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.ClassBean.MovieBean;
+import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
 
 public class MovieListAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, BaseViewHolder> {
     private int apiPosition;

@@ -23,7 +23,7 @@ import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.EpisodeAdapter;
 import com.m.freemovie.databinding.ActivitySeasonListBinding;
-import com.m.freemovie.mvp.ClassBean.EpisodeBean;
+import com.m.freemovie.mvp.Model.ClassBean.EpisodeBean;
 
 import java.util.ArrayList;
 import java.util.List;

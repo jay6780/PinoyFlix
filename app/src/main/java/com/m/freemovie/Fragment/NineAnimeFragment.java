@@ -17,7 +17,7 @@ import com.m.freemovie.Activity.ViewAllNineAnimeActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.adapter.NineAnimeAdapter;
 import com.m.freemovie.databinding.FragmentNineAnimeBinding;
-import com.m.freemovie.mvp.ClassBean.NineAnimeBean;
+import com.m.freemovie.mvp.Model.ClassBean.NineAnimeBean;
 import com.m.freemovie.mvp.Contract.NineAnimeContract;
 import com.m.freemovie.mvp.Presenter.NineAminePresenter;
 

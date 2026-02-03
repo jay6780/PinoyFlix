@@ -1,9 +1,9 @@
 package com.m.freemovie.mvp.Contract;
 
 
-import com.m.freemovie.mvp.ClassBean.AnimePaheDetailBean;
-import com.m.freemovie.mvp.ClassBean.AnimePaheDownloadBean;
-import com.m.freemovie.mvp.ClassBean.AnimePaheEpisodeBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDownloadBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimePaheEpisodeBean;
 
 public interface AnimePaheDetailContract {
     interface View {

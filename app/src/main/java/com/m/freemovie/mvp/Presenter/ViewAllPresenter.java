@@ -3,8 +3,8 @@ package com.m.freemovie.mvp.Presenter;
 import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
-import com.m.freemovie.mvp.ClassBean.MovieBean;
-import com.m.freemovie.mvp.ClassBean.TvSeriesBean;
+import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
+import com.m.freemovie.mvp.Model.ClassBean.TvSeriesBean;
 import com.m.freemovie.mvp.Contract.MovieAllContract;
 import com.m.freemovie.mvp.Model.ViewAllModel;
 

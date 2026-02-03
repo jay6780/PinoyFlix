@@ -7,7 +7,7 @@ import android.widget.TextView;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.ClassBean.AnimePaheDownloadBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDownloadBean;
 
 public class DownloadAdapter extends BaseQuickAdapter<AnimePaheDownloadBean.ResultsBean.DownloadBean, BaseViewHolder> {
     private DownListerner downListerner;

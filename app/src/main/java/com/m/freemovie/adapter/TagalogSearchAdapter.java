@@ -8,11 +8,10 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.m.freemovie.Activity.AnimeDetailsActivity;
-import com.m.freemovie.Activity.TagalogEpisodeActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.ClassBean.TagalogSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogSearchBean;
 
 public class TagalogSearchAdapter extends BaseQuickAdapter<TagalogSearchBean.ResultsBean, BaseViewHolder> {
 

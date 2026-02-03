@@ -15,7 +15,7 @@ import com.m.freemovie.R;
 import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.ClassBean.AnimeDetailsBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimeDetailsBean;
 
 public class AnimeSeasonAdapter extends BaseQuickAdapter<AnimeDetailsBean, BaseViewHolder> {
     private int position;

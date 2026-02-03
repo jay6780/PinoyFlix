@@ -3,9 +3,9 @@ package com.m.freemovie.mvp.Presenter;
 import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
-import com.m.freemovie.mvp.ClassBean.AnimePaheDetailBean;
-import com.m.freemovie.mvp.ClassBean.TagalogEpisodeBean;
-import com.m.freemovie.mvp.ClassBean.TagalogInfoBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogEpisodeBean;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogInfoBean;
 import com.m.freemovie.mvp.Contract.AnimeDetailsContract;
 import com.m.freemovie.mvp.Model.AnimePaheDetailModel;
 import com.m.freemovie.mvp.Model.RevivalDetailModel;

@@ -1,7 +1,7 @@
 package com.m.freemovie.mvp.Contract;
 
 
-import com.m.freemovie.mvp.ClassBean.DetailDownloadBean;
+import com.m.freemovie.mvp.Model.ClassBean.DetailDownloadBean;
 
 public interface RevivalContractTrack {
     interface View {

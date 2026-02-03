@@ -19,8 +19,8 @@ import com.m.freemovie.R;
 import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.ClassBean.DownloadPlayerListerner;
-import com.m.freemovie.mvp.ClassBean.TagalogEpisode;
+import com.m.freemovie.mvp.Model.ClassBean.DownloadPlayerListerner;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogEpisode;
 
 public class TagalogEpisodeAdapter extends BaseQuickAdapter<TagalogEpisode, BaseViewHolder> {
 

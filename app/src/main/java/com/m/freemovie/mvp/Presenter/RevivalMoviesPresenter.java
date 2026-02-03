@@ -3,11 +3,9 @@ package com.m.freemovie.mvp.Presenter;
 import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
-import com.m.freemovie.mvp.ClassBean.RevivalSeriesBean;
+import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.Contract.RevivalContractMovies;
-import com.m.freemovie.mvp.Contract.RevivalContractSeries;
 import com.m.freemovie.mvp.Model.RevivalMoviesModel;
-import com.m.freemovie.mvp.Model.RevivalSeriesModel;
 
 import java.io.IOException;
 

@@ -2,8 +2,8 @@ package com.m.freemovie.mvp.Model;
 
 import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.Retrofit.NetworkingUtils;
-import com.m.freemovie.mvp.ClassBean.DownloadNineAnimeBean;
-import com.m.freemovie.mvp.ClassBean.NineAnimeEpisodeBean;
+import com.m.freemovie.mvp.Model.ClassBean.DownloadNineAnimeBean;
+import com.m.freemovie.mvp.Model.ClassBean.NineAnimeEpisodeBean;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observer;
