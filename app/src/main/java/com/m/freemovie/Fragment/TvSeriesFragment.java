@@ -1,5 +1,6 @@
 package com.m.freemovie.Fragment;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -53,10 +54,16 @@ public class TvSeriesFragment extends Fragment implements TvSeriesContract.View,
         initRecycler();
         tvSeriesPresenter = new TvSeriesPresenter(this);
 
-        tvSeriesPresenter.getTodayTv(getString(R.string.key),page);
-        tvSeriesPresenter.getOnAiringTv(getString(R.string.key),page);
-        tvSeriesPresenter.getPopularTv(getString(R.string.key),page);
-        tvSeriesPresenter.getTopRatedTv(getString(R.string.key),page);
+        if(isNetworkAvailable()){
+            tvSeriesPresenter.getTodayTv(getString(R.string.key),page);
+            tvSeriesPresenter.getOnAiringTv(getString(R.string.key),page);
+            tvSeriesPresenter.getPopularTv(getString(R.string.key),page);
+            tvSeriesPresenter.getTopRatedTv(getString(R.string.key),page);
+        }else{
+            Toast.makeText(getContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+        }
+
+
 
         binding.swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -117,6 +124,7 @@ public class TvSeriesFragment extends Fragment implements TvSeriesContract.View,
         }
     }
     @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);

@@ -1,5 +1,6 @@
 package com.m.freemovie.Fragment;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -212,6 +213,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
         }
     }
     @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -235,6 +237,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
         swipeRefreshLayout.setRefreshing(true);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void showError(String error) {
         new Handler().postDelayed(() -> {
@@ -242,7 +245,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             swipeRefreshLayout.setRefreshing(false);
         }, 500);
     }
-
+    @SuppressWarnings("deprecation")
     @Override
     public void hideLoading() {
         new Handler().postDelayed(() -> {
@@ -477,6 +480,10 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
 
     }
     private void searchAll() {
+        if(!isNetworkAvailable()){
+            Toast.makeText(getContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+            return;
+        }
         switch (position){
             case 1:
                 et_search.setHint("Enter movie name");

@@ -1,13 +1,17 @@
 package com.m.freemovie.adapter;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.m.freemovie.R;
@@ -59,6 +63,10 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(!isNetworkAvailable()){
+                    Toast.makeText(mContext,"Please check internet and try again",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if(lastPosition == (helper.getAdapterPosition())){
                     lastPosition = -1;
                 }else {
@@ -68,9 +76,17 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
         });
     }
 
+
+    @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
     private void showVideoOptions(EpisodeBean item, Context mContext, BaseViewHolder helper) {
         String[] videoPlayer = {"Player 1 ( Click again if not load )", "Player 2"};
-
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         TextView titleView = new TextView(mContext);
         titleView.setText("Select player");

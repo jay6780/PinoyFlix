@@ -2,6 +2,7 @@ package com.m.freemovie.Fragment;
 
 import static com.zhpan.bannerview.utils.BannerUtils.dp2px;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -27,7 +28,6 @@ import com.m.freemovie.databinding.FragmentMovieBinding;
 import com.m.freemovie.mvp.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Contract.MovieContract;
 import com.m.freemovie.mvp.Presenter.MoviePresenter;
-import com.zhpan.bannerview.BannerViewPager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,10 +54,16 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
         initRecycler();
         moviePresenter = new MoviePresenter(this);
 
-        moviePresenter.getPopularMovie(getString(R.string.key),page);
-        moviePresenter.getTopRated(getString(R.string.key),page);
-        moviePresenter.getUpcoming(getString(R.string.key),page);
-        moviePresenter.getNow(getString(R.string.key),page);
+        if(isNetworkAvailable()){
+            moviePresenter.getPopularMovie(getString(R.string.key),page);
+            moviePresenter.getTopRated(getString(R.string.key),page);
+            moviePresenter.getUpcoming(getString(R.string.key),page);
+            moviePresenter.getNow(getString(R.string.key),page);
+        }else{
+            Toast.makeText(getContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+        }
+
+
 
         binding.swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -112,9 +118,9 @@ public class MovieFragment extends Fragment implements MovieContract.View,View.O
         }
     }
     @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
     private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }

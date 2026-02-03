@@ -1,9 +1,9 @@
 package com.m.freemovie.Activity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
@@ -103,7 +103,13 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         binding.llBookmark.setOnClickListener(view -> savedBook());
         detailPresenter = new AnimePaheDetailPresenter(this);
         url = "https://animepahe.si/anime/"+id;
-        detailPresenter.getDetailQuery(url);
+
+        if(isNetworkAvailable()){
+            detailPresenter.getDetailQuery(url);
+        }else{
+            Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+        }
+
         setImageData(id);
         SPUtils.getInstance().put(AppConstant.isShow, false);
 
@@ -115,6 +121,10 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                if(!isNetworkAvailable()){
+                    Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 page = 1;
                 isNomore = false;
                 isInit = true;
@@ -205,55 +215,23 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(binding.swipe != null &&binding.swipe.isRefreshing()){
-            binding.swipe.setRefreshing(false);
-        }
-        if (binding != null && binding.webView != null) {
-            binding.webView.stopLoading();
-            binding.webView.setWebChromeClient(null);
-            binding.webView.setWebViewClient(null);
-            binding.webView.destroy();
-            binding.webView.clearCache(true);
-            binding.webView.clearHistory();
-            binding.webView.reload();
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        super.onPause();
-    }
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        if (binding != null && binding.webView != null) {
-            try {
-                binding.webView.clearCache(true);
-                binding.webView.clearHistory();
-                binding.webView.reload();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
-    }
-
-    @Override
     public void onBackPressed() {
         if(!finishing){
             defaultScreen();
         }else{
             super.onBackPressed();
+            if(binding.swipe != null &&binding.swipe.isRefreshing()){
+                binding.swipe.setRefreshing(false);
+            }
+            if (binding != null && binding.webView != null) {
+                binding.webView.stopLoading();
+                binding.webView.setWebChromeClient(null);
+                binding.webView.setWebViewClient(null);
+                binding.webView.destroy();
+                binding.webView.clearCache(true);
+                binding.webView.clearHistory();
+                binding.webView.reload();
+            }
             finish();
         }
     }
@@ -273,6 +251,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     }
 
     @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
@@ -526,11 +505,10 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     }
     @Override
     public void getSrc(String videoUrl) {
-        this.videoUrl = videoUrl;
         if(dialog !=null){
             dialog.dismiss();
         }
-        initStart();
+        setupWebView(videoUrl);
     }
     @Override
     public void getDownloadLink(String videoUrl) {
@@ -543,19 +521,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         intent.putExtra("title", title);
         intent.putExtra("EpisodeNum",episode);
         startActivity(intent);
-    }
-
-    private void initStart() {
-        if (binding == null) return;
-
-        if (!isNetworkAvailable()) {
-            binding.webView.setVisibility(View.GONE);
-            binding.tvSelect.setVisibility(View.VISIBLE);
-            binding.tvSelect.setText("Please check your internet and try again");
-        } else {
-            binding.webView.setVisibility(View.VISIBLE);
-            setupWebView(videoUrl);
-        }
     }
 
 
@@ -571,7 +536,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             String url = "https://animepahe.si/play/"+animeId+"/"+videoUrl;
             detailPresenter.getTrackQuery(url);
         }
-
     }
 
 

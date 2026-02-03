@@ -1,8 +1,8 @@
 package com.m.freemovie.Activity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
@@ -91,6 +91,10 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
         binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                if(!isNetworkAvailable()){
+                    Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if(isMovie){
                     revivalTrackPresenter.getTrackUrl(id);
                 }else{
@@ -111,7 +115,11 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
             }
         });
 
-        isMovieVideo();
+        if(isNetworkAvailable()){
+            isMovieVideo();
+        }else{
+            Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+        }
 
 
         binding.rvSeason.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(this));
@@ -198,49 +206,6 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
         return context.getResources();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(binding.swipe != null &&binding.swipe.isRefreshing()){
-            binding.swipe.setRefreshing(false);
-        }
-        if (binding != null && binding.webView != null) {
-            binding.webView.stopLoading();
-            binding.webView.setWebChromeClient(null);
-            binding.webView.setWebViewClient(null);
-            binding.webView.destroy();
-            binding.webView.clearCache(true);
-            binding.webView.clearHistory();
-            binding.webView.reload();
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        super.onPause();
-    }
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        if (binding != null && binding.webView != null) {
-            try {
-                binding.webView.clearCache(true);
-                binding.webView.clearHistory();
-                binding.webView.reload();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
-    }
 
     @Override
     public void onBackPressed() {
@@ -248,6 +213,18 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
             defaultScreen();
         }else{
             super.onBackPressed();
+            if(binding.swipe != null &&binding.swipe.isRefreshing()){
+                binding.swipe.setRefreshing(false);
+            }
+            if (binding != null && binding.webView != null) {
+                binding.webView.stopLoading();
+                binding.webView.setWebChromeClient(null);
+                binding.webView.setWebViewClient(null);
+                binding.webView.destroy();
+                binding.webView.clearCache(true);
+                binding.webView.clearHistory();
+                binding.webView.reload();
+            }
             finish();
         }
     }
@@ -273,6 +250,7 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
     }
 
     @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
@@ -368,24 +346,10 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
 //            Log.d("VideoUrl","val: "+videoUrl);
             isError = false;
             videoUrl = tagalogInfoBean.getMetaframe();
-            initStart();
-        }
-
-    }
-
-    private void initStart() {
-        if (binding == null) return;
-
-        if (!isNetworkAvailable()) {
-            binding.webView.setVisibility(View.GONE);
-            binding.tvSelect.setVisibility(View.VISIBLE);
-            binding.tvSelect.setText("Please check your internet and try again");
-        } else {
-            binding.webView.setVisibility(View.VISIBLE);
             setupWebView(videoUrl);
         }
-    }
 
+    }
 
     @Override
     public void getInfoTagalog(TagalogInfoBean tagalogInfoBean) {
@@ -433,7 +397,6 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
             isError = false;
             revivalTrackPresenter.getTrackUrl(videoUrl);
         }
-
     }
 
 

@@ -7,6 +7,8 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -107,7 +109,14 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
         tagalogEpisodePresenter = new TagalogEpisodePresenter(this);
-        tagalogEpisodePresenter.getUrl(url);
+
+        if(isNetworkAvailable()){
+            tagalogEpisodePresenter.getUrl(url);
+        }else{
+            Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+        }
+
+
         binding.rvEpisode.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(this));
         tagalogEpisodeAdapter = new TagalogEpisodeAdapter(this,this);
         binding.rvEpisode.setAdapter(tagalogEpisodeAdapter);
@@ -203,6 +212,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
 
         initTopPadding(70);
     }
+
     private void initTopPadding(int topPadding) {
         ViewCompat.setOnApplyWindowInsetsListener(binding.llRoot, (v, windowInsets) -> {
             ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
@@ -378,7 +388,13 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
         binding.btnRefresh.setVisibility(View.GONE);
     }
 
-
+    @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
     @Override
     public void onClick(View view) {
         switch (view.getId()){

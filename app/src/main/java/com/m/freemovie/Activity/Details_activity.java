@@ -1,15 +1,20 @@
 package com.m.freemovie.Activity;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -90,12 +95,28 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
         setImageData(id);
 
-        if (position == 2) {
-            detailPresenter.getTvDetail(id, getString(R.string.key));
-        } else {
-            detailPresenter.getDetail(id, getString(R.string.key));
+        if(isNetworkAvailable()){
+            if (position == 2) {
+                detailPresenter.getTvDetail(id, getString(R.string.key));
+            } else {
+                detailPresenter.getDetail(id, getString(R.string.key));
+            }
+
+        }else{
+            Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
         }
+
     }
+
+
+    @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
 
     private void initGuide(String label) {
         ImageView bookmarkImageView;

@@ -2,11 +2,8 @@ package com.m.freemovie.Activity;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -132,66 +129,29 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (dbHelper != null) {
-            dbHelper.close();
-        }
-        if (binding != null && binding.webView != null) {
-            binding.webView.stopLoading();
-            binding.webView.setWebChromeClient(null);
-            binding.webView.setWebViewClient(null);
-            binding.webView.destroy();
-            binding.webView.clearCache(true);
-            binding.webView.clearHistory();
-            binding.webView.reload();
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        super.onPause();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        if (binding != null && binding.webView != null) {
-            try {
-                binding.webView.clearCache(true);
-                binding.webView.clearHistory();
-                binding.webView.reload();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
-    }
-
-    @Override
     public void onBackPressed() {
         if (!finishing) {
             defaultScreen();
         } else {
             super.onBackPressed();
+            if (dbHelper != null) {
+                dbHelper.close();
+            }
+            if (binding != null && binding.webView != null) {
+                binding.webView.stopLoading();
+                binding.webView.setWebChromeClient(null);
+                binding.webView.setWebViewClient(null);
+                binding.webView.destroy();
+                binding.webView.clearCache(true);
+                binding.webView.clearHistory();
+                binding.webView.reload();
+            }
             finish();
         }
     }
 
     @Override
     public void getId(String id, int position, int seasonNum, int epNumber) {
-        if(!isNetworkAvailable()){
-            Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
-            return;
-        }
         binding.webView.clearCache(true);
         switch (position) {
             case 1:
@@ -207,22 +167,6 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         }
     }
 
-    private void initStart() {
-        if (!isNetworkAvailable()) {
-            binding.webView.setVisibility(View.GONE);
-            binding.tvSelect.setVisibility(View.VISIBLE);
-            binding.tvSelect.setText("Please check your internet and try again");
-        } else {
-            binding.webView.setVisibility(View.VISIBLE);
-            setupWebView(videoUrl);
-        }
-    }
-    @SuppressWarnings("deprecation")
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
 
     private void setupWebView(String videoUrl) {
         binding.webView.setWebViewClient(new CustomWebViewClient());

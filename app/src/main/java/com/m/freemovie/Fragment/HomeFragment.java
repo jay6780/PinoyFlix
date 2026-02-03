@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
 
 import com.app.hubert.guide.NewbieGuide;
 import com.app.hubert.guide.core.Controller;
@@ -23,7 +24,9 @@ import org.greenrobot.eventbus.EventBus;
 
 public class HomeFragment extends Fragment implements View.OnClickListener {
     private FragmentHomeBinding binding;
-    private Fragment movieFragment, tvSeriesFragment,animeFragment;
+    private Fragment movieFragment, tvSeriesFragment, animeFragment;
+    private boolean isTvSeriesAdded = false;
+    private boolean isAnimeAdded = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -32,23 +35,25 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         binding.tvMovies.setOnClickListener(this);
         binding.tvSeries.setOnClickListener(this);
         binding.tvTagalog.setOnClickListener(this);
+
         movieFragment = new MovieFragment();
-        tvSeriesFragment = new TvSeriesFragment();
-        animeFragment = new AnimeFragment();
+
         getChildFragmentManager()
                 .beginTransaction()
                 .add(R.id.fragment_container, movieFragment, "movie")
-                .add(R.id.fragment_container, tvSeriesFragment, "tvSeries")
-                .add(R.id.fragment_container, animeFragment, "animeFragment")
-                .hide(tvSeriesFragment)
-                .hide(animeFragment)
+                .setMaxLifecycle(movieFragment, Lifecycle.State.STARTED)
                 .commit();
+
         binding.tvMovies.setTextColor(getResources().getColor(R.color.SecondColor));
         binding.tvSeries.setTextColor(getResources().getColor(R.color.white));
         binding.tvTagalog.setTextColor(getResources().getColor(R.color.white));
         initGuide();
+
+        EventBus.getDefault().post(new MovieEvent(1));
+
         return binding.getRoot();
     }
+
 
     private void initGuide() {
         NewbieGuide.with(getActivity())
@@ -84,18 +89,37 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
         switch (view.getId()) {
             case R.id.tv_movies:
-                transaction.show(movieFragment);
-                transaction.hide(tvSeriesFragment);
-                transaction.hide(animeFragment);
+                if (movieFragment == null) {
+                    movieFragment = new MovieFragment();
+                    transaction.add(R.id.fragment_container, movieFragment, "movie");
+                    transaction.setMaxLifecycle(movieFragment, Lifecycle.State.STARTED);
+                } else {
+                    transaction.show(movieFragment);
+                }
+                if (tvSeriesFragment != null) {
+                    transaction.hide(tvSeriesFragment);
+                }
+                if (animeFragment != null) {
+                    transaction.hide(animeFragment);
+                }
                 binding.tvMovies.setTextColor(getResources().getColor(R.color.SecondColor));
                 binding.tvSeries.setTextColor(getResources().getColor(R.color.white));
                 binding.tvTagalog.setTextColor(getResources().getColor(R.color.white));
                 EventBus.getDefault().post(new MovieEvent(1));
                 break;
+
             case R.id.tv_series:
-                transaction.show(tvSeriesFragment);
+                if (tvSeriesFragment == null) {
+                    tvSeriesFragment = new TvSeriesFragment();
+                    transaction.add(R.id.fragment_container, tvSeriesFragment, "tvSeries");
+                    transaction.setMaxLifecycle(tvSeriesFragment, Lifecycle.State.STARTED);
+                } else {
+                    transaction.show(tvSeriesFragment);
+                }
                 transaction.hide(movieFragment);
-                transaction.hide(animeFragment);
+                if (animeFragment != null) {
+                    transaction.hide(animeFragment);
+                }
                 binding.tvSeries.setTextColor(getResources().getColor(R.color.SecondColor));
                 binding.tvMovies.setTextColor(getResources().getColor(R.color.white));
                 binding.tvTagalog.setTextColor(getResources().getColor(R.color.white));
@@ -103,9 +127,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 break;
 
             case R.id.tv_tagalog:
-                transaction.show(animeFragment);
+                if (animeFragment == null) {
+                    animeFragment = new AnimeFragment();
+                    transaction.add(R.id.fragment_container, animeFragment, "animeFragment");
+                    transaction.setMaxLifecycle(animeFragment, Lifecycle.State.STARTED);
+                } else {
+                    transaction.show(animeFragment);
+                }
                 transaction.hide(movieFragment);
-                transaction.hide(tvSeriesFragment);
+                if (tvSeriesFragment != null) {
+                    transaction.hide(tvSeriesFragment);
+                }
                 binding.tvTagalog.setTextColor(getResources().getColor(R.color.SecondColor));
                 binding.tvMovies.setTextColor(getResources().getColor(R.color.white));
                 binding.tvSeries.setTextColor(getResources().getColor(R.color.white));

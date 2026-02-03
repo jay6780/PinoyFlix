@@ -1,5 +1,6 @@
 package com.m.freemovie.Fragment;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -50,10 +51,14 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
                              Bundle savedInstanceState) {
         binding = FragmentAnimeBinding.inflate(inflater);
         presenter = new AnimePresenter(this);
-        presenter.getNewestPage(page);
-        presenter.getHotPage();
-        presenter.getPopular(page);
-        presenter.getMovie(page);
+        if(isNetworkAvailable()){
+            presenter.getNewestPage(page);
+            presenter.getHotPage();
+            presenter.getPopular(page);
+            presenter.getMovie(page);
+        }else{
+            Toast.makeText(getContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+        }
 
         List<View> viewsList = new ArrayList<>();
         viewsList.add(binding.tvNew);
@@ -142,6 +147,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
 
     }
     @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);

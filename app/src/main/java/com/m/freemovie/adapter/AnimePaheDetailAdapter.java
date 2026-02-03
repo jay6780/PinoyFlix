@@ -1,11 +1,16 @@
 package com.m.freemovie.adapter;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -68,6 +73,10 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(!isNetworkAvailable()){
+                    Toast.makeText(mContext,"Please check internet and try again",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if(lastPosition == (helper.getAdapterPosition())){
                     lastPosition = -1;
                     videoPlayListerner.getVideoUrl("",false,"");
@@ -102,5 +111,14 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
         });
         builder.show();
     }
+
+    @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
 
 }

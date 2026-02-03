@@ -1,5 +1,6 @@
 package com.m.freemovie.Activity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -172,6 +173,10 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
     }
 
     private void initStartApi() {
+        if(!isNetworkAvailable()){
+            Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+            return;
+        }
         if(isTvSeries) {
             switch (position) {
                 case 1:
@@ -250,6 +255,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
     private void refreshSeries(){
         if(!isNetworkAvailable()){
             Toast.makeText(getApplicationContext(),"Please check your internet and try again",Toast.LENGTH_SHORT).show();
+            swipeRefreshLayout.setRefreshing(false);
             return;
         }
         page = 1;
@@ -278,6 +284,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
     private void refreshMovies(){
         if(!isNetworkAvailable()){
             Toast.makeText(getApplicationContext(),"Please check your internet and try again",Toast.LENGTH_SHORT).show();
+            swipeRefreshLayout.setRefreshing(false);
             return;
         }
         page = 1;
@@ -301,6 +308,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
             }
     }
     @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;

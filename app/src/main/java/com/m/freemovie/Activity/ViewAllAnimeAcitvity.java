@@ -1,5 +1,9 @@
 package com.m.freemovie.Activity;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -103,6 +107,11 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
         binding.swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                if(!isNetworkAvailable()){
+                    binding.swipeRefreshLayout.setRefreshing(false);
+                    Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 page = 1;
                 animeItemBeanList.clear();
                 viewAllAnimeAdapter.setNewData(animeItemBeanList);
@@ -138,6 +147,10 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
 
 
     private void callApi() {
+        if(!isNetworkAvailable()){
+            Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+            return;
+        }
         switch (position){
             case 1:
                 presenter.getNewestPage(page);
@@ -152,6 +165,14 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
                 presenter.getMovie(page);
                 break;
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     @Override

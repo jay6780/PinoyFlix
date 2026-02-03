@@ -1,5 +1,6 @@
 package com.m.freemovie.Activity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -87,19 +88,6 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
             return;
         }
         initRecyclerMovie();
-
-        switch (videoPosition){
-            case 1:
-                binding.titleName.setVisibility(View.VISIBLE);
-                binding.titleName.setText(title);
-                videoUrl ="https://player.videasy.net/movie/"+videoId;
-                break;
-            case 2:
-                binding.titleName.setVisibility(View.GONE);
-                videoUrl = "https://vidrock.net/movie/"+ videoId;
-                break;
-        }
-
 //        Log.d("VideoUrl","value: "+videoUrl);
 
         binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -126,6 +114,17 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 }
             }
         });
+        switch (videoPosition){
+            case 1:
+                binding.titleName.setVisibility(View.VISIBLE);
+                binding.titleName.setText(title);
+                videoUrl ="https://player.videasy.net/movie/"+videoId;
+                break;
+            case 2:
+                binding.titleName.setVisibility(View.GONE);
+                videoUrl = "https://vidrock.net/movie/"+ videoId;
+                break;
+        }
         initApi();
         initStart();
         binding.llReset.setVisibility(View.GONE);
@@ -193,6 +192,10 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
     }
 
     private void initApi() {
+        if(!isNetworkAvailable()){
+            Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+            return;
+        }
         switch (apiPosition){
             case 1:
                 movieWatchListPresenter.getViewAll(getString(R.string.key),page,1);
@@ -243,16 +246,16 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
 
     private void initStart() {
         if (binding == null) return;
-
         if (!isNetworkAvailable()) {
             binding.webView.setVisibility(View.GONE);
-            Toast.makeText(getApplicationContext(), "Please check your internet and try again", Toast.LENGTH_SHORT).show();
         } else {
             binding.webView.setVisibility(View.VISIBLE);
             setupWebView(videoUrl);
         }
     }
+
     @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
@@ -364,6 +367,10 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
 
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
+            if(!isNetworkAvailable()){
+                hud.dismiss();
+                return;
+            }
             if (newProgress == 100) {
                 binding.tvSelect.setVisibility(View.GONE);
                 if (hud != null && hud.isShowing()) {
@@ -434,42 +441,24 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
 
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(binding.swipe != null &&binding.swipe.isRefreshing()){
-            binding.swipe.setRefreshing(false);
-        }
-        if (binding != null && binding.webView != null) {
-            binding.webView.stopLoading();
-            binding.webView.setWebChromeClient(null);
-            binding.webView.setWebViewClient(null);
-            binding.webView.destroy();
-            binding.webView.clearCache(true);
-            binding.webView.clearHistory();
-            binding.webView.reload();
-        }
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        if (binding != null && binding.webView != null) {
-            try {
-                binding.webView.clearCache(true);
-                binding.webView.clearHistory();
-                binding.webView.reload();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    @Override
     public void onBackPressed() {
         if(!finishing){
             defaultScreen();
         }else{
             super.onBackPressed();
             finish();
+            if(binding.swipe != null &&binding.swipe.isRefreshing()){
+                binding.swipe.setRefreshing(false);
+            }
+            if (binding != null && binding.webView != null) {
+                binding.webView.stopLoading();
+                binding.webView.setWebChromeClient(null);
+                binding.webView.setWebViewClient(null);
+                binding.webView.destroy();
+                binding.webView.clearCache(true);
+                binding.webView.clearHistory();
+                binding.webView.reload();
+            }
         }
     }
 }
