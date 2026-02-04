@@ -21,6 +21,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.app.hubert.guide.NewbieGuide;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.m.freemovie.Fragment.BookmarkFragment;
 import com.m.freemovie.Fragment.HomeFragment;
 import com.m.freemovie.Fragment.SearchFragment;
@@ -40,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView btn_back5;
     private static final int RESET_GUIDE_REQUEST_CODE = 100;
     private long pressedTime;
+    private AdView adView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +60,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ll_file.setOnClickListener(this);
         btn_back5.setOnClickListener(this);
         ll_guide.setOnClickListener(this);
+
+
+        new Thread(
+                () -> {
+                    MobileAds.initialize(this, initializationStatus -> {});
+                })
+                .start();
+        adView = new AdView(this);
+        adView.setAdUnitId(getString(R.string.banner_adId));
+
+        adView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, 360));
+        binding.adViewContainer.removeAllViews();
+        binding.adViewContainer.addView(adView);
+
+
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {

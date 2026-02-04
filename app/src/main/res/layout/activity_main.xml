@@ -44,6 +44,8 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+
+
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
@@ -64,7 +66,15 @@
             app:mbn_defaultIconColor="@color/white"
             app:mbn_selectedIconColor="@color/white"
             app:mbn_shadowColor="#313647" />
+
+        <FrameLayout
+            android:layout_above="@+id/nav"
+            android:id="@+id/ad_view_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
     </RelativeLayout>
+
 
     <include
         layout="@layout/nav_menu"

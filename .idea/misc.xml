@@ -14,6 +14,8 @@
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout-land/activity_tagalog_episode.xml" value="0.2" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/activity_anime_pahe_webview.xml" value="0.327445652173913" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/activity_details.xml" value="0.12590579710144928" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/activity_details_series.xml" value="0.36666666666666664" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/activity_download_video.xml" value="0.35104166666666664" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/activity_full_view_video.xml" value="0.22083333333333333" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/activity_main.xml" value="0.24954710144927536" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/activity_nine_anime_epsiode.xml" value="0.259375" />
@@ -22,26 +24,34 @@
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/activity_tagalog_webview.xml" value="0.2869791666666667" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/activity_video_webview.xml" value="0.284375" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/activity_view_all.xml" value="0.22" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/activity_view_all_anime_acitvity.xml" value="0.35104166666666664" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/activity_view_all_nine_anime.xml" value="0.27239583333333334" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/bookmark_highlight.xml" value="0.3026041666666667" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/dialog_select_quality.xml" value="0.2671875" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/episode_item.xml" value="0.22" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/fragment_anime.xml" value="0.36666666666666664" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/fragment_anime_pahe.xml" value="0.290625" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/fragment_bookmark.xml" value="0.35104166666666664" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/fragment_choose.xml" value="0.33697916666666666" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/fragment_home.xml" value="0.17" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/fragment_movie.xml" value="0.30052083333333335" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/fragment_nine_anime.xml" value="0.303125" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/fragment_search.xml" value="0.26706231454005935" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/fragment_tagalog_series.xml" value="0.34646739130434784" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/fragment_tagalog_series2.xml" value="0.30052083333333335" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/fragment_tagalog_server2.xml" value="0.35104166666666664" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/fragment_tvseries.xml" value="0.36666666666666664" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/guide_movie.xml" value="0.22083333333333333" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/guide_options.xml" value="0.19479166666666667" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/guide_series.xml" value="0.2" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/guide_tagalog.xml" value="0.21979166666666666" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/item_movie_now.xml" value="0.2140625" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/item_net_image.xml" value="0.2734375" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/long_press.xml" value="0.2859375" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/movie_item.xml" value="0.358695652173913" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/nav_menu.xml" value="0.2869791666666667" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/quality_item.xml" value="0.25" />
+        <entry key="..\:/practice/Free_movie/app/src/main/res/layout/recent_item.xml" value="0.7371031746031746" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/rl_title.xml" value="0.358695652173913" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/spinner_dropdown_item.xml" value="0.16458333333333333" />
         <entry key="..\:/practice/Free_movie/app/src/main/res/layout/spinner_highlight.xml" value="0.3026041666666667" />
