@@ -37,6 +37,7 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.m.freemovie.R;
+import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
 import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
@@ -243,7 +244,11 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
             initGuide("tagalog_series");
             revivalInfoDetailPresenter.getListTv(id);
             binding.tvEnjoy.setVisibility(View.GONE);
-            loadAd();
+            if(!AppConstant.isAddFree){
+                loadAd();
+            }else{
+                loadAdsFailed();
+            }
         }
         if(binding.tvEnjoy.getVisibility() == View.GONE){
             binding.rvSeason.setVisibility(View.VISIBLE);

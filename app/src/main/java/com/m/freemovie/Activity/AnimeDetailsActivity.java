@@ -112,10 +112,12 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
                 new InterstitialAdLoadCallback() {
                     @Override
                     public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                        mInterstitialAd = interstitialAd;
+                        if(!AppConstant.isAddFree){
+                            mInterstitialAd = interstitialAd;
 //                        Log.i(TAG, "Ad Loaded. Showing it now automatically...");
-                        Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
-                        mInterstitialAd.show(AnimeDetailsActivity.this);
+                            Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
+                            mInterstitialAd.show(AnimeDetailsActivity.this);
+                        }
                         mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
                             @Override
                             public void onAdDismissedFullScreenContent() {

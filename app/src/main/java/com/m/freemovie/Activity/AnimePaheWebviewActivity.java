@@ -158,7 +158,11 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         episodeAdapter = new AnimePaheDetailAdapter(this);
         binding.rvSeason.setAdapter(episodeAdapter);
         episodeAdapter.setNewData(episodeBeanList);
-        loadAd();
+        if(!AppConstant.isAddFree){
+            loadAd();
+        }else{
+            loadAdsFailed();
+        }
     }
 
     @SuppressLint("MissingPermission")

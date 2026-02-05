@@ -42,6 +42,7 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
+import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
 import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
@@ -221,7 +222,11 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
         });
 
         initTopPadding(70);
-        loadAd();
+        if(!AppConstant.isAddFree){
+            loadAd();
+        }else{
+            loadAdsFailed();
+        }
     }
 
     @SuppressLint("MissingPermission")

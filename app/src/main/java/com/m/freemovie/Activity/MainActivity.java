@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (getIntent().getBooleanExtra("resetGuide", false)) {
             resetGuideLabels();
         }
+
         initAd();
     }
 
@@ -100,9 +101,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new AppOpenAd.AppOpenAdLoadCallback() {
                     @Override
                     public void onAdLoaded(AppOpenAd ad) {
-                        appOpenAd = ad;
-                        showAdIfAvailable();
-                        Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
+                        if(!AppConstant.isAddFree){
+                            appOpenAd = ad;
+                            showAdIfAvailable();
+                            Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
+                        }
+
                     }
 
                     @Override

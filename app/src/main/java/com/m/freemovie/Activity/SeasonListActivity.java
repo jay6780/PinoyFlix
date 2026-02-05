@@ -26,6 +26,7 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.m.freemovie.R;
+import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.WatchHistoryDBHelper;
 import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
 import com.m.freemovie.Utils.WindowUtils;
@@ -100,7 +101,12 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                     "Last Episode watched: Episode " + lastWatchedEpisodeNumber,
                     Toast.LENGTH_SHORT).show();
         }
-        loadAd();
+        if(!AppConstant.isAddFree){
+            loadAd();
+        }else{
+            binding.adTvSeries.setVisibility(View.GONE);
+        }
+
     }
 
     @SuppressLint("MissingPermission")

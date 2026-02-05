@@ -124,10 +124,13 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                 new InterstitialAdLoadCallback() {
                     @Override
                     public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                        mInterstitialAd = interstitialAd;
+                        if(!AppConstant.isAddFree){
+                            mInterstitialAd = interstitialAd;
 //                        Log.i(TAG, "Ad Loaded. Showing it now automatically...");
-                        Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
-                        mInterstitialAd.show(Details_activity.this);
+                            Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
+                            mInterstitialAd.show(Details_activity.this);
+                        }
+
                         mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
                             @Override
                             public void onAdDismissedFullScreenContent() {
