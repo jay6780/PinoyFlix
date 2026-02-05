@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -74,6 +75,15 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
         if(isNetworkAvailable()){
+            new CountDownTimer(1500, 1000) {
+                public void onTick(long millisUntilFinished) {
+                }
+
+                public void onFinish() {
+                    initApi();
+                }
+
+            }.start();
             loadAd();
         }else{
             Toast.makeText(getApplicationContext(),"Please check connection and try again",Toast.LENGTH_SHORT).show();
@@ -111,12 +121,12 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
                             public void onAdDismissedFullScreenContent() {
 //                                Log.d(TAG, "Ad dismissed by user.");
                                 mInterstitialAd = null;
-                                initApi();
                             }
 
                             @Override
                             public void onAdFailedToShowFullScreenContent(AdError adError) {
-                                Log.e(TAG, "Ad failed to show: " + adError.getMessage());
+//                                Log.e(TAG, "Ad failed to show: " + adError.getMessage());
+
                                 mInterstitialAd = null;
                             }
                         });

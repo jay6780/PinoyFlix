@@ -11,5 +11,7 @@ public class AppConstant {
     public static  final String AppAdId = "ca-app-pub-4940235333780807~6073109122";
     public static  final String OpenAppId = "ca-app-pub-4940235333780807/2135532412";
     public static final String InterstitialId = "ca-app-pub-4940235333780807/3808106112";
+    public static  final String BannerAppId = "ca-app-pub-4940235333780807/3670307066";
+
 
 }

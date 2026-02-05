@@ -10,63 +10,63 @@
         android:layout_height="match_parent"
         android:background="#313647">
 
-    <RelativeLayout
-        android:id="@+id/rl_webview"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:background="#000000">
-
-        <LinearLayout
-            android:id="@+id/ll_root"
+        <RelativeLayout
+            android:id="@+id/rl_webview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="7dp"
-            android:elevation="20dp"
-            android:orientation="horizontal">
+            android:layout_height="250dp"
+            android:background="#000000">
 
-            <ImageView
-                android:id="@+id/btn_back_finish"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@mipmap/icon_backwhite" />
+            <LinearLayout
+                android:id="@+id/ll_root"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="7dp"
+                android:elevation="20dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/btn_back_finish"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@mipmap/icon_backwhite" />
+
+                <TextView
+                    android:id="@+id/title_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <WebView
+                android:id="@+id/webView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
 
             <TextView
-                android:id="@+id/title_name"
+                android:id="@+id/tv_select"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textSize="16sp" />
-        </LinearLayout>
+                android:layout_centerInParent="true"
+                android:text="Select movie to play" />
 
-        <WebView
-            android:id="@+id/webView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/tv_select"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Select movie to play" />
-
-        <ImageView
-            android:id="@+id/expand"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:elevation="20dp"
-            android:src="@mipmap/expand"
-            android:visibility="gone" />
-    </RelativeLayout>
+            <ImageView
+                android:id="@+id/expand"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:elevation="20dp"
+                android:src="@mipmap/expand"
+                android:visibility="gone" />
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/episodeTxt"
@@ -82,24 +82,25 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/episodeTxt"
-            android:visibility="gone"
-            android:layout_marginTop="2dp" />
+            android:layout_marginTop="2dp"
+            android:visibility="gone" />
+
         <LinearLayout
             android:id="@+id/ll_reset"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:visibility="gone"
-            android:background="@drawable/up_bg"
-            android:layout_marginBottom="10dp"
-            android:layout_marginRight="10dp"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/up_bg"
             android:gravity="center"
-            android:layout_alignParentBottom="true">
+            android:visibility="gone">
 
             <ImageView
                 android:layout_width="30dp"
-                android:src="@mipmap/up_reset"
-                android:layout_height="30dp"/>
+                android:layout_height="30dp"
+                android:src="@mipmap/up_reset" />
 
         </LinearLayout>
 

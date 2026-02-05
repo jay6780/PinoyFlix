@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -26,8 +26,7 @@ import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
+import com.google.android.gms.ads.appopen.AppOpenAd;
 import com.m.freemovie.Fragment.BookmarkFragment;
 import com.m.freemovie.Fragment.HomeFragment;
 import com.m.freemovie.Fragment.SearchFragment;
@@ -48,16 +47,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView btn_back5;
     private static final int RESET_GUIDE_REQUEST_CODE = 100;
     private long pressedTime;
-    private InterstitialAd mInterstitialAd;
     private String TAG ="MainAd";
+    private AppOpenAd appOpenAd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
-        initializeBottomNavigation();
-        initPermission();
         ll_file = findViewById(R.id.ll_file);
         btn_back5 = findViewById(R.id.btn_back5);
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -92,7 +89,67 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (getIntent().getBooleanExtra("resetGuide", false)) {
             resetGuideLabels();
         }
+        initAd();
     }
+
+    private void initAd() {
+        AppOpenAd.load(
+                this,
+                AppConstant.OpenAppId,
+                new AdRequest.Builder().build(),
+                new AppOpenAd.AppOpenAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(AppOpenAd ad) {
+                        appOpenAd = ad;
+                        showAdIfAvailable();
+                        Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(LoadAdError loadAdError) {
+//                        Log.d(TAG, "App open ad failed to load with error: " + loadAdError.getMessage());
+
+                    }
+                });
+
+
+        new CountDownTimer(1500, 1000) {
+            public void onTick(long millisUntilFinished) {
+            }
+
+            public void onFinish() {
+                initializeBottomNavigation();
+                initPermission();
+            }
+
+        }.start();
+    }
+
+
+    private void showAdIfAvailable() {
+        if (appOpenAd != null) {
+            appOpenAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                @Override
+                public void onAdDismissedFullScreenContent() {
+//                    Log.d(TAG, "Ad dismissed.");
+                }
+
+                @Override
+                public void onAdFailedToShowFullScreenContent(AdError adError) {
+//                    Log.d(TAG, "Ad failed to show.");
+                }
+
+                @Override
+                public void onAdShowedFullScreenContent() {
+//                    Log.d(TAG, "Ad showed successfully.");
+                }
+            });
+
+            // Show the ad
+            appOpenAd.show(MainActivity.this);
+        }
+    }
+
 
     private void initPermission() {
         ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE,android.Manifest.permission.READ_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
@@ -220,7 +277,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             NewbieGuide.resetLabel(getApplicationContext(), reset);
         }
     }
-
 
     @Override
     public void onBackPressed() {

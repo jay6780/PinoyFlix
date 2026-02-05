@@ -79,6 +79,7 @@
             android:id="@+id/rv_season"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_above="@+id/ll_ads"
             android:layout_below="@+id/episodeTxt"
             android:layout_marginTop="2dp" />
 
@@ -93,15 +94,31 @@
 
 
         <LinearLayout
+            android:id="@+id/ll_ads"
+            android:layout_width="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@+id/ll_bookmark"
+            android:visibility="gone"
+            android:layout_marginBottom="5dp"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/ad_tvSeries"
+                android:layout_width="match_parent"
+                android:visibility="gone"
+                android:layout_height="50dp"/>
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/ll_bookmark"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:background="@drawable/circle_floating"
             android:layout_marginBottom="10dp"
             android:layout_marginRight="10dp"
+            android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:gravity="center"
-            android:layout_alignParentBottom="true">
+            android:gravity="center">
 
             <ImageView
                 android:id="@+id/iv_heart"
@@ -109,6 +126,9 @@
                 android:layout_height="30dp"/>
 
         </LinearLayout>
+
+
+
 
     </RelativeLayout>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

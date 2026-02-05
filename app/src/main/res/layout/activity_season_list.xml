@@ -77,9 +77,18 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_season"
+        android:layout_above="@+id/ad_tvSeries"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/episodeTxt"
         android:layout_marginTop="2dp" />
+
+
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/ad_tvSeries"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_height="50dp"/>
 
 </RelativeLayout>

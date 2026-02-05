@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -40,9 +41,9 @@ import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.SeasonsAdapter;
 import com.m.freemovie.databinding.ActivityDetailsBinding;
 import com.m.freemovie.databinding.ActivityDetailsSeriesBinding;
+import com.m.freemovie.mvp.Contract.DetailContract;
 import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.DetailTvBean;
-import com.m.freemovie.mvp.Contract.DetailContract;
 import com.m.freemovie.mvp.Presenter.DetailPresenter;
 
 import java.text.SimpleDateFormat;
@@ -105,9 +106,19 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
         setImageData(id);
         loadAd();
-    }
 
+    }
+    @SuppressLint("MissingPermission")
     private void loadAd() {
+        new CountDownTimer(1500, 1000) {
+            public void onTick(long millisUntilFinished) {
+            }
+
+            public void onFinish() {
+                callApi();
+            }
+
+        }.start();
         AdRequest adRequest = new AdRequest.Builder().build();
         InterstitialAd.load(this, AppConstant.InterstitialId, adRequest,
                 new InterstitialAdLoadCallback() {
@@ -121,23 +132,11 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                             @Override
                             public void onAdDismissedFullScreenContent() {
                                 Log.d(TAG, "Ad dismissed by user.");
-                                mInterstitialAd = null;
-                                if(isNetworkAvailable()){
-                                    if (position == 2) {
-                                        detailPresenter.getTvDetail(id, getString(R.string.key));
-                                    } else {
-                                        detailPresenter.getDetail(id, getString(R.string.key));
-                                    }
-
-                                }else{
-                                    Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
-                                }
                             }
 
                             @Override
                             public void onAdFailedToShowFullScreenContent(AdError adError) {
 //                                Log.e(TAG, "Ad failed to show: " + adError.getMessage());
-                                mInterstitialAd = null;
                             }
                         });
                     }
@@ -145,12 +144,23 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
 //                        Log.e(TAG, "Ad failed to load: " + loadAdError.getMessage());
-                        mInterstitialAd = null;
                     }
                 });
     }
 
 
+    private void callApi(){
+        if(isNetworkAvailable()){
+            if (position == 2) {
+                detailPresenter.getTvDetail(id, getString(R.string.key));
+            } else {
+                detailPresenter.getDetail(id, getString(R.string.key));
+            }
+
+        }else{
+            Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+        }
+    }
     @SuppressWarnings("deprecation")
     @SuppressLint("MissingPermission")
     private boolean isNetworkAvailable() {

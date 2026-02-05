@@ -17,7 +17,6 @@ import java.io.File;
 
 public class MyApplication extends Application {
     private static MyApplication instance;
-    private static AppOpenManager appOpenManager;
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
@@ -35,7 +34,6 @@ public class MyApplication extends Application {
                 this,
                 initializationStatus -> {
                 });
-        appOpenManager = new AppOpenManager(this);
     }
 
     public static void deleteCache(Context context) {
