@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.ads.MobileAds;
 
 import java.io.File;
 
@@ -16,7 +17,7 @@ import java.io.File;
 
 public class MyApplication extends Application {
     private static MyApplication instance;
-
+    private static AppOpenManager appOpenManager;
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
@@ -30,6 +31,11 @@ public class MyApplication extends Application {
 //        LeakCanary.setConfig(config);
         initGlide();
         deleteCache(instance);
+        MobileAds.initialize(
+                this,
+                initializationStatus -> {
+                });
+        appOpenManager = new AppOpenManager(this);
     }
 
     public static void deleteCache(Context context) {

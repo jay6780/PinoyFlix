@@ -16,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -25,8 +26,15 @@ import com.app.hubert.guide.listener.OnGuideChangedListener;
 import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
+import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.SeasonsAdapter;
@@ -55,6 +63,8 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     private BookmarkDbHelper dbHelper;
     private int position = 2;
     private int apiPosition;
+    private InterstitialAd mInterstitialAd;
+    private String TAG = "Details_activity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,18 +104,50 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
         }
 
         setImageData(id);
+        loadAd();
+    }
 
-        if(isNetworkAvailable()){
-            if (position == 2) {
-                detailPresenter.getTvDetail(id, getString(R.string.key));
-            } else {
-                detailPresenter.getDetail(id, getString(R.string.key));
-            }
+    private void loadAd() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        InterstitialAd.load(this, AppConstant.InterstitialId, adRequest,
+                new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        mInterstitialAd = interstitialAd;
+                        Log.i(TAG, "Ad Loaded. Showing it now automatically...");
+                        Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
+                        mInterstitialAd.show(Details_activity.this);
+                        mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                            @Override
+                            public void onAdDismissedFullScreenContent() {
+                                Log.d(TAG, "Ad dismissed by user.");
+                                mInterstitialAd = null;
+                                if(isNetworkAvailable()){
+                                    if (position == 2) {
+                                        detailPresenter.getTvDetail(id, getString(R.string.key));
+                                    } else {
+                                        detailPresenter.getDetail(id, getString(R.string.key));
+                                    }
 
-        }else{
-            Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
-        }
+                                }else{
+                                    Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+                                }
+                            }
 
+                            @Override
+                            public void onAdFailedToShowFullScreenContent(AdError adError) {
+                                Log.e(TAG, "Ad failed to show: " + adError.getMessage());
+                                mInterstitialAd = null;
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        Log.e(TAG, "Ad failed to load: " + loadAdError.getMessage());
+                        mInterstitialAd = null;
+                    }
+                });
     }
 
 

@@ -1,23 +1,35 @@
 package com.m.freemovie.Activity;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.kaopiz.kprogresshud.KProgressHUD;
+import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.AnimeSeasonAdapter;
 import com.m.freemovie.databinding.ActivityAnimeDetailsBinding;
+import com.m.freemovie.mvp.Contract.AnimeDetailsContract;
 import com.m.freemovie.mvp.Model.ClassBean.AnimeDetailsBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogInfoBean;
-import com.m.freemovie.mvp.Contract.AnimeDetailsContract;
 import com.m.freemovie.mvp.Presenter.AnimeDetailPresenter;
 
 import java.util.ArrayList;
@@ -43,6 +55,8 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
     private String airDate;
     private Random random;
     private KProgressHUD hud;
+    private InterstitialAd mInterstitialAd;
+    private String TAG = "AnimeDetailsActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +73,11 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
-        initApi();
+        if(isNetworkAvailable()){
+            loadAd();
+        }else{
+            Toast.makeText(getApplicationContext(),"Please check connection and try again",Toast.LENGTH_SHORT).show();
+        }
         binding.ivBack.setOnClickListener(view ->onBackPressed());
     }
 
@@ -68,6 +86,48 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
         animeSeasonAdapter = new AnimeSeasonAdapter(apiPosition);
         binding.rvSeasons.setLayoutManager(new LinearLayoutManager(this));
         binding.rvSeasons.setAdapter(animeSeasonAdapter);
+    }
+    @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+
+    private void loadAd() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        InterstitialAd.load(this, AppConstant.InterstitialId, adRequest,
+                new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        mInterstitialAd = interstitialAd;
+                        Log.i(TAG, "Ad Loaded. Showing it now automatically...");
+                        Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
+                        mInterstitialAd.show(AnimeDetailsActivity.this);
+                        mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                            @Override
+                            public void onAdDismissedFullScreenContent() {
+                                Log.d(TAG, "Ad dismissed by user.");
+                                mInterstitialAd = null;
+                                initApi();
+                            }
+
+                            @Override
+                            public void onAdFailedToShowFullScreenContent(AdError adError) {
+                                Log.e(TAG, "Ad failed to show: " + adError.getMessage());
+                                mInterstitialAd = null;
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        Log.e(TAG, "Ad failed to load: " + loadAdError.getMessage());
+                        mInterstitialAd = null;
+                    }
+                });
     }
 
 

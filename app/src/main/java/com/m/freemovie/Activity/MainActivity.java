@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -21,13 +22,17 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.app.hubert.guide.NewbieGuide;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.m.freemovie.Fragment.BookmarkFragment;
 import com.m.freemovie.Fragment.HomeFragment;
 import com.m.freemovie.Fragment.SearchFragment;
 import com.m.freemovie.R;
+import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
@@ -43,7 +48,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView btn_back5;
     private static final int RESET_GUIDE_REQUEST_CODE = 100;
     private long pressedTime;
-    private AdView adView;
+    private InterstitialAd mInterstitialAd;
+    private String TAG ="MainAd";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,18 +67,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_back5.setOnClickListener(this);
         ll_guide.setOnClickListener(this);
 
-
-        new Thread(
-                () -> {
-                    MobileAds.initialize(this, initializationStatus -> {});
-                })
-                .start();
-        adView = new AdView(this);
-        adView.setAdUnitId(getString(R.string.banner_adId));
-
-        adView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, 360));
-        binding.adViewContainer.removeAllViews();
-        binding.adViewContainer.addView(adView);
 
 
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {

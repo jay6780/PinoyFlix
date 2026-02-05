@@ -18,8 +18,9 @@
         <item>Movie anime</item>
     </string-array>
 
-    <string name="ads_id">"ca-app-pub-4940235333780807~6073109122</string>
-    <string name="banner_adId">"ca-app-pub-4940235333780807/3670307066</string>
+    <string name="ads_id">ca-app-pub-4940235333780807~6073109122</string>
+    <string name="banner_adId">ca-app-pub-4940235333780807/3670307066</string>
+    <string name="openAppId">ca-app-pub-4940235333780807/2135532412</string>
     <string name="brvah_app_name">Library</string>
     <string name="brvah_loading">正在加载中...</string>
     <string name="brvah_load_failed">加载失败，请点我重试</string>
