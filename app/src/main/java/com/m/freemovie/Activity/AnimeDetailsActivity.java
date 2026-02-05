@@ -103,13 +103,13 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
                     @Override
                     public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
                         mInterstitialAd = interstitialAd;
-                        Log.i(TAG, "Ad Loaded. Showing it now automatically...");
+//                        Log.i(TAG, "Ad Loaded. Showing it now automatically...");
                         Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
                         mInterstitialAd.show(AnimeDetailsActivity.this);
                         mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
                             @Override
                             public void onAdDismissedFullScreenContent() {
-                                Log.d(TAG, "Ad dismissed by user.");
+//                                Log.d(TAG, "Ad dismissed by user.");
                                 mInterstitialAd = null;
                                 initApi();
                             }
@@ -124,7 +124,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
 
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        Log.e(TAG, "Ad failed to load: " + loadAdError.getMessage());
+//                        Log.e(TAG, "Ad failed to load: " + loadAdError.getMessage());
                         mInterstitialAd = null;
                     }
                 });

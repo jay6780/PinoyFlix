@@ -114,7 +114,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                     @Override
                     public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
                         mInterstitialAd = interstitialAd;
-                        Log.i(TAG, "Ad Loaded. Showing it now automatically...");
+//                        Log.i(TAG, "Ad Loaded. Showing it now automatically...");
                         Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
                         mInterstitialAd.show(Details_activity.this);
                         mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
@@ -136,7 +136,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
                             @Override
                             public void onAdFailedToShowFullScreenContent(AdError adError) {
-                                Log.e(TAG, "Ad failed to show: " + adError.getMessage());
+//                                Log.e(TAG, "Ad failed to show: " + adError.getMessage());
                                 mInterstitialAd = null;
                             }
                         });
@@ -144,7 +144,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        Log.e(TAG, "Ad failed to load: " + loadAdError.getMessage());
+//                        Log.e(TAG, "Ad failed to load: " + loadAdError.getMessage());
                         mInterstitialAd = null;
                     }
                 });
