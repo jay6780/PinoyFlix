@@ -69,6 +69,7 @@ public class DownloadWebview extends AppCompatActivity {
             setupWebView(downloadUrl);
             binding.webView.setVisibility(View.VISIBLE);
         }
+        binding.webContainer.setVisibility(View.VISIBLE);
     }
     @SuppressWarnings("deprecation")
     private boolean isNetworkAvailable() {
@@ -123,6 +124,7 @@ public class DownloadWebview extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(),"Download in progress",Toast.LENGTH_SHORT).show();
                         return;
                     }
+                    binding.webContainer.setVisibility(View.GONE);
                     downloadVideo(videoUrl);
                 }else{
                     Toast.makeText(getApplicationContext(),"Video can't be downloaded",Toast.LENGTH_SHORT).show();
@@ -146,6 +148,7 @@ public class DownloadWebview extends AppCompatActivity {
                 "^https?://vault-.*\\.uwucdn\\.top.*",
                 "^https?://.*\\.mp4.*",
                 "^https?://.*/mp4/.*",
+                "^https?://.*/mkv/.*",
         };
 
         for (String pattern : allowedPatterns) {
@@ -212,6 +215,7 @@ public class DownloadWebview extends AppCompatActivity {
             isFirstTask = false;
             if (outputFile.exists()) {
                 outputFile.delete();
+                binding.webContainer.setVisibility(View.VISIBLE);
                 Toast.makeText(getApplicationContext(), "Download cancelled", Toast.LENGTH_SHORT).show();
             }
         });
@@ -277,6 +281,7 @@ public class DownloadWebview extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(),
                                     "Download Complete!", Toast.LENGTH_LONG).show();
                             startActivity(new Intent(getApplicationContext(), Download_videoActivity.class));
+                            binding.webContainer.setVisibility(View.VISIBLE);
                         });
                     }
                 } else {
