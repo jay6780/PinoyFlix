@@ -184,6 +184,7 @@ public class TagalogWebviewActivity extends AppCompatActivity
         adView.setAdUnitId(getString(R.string.banner_adId));
         adView.setAdSize(AdSize.BANNER);
         if(isOther){
+            binding.adTvSeries.setVisibility(View.GONE);
             binding.adMovie.removeAllViews();
             binding.adMovie.addView(adView);
         }else{
@@ -230,8 +231,8 @@ public class TagalogWebviewActivity extends AppCompatActivity
         params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         params.addRule(RelativeLayout.BELOW,binding.episodeTxt.getId());
         binding.rvSeason.setLayoutParams(params);
-        binding.adTvSeries.removeAllViews();
         binding.adTvSeries.setVisibility(View.GONE);
+        binding.adMovie.setVisibility(View.GONE);
         binding.llAds.setVisibility(View.GONE);
     }
 
@@ -321,6 +322,9 @@ public class TagalogWebviewActivity extends AppCompatActivity
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         binding.llBookmark.setVisibility(View.GONE);
         binding.swipe.setEnabled(false);
+        if(isOther){
+            binding.adMovie.setVisibility(View.GONE);
+        }
         if(!isMovie){
             loadAdsFailed();
         }
