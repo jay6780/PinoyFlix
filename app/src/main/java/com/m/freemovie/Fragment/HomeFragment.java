@@ -73,6 +73,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                         .addHighLight(binding.tvTagalog, HighLight.Shape.ROUND_RECTANGLE, 1)
                         .setLayoutRes(R.layout.guide_tagalog)
                 )
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(binding.tvOthers, HighLight.Shape.ROUND_RECTANGLE, 1)
+                        .setLayoutRes(R.layout.guide_other)
+                )
                 .show();
     }
 
