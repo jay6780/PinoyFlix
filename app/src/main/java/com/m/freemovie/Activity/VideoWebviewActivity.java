@@ -400,7 +400,6 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 startActivity(intent);
                 return true;
             } else {
-                view.stopLoading();
                 return true;
             }
         }

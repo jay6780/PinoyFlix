@@ -575,7 +575,6 @@ public class TagalogWebviewActivity extends AppCompatActivity
                 if (url.contains(videoUrl)) {
                     return false;
                 } else {
-                    view.stopLoading();
                     return true;
                 }
             }catch (Exception e){

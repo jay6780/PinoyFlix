@@ -268,7 +268,6 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                 if (url.contains(videoUrl)) {
                     return false;
                 } else {
-                    view.stopLoading();
                     return true;
                 }
             } catch (Exception e) {
