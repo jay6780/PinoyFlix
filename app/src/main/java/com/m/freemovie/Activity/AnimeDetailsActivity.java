@@ -58,6 +58,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
     private KProgressHUD hud;
     private InterstitialAd mInterstitialAd;
     private String TAG = "AnimeDetailsActivity";
+    private boolean isAdLoad = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +86,11 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
 
             }.start();
             loadAd();
+            if(AppConstant.isAddFree){
+                isAdLoad = false;
+            }else{
+                isAdLoad = true;
+            }
         }else{
             Toast.makeText(getApplicationContext(),"Please check connection and try again",Toast.LENGTH_SHORT).show();
         }
@@ -117,12 +123,14 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
 //                        Log.i(TAG, "Ad Loaded. Showing it now automatically...");
                             Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
                             mInterstitialAd.show(AnimeDetailsActivity.this);
+                            isAdLoad = false;
                         }
                         mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
                             @Override
                             public void onAdDismissedFullScreenContent() {
 //                                Log.d(TAG, "Ad dismissed by user.");
                                 mInterstitialAd = null;
+                                isAdLoad = false;
                             }
 
                             @Override
@@ -130,6 +138,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
 //                                Log.e(TAG, "Ad failed to show: " + adError.getMessage());
 
                                 mInterstitialAd = null;
+                                isAdLoad = false;
                             }
                         });
                     }
@@ -138,6 +147,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
 //                        Log.e(TAG, "Ad failed to load: " + loadAdError.getMessage());
                         mInterstitialAd = null;
+                        isAdLoad = false;
                     }
                 });
     }
@@ -326,6 +336,9 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
 
     @Override
     public void onBackPressed() {
+        if(isAdLoad){
+            return;
+        }
         finish();
         super.onBackPressed();
     }

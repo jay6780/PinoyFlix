@@ -15,18 +15,11 @@ import com.app.hubert.guide.listener.OnGuideChangedListener;
 import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
-import com.m.freemovie.Retrofit.AppConstant;
-import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.databinding.FragmentHomeBinding;
-import com.m.freemovie.mvp.Model.ClassBean.MovieEvent;
-
-import org.greenrobot.eventbus.EventBus;
 
 public class HomeFragment extends Fragment implements View.OnClickListener {
     private FragmentHomeBinding binding;
-    private Fragment movieFragment, tvSeriesFragment, animeFragment;
-    private boolean isTvSeriesAdded = false;
-    private boolean isAnimeAdded = false;
+    private Fragment movieFragment, tvSeriesFragment, animeFragment,otherFragment;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,6 +28,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         binding.tvMovies.setOnClickListener(this);
         binding.tvSeries.setOnClickListener(this);
         binding.tvTagalog.setOnClickListener(this);
+        binding.tvOthers.setOnClickListener(this);
 
         movieFragment = new MovieFragment();
 
@@ -49,7 +43,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         binding.tvTagalog.setTextColor(getResources().getColor(R.color.white));
         initGuide();
 
-        EventBus.getDefault().post(new MovieEvent(1));
 
         return binding.getRoot();
     }
@@ -102,10 +95,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 if (animeFragment != null) {
                     transaction.hide(animeFragment);
                 }
+
+                if (otherFragment != null) {
+                    transaction.hide(otherFragment);
+                }
                 binding.tvMovies.setTextColor(getResources().getColor(R.color.SecondColor));
                 binding.tvSeries.setTextColor(getResources().getColor(R.color.white));
                 binding.tvTagalog.setTextColor(getResources().getColor(R.color.white));
-                EventBus.getDefault().post(new MovieEvent(1));
+                binding.tvOthers.setTextColor(getResources().getColor(R.color.white));
                 break;
 
             case R.id.tv_series:
@@ -116,14 +113,19 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 } else {
                     transaction.show(tvSeriesFragment);
                 }
-                transaction.hide(movieFragment);
+                if(movieFragment !=null){
+                    transaction.hide(movieFragment);
+                }
                 if (animeFragment != null) {
                     transaction.hide(animeFragment);
+                }
+                if (otherFragment != null) {
+                    transaction.hide(otherFragment);
                 }
                 binding.tvSeries.setTextColor(getResources().getColor(R.color.SecondColor));
                 binding.tvMovies.setTextColor(getResources().getColor(R.color.white));
                 binding.tvTagalog.setTextColor(getResources().getColor(R.color.white));
-                EventBus.getDefault().post(new MovieEvent(2));
+                binding.tvOthers.setTextColor(getResources().getColor(R.color.white));
                 break;
 
             case R.id.tv_tagalog:
@@ -134,14 +136,43 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 } else {
                     transaction.show(animeFragment);
                 }
-                transaction.hide(movieFragment);
+                if(movieFragment !=null){
+                    transaction.hide(movieFragment);
+                }
                 if (tvSeriesFragment != null) {
                     transaction.hide(tvSeriesFragment);
+                }
+                if (otherFragment != null) {
+                    transaction.hide(otherFragment);
                 }
                 binding.tvTagalog.setTextColor(getResources().getColor(R.color.SecondColor));
                 binding.tvMovies.setTextColor(getResources().getColor(R.color.white));
                 binding.tvSeries.setTextColor(getResources().getColor(R.color.white));
-                EventBus.getDefault().post(new MovieEvent(SPUtils.getInstance().getInt(AppConstant.lastposition,3)));
+                binding.tvOthers.setTextColor(getResources().getColor(R.color.white));
+                break;
+
+            case R.id.tv_others:
+                if (otherFragment == null) {
+                    otherFragment = new OtherFragment();
+                    transaction.add(R.id.fragment_container, otherFragment, "other");
+                    transaction.setMaxLifecycle(otherFragment, Lifecycle.State.STARTED);
+                } else {
+                    transaction.show(otherFragment);
+                }
+
+                if(movieFragment !=null){
+                    transaction.hide(movieFragment);
+                }
+                if (animeFragment != null) {
+                    transaction.hide(animeFragment);
+                }
+                if (tvSeriesFragment != null) {
+                    transaction.hide(tvSeriesFragment);
+                }
+                binding.tvOthers.setTextColor(getResources().getColor(R.color.SecondColor));
+                binding.tvTagalog.setTextColor(getResources().getColor(R.color.white));
+                binding.tvMovies.setTextColor(getResources().getColor(R.color.white));
+                binding.tvSeries.setTextColor(getResources().getColor(R.color.white));
                 break;
         }
 

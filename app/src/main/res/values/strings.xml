@@ -16,7 +16,41 @@
         <item>Hot anime</item>
         <item>Popular anime</item>
         <item>Movie anime</item>
+        <item>Others</item>
     </string-array>
+
+
+    <string-array name="genre">
+        <item>sci-fi-fantasy</item>
+        <item>thai-drama</item>
+        <item>crime</item>
+        <item>romance</item>
+        <item>history</item>
+        <item>war</item>
+        <item>action</item>
+        <item>drama</item>
+        <item>movie-speak-khmer</item>
+        <item>thriller</item>
+        <item>fantasy</item>
+        <item>music</item>
+        <item>war-politics</item>
+        <item>vivamax</item>
+        <item>tv-movie</item>
+        <item>documentary</item>
+        <item>korea-drama</item>
+        <item>mystery</item>
+        <item>adventure</item>
+        <item>comedy</item>
+        <item>chinese-drama</item>
+        <item>science-fiction</item>
+        <item>family</item>
+        <item>tvshows</item>
+        <item>erotic</item>
+        <item>movie</item>
+        <item>animation</item>
+        <item>horror</item>
+    </string-array>
+
 
     <string name="ads_id">ca-app-pub-4940235333780807~6073109122</string>
     <string name="banner_adId">ca-app-pub-4940235333780807/3670307066</string>

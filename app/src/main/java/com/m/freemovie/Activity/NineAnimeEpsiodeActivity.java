@@ -1,5 +1,6 @@
 package com.m.freemovie.Activity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -29,11 +30,11 @@ import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.TagalogDetailAdapter;
 import com.m.freemovie.databinding.ActivityNineAnimeEpsiodeBinding;
+import com.m.freemovie.mvp.Contract.NineAnimeDetailContract;
 import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.DownloadNineAnimeBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogDetailBean;
-import com.m.freemovie.mvp.Contract.NineAnimeDetailContract;
 import com.m.freemovie.mvp.Presenter.NineAnimeDetailPresenter;
 
 import java.text.SimpleDateFormat;
@@ -198,6 +199,7 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
         binding.ivHeart.setImageResource(!isBookmarked? R.mipmap.heart_no :R.mipmap.heart_yes);
     }
     @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;

@@ -66,6 +66,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     private int apiPosition;
     private InterstitialAd mInterstitialAd;
     private String TAG = "Details_activity";
+    private boolean isAdLoad = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +108,12 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
         setImageData(id);
         loadAd();
 
+        if(AppConstant.isAddFree){
+            isAdLoad = false;
+        }else{
+            isAdLoad = true;
+        }
+
     }
     @SuppressLint("MissingPermission")
     private void loadAd() {
@@ -135,11 +142,13 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                             @Override
                             public void onAdDismissedFullScreenContent() {
                                 Log.d(TAG, "Ad dismissed by user.");
+                                isAdLoad = false;
                             }
 
                             @Override
                             public void onAdFailedToShowFullScreenContent(AdError adError) {
 //                                Log.e(TAG, "Ad failed to show: " + adError.getMessage());
+                                isAdLoad = false;
                             }
                         });
                     }
@@ -147,6 +156,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
 //                        Log.e(TAG, "Ad failed to load: " + loadAdError.getMessage());
+                        isAdLoad = false;
                     }
                 });
     }
@@ -306,6 +316,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
             binding.tvOriginal.setText(movieBean.getOriginal_title());
             this.title = movieBean.getTitle();
 
+
             Glide.with(this)
                     .asBitmap()
                     .load(posterPath)
@@ -408,6 +419,9 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
     @Override
     public void onBackPressed() {
+        if(isAdLoad){
+            return;
+        }
         super.onBackPressed();
         finish();
     }

@@ -12,6 +12,8 @@ import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.OtherBean;
+import com.m.freemovie.mvp.Model.ClassBean.OthersDlBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
@@ -199,4 +201,102 @@ public interface MovieApi {
     @GET("animepahe/api")
     Observable<AnimePaheSearchBean> getPaheSearch(
             @Query("search") String search);
+
+
+    //other's api
+    @GET("/khflix/genre/sci-fi-fantasy")
+    Observable<OtherBean> getSciFiFantasy(@Query("page") int page);
+
+    @GET("/khflix/genre/thai-drama")
+    Observable<OtherBean> getThaiDrama(@Query("page") int page);
+
+    @GET("/khflix/genre/crime")
+    Observable<OtherBean> getCrime(@Query("page") int page);
+
+    @GET("/khflix/genre/romance")
+    Observable<OtherBean> getRomance(@Query("page") int page);
+
+    @GET("/khflix/genre/history")
+    Observable<OtherBean> getHistory(@Query("page") int page);
+
+    @GET("/khflix/genre/war")
+    Observable<OtherBean> getWar(@Query("page") int page);
+
+    @GET("/khflix/genre/action")
+    Observable<OtherBean> getAction(@Query("page") int page);
+
+    @GET("/khflix/genre/drama")
+    Observable<OtherBean> getDrama(@Query("page") int page);
+
+    @GET("/khflix/genre/movie-speak-khmer")
+    Observable<OtherBean> getMovieSpeakKhmer(@Query("page") int page);
+
+    @GET("/khflix/genre/thriller")
+    Observable<OtherBean> getThriller(@Query("page") int page);
+
+    @GET("/khflix/genre/fantasy")
+    Observable<OtherBean> getFantasy(@Query("page") int page);
+
+    @GET("/khflix/genre/music")
+    Observable<OtherBean> getMusic(@Query("page") int page);
+
+    @GET("/khflix/genre/war-politics")
+    Observable<OtherBean> getWarPolitics(@Query("page") int page);
+
+    @GET("/khflix/genre/vivamax")
+    Observable<OtherBean> getVivamax(@Query("page") int page);
+
+    @GET("/khflix/genre/tv-movie")
+    Observable<OtherBean> getTvMovie(@Query("page") int page);
+
+    @GET("/khflix/genre/documentary")
+    Observable<OtherBean> getDocumentary(@Query("page") int page);
+
+    @GET("/khflix/genre/korea-drama")
+    Observable<OtherBean> getKoreaDrama(@Query("page") int page);
+
+    @GET("/khflix/genre/mystery")
+    Observable<OtherBean> getMystery(@Query("page") int page);
+
+    @GET("/khflix/genre/adventure")
+    Observable<OtherBean> getAdventure(@Query("page") int page);
+
+    @GET("/khflix/genre/comedy")
+    Observable<OtherBean> getComedy(@Query("page") int page);
+
+    @GET("/khflix/genre/chinese-drama")
+    Observable<OtherBean> getChineseDrama(@Query("page") int page);
+
+    @GET("/khflix/genre/science-fiction")
+    Observable<OtherBean> getScienceFiction(@Query("page") int page);
+
+    @GET("/khflix/genre/family")
+    Observable<OtherBean> getFamily(@Query("page") int page);
+
+    @GET("/khflix/genre/tvshows")
+    Observable<OtherBean> getTvShows(@Query("page") int page);
+
+    @GET("/khflix/genre/erotic")
+    Observable<OtherBean> getErotic(@Query("page") int page);
+
+
+    @GET("/khflix/genre/movie")
+    Observable<OtherBean> getMovie(@Query("page") int page);
+
+
+    @GET("/khflix/genre/animation")
+    Observable<OtherBean> getAnimation(@Query("page") int page);
+
+
+    @GET("/khflix/genre/horror")
+    Observable<OtherBean> getHorror(@Query("page") int page);
+
+
+    @GET("/khflix/movies")
+    Observable<OtherBean> getAllMovies(@Query("page") int page);
+
+
+    @GET("/khflix/download")
+    Observable<OthersDlBean> getOtherDownload(@Query("url") String url);
+
 }

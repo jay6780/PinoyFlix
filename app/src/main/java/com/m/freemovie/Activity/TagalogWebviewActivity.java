@@ -44,12 +44,15 @@ import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.TagalogDetailAdapter;
 import com.m.freemovie.databinding.ActivityTagalogWebviewBinding;
-import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
-import com.m.freemovie.mvp.Model.ClassBean.DetailDownloadBean;
-import com.m.freemovie.mvp.Model.ClassBean.TagalogDetailBean;
-import com.m.freemovie.mvp.Model.ClassBean.TagalogInfoBean;
+import com.m.freemovie.mvp.Contract.OtherDownloadContract;
 import com.m.freemovie.mvp.Contract.RevivalContractDetail;
 import com.m.freemovie.mvp.Contract.RevivalContractTrack;
+import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.DetailDownloadBean;
+import com.m.freemovie.mvp.Model.ClassBean.OthersDlBean;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogDetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.TagalogInfoBean;
+import com.m.freemovie.mvp.Presenter.OtherDownloadPresenter;
 import com.m.freemovie.mvp.Presenter.RevivalInfoDetailPresenter;
 import com.m.freemovie.mvp.Presenter.RevivalTrackPresenter;
 
@@ -61,9 +64,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-public class TagalogWebviewActivity extends AppCompatActivity implements RevivalContractDetail.View, RevivalContractTrack.View, TagalogDetailAdapter.TagalogVideoPlayListerner {
+public class TagalogWebviewActivity extends AppCompatActivity
+        implements RevivalContractDetail.View, RevivalContractTrack.View,
+        TagalogDetailAdapter.TagalogVideoPlayListerner, OtherDownloadContract.View {
     private ActivityTagalogWebviewBinding binding;
-    private String id,title,image;
+    private String id,title,image,link,genre;
     private TagalogDetailAdapter episodeAdapter;
     private List<TagalogDetailBean> episodeBeanList = new ArrayList<>();
     private RevivalInfoDetailPresenter revivalInfoDetailPresenter;
@@ -76,6 +81,8 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
     private BookmarkDbHelper bookmarkDbHelper;
     private AdView adView;
     private RelativeLayout.LayoutParams params;
+    private boolean isOther = false;
+    private OtherDownloadPresenter presenter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,6 +94,16 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
         isMovie = getIntent().getBooleanExtra("isMovie",false);
         id = getIntent().getStringExtra("id");
         image = getIntent().getStringExtra("image");
+        isOther = getIntent().getBooleanExtra("isOther",false);
+
+        if(isOther){
+            presenter = new OtherDownloadPresenter(this);
+            link = getIntent().getStringExtra("link");
+            genre = getIntent().getStringExtra("genres");
+//            Log.d("genreTest:", genre);
+            presenter.getLink(link);
+
+        }
 //        Log.d("SeasonList","ids"+" videoId: "+id + " SeasonId: "+seasonId);
         binding.titleName.setText(title);
         revivalInfoDetailPresenter = new RevivalInfoDetailPresenter(this);
@@ -94,9 +111,13 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
         bookmarkDbHelper = new BookmarkDbHelper(this);
         dbHelper = new PinoyWatchHistoryHelper(this);
         binding.expand.setOnClickListener(view -> rotateScreen());
-        binding.llBookmark.setOnClickListener(view -> savedBook());
+        binding.llBookmark.setOnClickListener(view -> savedOption());
+        if(isOther){
+            setImageData(link);
+        }else{
+            setImageData(id);
+        }
 
-        setImageData(id);
 
         binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -105,8 +126,10 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
                     Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if(isMovie){
+                if(isMovie) {
                     revivalTrackPresenter.getTrackUrl(id);
+                }else if(isOther){
+                    presenter.getLink(link);
                 }else{
                     episodeBeanList.clear();
                     episodeAdapter.setNewData(new ArrayList<>());
@@ -139,14 +162,34 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
         episodeAdapter.setNewData(episodeBeanList);
     }
 
+    private void savedOption() {
+        if(isMovie){
+            savedBook();
+        }else if (isOther){
+            String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
+            DetailBean details = new DetailBean(link, timestamp, image, title,"false");
+            details.setVideoId(link);
+            details.setTimeStamp(timestamp);
+            bookmarkDbHelper.toggleBookmark(details, 8);
+            setImageData(link);
+        }else{
+            savedBook();
+        }
+    }
+
     @SuppressLint("MissingPermission")
     private void loadAd() {
         AdRequest adRequest = new AdRequest.Builder().build();
         adView = new AdView(TagalogWebviewActivity.this);
         adView.setAdUnitId(getString(R.string.banner_adId));
         adView.setAdSize(AdSize.BANNER);
-        binding.adTvSeries.removeAllViews();
-        binding.adTvSeries.addView(adView);
+        if(isOther){
+            binding.adMovie.removeAllViews();
+            binding.adMovie.addView(adView);
+        }else{
+            binding.adTvSeries.removeAllViews();
+            binding.adTvSeries.addView(adView);
+        }
         adView.loadAd(adRequest);
         if (adView != null) {
             adView.setAdListener(
@@ -161,6 +204,9 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
 
                         @Override
                         public void onAdFailedToLoad(@NonNull LoadAdError adError) {
+                            if(binding.adMovie.getVisibility() == View.VISIBLE){
+                                return;
+                            }
                             loadAdsFailed();
                         }
 
@@ -229,11 +275,19 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
                 .show();
     }
     private void isMovieVideo() {
-        if(isMovie){
-            revivalTrackPresenter.getTrackUrl(id);
-            binding.tvEnjoy.setVisibility(View.VISIBLE);
+        if(isMovie || isOther){
+            if(isMovie){
+                revivalTrackPresenter.getTrackUrl(id);
+            }
+            binding.adMovie.setVisibility(isOther? View.VISIBLE :View.GONE);
+            binding.tvEnjoy.setVisibility(isMovie? View.VISIBLE: View.GONE);
             binding.rvSeason.setVisibility(View.GONE);
             binding.episodeTxt.setVisibility(View.GONE);
+            if(isOther){
+                if(!AppConstant.isAddFree) {
+                    loadAd();
+                }
+            }
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
             params.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
             params.addRule(RelativeLayout.BELOW,binding.rlWebview.getId());
@@ -250,6 +304,7 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
                 loadAdsFailed();
             }
         }
+
         if(binding.tvEnjoy.getVisibility() == View.GONE){
             binding.rvSeason.setVisibility(View.VISIBLE);
             binding.episodeTxt.setVisibility(View.VISIBLE);
@@ -424,6 +479,14 @@ public class TagalogWebviewActivity extends AppCompatActivity implements Revival
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public void getDownloadSuccess(OthersDlBean othersDlBean) {
+        if(othersDlBean !=null && othersDlBean.getResults() !=null){
+            videoUrl = othersDlBean.getResults().getPlayer().getVideoUrl();
+            setupWebView(videoUrl);
+        }
     }
 
     @Override

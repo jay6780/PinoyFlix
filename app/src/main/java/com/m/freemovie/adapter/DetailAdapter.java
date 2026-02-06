@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.m.freemovie.Activity.AnimeDetailsActivity;
 import com.m.freemovie.Activity.Details_activity;
+import com.m.freemovie.Activity.OthersDetailsActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
@@ -71,6 +72,14 @@ public class DetailAdapter extends BaseQuickAdapter<DetailBean, BaseViewHolder> 
                         intent = new Intent(mContext, AnimeDetailsActivity.class);
                         intent.putExtra("id",item.getVideoId());
                         intent.putExtra("apiPosition",1);
+                        break;
+
+                    case 8:
+                        intent = new Intent(mContext, OthersDetailsActivity.class);
+                        intent.putExtra("title",item.getMovieName());
+                        intent.putExtra("link",item.getVideoId());
+                        intent.putExtra("image",item.getTempImage());
+                        intent.putExtra("isBook",true);
                         break;
 
                 }

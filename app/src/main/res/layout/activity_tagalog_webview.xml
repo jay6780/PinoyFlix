@@ -95,6 +95,14 @@
         android:text="Enjoy watch movie" />
 
 
+        <com.google.android.gms.ads.AdView
+            android:layout_centerInParent="true"
+            android:id="@+id/ad_Movie"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_height="50dp"/>
+
+
         <LinearLayout
             android:id="@+id/ll_ads"
             android:layout_width="match_parent"

@@ -20,13 +20,19 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="@string/ads_id"/>
+            android:value="@string/ads_id" />
+
+        <activity
+            android:name=".Activity.OthersDetailsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Activity.AnimeDetailsActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Activity.ViewAllAnimeAcitvity"
             android:exported="false"

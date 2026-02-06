@@ -132,6 +132,9 @@ public class BookmarkFragment extends Fragment implements AdapterView.OnItemSele
             case 5:
                 bookmarkposition = 5;
                 break;
+            case 6:
+                bookmarkposition = 8;
+                break;
         }
         loadBookmarkData();
         detailAdapter.isTv(bookmarkposition);

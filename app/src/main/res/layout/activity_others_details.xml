@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#313647"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:id="@+id/rl_back"
+        android:layout_width="match_parent"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginStart="15dp"
+        android:elevation="10sp"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_arrow_back_24" />
+
+        <ImageView
+            android:id="@+id/iv_book"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/unbooked" />
+    </RelativeLayout>
+
+
+    <ImageView
+        android:id="@+id/iv_big"
+        android:layout_width="match_parent"
+        android:layout_height="250sp"
+        android:alpha="0.4"
+        android:scaleType="fitXY"
+        android:src="@drawable/noimage" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/tv_watch"
+        android:layout_below="@+id/rl_back"
+        android:layout_marginBottom="5dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:textSize="20sp" />
+
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card"
+                android:layout_width="130sp"
+                android:layout_height="220sp"
+                android:layout_below="@+id/tv_title"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="15sp"
+                android:layout_marginEnd="10sp"
+                android:layout_marginBottom="10sp"
+                app:cardCornerRadius="5sp">
+
+                <ImageView
+                    android:id="@+id/iv_smallimg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/noimage" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tv_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_title"
+                android:layout_marginTop="20dp"
+                android:layout_toRightOf="@+id/card"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tv_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_date"
+                android:layout_toRightOf="@+id/card"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_info"
+                android:layout_marginTop="10sp"
+                android:layout_toRightOf="@+id/card"
+                app:cardBackgroundColor="@color/material_on_background_disabled"
+                app:cardCornerRadius="100sp"
+                app:strokeColor="@color/SecondColor"
+                app:strokeWidth="2sp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:id="@+id/tv_rate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5sp"
+                        android:text="0.0"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_info"
+                android:layout_marginStart="7dp "
+                android:layout_marginTop="10sp"
+                android:layout_toRightOf="@+id/card1"
+                app:cardBackgroundColor="@color/material_on_background_disabled"
+                app:strokeColor="@color/SecondColor"
+                app:strokeWidth="2sp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:id="@+id/language"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5sp"
+                        android:text="none"
+                        android:textAllCaps="true"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+
+
+
+
+            <TextView
+                android:id="@+id/orig"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/card"
+                android:layout_marginStart="15dp"
+                android:text="Orinal Title"
+                android:textColor="#7C7C7C"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_original"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/orig"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="5dp"
+                android:textColor="#ffffff"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/overView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_original"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="5dp"
+                android:text="Overview"
+                android:textColor="#ffffff"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/overView"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="5dp"
+                android:justificationMode="inter_word"
+                android:textColor="#7C7C7C"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <TextView
+        android:id="@+id/tv_watch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_button"
+        android:gravity="center"
+        android:padding="15dp"
+        android:text="Watch now"
+        android:textSize="18sp" />
+</RelativeLayout>
