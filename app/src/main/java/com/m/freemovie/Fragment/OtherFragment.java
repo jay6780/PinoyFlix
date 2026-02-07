@@ -85,121 +85,80 @@ public class OtherFragment extends Fragment implements AdapterView.OnItemSelecte
     }
 
     private void initApi(int genrePosition) {
+        if(othersAdapter !=null){
+           othersAdapter.setType(genrePosition);
+        }
         switch (genrePosition) {
             case 0:
-                presenter.getSciFiFantasyPage(page);
-                break;
-
-            case 1:
-                presenter.getThaiDramaPage(page);
-                break;
-
-            case 2:
-                presenter.getCrimePage(page);
-                break;
-
-            case 3:
-                presenter.getRomancePage(page);
-                break;
-
-            case 4:
-                presenter.getHistoryPage(page);
-                break;
-
-            case 5:
-                presenter.getWarPage(page);
-                break;
-
-            case 6:
-                presenter.getActionPage(page);
-                break;
-
-            case 7:
-                presenter.getDramaPage(page);
-                break;
-
-            case 8:
-                presenter.getMovieSpeakKhmerPage(page);
-                break;
-
-            case 9:
-                presenter.getThrillerPage(page);
-                break;
-
-            case 10:
-                presenter.getFantasyPage(page);
-                break;
-
-            case 11:
-                presenter.getMusicPage(page);
-                break;
-
-            case 12:
-                presenter.getWarPoliticsPage(page);
-                break;
-
-            case 13:
-                presenter.getVivamaxPage(page);
-                break;
-
-            case 14:
-                presenter.getTvMoviePage(page);
-                break;
-
-            case 15:
-                presenter.getDocumentaryPage(page);
-                break;
-
-            case 16:
-                presenter.getKoreaDramaPage(page);
-                break;
-
-            case 17:
-                presenter.getMysteryPage(page);
-                break;
-
-            case 18:
-                presenter.getAdventurePage(page);
-                break;
-
-            case 19:
-                presenter.getComedyPage(page);
-                break;
-
-            case 20:
-                presenter.getChineseDramaPage(page);
-                break;
-
-            case 21:
-                presenter.getScienceFictionPage(page);
-                break;
-
-            case 22:
-                presenter.getFamilyPage(page);
-                break;
-
-            case 23:
-                presenter.getTvShowsPage(page);
-                break;
-
-            case 24:
-                presenter.getEroticPage(page);
-                break;
-
-            case 25:
-                presenter.getMoviePage(page);
-                break;
-
-            case 26:
-                presenter.getAnimationPage(page);
-                break;
-
-            case 27:
                 presenter.getHorrorPage(page);
                 break;
 
-            case 28:
-                presenter.getAllMoviesPage(page);
+            case 1:
+                presenter.getCrimePage(page);
+                break;
+
+            case 2:
+                presenter.getRomancePage(page);
+                break;
+
+            case 3:
+                presenter.getHistoryPage(page);
+                break;
+
+            case 4:
+                presenter.getActionPage(page);
+                break;
+
+            case 5:
+                presenter.getDramaPage(page);
+                break;
+
+            case 6:
+                presenter.getMovieSpeakKhmerPage(page);
+                break;
+
+            case 7:
+                presenter.getFantasyPage(page);
+                break;
+
+            case 8:
+                presenter.getVivamaxPage(page);
+                break;
+
+            case 9:
+                presenter.getTvMoviePage(page);
+                break;
+
+            case 10:
+                presenter.getDocumentaryPage(page);
+                break;
+
+            case 11:
+                presenter.getMysteryPage(page);
+                break;
+
+            case 12:
+                presenter.getAdventurePage(page);
+                break;
+
+            case 13:
+                presenter.getComedyPage(page);
+                break;
+
+            case 14:
+                presenter.getScienceFictionPage(page);
+                break;
+
+            case 15:
+                presenter.getFamilyPage(page);
+                break;
+
+            case 16:
+                presenter.getAnimationPage(page);
+                break;
+
+            case 17:
+                presenter.getSciFiFantasyPage(page);
                 break;
         }
     }
@@ -354,506 +313,160 @@ public class OtherFragment extends Fragment implements AdapterView.OnItemSelecte
 
     @Override
     public void getSciFiFantasy(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                isNomore = true;
-            }
-
-        }else{
-            isNomore = true;
-        }
-
+        fetchList(otherBean);
     }
 
     @Override
     public void getThaiDrama(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                isNomore = true;
-            }
-
-        }else{
-            isNomore = true;
-        }
-
+        fetchList(otherBean);
     }
 
     @Override
     public void getCrime(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                isNomore = true;
-            }
-
-        }else{
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getRomance(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                isNomore = true;
-            }
-
-        }else{
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getHistory(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getWar(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getAction(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getDrama(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getMovieSpeakKhmer(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getThriller(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getFantasy(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getMusic(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
+        fetchList(otherBean);
 
-        }else{
-            isNomore = true;
-        }
     }
 
     @Override
     public void getWarPolitics(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getVivamax(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getTvMovie(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getDocumentary(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getKoreaDrama(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getMystery(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getAdventure(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getComedy(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getChineseDrama(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getScienceFiction(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getFamily(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getTvShows(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getErotic(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getMovie(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getAnimation(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getHorror(OtherBean otherBean) {
-        if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()){
-                otherList.addAll(otherBean.getResults());
-                othersAdapter.setNewData(otherList);
-            }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-                isNomore = true;
-            }
-
-        }else{
-            Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
-            isNomore = true;
-        }
+        fetchList(otherBean);
     }
 
     @Override
     public void getAllMovies(OtherBean otherBean) {
+        fetchList(otherBean);
+    }
+
+    private void fetchList(OtherBean otherBean){
         if(otherBean !=null && otherBean.getResults() !=null){
-            isLoading = false;
             if(!otherBean.getResults().isEmpty()){
                 otherList.addAll(otherBean.getResults());
                 othersAdapter.setNewData(otherList);
             }else{
-                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
                 isNomore = true;
             }
 
         }else{
-            Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
             isNomore = true;
         }
     }

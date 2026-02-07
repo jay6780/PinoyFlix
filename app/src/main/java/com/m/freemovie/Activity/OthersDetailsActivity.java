@@ -21,23 +21,34 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
+import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.databinding.ActivityOthersDetailsBinding;
+import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Random;
 
 public class OthersDetailsActivity extends AppCompatActivity implements View.OnClickListener {
     private ActivityOthersDetailsBinding binding;
-    private boolean isAdLoad,isBook;
+    private boolean isAdLoad;
     private String TAG = "OthersDetailsActivity";
     private InterstitialAd mInterstitialAd;
     private String title,link,image;
     private KProgressHUD hud;
+    private int type;
+    private BookmarkDbHelper bookmarkDbHelper;
+    private boolean isBook;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityOthersDetailsBinding.inflate(getLayoutInflater());
         title = getIntent().getStringExtra("title");
         link = getIntent().getStringExtra("link");
         image = getIntent().getStringExtra("image");
-
+        type = getIntent().getIntExtra("type",0);
+        isBook = getIntent().getBooleanExtra("isBook",false);
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
         if(AppConstant.isAddFree){
@@ -45,11 +56,18 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
         }else{
             isAdLoad = true;
         }
+        bookmarkDbHelper = new BookmarkDbHelper(this);
         loadAd();
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
         hud.show();
+
+        if(isBook && type == 0){
+            Random random = new Random();
+            int roll = random.nextInt(7) + 1;
+            type = roll;
+        }
 
     }
 
@@ -111,7 +129,6 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
     }
 
     private void initViews() {
-        binding.ivBook.setVisibility(View.GONE);
         binding.tvWatch.setOnClickListener(this);
         binding.ivBack.setOnClickListener(this);
         binding.tvTitle.setText(title == null? "N/A": title);
@@ -137,10 +154,14 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
         }catch (Exception e){
             e.printStackTrace();
         }
+        binding.ivBook.setOnClickListener(this);
 
-
+        setImageData(link);
     }
-
+    private void setImageData(String videoId) {
+        boolean isBookmarked = bookmarkDbHelper.isBookmarked(videoId);
+        binding.ivBook.setImageResource(isBookmarked ? R.drawable.booked : R.drawable.unbooked);
+    }
 
     @Override
     protected void onStart() {
@@ -161,14 +182,22 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.tv_watch:
-                startActivity(new Intent(this,TagalogWebviewActivity.class)
+                startActivity(new Intent(this,OtherWebviewActivity.class)
                         .putExtra("title",title)
                         .putExtra("link",link)
-                        .putExtra("isOther",true)
-                        .putExtra("image",image));
+                        .putExtra("image",image)
+                        .putExtra("type",type));
                 break;
             case R.id.iv_back:
                 onBackPressed();
+                break;
+            case R.id.iv_book:
+                String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
+                DetailBean details = new DetailBean(link, timestamp, image, title,"false");
+                details.setVideoId(link);
+                details.setTimeStamp(timestamp);
+                bookmarkDbHelper.toggleBookmark(details, 8);
+                setImageData(link);
                 break;
         }
 

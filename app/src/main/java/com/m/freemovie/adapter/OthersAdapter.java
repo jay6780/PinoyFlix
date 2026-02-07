@@ -14,7 +14,7 @@ import com.m.freemovie.Utils.base.BaseViewHolder;
 import com.m.freemovie.mvp.Model.ClassBean.OtherBean;
 
 public class OthersAdapter extends BaseQuickAdapter<OtherBean.ResultsBean, BaseViewHolder> {
-
+    private int type;
     public OthersAdapter() {
         super(R.layout.view_all_item);
     }
@@ -41,9 +41,14 @@ public class OthersAdapter extends BaseQuickAdapter<OtherBean.ResultsBean, BaseV
                 intent.putExtra("title",item.getTitle());
                 intent.putExtra("link",item.getLink());
                 intent.putExtra("image",item.getImg());
+                intent.putExtra("type",type);
                 mContext.startActivity(intent);
             }
         });
     }
 
+    public void setType(int genrePosition) {
+        this.type = genrePosition;
+        notifyDataSetChanged();
+    }
 }

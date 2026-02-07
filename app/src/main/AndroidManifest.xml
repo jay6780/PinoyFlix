@@ -26,6 +26,11 @@
             android:value="@string/ads_id" />
 
         <activity
+            android:name=".Activity.OtherWebviewActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+        <activity
             android:name=".Activity.OthersDetailsActivity"
             android:exported="false"
             android:screenOrientation="portrait" />

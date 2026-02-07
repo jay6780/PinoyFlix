@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:id="@+id/swipe"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
+
 
     <RelativeLayout
-        android:background="#313647"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#313647">
 
         <RelativeLayout
             android:id="@+id/rl_webview"
@@ -52,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="Select episode to play" />
+                android:text="Select movie to play" />
 
             <ImageView
                 android:id="@+id/expand"
@@ -68,63 +68,46 @@
                 android:visibility="gone" />
         </RelativeLayout>
 
-        <TextView
-        android:layout_below="@+id/rl_webview"
-        android:id="@+id/episodeTxt"
-        android:layout_width="wrap_content"
-        android:visibility="gone"
-        android:layout_height="wrap_content"
-        android:padding="5dp"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_season"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/episodeTxt"
-        android:layout_above="@+id/ll_ads"
-        android:visibility="gone"
-        android:layout_marginTop="2dp" />
-
-    <TextView
-        android:id="@+id/tv_enjoy"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:textSize="20sp"
-        android:padding="5dp"
-        android:text="Enjoy watch movie" />
-
-        <LinearLayout
-            android:id="@+id/ll_ads"
+        <com.google.android.gms.ads.AdView
+            android:layout_centerInParent="true"
+            android:id="@+id/ad_Movie"
             android:layout_width="match_parent"
-            android:layout_centerHorizontal="true"
-            android:layout_above="@+id/ll_bookmark"
+            android:layout_below="@+id/rl_webview"
             android:visibility="gone"
-            android:layout_marginBottom="5dp"
-            android:orientation="vertical"
-            android:layout_height="wrap_content">
-            <com.google.android.gms.ads.AdView
-                android:id="@+id/ad_tvSeries"
-                android:layout_width="match_parent"
-                android:visibility="gone"
-                android:layout_height="50dp"/>
-        </LinearLayout>
+            android:layout_height="50dp"/>
+
+        <TextView
+            android:id="@+id/episodeTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ad_Movie"
+            android:padding="7dp"
+            android:text="Other movies" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_movielist"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/episodeTxt"
+            android:layout_marginTop="2dp"
+            android:visibility="gone" />
 
         <LinearLayout
-            android:id="@+id/ll_bookmark"
+            android:id="@+id/ll_reset"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:background="@drawable/circle_floating"
-            android:layout_marginBottom="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:gravity="center">
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/up_bg"
+            android:gravity="center"
+            android:visibility="gone">
 
             <ImageView
-                android:id="@+id/iv_heart"
                 android:layout_width="30dp"
-                android:layout_height="30dp"/>
+                android:layout_height="30dp"
+                android:src="@mipmap/up_reset" />
 
         </LinearLayout>
 

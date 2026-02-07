@@ -26,4 +26,10 @@
         <item name="android:textColor">@color/black</item>
         <item name="android:backgroundTint">@color/white</item>
     </style>
+    <style name="Theme.FreeMovie.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="Theme.FreeMovie.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.FreeMovie.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

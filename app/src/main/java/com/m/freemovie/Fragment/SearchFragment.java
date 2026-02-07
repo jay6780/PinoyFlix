@@ -114,7 +114,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
         animePaheSearchAdapter = new AnimePaheSearchAdapter();
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.Select_bookmark, R.layout.spinner_item);
+                R.array.search, R.layout.spinner_item);
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         fragmentSpinner.setAdapter(adapter);
         fragmentSpinner.setOnItemSelectedListener(this);

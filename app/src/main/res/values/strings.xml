@@ -20,35 +20,35 @@
     </string-array>
 
 
+    <string-array name="search">
+        <item>Movies</item>
+        <item>Tv Series</item>
+        <item>Newest anime</item>
+        <item>Hot anime</item>
+        <item>Popular anime</item>
+        <item>Movie anime</item>
+    </string-array>
+
+
     <string-array name="genre">
-        <item>sci-fi-fantasy</item>
-        <item>thai-drama</item>
+        <item>horror</item>
         <item>crime</item>
         <item>romance</item>
         <item>history</item>
-        <item>war</item>
         <item>action</item>
         <item>drama</item>
         <item>movie-speak-khmer</item>
-        <item>thriller</item>
         <item>fantasy</item>
-        <item>music</item>
-        <item>war-politics</item>
         <item>vivamax</item>
         <item>tv-movie</item>
         <item>documentary</item>
-        <item>korea-drama</item>
         <item>mystery</item>
         <item>adventure</item>
         <item>comedy</item>
-        <item>chinese-drama</item>
         <item>science-fiction</item>
         <item>family</item>
-        <item>tvshows</item>
-        <item>erotic</item>
-        <item>movie</item>
         <item>animation</item>
-        <item>horror</item>
+        <item>sci-fi-fantasy</item>
     </string-array>
 
 
@@ -61,4 +61,13 @@
     <string name="brvah_load_end">没有更多数据</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="key">eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2MjA4NGQ1ZWFiZjE0YTU2ZjlhZTRhODI4M2YzNjExZCIsIm5iZiI6MTY5MzEyODM4Mi41MTYsInN1YiI6IjY0ZWIxNmJlNTI1OGFlMDEwYmRhMmFmMCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.U0CCkZYg9dAiYNGArBKbsiK1GRklw4-92J-quKEnrQw</string>
+    <string name="title_activity_other_webview">OtherWebviewActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 </resources>
