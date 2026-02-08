@@ -459,14 +459,17 @@ public class OtherFragment extends Fragment implements AdapterView.OnItemSelecte
 
     private void fetchList(OtherBean otherBean){
         if(otherBean !=null && otherBean.getResults() !=null){
+            isLoading = false;
             if(!otherBean.getResults().isEmpty()){
                 otherList.addAll(otherBean.getResults());
                 othersAdapter.setNewData(otherList);
             }else{
+                Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
                 isNomore = true;
             }
 
         }else{
+            Toast.makeText(getContext(),"No more data",Toast.LENGTH_SHORT).show();
             isNomore = true;
         }
     }

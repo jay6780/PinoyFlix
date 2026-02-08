@@ -72,6 +72,7 @@ public class OtherWebviewActivity extends AppCompatActivity
     private String videoUrl;
     private RelativeLayout.LayoutParams params,params1;
     private AdView adView;
+    private boolean isRotate = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -342,7 +343,11 @@ public class OtherWebviewActivity extends AppCompatActivity
                 }
                 break;
             case R.id.expand:
-                rotateScreen();
+                if(isRotate){
+                    portraitFull();
+                }else{
+                    rotateScreen();
+                }
                 break;
             case R.id.ll_reset:
                 reset();
@@ -461,7 +466,8 @@ public class OtherWebviewActivity extends AppCompatActivity
 
     private void rotateScreen() {
         finishing = false;
-        binding.expand.setVisibility(View.INVISIBLE);
+        isRotate = true;
+        binding.expand.setVisibility(View.VISIBLE);
         binding.rvMovielist.setVisibility(View.INVISIBLE);
         binding.btnBackFinish.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
@@ -469,18 +475,54 @@ public class OtherWebviewActivity extends AppCompatActivity
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         binding.swipe.setEnabled(false);
         loadAdsFailed();
+        binding.expand.setImageResource(R.mipmap.rotate_screen);
+
+        RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(dip2px(30), dip2px(30));
+        params2.addRule(RelativeLayout.ALIGN_PARENT_END);
+        params2.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        params2.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
+        binding.expand.setLayoutParams(params2);
+        params2.setMargins(0,0,15,20);
         new WindowUtils(this,true,false);
     }
 
+    private void portraitFull(){
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        binding.expand.setVisibility(View.VISIBLE);
+        binding.rvMovielist.setVisibility(View.VISIBLE);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        binding.rlWebview.setLayoutParams(params);
+        binding.titleName.setVisibility(View.GONE);
+        binding.swipe.setEnabled(true);
+
+        RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(dip2px(30), dip2px(30));
+        params2.addRule(RelativeLayout.ALIGN_PARENT_END);
+        params2.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        params2.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
+        params2.setMargins(0,0,15,20);
+        binding.expand.setLayoutParams(params2);
+        isRotate = false;
+        new WindowUtils(this,true,false);
+    }
 
     private void defaultScreen(){
+        isRotate = false;
         finishing = true;
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         binding.expand.setVisibility(View.VISIBLE);
         binding.rvMovielist.setVisibility(View.VISIBLE);
+        binding.titleName.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(250));
         binding.rlWebview.setLayoutParams(params);
         binding.swipe.setEnabled(true);
+
+        RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(dip2px(25), dip2px(25));
+        params2.addRule(RelativeLayout.ALIGN_PARENT_END);
+        params2.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        params2.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
+        params2.setMargins(0,0,10,10);
+        binding.expand.setLayoutParams(params2);
+        binding.expand.setImageResource(R.mipmap.expand);
         new WindowUtils(this,true,false);
     }
     public int dip2px(float dpValue) {
