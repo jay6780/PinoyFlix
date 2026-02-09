@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (totalSeconds % 10 == 0) {
                     binding.time.setText("Welcome to PinoyFlix");
                 } else {
-                    binding.time.setText("Long Ad reset in: " + String.format("%02d:%02d:%02d:%02d", day, hour, minute, second));
+                    binding.time.setText("Task reset in : " + String.format("%02d:%02d:%02d:%02d", day, hour, minute, second));
                 }
             }
 
