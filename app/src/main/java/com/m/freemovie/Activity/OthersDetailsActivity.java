@@ -51,13 +51,25 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
         isBook = getIntent().getBooleanExtra("isBook",false);
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
+        new CountDownTimer(1500, 1000) {
+            public void onTick(long millisUntilFinished) {
+            }
+
+            public void onFinish() {
+                initViews();
+                hud.dismiss();
+
+            }
+
+        }.start();
         if(AppConstant.isAddFree){
             isAdLoad = false;
         }else{
+            loadAd();
             isAdLoad = true;
         }
         bookmarkDbHelper = new BookmarkDbHelper(this);
-        loadAd();
+
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
@@ -82,17 +94,6 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
 
     @SuppressLint("MissingPermission")
     private void loadAd() {
-        new CountDownTimer(1500, 1000) {
-            public void onTick(long millisUntilFinished) {
-            }
-
-            public void onFinish() {
-               initViews();
-                hud.dismiss();
-
-            }
-
-        }.start();
         AdRequest adRequest = new AdRequest.Builder().build();
         InterstitialAd.load(this, AppConstant.InterstitialId, adRequest,
                 new InterstitialAdLoadCallback() {

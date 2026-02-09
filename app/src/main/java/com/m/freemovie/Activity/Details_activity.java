@@ -106,17 +106,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
         }
 
         setImageData(id);
-        loadAd();
 
-        if(AppConstant.isAddFree){
-            isAdLoad = false;
-        }else{
-            isAdLoad = true;
-        }
-
-    }
-    @SuppressLint("MissingPermission")
-    private void loadAd() {
         new CountDownTimer(1500, 1000) {
             public void onTick(long millisUntilFinished) {
             }
@@ -126,6 +116,17 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
             }
 
         }.start();
+
+        if(AppConstant.isAddFree){
+            isAdLoad = false;
+        }else{
+            isAdLoad = true;
+            loadAd();
+        }
+
+    }
+    @SuppressLint("MissingPermission")
+    private void loadAd() {
         AdRequest adRequest = new AdRequest.Builder().build();
         InterstitialAd.load(this, AppConstant.InterstitialId, adRequest,
                 new InterstitialAdLoadCallback() {
@@ -264,7 +265,11 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
     @Override
     public void showLoading() {
-        hud.show();
+        try {
+            hud.show();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -316,15 +321,19 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
             binding.tvOriginal.setText(movieBean.getOriginal_title());
             this.title = movieBean.getTitle();
 
+            try {
+                Glide.with(this)
+                        .asBitmap()
+                        .load(posterPath)
+                        .into(binding.ivSmallimg);
+                Glide.with(this)
+                        .asBitmap()
+                        .load(posterPath)
+                        .into(binding.ivBig);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
 
-            Glide.with(this)
-                    .asBitmap()
-                    .load(posterPath)
-                    .into(binding.ivSmallimg);
-            Glide.with(this)
-                    .asBitmap()
-                    .load(posterPath)
-                    .into(binding.ivBig);
 
             setImageData(id);
         }
@@ -377,14 +386,19 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
                 seasonRecycler(detailTvBean.getSeasons());
 
-                Glide.with(this)
-                        .asBitmap()
-                        .load(posterPath)
-                        .into(seriesBinding.ivSmallimg);
-                Glide.with(this)
-                        .asBitmap()
-                        .load(posterPath)
-                        .into(seriesBinding.ivBig);
+                try {
+                    Glide.with(this)
+                            .asBitmap()
+                            .load(posterPath)
+                            .into(seriesBinding.ivSmallimg);
+                    Glide.with(this)
+                            .asBitmap()
+                            .load(posterPath)
+                            .into(seriesBinding.ivBig);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
 
                 setImageData(id);
             }

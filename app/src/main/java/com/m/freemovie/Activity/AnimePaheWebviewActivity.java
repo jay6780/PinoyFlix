@@ -633,12 +633,18 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
         if (isNomore) {
-            Toast.makeText(getApplicationContext(), "No more data please pull down to refresh", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "No more data, refreshing...", Toast.LENGTH_SHORT).show();
+            isNomore = false;
+            page = 1;
+            episodeBeanList.clear();
+            episodeAdapter.setNewData(episodeBeanList);
+            detailPresenter.getEpisodeQuery(animeId, page);
+            binding.spinner.setSelection(0);
             return;
         }
+
         isPaging = true;
         page = position + 1;
-        SPUtils.getInstance().put(AppConstant.SpinnerPosition, position);
         if (position == spinnerItems.size() - 1) {
             totalPages++;
             spinnerTotalDbHelper.saveOrUpdateShowPages(id, totalPages, page);
@@ -646,6 +652,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             ArrayAdapter<String> adapter = (ArrayAdapter<String>) binding.spinner.getAdapter();
             adapter.notifyDataSetChanged();
         }
+
         episodeBeanList.clear();
         episodeAdapter.setNewData(episodeBeanList);
         detailPresenter.getEpisodeQuery(animeId, page);

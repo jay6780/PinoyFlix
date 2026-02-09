@@ -85,11 +85,11 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
                 }
 
             }.start();
-            loadAd();
             if(AppConstant.isAddFree){
                 isAdLoad = false;
             }else{
                 isAdLoad = true;
+                loadAd();
             }
         }else{
             Toast.makeText(getApplicationContext(),"Please check connection and try again",Toast.LENGTH_SHORT).show();
@@ -170,8 +170,22 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
     }
 
     @Override
+    protected void onDestroy() {
+        if(hud!=null && hud.isShowing()){
+            hud.dismiss();
+            hud = null;
+        }
+        super.onDestroy();
+    }
+
+    @Override
     public void showLoading() {
-        hud.show();
+        try {
+            hud.show();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -254,14 +268,19 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
                     double x = (Math.random() * ((max - min) + 1)) + min;
                     double xrounded = Math.round(x * 100.0) / 100.0;
                     binding.tvRate.setText(String.valueOf(xrounded));
-                    Glide.with(this)
-                            .asBitmap()
-                            .load(imageUrl)
-                            .into(binding.ivSmallimg);
-                    Glide.with(this)
-                            .asBitmap()
-                            .load(imageUrl)
-                            .into(binding.ivBig);
+                    try {
+                        Glide.with(this)
+                                .asBitmap()
+                                .load(imageUrl)
+                                .into(binding.ivSmallimg);
+                        Glide.with(this)
+                                .asBitmap()
+                                .load(imageUrl)
+                                .into(binding.ivBig);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
                 }else{
                     Toast.makeText(getApplicationContext(),"Episodes not found",Toast.LENGTH_SHORT).show();
                     finish();
@@ -300,14 +319,18 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
             double x = (Math.random() * ((max - min) + 1)) + min;
             double xrounded = Math.round(x * 100.0) / 100.0;
             binding.tvRate.setText(String.valueOf(xrounded));
-            Glide.with(this)
-                    .asBitmap()
-                    .load(imageUrl)
-                    .into(binding.ivSmallimg);
-            Glide.with(this)
-                    .asBitmap()
-                    .load(imageUrl)
-                    .into(binding.ivBig);
+            try {
+                Glide.with(this)
+                        .asBitmap()
+                        .load(imageUrl)
+                        .into(binding.ivSmallimg);
+                Glide.with(this)
+                        .asBitmap()
+                        .load(imageUrl)
+                        .into(binding.ivBig);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
@@ -324,14 +347,19 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
         double x = (Math.random() * ((max - min) + 1)) + min;
         double xrounded = Math.round(x * 100.0) / 100.0;
         binding.tvRate.setText(String.valueOf(xrounded));
-        Glide.with(this)
-                .asBitmap()
-                .load(detailBean.getResults().getPoster())
-                .into(binding.ivSmallimg);
-        Glide.with(this)
-                .asBitmap()
-                .load(detailBean.getResults().getPoster())
-                .into(binding.ivBig);
+        try {
+            Glide.with(this)
+                    .asBitmap()
+                    .load(detailBean.getResults().getPoster())
+                    .into(binding.ivSmallimg);
+            Glide.with(this)
+                    .asBitmap()
+                    .load(detailBean.getResults().getPoster())
+                    .into(binding.ivBig);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     @Override
