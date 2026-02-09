@@ -110,18 +110,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private long getTimeHour() {
         Calendar calendar = Calendar.getInstance();
         long currentTime = System.currentTimeMillis();
-        calendar.set(Calendar.HOUR_OF_DAY, 2);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
+
         long timeHour = calendar.getTimeInMillis();
+        if (currentTime >= timeHour) {
+            calendar.add(Calendar.HOUR_OF_DAY, 2);
+//            calendar.add(Calendar.MINUTE, 1);
+            timeHour = calendar.getTimeInMillis();
+        }
         return timeHour - currentTime;
+
     }
 
-
     private void startHourCount() {
-        long milliHours = getTimeHour();
-        start(milliHours, 1000);
+        try {
+            long milliHours = getTimeHour();
+            if (milliHours <= 0) {
+                milliHours = 10000;
+            }
+            start(milliHours, 1000);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 
@@ -147,8 +159,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     binding.time.setText("Task reset in : " + String.format("%02d:%02d:%02d:%02d", day, hour, minute, second));
                 }
             }
-
-
             @Override
             public void onFinish() {
                 startHourCount();
