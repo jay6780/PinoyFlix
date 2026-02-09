@@ -31,12 +31,22 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
                 <LinearLayout
                     android:id="@+id/ll_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
+
                     <include layout="@layout/rl_title" />
+
+                    <TextView
+                        android:id="@+id/time"
+                        android:layout_marginStart="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inAnimation="@android:anim/fade_in"
+                        android:outAnimation="@android:anim/fade_out" />
                 </LinearLayout>
             </RelativeLayout>
 

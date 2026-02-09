@@ -37,6 +37,7 @@ import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
+import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.SeasonsAdapter;
 import com.m.freemovie.databinding.ActivityDetailsBinding;
@@ -66,7 +67,6 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     private int apiPosition;
     private InterstitialAd mInterstitialAd;
     private String TAG = "Details_activity";
-    private boolean isAdLoad = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,13 +117,10 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
         }.start();
 
-        if(AppConstant.isAddFree){
-            isAdLoad = false;
-        }else{
-            isAdLoad = true;
+        boolean isAddShow = position ==2 ? SPUtils.getInstance().getBoolean(AppConstant.adSeries) : SPUtils.getInstance().getBoolean(AppConstant.adMovies);
+        if(!isAddShow) {
             loadAd();
         }
-
     }
     @SuppressLint("MissingPermission")
     private void loadAd() {
@@ -137,19 +134,22 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 //                        Log.i(TAG, "Ad Loaded. Showing it now automatically...");
                             Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
                             mInterstitialAd.show(Details_activity.this);
+                            if(position == 2){
+                                SPUtils.getInstance().put(AppConstant.adSeries,true);
+                            }else{
+                                SPUtils.getInstance().put(AppConstant.adMovies,true);
+                            }
                         }
 
                         mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
                             @Override
                             public void onAdDismissedFullScreenContent() {
-                                Log.d(TAG, "Ad dismissed by user.");
-                                isAdLoad = false;
+//                                Log.d(TAG, "Ad dismissed by user.");
                             }
 
                             @Override
                             public void onAdFailedToShowFullScreenContent(AdError adError) {
 //                                Log.e(TAG, "Ad failed to show: " + adError.getMessage());
-                                isAdLoad = false;
                             }
                         });
                     }
@@ -157,7 +157,6 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
 //                        Log.e(TAG, "Ad failed to load: " + loadAdError.getMessage());
-                        isAdLoad = false;
                     }
                 });
     }
@@ -277,11 +276,17 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
         Log.d("ErrorData", "val: " + error);
     }
 
+
     @Override
     public void hideLoading() {
-        if (hud != null && hud.isShowing()) {
-            hud.dismiss();
+        try {
+            if (hud != null && hud.isShowing()) {
+                hud.dismiss();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
+
     }
 
     @Override
@@ -433,9 +438,6 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
     @Override
     public void onBackPressed() {
-        if(isAdLoad){
-            return;
-        }
         super.onBackPressed();
         finish();
     }

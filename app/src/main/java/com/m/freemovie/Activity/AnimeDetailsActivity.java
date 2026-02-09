@@ -23,6 +23,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.Retrofit.AppConstant;
+import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.AnimeSeasonAdapter;
 import com.m.freemovie.databinding.ActivityAnimeDetailsBinding;
@@ -58,7 +59,6 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
     private KProgressHUD hud;
     private InterstitialAd mInterstitialAd;
     private String TAG = "AnimeDetailsActivity";
-    private boolean isAdLoad = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,12 +85,11 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
                 }
 
             }.start();
-            if(AppConstant.isAddFree){
-                isAdLoad = false;
-            }else{
-                isAdLoad = true;
+
+            if(!SPUtils.getInstance().getBoolean(AppConstant.adAnime)) {
                 loadAd();
             }
+
         }else{
             Toast.makeText(getApplicationContext(),"Please check connection and try again",Toast.LENGTH_SHORT).show();
         }
@@ -123,22 +122,17 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
 //                        Log.i(TAG, "Ad Loaded. Showing it now automatically...");
                             Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
                             mInterstitialAd.show(AnimeDetailsActivity.this);
-                            isAdLoad = false;
+                            SPUtils.getInstance().put(AppConstant.adAnime,true);
                         }
                         mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
                             @Override
                             public void onAdDismissedFullScreenContent() {
 //                                Log.d(TAG, "Ad dismissed by user.");
-                                mInterstitialAd = null;
-                                isAdLoad = false;
                             }
 
                             @Override
                             public void onAdFailedToShowFullScreenContent(AdError adError) {
 //                                Log.e(TAG, "Ad failed to show: " + adError.getMessage());
-
-                                mInterstitialAd = null;
-                                isAdLoad = false;
                             }
                         });
                     }
@@ -146,8 +140,6 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
 //                        Log.e(TAG, "Ad failed to load: " + loadAdError.getMessage());
-                        mInterstitialAd = null;
-                        isAdLoad = false;
                     }
                 });
     }
@@ -198,9 +190,14 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
 
     @Override
     public void hideLoading() {
-        if (hud != null && hud.isShowing()) {
-            hud.dismiss();
+        try {
+            if (hud != null && hud.isShowing()) {
+                hud.dismiss();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
+
     }
 
 
@@ -364,9 +361,6 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
 
     @Override
     public void onBackPressed() {
-        if(isAdLoad){
-            return;
-        }
         finish();
         super.onBackPressed();
     }

@@ -32,10 +32,13 @@ import com.m.freemovie.Fragment.HomeFragment;
 import com.m.freemovie.Fragment.SearchFragment;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
+import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import meow.bottomnavigation.MeowBottomNavigation;
 
@@ -63,9 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ll_file.setOnClickListener(this);
         btn_back5.setOnClickListener(this);
         ll_guide.setOnClickListener(this);
-
-
-
+        startHourCount();
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
@@ -90,7 +91,75 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             resetGuideLabels();
         }
 
-        initAd();
+        new CountDownTimer(1500, 1000) {
+            public void onTick(long millisUntilFinished) {
+            }
+
+            public void onFinish() {
+                initializeBottomNavigation();
+                initPermission();
+            }
+
+        }.start();
+        if(!SPUtils.getInstance().getBoolean(AppConstant.adOpen)) {
+            initAd();
+        }
+
+    }
+
+    private long getTimeHour() {
+        Calendar calendar = Calendar.getInstance();
+        long currentTime = System.currentTimeMillis();
+        calendar.set(Calendar.HOUR_OF_DAY, 2);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        long timeHour = calendar.getTimeInMillis();
+        return timeHour - currentTime;
+    }
+
+
+    private void startHourCount() {
+        long milliHours = getTimeHour();
+        start(milliHours, 1000);
+    }
+
+
+    private void start(final long miliSecond, final int interval) {
+        new CountDownTimer(miliSecond, interval) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                long day = TimeUnit.MILLISECONDS.toDays(millisUntilFinished);
+                millisUntilFinished -= TimeUnit.DAYS.toMillis(day);
+
+                long hour = TimeUnit.MILLISECONDS.toHours(millisUntilFinished);
+                millisUntilFinished -= TimeUnit.HOURS.toMillis(hour);
+
+                long minute = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
+                millisUntilFinished -= TimeUnit.MINUTES.toMillis(minute);
+
+                long second = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
+                long totalSeconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
+
+                if (totalSeconds % 10 == 0) {
+                    binding.time.setText("Welcome to PinoyFlix");
+                } else {
+                    binding.time.setText("Long Ad reset in: " + String.format("%02d:%02d:%02d:%02d", day, hour, minute, second));
+                }
+            }
+
+
+            @Override
+            public void onFinish() {
+                startHourCount();
+                SPUtils.getInstance().put(AppConstant.adSeries,false);
+                SPUtils.getInstance().put(AppConstant.adMovies,false);
+                SPUtils.getInstance().put(AppConstant.adAnime,false);
+                SPUtils.getInstance().put(AppConstant.adOpen,false);
+            }
+
+        }.start();
+
     }
 
     private void initAd() {
@@ -103,7 +172,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onAdLoaded(AppOpenAd ad) {
                         if(!AppConstant.isAddFree){
                             appOpenAd = ad;
+//                            SPUtils.getInstance().put(AppConstant.isAddShow,true);
                             showAdIfAvailable();
+                            SPUtils.getInstance().put(AppConstant.adOpen,true);
                             Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
                         }
 
@@ -116,17 +187,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
 
-
-        new CountDownTimer(1500, 1000) {
-            public void onTick(long millisUntilFinished) {
-            }
-
-            public void onFinish() {
-                initializeBottomNavigation();
-                initPermission();
-            }
-
-        }.start();
     }
 
 
@@ -247,6 +307,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -256,6 +318,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
+
 
     private void resetGuideLabels() {
         List<String> guideString = new ArrayList<>();
