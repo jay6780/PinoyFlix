@@ -633,7 +633,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
         if (isNomore) {
-            Toast.makeText(getApplicationContext(), "No more data please refresh", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "No more data please pull down to refresh", Toast.LENGTH_SHORT).show();
             return;
         }
         isPaging = true;
