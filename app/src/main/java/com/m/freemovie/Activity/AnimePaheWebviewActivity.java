@@ -22,6 +22,8 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -45,6 +47,7 @@ import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
+import com.m.freemovie.Utils.DbHelper.SpinnerTotalDbHelper;
 import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
 import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.WindowUtils;
@@ -69,17 +72,18 @@ import java.util.List;
 import java.util.Locale;
 
 public class AnimePaheWebviewActivity extends AppCompatActivity
-        implements AnimePaheDetailContract.View, AnimePaheDetailAdapter.EpisodeListener, QualityAdapter.SrcListener, DownloadAdapter.DownListerner {
+        implements AnimePaheDetailContract.View, AnimePaheDetailAdapter.EpisodeListener,
+        QualityAdapter.SrcListener, DownloadAdapter.DownListerner, AdapterView.OnItemSelectedListener {
     private ActivityAnimePaheWebviewBinding binding;
-    private String id,title;
+    private String id, title;
     private AnimePaheDetailAdapter episodeAdapter;
     private List<AnimePaheBeanList> episodeBeanList = new ArrayList<>();
     private boolean finishing = true;
-    private String videoUrl ="";
-    private boolean isError =  false;
+    private String videoUrl = "";
+    private boolean isError = false;
     private PinoyWatchHistoryHelper dbHelper;
     private BookmarkDbHelper bookmarkDbHelper;
-    private String animeId ="";
+    private String animeId = "";
     private String image = "";
     private AnimePaheDetailPresenter detailPresenter;
     private String url = "";
@@ -93,6 +97,10 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     private String episode = "";
     private AdView adView;
     private RelativeLayout.LayoutParams params;
+
+    private SpinnerTotalDbHelper spinnerTotalDbHelper;
+    private int totalPages = 0;
+    private List<String> spinnerItems = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,7 +108,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
         initGuide();
-        new WindowUtils(this,true,false);
+        new WindowUtils(this, true, false);
         title = getIntent().getStringExtra("title");
 //        Log.d("AnimeTitle","val: "+title);
         id = getIntent().getStringExtra("id");
@@ -111,27 +119,28 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         binding.expand.setOnClickListener(view -> rotateScreen());
         binding.llBookmark.setOnClickListener(view -> savedBook());
         detailPresenter = new AnimePaheDetailPresenter(this);
-        url = "https://animepahe.si/anime/"+id;
-
-        if(isNetworkAvailable()){
+        url = "https://animepahe.si/anime/" + id;
+        spinnerTotalDbHelper = new SpinnerTotalDbHelper(this);
+        if (isNetworkAvailable()) {
             detailPresenter.getDetailQuery(url);
-        }else{
-            Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Please check internet and try again", Toast.LENGTH_SHORT).show();
         }
 
         setImageData(id);
         SPUtils.getInstance().put(AppConstant.isShow, false);
 
 
+        initializeSpinnerItems();
 
-        if(isInit){
+        if (isInit) {
             binding.swipe.setRefreshing(true);
         }
         binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if(!isNetworkAvailable()){
-                    Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+                if (!isNetworkAvailable()) {
+                    Toast.makeText(getApplicationContext(), "Please check internet and try again", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 page = 1;
@@ -141,14 +150,19 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 detailPresenter.getDetailQuery(url);
                 episodeBeanList.clear();
                 episodeAdapter.setNewData(new ArrayList<>());
+                if(isPaging){
+                    detailPresenter.getEpisodeQuery(animeId,page);
+                    SPUtils.getInstance().put(AppConstant.SpinnerPosition,0);
+                    binding.spinner.setSelection(0);
+                }
             }
         });
         binding.btnBackFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(finishing){
+                if (finishing) {
                     finish();
-                }else{
+                } else {
                     defaultScreen();
                 }
             }
@@ -158,11 +172,23 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         episodeAdapter = new AnimePaheDetailAdapter(this);
         binding.rvSeason.setAdapter(episodeAdapter);
         episodeAdapter.setNewData(episodeBeanList);
-        if(!AppConstant.isAddFree){
+        if (!AppConstant.isAddFree) {
             loadAd();
-        }else{
+        } else {
             loadAdsFailed();
         }
+    }
+    private void initializeSpinnerItems() {
+        spinnerItems.clear();
+
+        totalPages = spinnerTotalDbHelper.getTotalPages(id) == 0? 5 : spinnerTotalDbHelper.getTotalPages(id);
+        for (int i = 1; i <= totalPages; i++) {
+            spinnerItems.add(String.valueOf(i));
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                R.layout.spinner_item, spinnerItems);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        binding.spinner.setAdapter(adapter);
     }
 
     @SuppressLint("MissingPermission")
@@ -207,22 +233,21 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     }
 
 
-
-    private void loadAdsFailed(){
+    private void loadAdsFailed() {
         params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        params.addRule(RelativeLayout.BELOW,binding.episodeTxt.getId());
+        params.addRule(RelativeLayout.BELOW, binding.rlOption.getId());
         binding.rvSeason.setLayoutParams(params);
         binding.adTvSeries.removeAllViews();
         binding.adTvSeries.setVisibility(View.GONE);
         binding.llAds.setVisibility(View.GONE);
     }
 
-    private void loadAdsSuccess(){
+    private void loadAdsSuccess() {
         binding.adTvSeries.setVisibility(View.VISIBLE);
         binding.llAds.setVisibility(View.VISIBLE);
         params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        params.addRule(RelativeLayout.ABOVE,binding.llAds.getId());
-        params.addRule(RelativeLayout.BELOW,binding.episodeTxt.getId());
+        params.addRule(RelativeLayout.ABOVE, binding.llAds.getId());
+        params.addRule(RelativeLayout.BELOW, binding.rlOption.getId());
         binding.rvSeason.setLayoutParams(params);
 
         new CountDownTimer(10000, 1000) {
@@ -260,11 +285,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
 
 
-    private void loadmore() {
-        detailPresenter.getEpisodeQuery(animeId,page);
-    }
-
-
     private void rotateScreen() {
         finishing = false;
         binding.expand.setVisibility(View.INVISIBLE);
@@ -275,13 +295,13 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         binding.llBookmark.setVisibility(View.GONE);
         binding.swipe.setEnabled(false);
+        binding.spinner.setVisibility(isPaging ? View.VISIBLE : View.GONE);
         loadAdsFailed();
-
-        new WindowUtils(this,true,false);
+        new WindowUtils(this, true, false);
     }
 
 
-    private void defaultScreen(){
+    private void defaultScreen() {
         finishing = true;
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         binding.expand.setVisibility(View.VISIBLE);
@@ -290,23 +310,26 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         binding.rlWebview.setLayoutParams(params);
         binding.llBookmark.setVisibility(View.VISIBLE);
         binding.swipe.setEnabled(true);
-        new WindowUtils(this,true,false);
+        binding.spinner.setVisibility(isPaging ? View.VISIBLE : View.GONE);
+        new WindowUtils(this, true, false);
     }
+
     public int dip2px(float dpValue) {
         final float scale = getResources(this).getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
     }
+
     public static Resources getResources(Context context) {
         return context.getResources();
     }
 
     @Override
     public void onBackPressed() {
-        if(!finishing){
+        if (!finishing) {
             defaultScreen();
-        }else{
+        } else {
             super.onBackPressed();
-            if(binding.swipe != null &&binding.swipe.isRefreshing()){
+            if (binding.swipe != null && binding.swipe.isRefreshing()) {
                 binding.swipe.setRefreshing(false);
             }
             if (binding != null && binding.webView != null) {
@@ -325,15 +348,16 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
     private void savedBook() {
         String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
-        DetailBean details = new DetailBean(id, timestamp, image, title,"false");
+        DetailBean details = new DetailBean(id, timestamp, image, title, "false");
         details.setVideoId(id);
         details.setTimeStamp(timestamp);
-        bookmarkDbHelper.toggleBookmark(details,7);
+        bookmarkDbHelper.toggleBookmark(details, 7);
         setImageData(id);
     }
+
     private void setImageData(String videoId) {
         boolean isBookmarked = bookmarkDbHelper.isBookmarked(videoId);
-        binding.ivHeart.setImageResource(!isBookmarked? R.mipmap.heart_no :R.mipmap.heart_yes);
+        binding.ivHeart.setImageResource(!isBookmarked ? R.mipmap.heart_no : R.mipmap.heart_yes);
     }
 
     @SuppressWarnings("deprecation")
@@ -346,7 +370,8 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
     private void setupWebView(String videoUrl) {
         binding.webView.setWebViewClient(new CustomWebViewClient());
-        binding.webView.setWebChromeClient(new CustomWebChromeClient(){});
+        binding.webView.setWebChromeClient(new CustomWebChromeClient() {
+        });
         WebSettings webSettings = binding.webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
@@ -402,15 +427,15 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
     @Override
     public void showLoading() {
-        if(!isInit){
+        if (!isInit) {
             binding.swipe.setRefreshing(true);
         }
     }
 
     @Override
     public void showError(String error) {
-        Toast.makeText(this,"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
-        if(binding.swipe.isRefreshing()){
+        Toast.makeText(this, "Error fetching data: " + error, Toast.LENGTH_SHORT).show();
+        if (binding.swipe.isRefreshing()) {
             binding.swipe.setRefreshing(false);
         }
     }
@@ -424,61 +449,37 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                     binding.swipe.setRefreshing(false);
                 }
             }, 500);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
 
-
     int pageSize = 0;
     boolean isPaging = false;
     @Override
     public void getDetailData(AnimePaheDetailBean detailBean) {
-        if(detailBean!=null && detailBean.getResults()!=null){
+        if (detailBean != null && detailBean.getResults() != null) {
             animeId = detailBean.getResults().getId();
             image = detailBean.getResults().getPoster();
-            detailPresenter.getEpisodeQuery(animeId,page);
             try {
-                pageSize = Integer.parseInt(detailBean.getResults().getEpisodes());
-            }catch (Exception e){
+                if(!isPaging){
+                    detailPresenter.getEpisodeQuery(animeId,page);
+                    pageSize = Integer.parseInt(detailBean.getResults().getEpisodes());
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
-                pageSize = 1;
-                page = 1;
                 isPaging = true;
-                openScroll();
+                binding.spinner.setVisibility(View.VISIBLE);
+                binding.spinner.setOnItemSelectedListener(this);
+                binding.spinner.setSelection(0);
             }
         }
     }
 
-
-    private void openScroll(){
-        binding.rvSeason.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                if (!isLoading && layoutManager != null) {
-                    int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
-                    int totalItemCount = layoutManager.getItemCount();
-                    if (!episodeBeanList.isEmpty()) {
-                        if (lastVisibleItemPosition >= totalItemCount - 1) {
-                            if (isNomore) {
-                                return;
-                            }
-                            isLoading = true;
-                            isInit = false;
-                            page++;
-                            loadmore();
-                        }
-                    }
-                }
-            }
-        });
-
-    }
     int lastWatchedPosition = -1;
+
     @Override
     public void getEpisodes(AnimePaheEpisodeBean episodeBean) {
         if (binding == null) return;
@@ -492,19 +493,19 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                     detailBean.setVideoId(id);
                     detailBean.setWatched(isWatched);
                     episodeBeanList.add(detailBean);
-                    if(isWatched){
+                    if (isWatched) {
                         lastWatchedPosition = episodeBeanList.size() - 1;
                     }
                 }
                 episodeAdapter.setNewData(episodeBeanList);
-                if(!isPaging){
+                if (!isPaging) {
                     if (episodeBeanList.size() < pageSize) {
                         page++;
                         isInit = true;
                         detailPresenter.getEpisodeQuery(animeId, page);
                     }
                     if (lastWatchedPosition != -1) {
-                        if(!SPUtils.getInstance().getBoolean(AppConstant.isShow)){
+                        if (!SPUtils.getInstance().getBoolean(AppConstant.isShow)) {
                             Toast.makeText(getApplicationContext(), "Continuing from last watched episode", Toast.LENGTH_SHORT).show();
                             SPUtils.getInstance().put(AppConstant.isShow, true);
                         }
@@ -523,21 +524,22 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             }
         }
     }
+
     @Override
     public void getTrack(AnimePaheDownloadBean downloadBean) {
-        if(downloadBean !=null && downloadBean.getResults()!=null ){
-            if(!downloadBean.getResults().getStreaming().isEmpty()){
+        if (downloadBean != null && downloadBean.getResults() != null) {
+            if (!downloadBean.getResults().getStreaming().isEmpty()) {
                 streamingBeanList.clear();
                 downloadBeanList.clear();
-                for(AnimePaheDownloadBean.ResultsBean.StreamingBean streamingBean : downloadBean.getResults().getStreaming()){
+                for (AnimePaheDownloadBean.ResultsBean.StreamingBean streamingBean : downloadBean.getResults().getStreaming()) {
                     streamingBeanList.add(streamingBean);
                 }
-                for(AnimePaheDownloadBean.ResultsBean.DownloadBean downloadBean1 : downloadBean.getResults().getDownload()){
+                for (AnimePaheDownloadBean.ResultsBean.DownloadBean downloadBean1 : downloadBean.getResults().getDownload()) {
                     downloadBeanList.add(downloadBean1);
                 }
-                if(isDownload){
+                if (isDownload) {
                     showDownloadList(downloadBeanList);
-                }else{
+                } else {
                     ShowDialog(streamingBeanList);
                 }
 
@@ -545,15 +547,16 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         }
     }
 
-    private DialogPlus dialog,dldialog;
-    private void ShowDialog(List<AnimePaheDownloadBean.ResultsBean.StreamingBean> streamingBeanList){
+    private DialogPlus dialog, dldialog;
+
+    private void ShowDialog(List<AnimePaheDownloadBean.ResultsBean.StreamingBean> streamingBeanList) {
         dialog = DialogPlus.newDialog(this)
                 .setContentHolder(new ViewHolder(R.layout.dialog_select_quality))
                 .setContentWidth(ViewGroup.LayoutParams.MATCH_PARENT)
                 .setContentHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
                 .setGravity(Gravity.CENTER)
                 .setCancelable(true)
-                .setPadding(10,10,10,10)
+                .setPadding(10, 10, 10, 10)
                 .create();
 
         View dialogView = dialog.getHolderView();
@@ -568,14 +571,14 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         dialog.show();
     }
 
-    private void showDownloadList(List<AnimePaheDownloadBean.ResultsBean.DownloadBean> downloadBeanList){
+    private void showDownloadList(List<AnimePaheDownloadBean.ResultsBean.DownloadBean> downloadBeanList) {
         dldialog = DialogPlus.newDialog(this)
                 .setContentHolder(new ViewHolder(R.layout.dialog_select_quality))
                 .setContentWidth(ViewGroup.LayoutParams.MATCH_PARENT)
                 .setContentHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
                 .setGravity(Gravity.CENTER)
                 .setCancelable(true)
-                .setPadding(10,10,10,10)
+                .setPadding(10, 10, 10, 10)
                 .create();
 
         View dialogView = dldialog.getHolderView();
@@ -589,42 +592,69 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
         dldialog.show();
     }
+
     @Override
     public void getSrc(String videoUrl) {
-        if(dialog !=null){
+        if (dialog != null) {
             dialog.dismiss();
         }
         setupWebView(videoUrl);
     }
+
     @Override
     public void getDownloadLink(String videoUrl) {
-        if(dldialog !=null){
+        if (dldialog != null) {
             isDownload = false;
             dldialog.dismiss();
         }
-        Intent intent  = new Intent(getApplicationContext(), DownloadWebview.class);
+        Intent intent = new Intent(getApplicationContext(), DownloadWebview.class);
         intent.putExtra("DownloadUrl", videoUrl);
         intent.putExtra("title", title);
-        intent.putExtra("EpisodeNum",episode);
+        intent.putExtra("EpisodeNum", episode);
         startActivity(intent);
     }
 
 
     @Override
-    public void getVideoUrl(String videoUrl,boolean isDownload,String episode) {
+    public void getVideoUrl(String videoUrl, boolean isDownload, String episode) {
         this.isDownload = isDownload;
         this.episode = episode;
-        if(!videoUrl.isEmpty()){
+        if (!videoUrl.isEmpty()) {
             isError = false;
-            if(!streamingBeanList.isEmpty()){
+            if (!streamingBeanList.isEmpty()) {
                 streamingBeanList.clear();
             }
-            String url = "https://animepahe.si/play/"+animeId+"/"+videoUrl;
+            String url = "https://animepahe.si/play/" + animeId + "/" + videoUrl;
             detailPresenter.getTrackQuery(url);
         }
     }
 
 
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+        if (isNomore) {
+            Toast.makeText(getApplicationContext(), "No more data please refresh", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        isPaging = true;
+        page = position + 1;
+        SPUtils.getInstance().put(AppConstant.SpinnerPosition, position);
+        if (position == spinnerItems.size() - 1) {
+            totalPages++;
+            spinnerTotalDbHelper.saveOrUpdateShowPages(id, totalPages, page);
+            spinnerItems.add(String.valueOf(totalPages));
+            ArrayAdapter<String> adapter = (ArrayAdapter<String>) binding.spinner.getAdapter();
+            adapter.notifyDataSetChanged();
+        }
+        episodeBeanList.clear();
+        episodeAdapter.setNewData(episodeBeanList);
+        detailPresenter.getEpisodeQuery(animeId, page);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
+    }
 
 
     private class CustomWebChromeClient extends WebChromeClient {
@@ -632,6 +662,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
             return true;
         }
+
         @Override
         public Bitmap getDefaultVideoPoster() {
             return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888);
@@ -644,6 +675,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             String url = request.getUrl().toString();
             return handleUrlLoading(view, url);
         }
+
         private boolean handleUrlLoading(WebView view, String url) {
             try {
                 if (url.contains(videoUrl)) {
@@ -651,7 +683,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 } else {
                     return true;
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 isError = true;
                 binding.tvSelect.setVisibility(View.VISIBLE);
@@ -661,9 +693,10 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             }
             return false;
         }
+
         @Override
         public void onPageFinished(WebView view, String url) {
-            if(isError){
+            if (isError) {
                 binding.webView.setVisibility(View.GONE);
                 return;
             }
