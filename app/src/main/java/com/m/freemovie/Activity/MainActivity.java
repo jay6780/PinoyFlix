@@ -107,69 +107,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private long getTimeHour() {
-        Calendar calendar = Calendar.getInstance();
-        long currentTime = System.currentTimeMillis();
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-
-        long timeHour = calendar.getTimeInMillis();
-        if (currentTime >= timeHour) {
-            calendar.add(Calendar.HOUR_OF_DAY, 2);
-//            calendar.add(Calendar.MINUTE, 1);
-            timeHour = calendar.getTimeInMillis();
-        }
-        return timeHour - currentTime;
-
-    }
-
     private void startHourCount() {
         try {
-            long milliHours = getTimeHour();
-            if (milliHours <= 0) {
-                milliHours = 10000;
+            Calendar calendar = Calendar.getInstance();
+            int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+            int nextTwoHourMark = ((currentHour / 2) * 2) + 2;
+            if (nextTwoHourMark >= 24) {
+                nextTwoHourMark = 0;
+                calendar.add(Calendar.DAY_OF_YEAR, 1);
             }
-            start(milliHours, 1000);
+            calendar.set(Calendar.HOUR_OF_DAY, nextTwoHourMark);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+
+            long endTime = System.currentTimeMillis();
+            long startTime = calendar.getTimeInMillis();
+            long total = startTime - endTime;
+
+            start(total, 1000);
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
-
     private void start(final long miliSecond, final int interval) {
-        new CountDownTimer(miliSecond, interval) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                long day = TimeUnit.MILLISECONDS.toDays(millisUntilFinished);
-                millisUntilFinished -= TimeUnit.DAYS.toMillis(day);
+        try {
+            new CountDownTimer(miliSecond, interval) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    long day = TimeUnit.MILLISECONDS.toDays(millisUntilFinished);
+                    millisUntilFinished -= TimeUnit.DAYS.toMillis(day);
 
-                long hour = TimeUnit.MILLISECONDS.toHours(millisUntilFinished);
-                millisUntilFinished -= TimeUnit.HOURS.toMillis(hour);
+                    long hour = TimeUnit.MILLISECONDS.toHours(millisUntilFinished);
+                    millisUntilFinished -= TimeUnit.HOURS.toMillis(hour);
 
-                long minute = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
-                millisUntilFinished -= TimeUnit.MINUTES.toMillis(minute);
+                    long minute = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
+                    millisUntilFinished -= TimeUnit.MINUTES.toMillis(minute);
 
-                long second = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
-                long totalSeconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
+                    long second = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
+                    long totalSeconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
 
-                if (totalSeconds % 10 == 0) {
-                    binding.time.setText("Welcome to PinoyFlix");
-                } else {
-                    binding.time.setText("Task reset in : " + String.format("%02d:%02d:%02d:%02d", day, hour, minute, second));
+                    if (totalSeconds % 10 == 0) {
+                        binding.time.setText("Welcome to PinoyFlix");
+                    } else {
+                        binding.time.setText("Task reset in : " + String.format("%02d:%02d:%02d:%02d", day, hour, minute, second));
+                    }
                 }
-            }
-            @Override
-            public void onFinish() {
-                startHourCount();
-                SPUtils.getInstance().put(AppConstant.adSeries,false);
-                SPUtils.getInstance().put(AppConstant.adMovies,false);
-                SPUtils.getInstance().put(AppConstant.adAnime,false);
-                SPUtils.getInstance().put(AppConstant.adOpen,false);
-            }
 
-        }.start();
-
+                @Override
+                public void onFinish() {
+                    SPUtils.getInstance().put(AppConstant.adSeries, false);
+                    SPUtils.getInstance().put(AppConstant.adMovies, false);
+                    SPUtils.getInstance().put(AppConstant.adAnime, false);
+                    SPUtils.getInstance().put(AppConstant.adOpen, false);
+                    startHourCount();
+                }
+            }.start();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void initAd() {
