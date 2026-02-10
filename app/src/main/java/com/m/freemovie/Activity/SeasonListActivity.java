@@ -219,6 +219,10 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                 videoUrl = "https://vidrock.net/tv/" + id + "/" + seasonNum + "/" + epNumber + "&download=false";
                 setupWebView(videoUrl);
                 break;
+            case 3:
+                videoUrl = "https://moviesapi.club/tv/"+id+"-"+seasonNum+"-"+epNumber;
+                setupWebView(videoUrl);
+                break;
         }
     }
 

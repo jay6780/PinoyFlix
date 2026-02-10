@@ -68,7 +68,7 @@ public class MovieListAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Ba
 
     private void showDialog(MovieBean.ResultsBean item, BaseViewHolder helper) {
 
-        String[] option = {"Player 1 ( Click again if not load )","Player 2" ,"View Details"};
+        String[] option = {"Player 1","Player 2","Player 3" ,"View Details"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setItems(option, new DialogInterface.OnClickListener() {
@@ -87,6 +87,12 @@ public class MovieListAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Ba
                         notifyDataSetChanged();
                         break;
                     case 2:
+                        movieIdListener.getMovieId(item.getId(),item.getTitle(),3);
+                        lastPosition = (helper.getAdapterPosition());
+                        notifyItemChanged(helper.getAdapterPosition());
+                        notifyDataSetChanged();
+                        break;
+                    case 3:
                         Intent intent = new Intent(mContext, Details_activity.class);
                         intent.putExtra("id",item.getId());
                         intent.putExtra("position",1);

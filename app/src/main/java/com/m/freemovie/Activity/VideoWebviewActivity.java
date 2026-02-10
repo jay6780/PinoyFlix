@@ -120,6 +120,9 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
             case 2:
                 videoUrl = "https://vidrock.net/movie/"+ videoId;
                 break;
+            case 3:
+                videoUrl = "https://moviesapi.club/movie/"+ videoId;
+                break;
         }
         initApi();
         initStart();
@@ -346,6 +349,10 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 break;
             case 2:
                 videoUrl = "https://vidrock.net/movie/"+ id;
+                setupWebView(videoUrl);
+                break;
+            case 3:
+                videoUrl = "https://moviesapi.club/movie/"+ id;
                 setupWebView(videoUrl);
                 break;
         }

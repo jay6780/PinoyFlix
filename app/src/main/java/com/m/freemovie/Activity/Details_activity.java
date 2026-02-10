@@ -227,7 +227,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     }
 
     private void watchNow() {
-        String[] option = {"Player 1 ( Click again if not load )","Player 2"};
+        String[] option = {"Player 1","Player 2","Player 3"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         TextView titleView = new TextView(this);
         titleView.setText("Select player");
@@ -253,6 +253,12 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                         intent = new Intent(Details_activity.this, VideoWebviewActivity.class);
                         intent.putExtra("title", title);
                         intent.putExtra("videoPosition", 2);
+                        intent.putExtra("videoId", id);
+                        break;
+                    case 2:
+                        intent = new Intent(Details_activity.this, VideoWebviewActivity.class);
+                        intent.putExtra("title", title);
+                        intent.putExtra("videoPosition", 3);
                         intent.putExtra("videoId", id);
                         break;
                 }
