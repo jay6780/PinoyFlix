@@ -133,7 +133,6 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
         binding.rvEpisode.setAdapter(tagalogEpisodeAdapter);
         dbHelper = new PinoyWatchHistoryHelper(this);
         bookmarkDbHelper = new BookmarkDbHelper(this);
-        binding.title.setText(title);
         List<View> viewList = new ArrayList<>();
         viewList.add(binding.fullWide);
         viewList.add(binding.player);

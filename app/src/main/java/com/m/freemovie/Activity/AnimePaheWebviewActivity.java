@@ -113,7 +113,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 //        Log.d("AnimeTitle","val: "+title);
         id = getIntent().getStringExtra("id");
 //        Log.d("SeasonList","ids"+" videoId: "+id + " SeasonId: "+seasonId);
-        binding.titleName.setText(title);
         bookmarkDbHelper = new BookmarkDbHelper(this);
         dbHelper = new PinoyWatchHistoryHelper(this);
         binding.expand.setOnClickListener(view -> rotateScreen());

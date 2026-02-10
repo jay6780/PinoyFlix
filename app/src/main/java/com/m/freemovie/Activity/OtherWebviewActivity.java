@@ -84,8 +84,6 @@ public class OtherWebviewActivity extends AppCompatActivity
         link = getIntent().getStringExtra("link");
         image = getIntent().getStringExtra("image");
         defaultScreen();
-        binding.titleName.setVisibility(View.VISIBLE);
-        binding.titleName.setText(title);
         presenter = new OthersPresenter(this);
         downloadPresenter = new OtherDownloadPresenter(this);
         initRecyclerMovie();
@@ -358,8 +356,6 @@ public class OtherWebviewActivity extends AppCompatActivity
 
     @Override
     public void getMovieId(String id, String title,String link) {
-        binding.titleName.setVisibility(View.VISIBLE);
-        binding.titleName.setText(title);
         binding.webView.clearCache(true);
         downloadPresenter.getLink(link);
     }
@@ -492,7 +488,6 @@ public class OtherWebviewActivity extends AppCompatActivity
         binding.rvMovielist.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         binding.rlWebview.setLayoutParams(params);
-        binding.titleName.setVisibility(View.GONE);
         binding.swipe.setEnabled(true);
 
         RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(dip2px(30), dip2px(30));
@@ -511,7 +506,6 @@ public class OtherWebviewActivity extends AppCompatActivity
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         binding.expand.setVisibility(View.VISIBLE);
         binding.rvMovielist.setVisibility(View.VISIBLE);
-        binding.titleName.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, dip2px(250));
         binding.rlWebview.setLayoutParams(params);
         binding.swipe.setEnabled(true);

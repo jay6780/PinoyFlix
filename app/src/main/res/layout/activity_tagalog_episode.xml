@@ -30,14 +30,6 @@
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:src="@mipmap/icon_backwhite" />
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:layout_marginTop="2dp"
-                android:textSize="16sp"/>
         </LinearLayout>
         <ImageView
             android:id="@+id/rotate"
@@ -141,12 +133,13 @@
         android:layout_below="@+id/relative_video"
         android:layout_height="wrap_content"
         android:padding="5dp"/>
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_episode"
-        android:visibility="visible"
-        android:layout_below="@+id/episodeTxt"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_episode"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/episodeTxt"
+            android:visibility="visible" />
     </RelativeLayout>
 
     <LinearLayout

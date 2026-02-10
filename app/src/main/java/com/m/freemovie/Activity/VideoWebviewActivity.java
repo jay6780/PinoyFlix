@@ -80,7 +80,6 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
         hud.show();
-        binding.titleName.setVisibility(View.GONE);
         binding.expand.setOnClickListener(view -> rotateScreen());
         if (videoId == null) {
             Toast.makeText(getApplicationContext(), "Please try again", Toast.LENGTH_SHORT).show();
@@ -116,12 +115,9 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         });
         switch (videoPosition){
             case 1:
-                binding.titleName.setVisibility(View.VISIBLE);
-                binding.titleName.setText(title);
                 videoUrl ="https://player.videasy.net/movie/"+videoId;
                 break;
             case 2:
-                binding.titleName.setVisibility(View.GONE);
                 videoUrl = "https://vidrock.net/movie/"+ videoId;
                 break;
         }
@@ -345,13 +341,10 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         binding.webView.clearCache(true);
         switch (position){
             case 1:
-                binding.titleName.setVisibility(View.VISIBLE);
-                binding.titleName.setText(title);
                 videoUrl ="https://player.videasy.net/movie/"+id;
                 setupWebView(videoUrl);
                 break;
             case 2:
-                binding.titleName.setVisibility(View.GONE);
                 videoUrl = "https://vidrock.net/movie/"+ id;
                 setupWebView(videoUrl);
                 break;

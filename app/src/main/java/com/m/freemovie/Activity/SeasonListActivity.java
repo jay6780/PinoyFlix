@@ -62,7 +62,6 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         episodeCount = getIntent().getIntExtra("episodeCount", 0);
         seasonNum = getIntent().getIntExtra("seasonNum", 0);
 //        Log.d("SeasonList","ids"+" videoId: "+id + " SeasonId: "+seasonId);
-        binding.titleName.setText(tvSeriesName);
 
         binding.expand.setOnClickListener(view -> rotateScreen());
         binding.btnBackFinish.setOnClickListener(new View.OnClickListener() {
@@ -141,6 +140,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
 
                         @Override
                         public void onAdLoaded() {
+                            binding.adTvSeries.setVisibility(View.VISIBLE);
                         }
 
                         @Override
@@ -213,12 +213,10 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         switch (position) {
             case 1:
                 videoUrl = "https://player.videasy.net/tv/"+id+"/"+seasonNum+"/"+ epNumber;
-                binding.titleName.setVisibility(View.VISIBLE);
                 setupWebView(videoUrl);
                 break;
             case 2:
                 videoUrl = "https://vidrock.net/tv/" + id + "/" + seasonNum + "/" + epNumber + "&download=false";
-                binding.titleName.setVisibility(View.GONE);
                 setupWebView(videoUrl);
                 break;
         }
