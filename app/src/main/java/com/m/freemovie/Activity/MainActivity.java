@@ -109,27 +109,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void startHourCount() {
         try {
-            Calendar calendar = Calendar.getInstance();
-            int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
-            int nextTwoHourMark = ((currentHour / 2) * 2) + 2;
-            if (nextTwoHourMark >= 24) {
-                nextTwoHourMark = 0;
-                calendar.add(Calendar.DAY_OF_YEAR, 1);
+            long lastResetTime = SPUtils.getInstance().getLong("last_reset_time", 0);
+            long currentTime = System.currentTimeMillis();
+            long twoHours = 2 * 60 * 60 * 1000;
+
+            long nextResetTime = lastResetTime + twoHours;
+
+            if (currentTime >= nextResetTime) {
+                resetAds();
+                SPUtils.getInstance().put("last_reset_time", currentTime);
+                nextResetTime = currentTime + twoHours;
             }
-            calendar.set(Calendar.HOUR_OF_DAY, nextTwoHourMark);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MILLISECOND, 0);
 
-            long endTime = System.currentTimeMillis();
-            long startTime = calendar.getTimeInMillis();
-            long total = startTime - endTime;
+            long remainingTime = nextResetTime - currentTime;
+            start(remainingTime, 1000);
 
-            start(total, 1000);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    private void resetAds() {
+        SPUtils.getInstance().put(AppConstant.adSeries, false);
+        SPUtils.getInstance().put(AppConstant.adMovies, false);
+        SPUtils.getInstance().put(AppConstant.adAnime, false);
+        SPUtils.getInstance().put(AppConstant.adOpen, false);
+    }
+
 
     private void start(final long miliSecond, final int interval) {
         try {
@@ -157,10 +163,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 @Override
                 public void onFinish() {
-                    SPUtils.getInstance().put(AppConstant.adSeries, false);
-                    SPUtils.getInstance().put(AppConstant.adMovies, false);
-                    SPUtils.getInstance().put(AppConstant.adAnime, false);
-                    SPUtils.getInstance().put(AppConstant.adOpen, false);
+                    resetAds();
                     startHourCount();
                 }
             }.start();
