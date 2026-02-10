@@ -502,7 +502,8 @@ public class TagalogWebviewActivity extends AppCompatActivity
         if(revivalSeriesBean !=null && revivalSeriesBean.getResults()!=null){
             isLoading = false;
             if(!revivalSeriesBean.getResults().isEmpty()) {
-                tagalogAnimeAdapter.setNewData(revivalSeriesBean.getResults());
+                movieList.addAll(revivalSeriesBean.getResults());
+                tagalogAnimeAdapter.setNewData(movieList);
             }else{
                 isNomore = true;
                 Toast.makeText(getApplicationContext(),"No more data",Toast.LENGTH_SHORT).show();
