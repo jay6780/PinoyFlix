@@ -15,12 +15,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.ads.AdError;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.SPUtils;
@@ -57,7 +51,6 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
     private String airDate;
     private Random random;
     private KProgressHUD hud;
-    private InterstitialAd mInterstitialAd;
     private String TAG = "AnimeDetailsActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,9 +79,6 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
 
             }.start();
 
-            if(!SPUtils.getInstance().getBoolean(AppConstant.adAnime)) {
-                loadAd();
-            }
 
         }else{
             Toast.makeText(getApplicationContext(),"Please check connection and try again",Toast.LENGTH_SHORT).show();
@@ -108,40 +98,6 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
         ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
-
-    private void loadAd() {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        InterstitialAd.load(this, AppConstant.InterstitialId, adRequest,
-                new InterstitialAdLoadCallback() {
-                    @Override
-                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                        if(!AppConstant.isAddFree){
-                            mInterstitialAd = interstitialAd;
-//                        Log.i(TAG, "Ad Loaded. Showing it now automatically...");
-                            Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
-                            mInterstitialAd.show(AnimeDetailsActivity.this);
-                            SPUtils.getInstance().put(AppConstant.adAnime,true);
-                        }
-                        mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
-                            @Override
-                            public void onAdDismissedFullScreenContent() {
-//                                Log.d(TAG, "Ad dismissed by user.");
-                            }
-
-                            @Override
-                            public void onAdFailedToShowFullScreenContent(AdError adError) {
-//                                Log.e(TAG, "Ad failed to show: " + adError.getMessage());
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-//                        Log.e(TAG, "Ad failed to load: " + loadAdError.getMessage());
-                    }
-                });
     }
 
 

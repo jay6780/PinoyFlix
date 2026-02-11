@@ -38,11 +38,6 @@ import com.app.hubert.guide.core.Controller;
 import com.app.hubert.guide.listener.OnGuideChangedListener;
 import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.LoadAdError;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
@@ -105,7 +100,6 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
     private boolean isFirstTask = false;
     private BookmarkDbHelper bookmarkDbHelper;
     private String lastVideoUrl = "";
-    private AdView adView;
     private RelativeLayout.LayoutParams params;
     private LoudnessEnhancer booster;
     private final int[] gainValues = {-3000, -2000, -1000, 0, 1000, 2000};
@@ -230,11 +224,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
         });
 
         initTopPadding(70);
-        if(!AppConstant.isAddFree){
-            loadAd();
-        }else{
-            loadAdsFailed();
-        }
+
         binding.llVolume.setEnabled(false);
         try {
             booster = new LoudnessEnhancer(0);
@@ -289,75 +279,6 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
         }.start();
     }
 
-    @SuppressLint("MissingPermission")
-    private void loadAd() {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView = new AdView(TagalogEpisodeActivity.this);
-        adView.setAdUnitId(getString(R.string.banner_adId));
-        adView.setAdSize(AdSize.BANNER);
-        binding.adTvSeries.removeAllViews();
-        binding.adTvSeries.addView(adView);
-        adView.loadAd(adRequest);
-        if (adView != null) {
-            adView.setAdListener(
-                    new AdListener() {
-                        @Override
-                        public void onAdClicked() {
-                        }
-
-                        @Override
-                        public void onAdClosed() {
-                        }
-
-                        @Override
-                        public void onAdFailedToLoad(@NonNull LoadAdError adError) {
-                            loadAdsFailed();
-                        }
-
-                        @Override
-                        public void onAdImpression() {
-                        }
-
-                        @Override
-                        public void onAdLoaded() {
-                            loadAdsSuccess();
-                        }
-
-                        @Override
-                        public void onAdOpened() {
-                        }
-                    });
-        }
-    }
-
-    private void loadAdsFailed(){
-        params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        params.addRule(RelativeLayout.BELOW,binding.episodeTxt.getId());
-        binding.rlStart.setLayoutParams(params);
-        binding.adTvSeries.removeAllViews();
-        binding.adTvSeries.setVisibility(View.GONE);
-        binding.llAds.setVisibility(View.GONE);
-    }
-
-    private void loadAdsSuccess(){
-        binding.adTvSeries.setVisibility(View.VISIBLE);
-        binding.llAds.setVisibility(View.VISIBLE);
-        params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        params.addRule(RelativeLayout.ABOVE,binding.llAds.getId());
-        params.addRule(RelativeLayout.BELOW,binding.episodeTxt.getId());
-        binding.rlStart.setLayoutParams(params);
-
-        new CountDownTimer(10000, 1000) {
-
-            public void onTick(long millisUntilFinished) {
-            }
-
-            public void onFinish() {
-                loadAdsFailed();
-            }
-
-        }.start();
-    }
 
     private void initTopPadding(int topPadding) {
         ViewCompat.setOnApplyWindowInsetsListener(binding.llRoot, (v, windowInsets) -> {
@@ -569,7 +490,6 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
                 initTopPadding(10);
                 binding.relativeVideo.setLayoutParams(params);
                 binding.llBookmark.setVisibility(View.GONE);
-                loadAdsFailed();
                 break;
             case R.id.ten_negative:
                 if (binding.player == null || mDuration == 0) return;

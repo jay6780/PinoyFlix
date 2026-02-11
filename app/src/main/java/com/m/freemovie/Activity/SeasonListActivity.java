@@ -1,6 +1,5 @@
 package com.m.freemovie.Activity;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
@@ -21,16 +20,8 @@ import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.LoadAdError;
-import com.m.freemovie.R;
-import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.WatchHistoryDBHelper;
 import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
 import com.m.freemovie.Utils.WindowUtils;
@@ -49,7 +40,6 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
     private WatchHistoryDBHelper dbHelper;
     private boolean finishing = true;
     private String videoUrl;
-    private AdView adView;
     private LoudnessEnhancer booster;
     private final int[] gainValues = {-3000, -2000, -1000, 0, 1000, 2000};
     private final String[] labels = {"0%", "25%", "50%", "100%", "150%", "200%"};
@@ -118,55 +108,8 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                     "Last Episode watched: Episode " + lastWatchedEpisodeNumber,
                     Toast.LENGTH_SHORT).show();
         }
-        if(!AppConstant.isAddFree){
-            loadAd();
-        }else{
-            binding.adTvSeries.setVisibility(View.GONE);
-        }
 
         binding.llVolume.setEnabled(false);
-    }
-
-    @SuppressLint("MissingPermission")
-    private void loadAd() {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView = new AdView(SeasonListActivity.this);
-        adView.setAdUnitId(getString(R.string.banner_adId));
-        adView.setAdSize(AdSize.BANNER);
-        binding.adTvSeries.removeAllViews();
-        binding.adTvSeries.addView(adView);
-        adView.loadAd(adRequest);
-        if (adView != null) {
-            adView.setAdListener(
-                    new AdListener() {
-                        @Override
-                        public void onAdClicked() {
-                        }
-
-                        @Override
-                        public void onAdClosed() {
-                        }
-
-                        @Override
-                        public void onAdFailedToLoad(@NonNull LoadAdError adError) {
-                            binding.adTvSeries.removeAllViews();
-                            binding.adTvSeries.setVisibility(View.GONE);
-                        }
-
-                        @Override
-                        public void onAdImpression() {
-                        }
-
-                        @Override
-                        public void onAdLoaded() {
-                            binding.adTvSeries.setVisibility(View.VISIBLE);
-                        }
-
-                        @Override
-                        public void onAdOpened() {
-                        }
-                    });
-        }
     }
 
     private void rotateScreen() {
@@ -178,8 +121,6 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         binding.rlWebview.setLayoutParams(params);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         binding.episodeTxt.setVisibility(View.GONE);
-        binding.adTvSeries.removeAllViews();
-        binding.adTvSeries.setVisibility(View.GONE);
         new WindowUtils(this, true, false);
     }
 
