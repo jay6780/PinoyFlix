@@ -5,11 +5,15 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.audiofx.LoudnessEnhancer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -50,6 +54,12 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
     private int currentPosition = 0;
     private VideoDownloadAdapter videoDownloadAdapter;
     private List<VideoFile> videoFileList = new ArrayList<>();
+    private LoudnessEnhancer booster;
+    private final int[] gainValues = {-3000, -2000, -1000, 0, 1000, 2000};
+    private final String[] labels = {"0%", "25%", "50%", "100%", "150%", "200%"};
+    private int currentLevelIndex = 3;
+    private CountDownTimer volumeTimer;
+    private AudioManager audioManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,6 +151,15 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
         binding.player.setVideoPath(videopath);
         initTopPadding(70);
         setupFileList();
+        binding.llVolume.setEnabled(false);
+        try {
+            booster = new LoudnessEnhancer(0);
+            booster.setEnabled(true);
+            booster.setTargetGain(-1000);
+            audioManager = (android.media.AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -179,6 +198,50 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
             v.setLayoutParams(mlp);
             return WindowInsetsCompat.CONSUMED;
         });
+    }
+
+
+    private void updateVolume(int index) {
+        if (index < 0 || index >= gainValues.length) return;
+
+        currentLevelIndex = index;
+        booster.setTargetGain(gainValues[index]);
+        int maxSystemVolume = audioManager.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC);
+        int targetSystemVol = (index * maxSystemVolume) / 5;
+        audioManager.setStreamVolume(android.media.AudioManager.STREAM_MUSIC, targetSystemVol, 0);
+        binding.volumeSeekBar.setProgress(index);
+        binding.volumeText.setText(labels[index]);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (booster == null) return super.onKeyDown(keyCode, event);
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                binding.llVolume.setVisibility(View.VISIBLE);
+                if (currentLevelIndex < 5) updateVolume(currentLevelIndex + 1);
+                showVolumeUI();
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                binding.llVolume.setVisibility(View.VISIBLE);
+                if (currentLevelIndex > 0) updateVolume(currentLevelIndex - 1);
+                showVolumeUI();
+                return true;
+            default:
+                return super.onKeyDown(keyCode, event);
+        }
+    }
+
+    private void showVolumeUI() {
+        binding.llVolume.setVisibility(View.VISIBLE);
+        if (volumeTimer != null) volumeTimer.cancel();
+
+        volumeTimer = new CountDownTimer(3500, 1000) {
+            public void onTick(long millisUntilFinished) {}
+            public void onFinish() {
+                binding.llVolume.setVisibility(View.GONE);
+            }
+        }.start();
     }
 
 
