@@ -53,6 +53,7 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
         delete_btn = findViewById(R.id.delete_btn);
         delete_now = findViewById(R.id.delete_now);
         btn_back5 = findViewById(R.id.btn_back5);
+
         ll_bg = findViewById(R.id.ll_bg);
         file_recycler = findViewById(R.id.file_recycler);
         ll_empty = findViewById(R.id.ll_empty);
