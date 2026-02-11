@@ -53,7 +53,7 @@ public class SeasonsAdapter extends BaseQuickAdapter<DetailTvBean.SeasonsBean, B
             progressPercentage = (watchedCount * 100) / totalEpisodes;
             progressBar.setProgress(progressPercentage);
         }
-        String posterPath = "https://image.tmdb.org/t/p/w500/" + item.getPoster_path();
+        String posterPath = "http://image.tmdb.org/t/p/w500/" + item.getPoster_path();
         Glide.with(mContext)
                 .asBitmap()
                 .placeholder(R.drawable.noimage)

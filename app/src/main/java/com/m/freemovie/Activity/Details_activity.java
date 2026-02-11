@@ -257,7 +257,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     @Override
     public void getDetailResponse(DetailBean movieBean) {
         if (movieBean != null && !isFinishing() && !isDestroyed()) {
-            String posterPath = "https://image.tmdb.org/t/p/w500/" + movieBean.getPoster_path();
+            String posterPath = "http://image.tmdb.org/t/p/w500/" + movieBean.getPoster_path();
             this.lastImage = posterPath;
             binding.tvTitle.setText(movieBean.getOriginal_title());
 
@@ -306,7 +306,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     @Override
     public void getTvDetailResponse(DetailTvBean detailTvBean) {
         if (detailTvBean != null && !isFinishing() && !isDestroyed()) {
-            String posterPath = "https://image.tmdb.org/t/p/w500/" + detailTvBean.getPoster_path();
+            String posterPath = "http://image.tmdb.org/t/p/w500/" + detailTvBean.getPoster_path();
             this.lastImage = posterPath;
             seriesBinding.tvTitle.setText(detailTvBean.getName());
             tvSeriesName = detailTvBean.getName();

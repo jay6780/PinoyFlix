@@ -21,7 +21,7 @@ public class MovieAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, BaseVi
     protected void convert(BaseViewHolder helper, MovieBean.ResultsBean item) {
         TextView tv_title  = helper.getView(R.id.tv_title);
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
-        String posterPath = "https://image.tmdb.org/t/p/w500/"+item.getPoster_path();
+        String posterPath = "http://image.tmdb.org/t/p/w500/"+item.getPoster_path();
 
         Glide.with(mContext)
                 .asBitmap()

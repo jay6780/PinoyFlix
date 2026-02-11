@@ -21,7 +21,7 @@ public class TvSeriesCarouselAdapter extends BaseBannerAdapter<TvSeriesBean.Resu
     @Override
     protected void bindData(BaseViewHolder<TvSeriesBean.ResultsBean> holder, TvSeriesBean.ResultsBean data, int position, int pageSize) {
         ImageView imageView = holder.findViewById(R.id.banner_image);
-        String posterPath = "https://image.tmdb.org/t/p/w500/"+data.getPoster_path();
+        String posterPath = "http://image.tmdb.org/t/p/w500/"+data.getPoster_path();
         Glide.with(context)
                 .asBitmap()
                 .load(posterPath)
