@@ -61,7 +61,6 @@
                     android:id="@+id/nested"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_above="@+id/tv_watch"
                     android:layout_below="@+id/rl_back"
                     android:layout_marginBottom="5dp">
 
