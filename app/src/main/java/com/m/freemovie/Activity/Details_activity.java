@@ -97,7 +97,6 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
             initGuide("Tv_series");
             seriesBinding.ivBack.setOnClickListener(view -> finish());
             seriesBinding.ivBook.setOnClickListener(view -> savedBook());
-            seriesBinding.tvWatch.setOnClickListener(view -> watchNow());
         } else {
             initGuide("indie_movies");
             binding.ivBack.setOnClickListener(view -> finish());
@@ -396,7 +395,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                 seriesBinding.tvStatus.setVisibility(View.GONE);
                 seriesBinding.revenue.setVisibility(View.GONE);
                 seriesBinding.tvRevenue.setVisibility(View.GONE);
-                seriesBinding.tvWatch.setVisibility(View.GONE);
+
 
                 seasonRecycler(detailTvBean.getSeasons());
 
