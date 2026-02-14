@@ -115,7 +115,7 @@ public class OtherWebviewActivity extends AppCompatActivity
                 page = 1;
                 movieList.clear();
                 if(movieAdapter!=null){
-                    movieAdapter.clearCache();
+                    movieAdapter.setNewData(movieList);
                 }
                 if(binding.llReset.getVisibility() == View.VISIBLE){
                     binding.llReset.setVisibility(View.GONE);
@@ -244,7 +244,6 @@ public class OtherWebviewActivity extends AppCompatActivity
     public void getMovieList(List<PinoyMovieRuBean> bean) {
         if(bean !=null) {
             isLoading = false;
-            movieAdapter.clearCache();
             for (PinoyMovieRuBean data : bean) {
                 movieList.add(new PinoyRuBean(data.getLink(), data.getTitle().getRendered(), data.getId()));
             }

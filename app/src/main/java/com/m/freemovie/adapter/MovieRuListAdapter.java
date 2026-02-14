@@ -34,10 +34,12 @@ import okhttp3.Response;
 
 public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder> {
     private MovieIdListener movieIdListener;
-    public interface MovieIdListener{
-        void getMovieId(String id,int position);
+
+    public interface MovieIdListener {
+        void getMovieId(String id, int position);
     }
-    private  int lastPosition = -1;
+
+    private int lastPosition = -1;
     private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(5);
     private static final ConcurrentHashMap<String, String> THUMBNAIL_CACHE = new ConcurrentHashMap<>();
     private static final OkHttpClient OK_HTTP_CLIENT = new OkHttpClient.Builder()
@@ -69,9 +71,9 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
         RelativeLayout rl_select = helper.getView(R.id.rl_select);
         tv_title.setText(item.getTitle());
 
-        if(lastPosition == (helper.getAdapterPosition())){
+        if (lastPosition == (helper.getAdapterPosition())) {
             rl_select.setBackgroundColor(Color.parseColor("#050E3C"));
-        }else{
+        } else {
             rl_select.setBackgroundColor(Color.parseColor("#313647"));
         }
 
@@ -93,20 +95,20 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(lastPosition == (helper.getAdapterPosition())){
+                if (lastPosition == (helper.getAdapterPosition())) {
                     lastPosition = -1;
-                }else {
-                    if(item.getVideoId() == null && item.getVideoIdSecond() == null){
+                } else {
+                    if (item.getVideoId() == null && item.getVideoIdSecond() == null) {
                         return;
                     }
-                    showVideoOptions(item.getVideoId(),item.getVideoIdSecond(),mContext,helper);
+                    showVideoOptions(item.getVideoId(), item.getVideoIdSecond(), mContext, helper);
                 }
             }
         });
 
     }
 
-    private void showVideoOptions(String videoId,String videoId2, Context mContext, BaseViewHolder helper) {
+    private void showVideoOptions(String videoId, String videoId2, Context mContext, BaseViewHolder helper) {
         String[] videoPlayer = {"Player 1", "Player 2"};
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         TextView titleView = new TextView(mContext);
@@ -129,12 +131,12 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
                 switch (which) {
                     case 0:
                         lastPosition = (helper.getAdapterPosition());
-                        movieIdListener.getMovieId(videoId2,1);
+                        movieIdListener.getMovieId(videoId2, 1);
                         notifyDataSetChanged();
                         break;
                     case 1:
                         lastPosition = (helper.getAdapterPosition());
-                        movieIdListener.getMovieId(videoId,2);
+                        movieIdListener.getMovieId(videoId, 2);
                         notifyDataSetChanged();
                         break;
                 }
@@ -237,7 +239,7 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
         private final WeakReference<ImageView> imageViewRef;
         private final PinoyRuBean item;
         private String thumbnailUrl;
-        private String videoId,videoId2;
+        private String videoId, videoId2;
 
         ThumbnailFetchTask(ImageView imageView, PinoyRuBean item) {
             this.imageViewRef = new WeakReference<>(imageView);
@@ -246,6 +248,7 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
             this.videoId = null;
             this.videoId2 = null;
         }
+
         @SuppressWarnings("deprecation")
         @Override
         protected String doInBackground(Void... voids) {
@@ -285,6 +288,7 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
                 return null;
             }
         }
+
         @SuppressWarnings("deprecation")
         @Override
         protected void onPostExecute(String result) {
@@ -307,17 +311,5 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
                 }
             }
         }
-    }
-
-    public void clearCache() {
-        THUMBNAIL_CACHE.clear();
-        if (getData() != null) {
-            for (PinoyRuBean item : getData()) {
-                item.setThumbnailUrl(null);
-                item.setVideoId(null);
-                item.setVideoIdSecond(null);
-            }
-        }
-        notifyDataSetChanged();
     }
 }
