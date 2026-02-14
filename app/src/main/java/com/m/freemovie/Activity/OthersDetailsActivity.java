@@ -36,19 +36,16 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
     private ActivityOthersDetailsBinding binding;
     private String TAG = "OthersDetailsActivity";
     private InterstitialAd mInterstitialAd;
-    private String title,link,image;
+    private String title,videoId,image;
     private KProgressHUD hud;
-    private int type;
     private BookmarkDbHelper bookmarkDbHelper;
-    private boolean isBook;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityOthersDetailsBinding.inflate(getLayoutInflater());
         title = getIntent().getStringExtra("title");
-        link = getIntent().getStringExtra("link");
+        videoId = getIntent().getStringExtra("videoId");
         image = getIntent().getStringExtra("image");
-        type = getIntent().getIntExtra("type",0);
-        isBook = getIntent().getBooleanExtra("isBook",false);
+
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
         new CountDownTimer(1500, 1000) {
@@ -73,11 +70,9 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
                 .setLabel("Please wait");
         hud.show();
 
-        if(isBook && type == 0){
-            Random random = new Random();
-            int roll = random.nextInt(7) + 1;
-            type = roll;
-        }
+        Random random = new Random();
+        int roll = random.nextInt(7) + 1;
+
 
     }
 
@@ -153,7 +148,7 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
         }
         binding.ivBook.setOnClickListener(this);
 
-        setImageData(link);
+        setImageData(videoId);
     }
     private void setImageData(String videoId) {
         boolean isBookmarked = bookmarkDbHelper.isBookmarked(videoId);
@@ -176,22 +171,19 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.tv_watch:
-                startActivity(new Intent(this,OtherWebviewActivity.class)
-                        .putExtra("title",title)
-                        .putExtra("link",link)
-                        .putExtra("image",image)
-                        .putExtra("type",type));
+                startActivity(new Intent(this, OtherWebviewActivity.class)
+                        .putExtra("videoId",videoId).putExtra("title",title));
                 break;
             case R.id.iv_back:
                 onBackPressed();
                 break;
             case R.id.iv_book:
                 String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
-                DetailBean details = new DetailBean(link, timestamp, image, title,"false");
-                details.setVideoId(link);
+                DetailBean details = new DetailBean(videoId, timestamp, image, title,"false");
+                details.setVideoId(videoId);
                 details.setTimeStamp(timestamp);
                 bookmarkDbHelper.toggleBookmark(details, 8);
-                setImageData(link);
+                setImageData(videoId);
                 break;
         }
 

@@ -5,7 +5,7 @@ import com.m.freemovie.mvp.Api.MovieApi;
 
 public class NetworkingUtils {
 
-    private static MovieApi apiService,apService2;
+    private static MovieApi apiService,apService2,apiService3;
 
 
     public static MovieApi getMovieData() {
@@ -22,4 +22,9 @@ public class NetworkingUtils {
         return apService2;
     }
 
+    public static MovieApi getTagalogMovie() {
+        if (apiService3 == null)
+            apiService3 = TagalogMovieRetrofitAdapter.getInstance().create(MovieApi.class);
+        return apiService3;
+    }
 }

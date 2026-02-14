@@ -47,7 +47,7 @@
             android:layout_weight="0.8"
             android:gravity="center"
             android:layout_height="wrap_content"
-            android:text="Other's"
+            android:text="Tagalog"
             android:textSize="15sp"/>
 
     </LinearLayout>

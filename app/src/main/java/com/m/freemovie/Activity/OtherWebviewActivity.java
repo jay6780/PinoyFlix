@@ -45,30 +45,25 @@ import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.WindowUtils;
-import com.m.freemovie.adapter.OtherMovieListAdapter;
+import com.m.freemovie.adapter.MovieRuListAdapter;
 import com.m.freemovie.databinding.ActivityOtherWebview2Binding;
-import com.m.freemovie.mvp.Contract.OtherDownloadContract;
-import com.m.freemovie.mvp.Contract.OthersContract;
-import com.m.freemovie.mvp.Model.ClassBean.OtherBean;
-import com.m.freemovie.mvp.Model.ClassBean.OthersDlBean;
-import com.m.freemovie.mvp.Presenter.OtherDownloadPresenter;
-import com.m.freemovie.mvp.Presenter.OthersPresenter;
+import com.m.freemovie.mvp.Contract.PinoyRuMovieContract;
+import com.m.freemovie.mvp.Model.ClassBean.PinoyMovieRuBean;
+import com.m.freemovie.mvp.Model.ClassBean.PinoyRuBean;
+import com.m.freemovie.mvp.Presenter.PinoyRuPresenter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class OtherWebviewActivity extends AppCompatActivity
-        implements View.OnClickListener, OtherMovieListAdapter.MovieIdListener, OthersContract.View, OtherDownloadContract.View  {
+        implements View.OnClickListener, PinoyRuMovieContract.View, MovieRuListAdapter.MovieIdListener {
     private ActivityOtherWebview2Binding binding;
-    private int type;
     private int page = 1;
     private boolean isNomore = false;
     private boolean isLoading = false;
-    private String title,link,image;
-    private OtherMovieListAdapter otherMovieListAdapter;
-    private List<OtherBean.ResultsBean> movieList = new ArrayList<>();
-    private OthersPresenter presenter;
-    private OtherDownloadPresenter downloadPresenter;
+    private String videoId;
+    private MovieRuListAdapter movieAdapter;
+    private List<PinoyRuBean> movieList = new ArrayList<>();
     private boolean finishing = true;
     private int lastScroll;
     private KProgressHUD hud;
@@ -82,19 +77,16 @@ public class OtherWebviewActivity extends AppCompatActivity
     private int currentLevelIndex = 3;
     private CountDownTimer volumeTimer;
     private AudioManager audioManager;
+    private PinoyRuPresenter presenter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         binding = ActivityOtherWebview2Binding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        type = getIntent().getIntExtra("type",0);
-        title = getIntent().getStringExtra("title");
-        link = getIntent().getStringExtra("link");
-        image = getIntent().getStringExtra("image");
+        videoId = getIntent().getStringExtra("videoId");
         defaultScreen();
-        presenter = new OthersPresenter(this);
-        downloadPresenter = new OtherDownloadPresenter(this);
+        binding.llReset.setVisibility(View.GONE);
         initRecyclerMovie();
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
@@ -104,14 +96,18 @@ public class OtherWebviewActivity extends AppCompatActivity
         binding.llReset.setOnClickListener(this);
         binding.expand.setOnClickListener(this);
         binding.btnBackFinish.setOnClickListener(this);
-
+        videoUrl = "https://lauradaydo.com/e/"+videoId;
+//        Log.d("videoUrl: ",videoUrl);
+        setupWebView(videoUrl);
+        presenter = new PinoyRuPresenter(this);
+        initApi();
         binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 page = 1;
                 movieList.clear();
-                if(otherMovieListAdapter!=null){
-                    otherMovieListAdapter.setNewData(movieList);
+                if(movieAdapter!=null){
+                    movieAdapter.setNewData(movieList);
                 }
                 if(binding.llReset.getVisibility() == View.VISIBLE){
                     binding.llReset.setVisibility(View.GONE);
@@ -119,8 +115,7 @@ public class OtherWebviewActivity extends AppCompatActivity
                 initApi();
             }
         });
-        initApi();
-        downloadPresenter.getLink(link);
+
         binding.llReset.setVisibility(View.GONE);
         if(!AppConstant.isAddFree){
             loadAd();
@@ -145,6 +140,11 @@ public class OtherWebviewActivity extends AppCompatActivity
 
 
     private void setupWebView(String videoUrl) {
+        if(!isNetworkAvailable()){
+            Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        binding.webView.setVisibility(View.VISIBLE);
         binding.webView.setWebViewClient(new CustomWebViewClient());
         binding.webView.setWebChromeClient(new CustomWebChromeClient() {
         });
@@ -164,7 +164,6 @@ public class OtherWebviewActivity extends AppCompatActivity
 
     private void updateVolume(int index) {
         if (index < 0 || index >= gainValues.length) return;
-
         currentLevelIndex = index;
         booster.setTargetGain(gainValues[index]);
         int maxSystemVolume = audioManager.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC);
@@ -206,6 +205,52 @@ public class OtherWebviewActivity extends AppCompatActivity
     }
 
 
+    @Override
+    public void showLoading() {
+        binding.swipe.setRefreshing(true);
+    }
+
+    @Override
+    public void showError(String error) {
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(),"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
+                binding.swipe.setRefreshing(false);
+            }
+        }, 500);
+    }
+
+    @Override
+    public void hideLoading() {
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                binding.swipe.setRefreshing(false);
+            }
+        }, 500);
+    }
+
+
+    @Override
+    public void getMovieList(List<PinoyMovieRuBean> bean) {
+        if(bean !=null || !bean.isEmpty()) {
+            isLoading = false;
+            for (PinoyMovieRuBean data : bean) {
+                movieList.add(new PinoyRuBean(data.getLink(), data.getTitle().getRendered(), data.getId()));
+            }
+            movieAdapter.setNewData(movieList);
+        }
+
+    }
+
+    @Override
+    public void getMovieId(String id) {
+        binding.webView.clearCache(true);
+        this.videoUrl = "https://lauradaydo.com/e/"+id;
+        setupWebView(videoUrl);
+    }
+
     private class CustomWebChromeClient extends WebChromeClient {
         @Override
         public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
@@ -244,15 +289,14 @@ public class OtherWebviewActivity extends AppCompatActivity
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
+
         }
     }
 
-
     private void initRecyclerMovie() {
-        otherMovieListAdapter = new OtherMovieListAdapter(this,type);
+        movieAdapter = new MovieRuListAdapter(this);
         binding.rvMovielist.setLayoutManager(new LinearLayoutManager(this));
-        binding.rvMovielist.setAdapter(otherMovieListAdapter);
-
+        binding.rvMovielist.setAdapter(movieAdapter);
         binding.rvMovielist.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -262,7 +306,7 @@ public class OtherWebviewActivity extends AppCompatActivity
                     int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
                     int totalItemCount = layoutManager.getItemCount();
                     lastScroll = lastVisibleItemPosition;
-                    if (lastVisibleItemPosition > 10) {
+                    if (lastVisibleItemPosition > 10 && !isRotate) {
                         binding.llReset.setVisibility(View.VISIBLE);
                         initGuide();
                     } else if (lastVisibleItemPosition == 0) {
@@ -281,6 +325,10 @@ public class OtherWebviewActivity extends AppCompatActivity
                 }
             }
         });
+    }
+
+    private void initApi() {
+        presenter.getPage(page);
     }
 
 
@@ -303,86 +351,6 @@ public class OtherWebviewActivity extends AppCompatActivity
                 )
                 .show();
     }
-    private void initApi() {
-        if(!isNetworkAvailable()){
-            Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
-            return;
-        }
-            switch (type) {
-                case 0:
-                    presenter.getHorrorPage(page);
-                    break;
-
-                case 1:
-                    presenter.getCrimePage(page);
-                    break;
-
-                case 2:
-                    presenter.getRomancePage(page);
-                    break;
-
-                case 3:
-                    presenter.getHistoryPage(page);
-                    break;
-
-                case 4:
-                    presenter.getActionPage(page);
-                    break;
-
-                case 5:
-                    presenter.getDramaPage(page);
-                    break;
-
-                case 6:
-                    presenter.getMovieSpeakKhmerPage(page);
-                    break;
-
-                case 7:
-                    presenter.getFantasyPage(page);
-                    break;
-
-                case 8:
-                    presenter.getVivamaxPage(page);
-                    break;
-
-                case 9:
-                    presenter.getTvMoviePage(page);
-                    break;
-
-                case 10:
-                    presenter.getDocumentaryPage(page);
-                    break;
-
-                case 11:
-                    presenter.getMysteryPage(page);
-                    break;
-
-                case 12:
-                    presenter.getAdventurePage(page);
-                    break;
-
-                case 13:
-                    presenter.getComedyPage(page);
-                    break;
-
-                case 14:
-                    presenter.getScienceFictionPage(page);
-                    break;
-
-                case 15:
-                    presenter.getFamilyPage(page);
-                    break;
-
-                case 16:
-                    presenter.getAnimationPage(page);
-                    break;
-
-                case 17:
-                    presenter.getSciFiFantasyPage(page);
-                    break;
-        }
-    }
-
 
     @SuppressWarnings("deprecation")
     @SuppressLint("MissingPermission")
@@ -416,39 +384,6 @@ public class OtherWebviewActivity extends AppCompatActivity
 
     }
 
-    @Override
-    public void getMovieId(String id, String title,String link) {
-        binding.webView.clearCache(true);
-        downloadPresenter.getLink(link);
-    }
-
-    @Override
-    public void showLoading() {
-        binding.swipe.setRefreshing(true);
-    }
-
-    @Override
-    public void showError(String error) {
-        Toast.makeText(this,"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
-        if(binding.swipe.isRefreshing()){
-            binding.swipe.setRefreshing(false);
-        }
-    }
-
-    @Override
-    public void hideLoading() {
-        try {
-            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    binding.swipe.setRefreshing(false);
-                }
-            }, 500);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-    }
 
     @SuppressLint("MissingPermission")
     private void loadAd() {
@@ -589,206 +524,6 @@ public class OtherWebviewActivity extends AppCompatActivity
         return context.getResources();
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            binding.llReset.setVisibility(View.GONE);
-        } else {
-            if (lastScroll > 5) {
-                binding.llReset.setVisibility(View.VISIBLE);
-            }
-        }
-
-    }
-
-    @Override
-    public void getDownloadSuccess(OthersDlBean othersDlBean) {
-        if(othersDlBean !=null && othersDlBean.getResults() !=null){
-            this.videoUrl = othersDlBean.getResults().getPlayer().getVideoUrl();
-            initStart();
-        }
-    }
-
-    private void initStart() {
-        if (!isNetworkAvailable()) {
-            binding.webView.setVisibility(View.GONE);
-        } else {
-            binding.webView.setVisibility(View.VISIBLE);
-            setupWebView(videoUrl);
-        }
-    }
-    @Override
-    public void getSciFiFantasy(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getThaiDrama(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getCrime(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getRomance(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getHistory(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getWar(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getAction(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getDrama(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getMovieSpeakKhmer(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getThriller(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getFantasy(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getMusic(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getWarPolitics(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getVivamax(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getTvMovie(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getDocumentary(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getKoreaDrama(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getMystery(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getAdventure(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getComedy(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getChineseDrama(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getScienceFiction(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getFamily(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getTvShows(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getErotic(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getMovie(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getAnimation(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getHorror(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    @Override
-    public void getAllMovies(OtherBean otherBean) {
-        fetList(otherBean);
-    }
-
-    private void fetList(OtherBean otherBean){
-        if(otherBean!=null && otherBean.getResults() != null){
-            isLoading = false;
-            if(!otherBean.getResults().isEmpty()) {
-                binding.rvMovielist.setVisibility(View.VISIBLE);
-                for(OtherBean.ResultsBean data : otherBean.getResults()){
-                    //if same title remove
-                    if(!data.getTitle().contains(title)){
-                        movieList.add(data);
-                    }
-                }
-                if(!movieList.isEmpty()){
-                    otherMovieListAdapter.setNewData(movieList);
-                }else{
-                    isNomore = true;
-                    Toast.makeText(getApplicationContext(),"No more movies",Toast.LENGTH_SHORT).show();
-                }
-            }else{
-                binding.rvMovielist.setVisibility(View.GONE);
-            }
-        }else{
-            isNomore = true;
-            Toast.makeText(getApplicationContext(),"No more movies",Toast.LENGTH_SHORT).show();
-        }
-    }
 
     @Override
     public void onBackPressed() {

@@ -77,9 +77,8 @@ public class DetailAdapter extends BaseQuickAdapter<DetailBean, BaseViewHolder> 
                     case 8:
                         intent = new Intent(mContext, OthersDetailsActivity.class);
                         intent.putExtra("title",item.getMovieName());
-                        intent.putExtra("link",item.getVideoId());
+                        intent.putExtra("videoId",item.getVideoId());
                         intent.putExtra("image",item.getTempImage());
-                        intent.putExtra("isBook",true);
                         break;
 
                 }
