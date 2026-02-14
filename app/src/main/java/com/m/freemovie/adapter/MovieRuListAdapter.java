@@ -96,10 +96,9 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
                 if(lastPosition == (helper.getAdapterPosition())){
                     lastPosition = -1;
                 }else {
-                    if(item.getVideoId() == null && item.getVideoIdSecond() == null){
-                        return;
+                    if(item.getVideoId() != null && item.getVideoIdSecond() != null){
+                        showVideoOptions(item.getVideoId(),item.getVideoIdSecond(),mContext,helper);
                     }
-                    showVideoOptions(item.getVideoId(),item.getVideoIdSecond(),mContext,helper);
                 }
             }
         });

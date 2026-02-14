@@ -211,6 +211,10 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
                 onBackPressed();
                 break;
             case R.id.iv_book:
+                if(videoId == null && videoId2 == null){
+                    return;
+                }
+//                Log.d("VideoId","val: "+videoId);
                 String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
                 DetailBean details = new DetailBean(videoId, timestamp, image, title,"false",videoId2);
                 details.setVideoId(videoId);

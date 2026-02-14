@@ -13,8 +13,8 @@ import java.util.List;
 
 public class BookmarkDbHelper2 extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "bookmarks.db2";
-    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "BookMarkTagalog1";
+    private static final int DATABASE_VERSION = 3;
 
     // Bookmark table definition
     public static class BookmarkEntry {
@@ -33,13 +33,12 @@ public class BookmarkDbHelper2 extends SQLiteOpenHelper {
             "CREATE TABLE " + BookmarkEntry.TABLE_NAME + " (" +
                     BookmarkEntry.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     BookmarkEntry.COLUMN_VIDEO_ID + " TEXT UNIQUE NOT NULL," +
-                    BookmarkEntry.COLUMN_VIDEO_ID2 + " TEXT UNIQUE NOT NULL," +
                     BookmarkEntry.COLUMN_TIMESTAMP + " TEXT NOT NULL," +
                     BookmarkEntry.COLUMN_IMAGE_URL + " TEXT," +
                     BookmarkEntry.COLUMN_TITLE + " TEXT," +
                     BookmarkEntry.COLUMN_IS_TV + " INTEGER DEFAULT 0," +
                     BookmarkEntry.COLUMN_IS_MOVIE + " TEXT,"+
-                    BookmarkEntry.COLUMN_VIDEO_ID2 + " TEXT UNIQUE NOT NULL)";
+                    BookmarkEntry.COLUMN_VIDEO_ID2 + " TEXT)";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + BookmarkEntry.TABLE_NAME;
@@ -166,58 +165,6 @@ public class BookmarkDbHelper2 extends SQLiteOpenHelper {
             }
             db.close();
         }
-    }
-
-    /**
-     * Get all bookmarks
-     * optional
-     */
-    public List<DetailBean> getAllBookmarks() {
-        List<DetailBean> bookmarks = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = null;
-
-        try {
-            String[] projection = {
-                    BookmarkEntry.COLUMN_VIDEO_ID,
-                    BookmarkEntry.COLUMN_TIMESTAMP,
-                    BookmarkEntry.COLUMN_IMAGE_URL,
-                    BookmarkEntry.COLUMN_TITLE,
-                    BookmarkEntry.COLUMN_IS_TV,
-                    BookmarkEntry.COLUMN_IS_MOVIE
-            };
-
-            String sortOrder = BookmarkEntry.COLUMN_TIMESTAMP + " DESC";
-
-            cursor = db.query(
-                    BookmarkEntry.TABLE_NAME,
-                    projection,
-                    null,
-                    null,
-                    null,
-                    null,
-                    sortOrder
-            );
-
-            while (cursor != null && cursor.moveToNext()) {
-                DetailBean detail = new DetailBean();
-                detail.setVideoId(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_VIDEO_ID)));
-                detail.setTimeStamp(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_TIMESTAMP)));
-                detail.setTempImage(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_IMAGE_URL)));
-                detail.setMovieName(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_TITLE)));
-                detail.setMovie(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_IS_MOVIE)));
-                bookmarks.add(detail);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-            db.close();
-        }
-
-        return bookmarks;
     }
 
     /**
