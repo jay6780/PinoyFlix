@@ -2,8 +2,8 @@ package com.m.freemovie.Retrofit;
 
 public class AppConstant {
     //dev control
-    public static final boolean isDev = true;
-    public static final boolean isAddFree = true;
+    public static final boolean isDev = false;
+    public static final boolean isAddFree = false;
 
     public static final String adAnime = "adAnime";
     public static final String adSeries = "adSeries";

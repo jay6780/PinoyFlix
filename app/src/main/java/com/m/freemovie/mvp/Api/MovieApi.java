@@ -18,6 +18,7 @@ import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.PinoyMovieRuBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
+import com.m.freemovie.mvp.Model.ClassBean.SearchRuBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogInfoBean;
@@ -305,8 +306,10 @@ public interface MovieApi {
 
     //tagalog movie
 
-
     @GET("wp/v2/movies")
     Observable<List<PinoyMovieRuBean>> getPiNoyRuPage(@Query("page") int page);
+
+    @GET("wp/v2/search")
+    Observable<List<SearchRuBean>> getSearchRu(@Query("search") String search);
 
 }

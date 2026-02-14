@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.ConsoleMessage;
@@ -65,9 +66,9 @@ public class OtherWebviewActivity extends AppCompatActivity
     private MovieRuListAdapter movieAdapter;
     private List<PinoyRuBean> movieList = new ArrayList<>();
     private boolean finishing = true;
-    private int lastScroll;
     private KProgressHUD hud;
     private String videoUrl;
+    private int position;
     private RelativeLayout.LayoutParams params,params1;
     private AdView adView;
     private boolean isRotate = false;
@@ -85,6 +86,7 @@ public class OtherWebviewActivity extends AppCompatActivity
         binding = ActivityOtherWebview2Binding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         videoId = getIntent().getStringExtra("videoId");
+        position = getIntent().getIntExtra("position",1);
         defaultScreen();
         binding.llReset.setVisibility(View.GONE);
         initRecyclerMovie();
@@ -96,8 +98,14 @@ public class OtherWebviewActivity extends AppCompatActivity
         binding.llReset.setOnClickListener(this);
         binding.expand.setOnClickListener(this);
         binding.btnBackFinish.setOnClickListener(this);
-        videoUrl = "https://lauradaydo.com/e/"+videoId;
-//        Log.d("videoUrl: ",videoUrl);
+
+        if(position == 1){
+            videoUrl = "https://myvidplay.com/e/"+videoId;
+        }else{
+            videoUrl = "https://lauradaydo.com/e/"+videoId;
+        }
+
+        Log.d("videoUrl: ",videoUrl);
         setupWebView(videoUrl);
         presenter = new PinoyRuPresenter(this);
         initApi();
@@ -107,7 +115,7 @@ public class OtherWebviewActivity extends AppCompatActivity
                 page = 1;
                 movieList.clear();
                 if(movieAdapter!=null){
-                    movieAdapter.setNewData(movieList);
+                    movieAdapter.clearCache();
                 }
                 if(binding.llReset.getVisibility() == View.VISIBLE){
                     binding.llReset.setVisibility(View.GONE);
@@ -234,20 +242,34 @@ public class OtherWebviewActivity extends AppCompatActivity
 
     @Override
     public void getMovieList(List<PinoyMovieRuBean> bean) {
-        if(bean !=null || !bean.isEmpty()) {
+        if(bean !=null) {
             isLoading = false;
+            movieAdapter.clearCache();
             for (PinoyMovieRuBean data : bean) {
                 movieList.add(new PinoyRuBean(data.getLink(), data.getTitle().getRendered(), data.getId()));
             }
-            movieAdapter.setNewData(movieList);
+            if (!movieList.isEmpty()) {
+                movieAdapter.setNewData(movieList);
+            } else {
+                Toast.makeText(getApplicationContext(), "No data", Toast.LENGTH_SHORT).show();
+            }
         }
 
     }
 
     @Override
-    public void getMovieId(String id) {
+    public void getMovieId(String id,int position) {
         binding.webView.clearCache(true);
-        this.videoUrl = "https://lauradaydo.com/e/"+id;
+        String videoUrl ="";
+        switch (position){
+            case 1:
+                videoUrl ="https://myvidplay.com/e/"+id;
+                break;
+            case 2:
+                videoUrl ="https://lauradaydo.com/e/"+id;
+                break;
+        }
+//        Log.d("VideoUrl","val: "+videoUrl);
         setupWebView(videoUrl);
     }
 
@@ -280,7 +302,7 @@ public class OtherWebviewActivity extends AppCompatActivity
             return handleUrlLoading(view, url);
         }
         private boolean handleUrlLoading(WebView view, String url) {
-            if (url.contains(videoUrl)) {
+            if (url.contains(videoUrl) || url.contains("https://myvidplay.com/e/")) {
                 return false;
             } else {
                 return true;
@@ -305,9 +327,9 @@ public class OtherWebviewActivity extends AppCompatActivity
                 if (!isLoading && layoutManager != null) {
                     int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
                     int totalItemCount = layoutManager.getItemCount();
-                    lastScroll = lastVisibleItemPosition;
-                    if (lastVisibleItemPosition > 10 && !isRotate) {
-                        binding.llReset.setVisibility(View.VISIBLE);
+
+                    if (lastVisibleItemPosition > 10) {
+                        binding.llReset.setVisibility(isRotate?View.GONE:View.VISIBLE);
                         initGuide();
                     } else if (lastVisibleItemPosition == 0) {
                         binding.llReset.setVisibility(View.GONE);
@@ -524,6 +546,15 @@ public class OtherWebviewActivity extends AppCompatActivity
         return context.getResources();
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            binding.llReset.setVisibility(View.GONE);
+        }
+
+    }
 
     @Override
     public void onBackPressed() {

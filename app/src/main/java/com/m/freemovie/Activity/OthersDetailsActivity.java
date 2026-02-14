@@ -1,11 +1,15 @@
 package com.m.freemovie.Activity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,7 +25,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
-import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
+import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper2;
 import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.databinding.ActivityOthersDetailsBinding;
@@ -30,21 +34,23 @@ import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Random;
 
 public class OthersDetailsActivity extends AppCompatActivity implements View.OnClickListener {
     private ActivityOthersDetailsBinding binding;
     private String TAG = "OthersDetailsActivity";
     private InterstitialAd mInterstitialAd;
-    private String title,videoId,image;
+    private String title,videoId,image,videoId2;
     private KProgressHUD hud;
-    private BookmarkDbHelper bookmarkDbHelper;
+    private BookmarkDbHelper2 bookmarkDbHelper;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityOthersDetailsBinding.inflate(getLayoutInflater());
         title = getIntent().getStringExtra("title");
         videoId = getIntent().getStringExtra("videoId");
+        videoId2 = getIntent().getStringExtra("videoId2");
         image = getIntent().getStringExtra("image");
+
+//        Log.e("VideoId","1: "+videoId+"2: "+videoId2);
 
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
@@ -63,15 +69,13 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
         if(!SPUtils.getInstance().getBoolean(AppConstant.adOther)) {
             loadAd();
         }
-        bookmarkDbHelper = new BookmarkDbHelper(this);
+        bookmarkDbHelper = new BookmarkDbHelper2(this);
 
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
         hud.show();
 
-        Random random = new Random();
-        int roll = random.nextInt(7) + 1;
 
 
     }
@@ -171,15 +175,44 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.tv_watch:
-                startActivity(new Intent(this, OtherWebviewActivity.class)
-                        .putExtra("videoId",videoId).putExtra("title",title));
+                String[] option = {"Player 1","Player 2"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                TextView titleView = new TextView(this);
+                titleView.setText("Select player");
+                titleView.setTextColor(Color.BLACK);
+                titleView.setPadding(40, 40, 40, 20);
+                titleView.setTextSize(15);
+
+                builder.setCustomTitle(titleView);
+
+                builder.setItems(option, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                startActivity(new Intent(OthersDetailsActivity.this, OtherWebviewActivity.class)
+                                        .putExtra("videoId",videoId2)
+                                        .putExtra("title",title)
+                                        .putExtra("position",1));
+                                break;
+                            case 1:
+                                startActivity(new Intent(OthersDetailsActivity.this, OtherWebviewActivity.class)
+                                        .putExtra("videoId",videoId)
+                                        .putExtra("title",title)
+                                        .putExtra("position",2));
+                                break;
+                        }
+                    }
+                });
+                builder.show();
+
                 break;
             case R.id.iv_back:
                 onBackPressed();
                 break;
             case R.id.iv_book:
                 String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
-                DetailBean details = new DetailBean(videoId, timestamp, image, title,"false");
+                DetailBean details = new DetailBean(videoId, timestamp, image, title,"false",videoId2);
                 details.setVideoId(videoId);
                 details.setTimeStamp(timestamp);
                 bookmarkDbHelper.toggleBookmark(details, 8);

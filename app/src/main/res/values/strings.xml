@@ -16,7 +16,7 @@
         <item>Hot anime</item>
         <item>Popular anime</item>
         <item>Movie anime</item>
-        <item>Others</item>
+        <item>Tagalog</item>
     </string-array>
 
 
@@ -27,6 +27,7 @@
         <item>Hot anime</item>
         <item>Popular anime</item>
         <item>Movie anime</item>
+        <item>Tagalog Movie</item>
     </string-array>
 
 

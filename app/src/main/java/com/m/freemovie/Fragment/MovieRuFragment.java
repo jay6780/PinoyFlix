@@ -183,12 +183,16 @@ public class MovieRuFragment extends Fragment implements PinoyRuMovieContract.Vi
 
     @Override
     public void getMovieList(List<PinoyMovieRuBean> bean) {
-        if(bean !=null || !bean.isEmpty()) {
+        if(bean !=null) {
             isLoading = false;
             for (PinoyMovieRuBean data : bean) {
                 movieRuBeanList.add(new PinoyRuBean(data.getLink(), data.getTitle().getRendered(), data.getId()));
             }
-            movieRuAdapter.setNewData(movieRuBeanList);
+            if(!movieRuBeanList.isEmpty()){
+                movieRuAdapter.setNewData(movieRuBeanList);
+            }else{
+                Toast.makeText(getContext(),"No data",Toast.LENGTH_SHORT).show();
+            }
         }
 
     }

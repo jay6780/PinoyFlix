@@ -1,5 +1,8 @@
 package com.m.freemovie.adapter;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.view.View;
@@ -13,6 +16,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
+import com.m.freemovie.mvp.Model.ClassBean.EpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.PinoyRuBean;
 
 import java.io.IOException;
@@ -31,7 +35,7 @@ import okhttp3.Response;
 public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder> {
     private MovieIdListener movieIdListener;
     public interface MovieIdListener{
-        void getMovieId(String id);
+        void getMovieId(String id,int position);
     }
     private  int lastPosition = -1;
     private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(5);
@@ -43,6 +47,7 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
             .build();
     private static final Pattern THUMB_PATTERN = Pattern.compile("<img itemprop=\"image\" src=\"([^\"]+)\"");
     private static final Pattern VIDEO_PATTERN = Pattern.compile("https://voe\\.sx/e/([a-zA-Z0-9]+)");
+    private static final Pattern VIDEO_PATTERN2 = Pattern.compile("https://myvidplay\\.com/e/([a-zA-Z0-9]+)");
 
     private static final RequestOptions GLIDE_OPTIONS = new RequestOptions()
             .placeholder(R.drawable.noimage)
@@ -91,13 +96,51 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
                 if(lastPosition == (helper.getAdapterPosition())){
                     lastPosition = -1;
                 }else {
-                    lastPosition = (helper.getAdapterPosition());
-                    movieIdListener.getMovieId(item.getVideoId());
+                    if(item.getVideoId() == null && item.getVideoIdSecond() == null){
+                        return;
+                    }
+                    showVideoOptions(item.getVideoId(),item.getVideoIdSecond(),mContext,helper);
                 }
-                notifyDataSetChanged();
             }
         });
 
+    }
+
+    private void showVideoOptions(String videoId,String videoId2, Context mContext, BaseViewHolder helper) {
+        String[] videoPlayer = {"Player 1", "Player 2"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        TextView titleView = new TextView(mContext);
+        titleView.setText("Select player");
+        titleView.setTextColor(Color.BLACK);
+        titleView.setPadding(40, 40, 40, 20);
+        titleView.setTextSize(15);
+        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+
+            }
+        });
+
+        builder.setCustomTitle(titleView);
+
+        builder.setItems(videoPlayer, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case 0:
+                        lastPosition = (helper.getAdapterPosition());
+                        movieIdListener.getMovieId(videoId2,1);
+                        notifyDataSetChanged();
+                        break;
+                    case 1:
+                        lastPosition = (helper.getAdapterPosition());
+                        movieIdListener.getMovieId(videoId,2);
+                        notifyDataSetChanged();
+                        break;
+                }
+            }
+        });
+        builder.show();
     }
 
     @Override
@@ -151,6 +194,27 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
     }
 
 
+    private static String FetchVideoId2(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                .build();
+
+        try (Response response = OK_HTTP_CLIENT.newCall(request).execute()) {
+            if (!response.isSuccessful()) return null;
+
+            String html = response.body().string();
+            Matcher thumbMatcher2 = VIDEO_PATTERN2.matcher(html);
+
+            if (thumbMatcher2.find()) {
+                return thumbMatcher2.group(1);
+            }
+
+        }
+        return null;
+    }
+
+
     private static String FetchVideoId(String url) throws IOException {
         Request request = new Request.Builder()
                 .url(url)
@@ -162,7 +226,6 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
 
             String html = response.body().string();
             Matcher thumbMatcher = VIDEO_PATTERN.matcher(html);
-
             if (thumbMatcher.find()) {
                 return thumbMatcher.group(1);
             }
@@ -174,13 +237,14 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
         private final WeakReference<ImageView> imageViewRef;
         private final PinoyRuBean item;
         private String thumbnailUrl;
-        private String videoId;
+        private String videoId,videoId2;
 
         ThumbnailFetchTask(ImageView imageView, PinoyRuBean item) {
             this.imageViewRef = new WeakReference<>(imageView);
             this.item = item;
             this.thumbnailUrl = null;
             this.videoId = null;
+            this.videoId2 = null;
         }
         @SuppressWarnings("deprecation")
         @Override
@@ -201,11 +265,15 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
                 }
                 thumbnailUrl = fetchThumbnailFromHtml(item.getLink());
                 videoId = FetchVideoId(item.getLink());
+                videoId2 = FetchVideoId2(item.getLink());
                 if (thumbnailUrl != null) {
                     item.setThumbnailUrl(thumbnailUrl);
                     THUMBNAIL_CACHE.put(item.getLink(), thumbnailUrl);
                 }
 
+                if (videoId2 != null) {
+                    item.setVideoIdSecond(videoId2);
+                }
                 if (videoId != null) {
                     item.setVideoId(videoId);
                 }
@@ -239,5 +307,17 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
                 }
             }
         }
+    }
+
+    public void clearCache() {
+        THUMBNAIL_CACHE.clear();
+        if (getData() != null) {
+            for (PinoyRuBean item : getData()) {
+                item.setThumbnailUrl(null);
+                item.setVideoId(null);
+                item.setVideoIdSecond(null);
+            }
+        }
+        notifyDataSetChanged();
     }
 }

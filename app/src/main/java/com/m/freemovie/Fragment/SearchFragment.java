@@ -38,6 +38,7 @@ import com.m.freemovie.R;
 import com.m.freemovie.Utils.SharedPreferencesHelper;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.adapter.AnimePaheSearchAdapter;
+import com.m.freemovie.adapter.MovieRuAdapter;
 import com.m.freemovie.adapter.NineAnimeSearchAdapter;
 import com.m.freemovie.adapter.RecentAdapter;
 import com.m.freemovie.adapter.TagalogSearchAdapter;
@@ -48,7 +49,10 @@ import com.m.freemovie.mvp.Contract.SearchContract;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.PinoyMovieRuBean;
+import com.m.freemovie.mvp.Model.ClassBean.PinoyRuBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.SearchRuBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogSearchBean;
 import com.m.freemovie.mvp.Presenter.RevivalSearchPresenter;
 import com.m.freemovie.mvp.Presenter.SearchPresenter;
@@ -67,6 +71,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
     private TvRevivialSearchAdapter tvRevivialSearchAdapter;
     private NineAnimeSearchAdapter nineAnimeSearchAdapter;
     private AnimePaheSearchAdapter animePaheSearchAdapter;
+    private MovieRuAdapter movieRuAdapter;
     private boolean isLoading = false;
     private String lastQuery;
     private boolean isNomore = false;
@@ -76,6 +81,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
     private List<RevivalSearchBean.ResultsBean> revivalList = new ArrayList<>();
     private List<NineAnimeSearchBean.ResultsBean> nineList = new ArrayList<>();
     private List<AnimePaheSearchBean.ResultsBean.DataBean> animePaheList = new ArrayList<>();
+    private List<PinoyRuBean> tagalogMovieList = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
     private int position = 1;
     private RevivalSearchPresenter revivalSearchPresenter;
@@ -112,6 +118,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
         tvRevivialSearchAdapter = new TvRevivialSearchAdapter();
         nineAnimeSearchAdapter = new NineAnimeSearchAdapter();
         animePaheSearchAdapter = new AnimePaheSearchAdapter();
+        movieRuAdapter = new MovieRuAdapter();
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.search, R.layout.spinner_item);
@@ -200,6 +207,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                     nineList.clear();
                     tagaloglist.clear();
                     revivalList.clear();
+                    tagalogMovieList.clear();
 
                 }
             }
@@ -284,6 +292,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
         tvRevivialSearchAdapter.setNewData(new ArrayList<>());
         nineAnimeSearchAdapter.setNewData(new ArrayList<>());
         animePaheSearchAdapter.setNewData(new ArrayList<>());
+        movieRuAdapter.setNewData(new ArrayList<>());
         lastQuery = "";
         page = 1;
         String query = et_search.getText().toString().trim();
@@ -422,6 +431,23 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             }
         }
     }
+
+    @Override
+    public void getSearchList(List<SearchRuBean> bean) {
+        if(bean !=null) {
+            isLoading = false;
+            for (SearchRuBean data : bean) {
+                tagalogMovieList.add(new PinoyRuBean(data.getUrl(), data.getTitle(), data.getId()));
+            }
+            if (!tagalogMovieList.isEmpty()) {
+                movieRuAdapter.setNewData(tagalogMovieList);
+            } else {
+                Toast.makeText(getContext(), "No data", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }
+
     @SuppressWarnings("deprecation")
     @Override
     public void onClick(View view) {
@@ -535,6 +561,11 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                 animePaheSearchAdapter.setNewData(new ArrayList<>());
                 searchPresenter.getAnimePaheQuery(query);
                 break;
+            case 8:
+                tagalogMovieList.clear();
+                movieRuAdapter.clearCache();
+                searchPresenter.getTagalogMovieQuery(query);
+                break;
         }
     }
 
@@ -555,6 +586,9 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             case 6:
             case 7:
                 toast = "Please enter anime series";
+                break;
+            case 8:
+                toast = "Please enter Tagalog movie";
                 break;
         }
         Toast.makeText(getContext(),toast, Toast.LENGTH_SHORT).show();
@@ -583,6 +617,9 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                 break;
             case 5:
                 position = 5;
+                break;
+            case 6:
+                position = 8;
                 break;
         }
 
@@ -671,6 +708,17 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                     ll_reset.setVisibility(View.GONE);
                 }
                 break;
+            case 8:
+                et_search.setHint("Enter Tagalog Movie");
+                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+                movieRuAdapter = new MovieRuAdapter();
+                rv_search.setAdapter(movieRuAdapter);
+                tagalogMovieList.clear();
+                if(ll_reset !=null){
+                    ll_reset.setVisibility(View.GONE);
+                }
+                break;
+
 
         }
     }

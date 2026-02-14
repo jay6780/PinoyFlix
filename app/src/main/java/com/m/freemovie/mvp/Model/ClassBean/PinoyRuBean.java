@@ -5,7 +5,7 @@ public class PinoyRuBean {
     private String title;
     private String id;
     private String thumbnailUrl;
-    private String videoId;
+    private String videoId,videoIdSecond;
     private boolean isThumbnailLoaded;
 
     public PinoyRuBean(String link, String title, String id) {
@@ -13,6 +13,7 @@ public class PinoyRuBean {
         this.title = title;
         this.id = id;
     }
+
 
     public String getLink() {
         return link;
@@ -42,6 +43,16 @@ public class PinoyRuBean {
         this.videoId = videoId;
     }
 
+
+    public String getVideoIdSecond() {
+        return videoIdSecond;
+    }
+
+    public void setVideoIdSecond(String videoIdSecond) {
+        this.videoIdSecond = videoIdSecond;
+    }
+
+
     public boolean isThumbnailLoaded() {
         return isThumbnailLoaded;
     }
@@ -49,4 +60,6 @@ public class PinoyRuBean {
     public void setThumbnailLoaded(boolean thumbnailLoaded) {
         isThumbnailLoaded = thumbnailLoaded;
     }
+
+
 }

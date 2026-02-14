@@ -4,7 +4,10 @@ package com.m.freemovie.mvp.Contract;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.SearchRuBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogSearchBean;
+
+import java.util.List;
 
 public interface SearchContract {
     interface View {
@@ -16,6 +19,7 @@ public interface SearchContract {
         void getTagalogSearch(TagalogSearchBean tagalogSearchBean);
         void getNineAnime(NineAnimeSearchBean nineAnimeSearchBean);
         void getSearchPahe(AnimePaheSearchBean animePaheSearchBean);
+        void getSearchList(List<SearchRuBean> bean);
     }
 
     interface Presenter {
@@ -24,5 +28,6 @@ public interface SearchContract {
         void getTagalogQuery(String query);
         void getNineAnimeQuery(String query);
         void getAnimePaheQuery(String search);
+        void getTagalogMovieQuery(String query);
     }
 }
