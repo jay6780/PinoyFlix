@@ -211,13 +211,17 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
                 onBackPressed();
                 break;
             case R.id.iv_book:
-//                Log.d("VideoId","val: "+videoId);
+
+                String primary = videoId == null? videoId2 : videoId;
+                String secondary = videoId2 == null? videoId : videoId2;
+//                Log.d("VideoId","val1: "+primary);
+//                Log.d("VideoId","val2: "+secondary);
                 String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
-                DetailBean details = new DetailBean(videoId == null? videoId2 : videoId, timestamp, image, title,"false",videoId2 == null? videoId:videoId2);
-                details.setVideoId(videoId);
+                DetailBean details = new DetailBean(primary, timestamp, image, title,"false",secondary);
+                details.setVideoId(primary);
                 details.setTimeStamp(timestamp);
                 bookmarkDbHelper.toggleBookmark(details, 8);
-                setImageData(videoId);
+                setImageData(primary);
                 break;
         }
 
