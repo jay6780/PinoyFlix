@@ -77,14 +77,14 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
         helper.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(item.getVideoId() != null && item.getVideoIdSecond() != null){
-                    mContext.startActivity(new Intent(mContext, OthersDetailsActivity.class)
-                            .putExtra("videoId",item.getVideoId())
-                            .putExtra("title",item.getTitle())
-                            .putExtra("image",item.getThumbnailUrl())
-                            .putExtra("videoId2",item.getVideoIdSecond()));
+                if(item.getVideoId() == null && item.getVideoIdSecond() == null){
+                    return;
                 }
-
+                mContext.startActivity(new Intent(mContext, OthersDetailsActivity.class)
+                        .putExtra("videoId",item.getVideoId())
+                        .putExtra("title",item.getTitle())
+                        .putExtra("image",item.getThumbnailUrl())
+                        .putExtra("videoId2",item.getVideoIdSecond()));
             }
         });
     }
