@@ -36,9 +36,6 @@ android {
             keyPassword "123456"
         }
     }
-    lint {
-        baseline = file("lint-baseline.xml")
-    }
 
 
     buildTypes {
