@@ -31,9 +31,17 @@ import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.databinding.ActivityOthersDetailsBinding;
 import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class OthersDetailsActivity extends AppCompatActivity implements View.OnClickListener {
     private ActivityOthersDetailsBinding binding;
@@ -44,16 +52,44 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
     private BookmarkDbHelper2 bookmarkDbHelper;
     private int type = 1;
     private String downloadId;
+    private String link;
+
+    private static final OkHttpClient OK_HTTP_CLIENT = new OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
+            .build();
+
+    private static final Pattern DOWNLOAD_PATTERN = Pattern.compile("https://pinoymoviepedia\\.ru/links/([a-zA-Z0-9]+)/");
+    private static final Pattern DOWNLOAD_TABLE_PATTERN = Pattern.compile("<a href='https://pinoymoviepedia\\.ru/links/([a-zA-Z0-9]+)/' target='_blank'>Download</a>");
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityOthersDetailsBinding.inflate(getLayoutInflater());
         title = getIntent().getStringExtra("title");
-        downloadId = getIntent().getStringExtra("downloadId");
+        link = getIntent().getStringExtra("link");
         videoId = getIntent().getStringExtra("videoId");
         videoId2 = getIntent().getStringExtra("videoId2");
         type = getIntent().getIntExtra("type", 1);
         image = getIntent().getStringExtra("image");
+
+        new Thread(() -> {
+            try {
+                final String id = fetchDownloadId(link);
+                runOnUiThread(() -> {
+                    downloadId = id;
+                });
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                runOnUiThread(() -> {
+                    Toast.makeText(OthersDetailsActivity.this, "Failed to load download link", Toast.LENGTH_SHORT).show();
+                });
+            }
+        }).start();
+
+
 
 //        Log.e("DownloadLink","val: "+link);
 
@@ -84,6 +120,32 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
 
 
     }
+
+
+    private static String fetchDownloadId(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                .build();
+
+        try (Response response = OK_HTTP_CLIENT.newCall(request).execute()) {
+            if (!response.isSuccessful()) return null;
+
+            String html = response.body().string();
+
+            Matcher downloadMatcher = DOWNLOAD_TABLE_PATTERN.matcher(html);
+            if (downloadMatcher.find()) {
+                return downloadMatcher.group(1);
+            }
+
+            Matcher linkMatcher = DOWNLOAD_PATTERN.matcher(html);
+            if (linkMatcher.find()) {
+                return linkMatcher.group(1);
+            }
+        }
+        return null;
+    }
+
 
 
     @Override

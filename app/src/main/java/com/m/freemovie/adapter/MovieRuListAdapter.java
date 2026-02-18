@@ -43,7 +43,7 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
     }
 
     private int lastPosition = -1;
-    private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(5);
+    private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(10);
     private static final ConcurrentHashMap<String, String> THUMBNAIL_CACHE = new ConcurrentHashMap<>();
     private static final OkHttpClient OK_HTTP_CLIENT = new OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
@@ -106,15 +106,15 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
                     if (item.getVideoId() == null && item.getVideoIdSecond() == null) {
                         return;
                     }
-                    showVideoOptions(item.getVideoId(), item.getVideoIdSecond(), mContext, helper,item.getDownloadId(),item.getTitle());
+                    showVideoOptions(item.getVideoId(), item.getVideoIdSecond(), mContext, helper, item.getDownloadId(), item.getTitle());
                 }
             }
         });
 
     }
 
-    private void showVideoOptions(String videoId, String videoId2, Context mContext, BaseViewHolder helper,String downloadId,String title) {
-        String[] videoPlayer = {"Player 1", "Player 2","Download"};
+    private void showVideoOptions(String videoId, String videoId2, Context mContext, BaseViewHolder helper, String downloadId, String title) {
+        String[] videoPlayer = {"Player 1", "Player 2", "Download"};
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         TextView titleView = new TextView(mContext);
         titleView.setText("Select player");
@@ -146,11 +146,11 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
                         break;
 
                     case 2:
-                        if(downloadId == null){
-                            Toast.makeText(mContext,"No available links for download",Toast.LENGTH_SHORT).show();
+                        if (downloadId == null) {
+                            Toast.makeText(mContext, "No available links for download", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        String link = "https://pinoymoviepedia.ru/links/"+downloadId+"/";
+                        String link = "https://pinoymoviepedia.ru/links/" + downloadId + "/";
                         Intent intent = new Intent(mContext, DownloadWebview.class);
                         intent.putExtra("DownloadUrl", link);
                         intent.putExtra("EpisodeNum", "");
@@ -218,7 +218,6 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
     }
 
 
-
     private static String fetchThumbnailFromHtml(String url) throws IOException {
         Request request = new Request.Builder()
                 .url(url)
@@ -282,7 +281,7 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
         private final WeakReference<ImageView> imageViewRef;
         private final PinoyRuBean item;
         private String thumbnailUrl;
-        private String videoId, videoId2,downloadId;
+        private String videoId, videoId2, downloadId;
 
         ThumbnailFetchTask(ImageView imageView, PinoyRuBean item) {
             this.imageViewRef = new WeakReference<>(imageView);
@@ -341,23 +340,27 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
         @SuppressWarnings("deprecation")
         @Override
         protected void onPostExecute(String result) {
-            if (isCancelled() || result == null) return;
+            try {
+                if (isCancelled() || result == null) return;
 
-            ImageView imageView = imageViewRef.get();
-            if (imageView != null) {
-                Object tag = imageView.getTag(R.id.iv_thumb);
-                if (tag == this) {
-                    Glide.with(imageView.getContext())
-                            .asBitmap()
-                            .load(result)
-                            .apply(GLIDE_OPTIONS)
-                            .thumbnail(0.25f)
-                            .into(imageView);
-                    imageView.setTag(R.id.iv_thumb, null);
-                    if (item.getVideoId() != null) {
+                ImageView imageView = imageViewRef.get();
+                if (imageView != null) {
+                    Object tag = imageView.getTag(R.id.iv_thumb);
+                    if (tag == this) {
+                        Glide.with(imageView.getContext())
+                                .asBitmap()
+                                .load(result)
+                                .apply(GLIDE_OPTIONS)
+                                .thumbnail(0.25f)
+                                .into(imageView);
+                        imageView.setTag(R.id.iv_thumb, null);
+                        if (item.getVideoId() != null) {
 //                        android.util.Log.d("MovieRuAdapter", "Video ID for " + item.getTitle() + ": " + item.getVideoId());
+                        }
                     }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
