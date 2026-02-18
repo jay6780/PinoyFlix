@@ -2,7 +2,6 @@ package com.m.freemovie.adapter;
 
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,7 +13,7 @@ import com.m.freemovie.Activity.OthersDetailsActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.Model.ClassBean.PinoyRuBean;
+import com.m.freemovie.mvp.Model.ClassBean.PinoyAllBean;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -29,7 +28,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder> {
+public class MovieRuAllAdapter extends BaseQuickAdapter<PinoyAllBean, BaseViewHolder> {
     private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(5);
     private static final ConcurrentHashMap<String, String> THUMBNAIL_CACHE = new ConcurrentHashMap<>();
     private static final OkHttpClient OK_HTTP_CLIENT = new OkHttpClient.Builder()
@@ -48,15 +47,13 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
             .centerCrop()
             .timeout(10000);
 
-    private int type;
-
-    public MovieRuAdapter() {
-        super(R.layout.view_all_item);
+    public MovieRuAllAdapter() {
+        super(R.layout.all_ru_item);
         setHasStableIds(true);
     }
 
     @Override
-    protected void convert(BaseViewHolder helper, PinoyRuBean item) {
+    protected void convert(BaseViewHolder helper, PinoyAllBean item) {
         TextView tv_title = helper.getView(R.id.tv_title);
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
         tv_title.setText(item.getTitle());
@@ -87,18 +84,18 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
                         .putExtra("title", item.getTitle())
                         .putExtra("image", item.getThumbnailUrl())
                         .putExtra("videoId2", item.getVideoIdSecond())
-                        .putExtra("type", type));
+                        .putExtra("type", item.getType()));
             }
         });
     }
 
     @Override
     public long getItemId(int position) {
-        PinoyRuBean item = getItem(position);
+        PinoyAllBean item = getItem(position);
         return item != null ? item.getLink().hashCode() : super.getItemId(position);
     }
 
-    private String getThumbnailUrl(PinoyRuBean item) {
+    private String getThumbnailUrl(PinoyAllBean item) {
         if (item.getThumbnailUrl() != null) {
             return item.getThumbnailUrl();
         }
@@ -183,11 +180,11 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
 
     private static class ThumbnailFetchTask extends AsyncTask<Void, Void, String> {
         private final WeakReference<ImageView> imageViewRef;
-        private final PinoyRuBean item;
+        private final PinoyAllBean item;
         private String thumbnailUrl;
         private String videoId, videoId2;
 
-        ThumbnailFetchTask(ImageView imageView, PinoyRuBean item) {
+        ThumbnailFetchTask(ImageView imageView, PinoyAllBean item) {
             this.imageViewRef = new WeakReference<>(imageView);
             this.item = item;
             this.thumbnailUrl = null;
@@ -266,17 +263,12 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
     public void clearCache() {
         THUMBNAIL_CACHE.clear();
         if (getData() != null) {
-            for (PinoyRuBean item : getData()) {
+            for (PinoyAllBean item : getData()) {
                 item.setThumbnailUrl(null);
                 item.setVideoId(null);
                 item.setVideoIdSecond(null);
             }
         }
-        notifyDataSetChanged();
-    }
-
-    public void type(int type) {
-        this.type = type;
         notifyDataSetChanged();
     }
 }

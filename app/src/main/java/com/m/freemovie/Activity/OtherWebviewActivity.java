@@ -48,16 +48,18 @@ import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.MovieRuListAdapter;
 import com.m.freemovie.databinding.ActivityOtherWebview2Binding;
+import com.m.freemovie.mvp.Contract.PinoyRuMovieAllContract;
 import com.m.freemovie.mvp.Contract.PinoyRuMovieContract;
 import com.m.freemovie.mvp.Model.ClassBean.PinoyMovieRuBean;
 import com.m.freemovie.mvp.Model.ClassBean.PinoyRuBean;
+import com.m.freemovie.mvp.Presenter.PinoyRuAllPresenter;
 import com.m.freemovie.mvp.Presenter.PinoyRuPresenter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class OtherWebviewActivity extends AppCompatActivity
-        implements View.OnClickListener, PinoyRuMovieContract.View, MovieRuListAdapter.MovieIdListener {
+        implements View.OnClickListener, PinoyRuMovieAllContract.View, MovieRuListAdapter.MovieIdListener {
     private ActivityOtherWebview2Binding binding;
     private int page = 1;
     private boolean isNomore = false;
@@ -78,7 +80,9 @@ public class OtherWebviewActivity extends AppCompatActivity
     private int currentLevelIndex = 3;
     private CountDownTimer volumeTimer;
     private AudioManager audioManager;
-    private PinoyRuPresenter presenter;
+    private PinoyRuAllPresenter presenter;
+    private int type = 1;
+    private int perPage = 10;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,6 +91,8 @@ public class OtherWebviewActivity extends AppCompatActivity
         setContentView(binding.getRoot());
         videoId = getIntent().getStringExtra("videoId");
         position = getIntent().getIntExtra("position",1);
+        type = getIntent().getIntExtra("type",1);
+        Log.d("Type","val: "+type);
         defaultScreen();
         binding.llReset.setVisibility(View.GONE);
         initRecyclerMovie();
@@ -105,14 +111,15 @@ public class OtherWebviewActivity extends AppCompatActivity
             videoUrl = "https://lauradaydo.com/e/"+videoId;
         }
 
-        Log.d("videoUrl: ",videoUrl);
+//        Log.d("videoUrl: ",videoUrl);
         setupWebView(videoUrl);
-        presenter = new PinoyRuPresenter(this);
+        presenter = new PinoyRuAllPresenter(this);
         initApi();
         binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 page = 1;
+                perPage = 10;
                 movieList.clear();
                 if(movieAdapter!=null){
                     movieAdapter.setNewData(movieList);
@@ -257,6 +264,51 @@ public class OtherWebviewActivity extends AppCompatActivity
     }
 
     @Override
+    public void getActionList(List<PinoyMovieRuBean> bean) {
+        if(bean !=null) {
+            isLoading = false;
+            for (PinoyMovieRuBean data : bean) {
+                movieList.add(new PinoyRuBean(data.getLink(), data.getTitle().getRendered(), data.getId()));
+            }
+            if (!movieList.isEmpty()) {
+                movieAdapter.setNewData(movieList);
+            } else {
+                Toast.makeText(getApplicationContext(), "No data", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    public void getRomanceList(List<PinoyMovieRuBean> bean) {
+        if(bean !=null) {
+            isLoading = false;
+            for (PinoyMovieRuBean data : bean) {
+                movieList.add(new PinoyRuBean(data.getLink(), data.getTitle().getRendered(), data.getId()));
+            }
+            if (!movieList.isEmpty()) {
+                movieAdapter.setNewData(movieList);
+            } else {
+                Toast.makeText(getApplicationContext(), "No data", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    public void getComedyList(List<PinoyMovieRuBean> bean) {
+        if(bean !=null) {
+            isLoading = false;
+            for (PinoyMovieRuBean data : bean) {
+                movieList.add(new PinoyRuBean(data.getLink(), data.getTitle().getRendered(), data.getId()));
+            }
+            if (!movieList.isEmpty()) {
+                movieAdapter.setNewData(movieList);
+            } else {
+                Toast.makeText(getApplicationContext(), "No data", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
     public void getMovieId(String id,int position) {
         binding.webView.clearCache(true);
         String videoUrl ="";
@@ -349,7 +401,20 @@ public class OtherWebviewActivity extends AppCompatActivity
     }
 
     private void initApi() {
-        presenter.getPage(page);
+        switch (type){
+            case 1:
+                presenter.getActionPageQuery("26",perPage,page);
+                break;
+            case 2:
+                presenter.getRomanceQuery("52",perPage,page);
+                break;
+            case 3:
+                presenter.getComedyQuery("15",perPage,page);
+                break;
+            case 4:
+                presenter.getPage(page);
+                break;
+        }
     }
 
 

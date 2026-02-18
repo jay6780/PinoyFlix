@@ -112,13 +112,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             long lastResetTime = SPUtils.getInstance().getLong("last_reset_time", 0);
             long currentTime = System.currentTimeMillis();
             long twoHours = 2 * 60 * 60 * 1000;
+            long twentyFiveMins = 25 * 60 * 1000;
 
-            long nextResetTime = lastResetTime + twoHours;
+            long nextResetTime = lastResetTime + twentyFiveMins;
 
             if (currentTime >= nextResetTime) {
                 resetAds();
                 SPUtils.getInstance().put("last_reset_time", currentTime);
-                nextResetTime = currentTime + twoHours;
+                nextResetTime = currentTime + twentyFiveMins;
             }
 
             long remainingTime = nextResetTime - currentTime;
@@ -154,11 +155,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     long second = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
                     long totalSeconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
 
-                    if (totalSeconds % 10 == 0) {
-                        binding.time.setText("Welcome to PinoyFlix");
-                    } else {
-                        binding.time.setText("Ads reset in : " + String.format("%02d:%02d:%02d:%02d", day, hour, minute, second));
-                    }
+//                    if (totalSeconds % 10 == 0) {
+//                        binding.time.setText("Welcome to PinoyFlix");
+//                    } else {
+//                        binding.time.setText("Ads reset in : " + String.format("%02d:%02d:%02d:%02d", day, hour, minute, second));
+//                    }
                 }
 
                 @Override

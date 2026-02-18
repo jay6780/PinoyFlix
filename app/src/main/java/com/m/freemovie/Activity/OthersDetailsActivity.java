@@ -39,15 +39,18 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
     private ActivityOthersDetailsBinding binding;
     private String TAG = "OthersDetailsActivity";
     private InterstitialAd mInterstitialAd;
-    private String title,videoId,image,videoId2;
+    private String title, videoId, image, videoId2;
     private KProgressHUD hud;
     private BookmarkDbHelper2 bookmarkDbHelper;
+    private int type = 1;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityOthersDetailsBinding.inflate(getLayoutInflater());
         title = getIntent().getStringExtra("title");
         videoId = getIntent().getStringExtra("videoId");
         videoId2 = getIntent().getStringExtra("videoId2");
+        type = getIntent().getIntExtra("type", 1);
         image = getIntent().getStringExtra("image");
 
 //        Log.e("VideoId","1: "+videoId+"2: "+videoId2);
@@ -66,7 +69,7 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
 
         }.start();
 
-        if(!SPUtils.getInstance().getBoolean(AppConstant.adOther)) {
+        if (!SPUtils.getInstance().getBoolean(AppConstant.adOther)) {
             loadAd();
         }
         bookmarkDbHelper = new BookmarkDbHelper2(this);
@@ -75,7 +78,6 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
         hud.show();
-
 
 
     }
@@ -96,12 +98,12 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
                 new InterstitialAdLoadCallback() {
                     @Override
                     public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                        if(!AppConstant.isAddFree){
+                        if (!AppConstant.isAddFree) {
                             mInterstitialAd = interstitialAd;
 //                        Log.i(TAG, "Ad Loaded. Showing it now automatically...");
-                            Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Ads incoming", Toast.LENGTH_SHORT).show();
                             mInterstitialAd.show(OthersDetailsActivity.this);
-                            SPUtils.getInstance().put(AppConstant.adOther,true);
+                            SPUtils.getInstance().put(AppConstant.adOther, true);
                         }
 
                         mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
@@ -127,8 +129,8 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
     private void initViews() {
         binding.tvWatch.setOnClickListener(this);
         binding.ivBack.setOnClickListener(this);
-        binding.tvTitle.setText(title == null? "N/A": title);
-        binding.tvOriginal.setText(title == null? "N/A": title);
+        binding.tvTitle.setText(title == null ? "N/A" : title);
+        binding.tvOriginal.setText(title == null ? "N/A" : title);
         binding.tvDescription.setText("N/A");
 
         binding.tvInfo.setVisibility(View.GONE);
@@ -147,13 +149,14 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
                     .asBitmap()
                     .load(image)
                     .into(binding.ivBig);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         binding.ivBook.setOnClickListener(this);
 
         setImageData(videoId);
     }
+
     private void setImageData(String videoId) {
         boolean isBookmarked = bookmarkDbHelper.isBookmarked(videoId);
         binding.ivBook.setImageResource(isBookmarked ? R.drawable.booked : R.drawable.unbooked);
@@ -162,7 +165,7 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
     @Override
     protected void onStart() {
         super.onStart();
-        new WindowUtils(this,false,false);
+        new WindowUtils(this, false, false);
     }
 
 
@@ -173,9 +176,9 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.tv_watch:
-                String[] option = {"Player 1","Player 2"};
+                String[] option = {"Player 1", "Player 2"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 TextView titleView = new TextView(this);
                 titleView.setText("Select player");
@@ -191,15 +194,17 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
                         switch (which) {
                             case 0:
                                 startActivity(new Intent(OthersDetailsActivity.this, OtherWebviewActivity.class)
-                                        .putExtra("videoId",videoId2)
-                                        .putExtra("title",title)
-                                        .putExtra("position",1));
+                                        .putExtra("videoId", videoId2)
+                                        .putExtra("title", title)
+                                        .putExtra("type", type)
+                                        .putExtra("position", 1));
                                 break;
                             case 1:
                                 startActivity(new Intent(OthersDetailsActivity.this, OtherWebviewActivity.class)
-                                        .putExtra("videoId",videoId)
-                                        .putExtra("title",title)
-                                        .putExtra("position",2));
+                                        .putExtra("videoId", videoId)
+                                        .putExtra("title", title)
+                                        .putExtra("type", type)
+                                        .putExtra("position", 2));
                                 break;
                         }
                     }
@@ -212,12 +217,12 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
                 break;
             case R.id.iv_book:
 
-                String primary = videoId == null? videoId2 : videoId;
-                String secondary = videoId2 == null? videoId : videoId2;
+                String primary = videoId == null ? videoId2 : videoId;
+                String secondary = videoId2 == null ? videoId : videoId2;
 //                Log.d("VideoId","val1: "+primary);
 //                Log.d("VideoId","val2: "+secondary);
                 String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
-                DetailBean details = new DetailBean(primary, timestamp, image, title,"false",secondary);
+                DetailBean details = new DetailBean(primary, timestamp, image, title, "false", secondary);
                 details.setVideoId(primary);
                 details.setTimeStamp(timestamp);
                 bookmarkDbHelper.toggleBookmark(details, 8);

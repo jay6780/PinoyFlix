@@ -35,4 +35,78 @@ public class PinoyRuModel {
                     public void onComplete() {}
                 });
     }
+
+    public static void getAction(String type,int per_page , int page,final Callback<List<PinoyMovieRuBean>> callback) {
+        NetworkingUtils.getTagalogMovie()
+                .getActionType(type,per_page,page)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<List<PinoyMovieRuBean>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {}
+
+                    @Override
+                    public void onNext(List<PinoyMovieRuBean> data) {
+                        callback.returnResult(data);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.returnError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {}
+                });
+    }
+
+
+    public static void getRomance(String type,int per_page , int page,final Callback<List<PinoyMovieRuBean>> callback) {
+        NetworkingUtils.getTagalogMovie()
+                .getRomanceType(type,per_page,page)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<List<PinoyMovieRuBean>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {}
+
+                    @Override
+                    public void onNext(List<PinoyMovieRuBean> data) {
+                        callback.returnResult(data);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.returnError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {}
+                });
+    }
+
+
+    public static void getComedy(String type,int per_page , int page,final Callback<List<PinoyMovieRuBean>> callback) {
+        NetworkingUtils.getTagalogMovie()
+                .getComedyType(type,per_page,page)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<List<PinoyMovieRuBean>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {}
+
+                    @Override
+                    public void onNext(List<PinoyMovieRuBean> data) {
+                        callback.returnResult(data);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.returnError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {}
+                });
+    }
 }

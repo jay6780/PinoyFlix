@@ -157,7 +157,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
             case R.id.tv_others:
                 if (tagalogMovieFragment == null) {
-                    tagalogMovieFragment = new MovieRuFragment();
+                    tagalogMovieFragment = new GenreRuFragment();
                     transaction.add(R.id.fragment_container, tagalogMovieFragment, "tagalogFragment");
                     transaction.setMaxLifecycle(tagalogMovieFragment, Lifecycle.State.STARTED);
                 } else {

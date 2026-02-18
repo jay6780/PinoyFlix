@@ -309,6 +309,28 @@ public interface MovieApi {
     @GET("wp/v2/movies")
     Observable<List<PinoyMovieRuBean>> getPiNoyRuPage(@Query("page") int page);
 
+    @GET("wp/v2/movies")
+    Observable<List<PinoyMovieRuBean>> getActionType(
+            @Query("genres") String genres,
+            @Query("per_page") int per_page,
+            @Query("page") int page);
+
+
+    @GET("wp/v2/movies")
+    Observable<List<PinoyMovieRuBean>> getRomanceType(
+            @Query("genres") String genres,
+            @Query("per_page") int per_page,
+            @Query("page") int page);
+
+
+    @GET("wp/v2/movies")
+    Observable<List<PinoyMovieRuBean>> getComedyType(
+            @Query("genres") String genres,
+            @Query("per_page") int per_page,
+            @Query("page") int page);
+
+
+
     @GET("wp/v2/search")
     Observable<List<SearchRuBean>> getSearchRu(@Query("search") String search);
 
