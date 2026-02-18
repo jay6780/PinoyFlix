@@ -39,6 +39,9 @@ public class MovieRuAllAdapter extends BaseQuickAdapter<PinoyAllBean, BaseViewHo
     private static final Pattern THUMB_PATTERN = Pattern.compile("<img itemprop=\"image\" src=\"([^\"]+)\"");
     private static final Pattern VIDEO_PATTERN = Pattern.compile("https://voe\\.sx/e/([a-zA-Z0-9]+)");
     private static final Pattern VIDEO_PATTERN2 = Pattern.compile("https://myvidplay\\.com/e/([a-zA-Z0-9]+)");
+    private static final Pattern DOWNLOAD_PATTERN = Pattern.compile("https://pinoymoviepedia\\.ru/links/([a-zA-Z0-9]+)/");
+    private static final Pattern DOWNLOAD_TABLE_PATTERN = Pattern.compile("<a href='https://pinoymoviepedia\\.ru/links/([a-zA-Z0-9]+)/' target='_blank'>Download</a>");
+
 
     private static final RequestOptions GLIDE_OPTIONS = new RequestOptions()
             .placeholder(R.drawable.noimage)
@@ -84,7 +87,8 @@ public class MovieRuAllAdapter extends BaseQuickAdapter<PinoyAllBean, BaseViewHo
                         .putExtra("title", item.getTitle())
                         .putExtra("image", item.getThumbnailUrl())
                         .putExtra("videoId2", item.getVideoIdSecond())
-                        .putExtra("type", item.getType()));
+                        .putExtra("type", item.getType())
+                        .putExtra("downloadId",item.getDownloadId()));
             }
         });
     }
@@ -117,6 +121,30 @@ public class MovieRuAllAdapter extends BaseQuickAdapter<PinoyAllBean, BaseViewHo
                 .apply(GLIDE_OPTIONS)
                 .thumbnail(0.25f)
                 .into(imageView);
+    }
+
+    private static String fetchDownloadId(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                .build();
+
+        try (Response response = OK_HTTP_CLIENT.newCall(request).execute()) {
+            if (!response.isSuccessful()) return null;
+
+            String html = response.body().string();
+
+            Matcher downloadMatcher = DOWNLOAD_TABLE_PATTERN.matcher(html);
+            if (downloadMatcher.find()) {
+                return downloadMatcher.group(1);
+            }
+
+            Matcher linkMatcher = DOWNLOAD_PATTERN.matcher(html);
+            if (linkMatcher.find()) {
+                return linkMatcher.group(1);
+            }
+        }
+        return null;
     }
 
 
@@ -182,7 +210,7 @@ public class MovieRuAllAdapter extends BaseQuickAdapter<PinoyAllBean, BaseViewHo
         private final WeakReference<ImageView> imageViewRef;
         private final PinoyAllBean item;
         private String thumbnailUrl;
-        private String videoId, videoId2;
+        private String videoId, videoId2,downloadId;
 
         ThumbnailFetchTask(ImageView imageView, PinoyAllBean item) {
             this.imageViewRef = new WeakReference<>(imageView);
@@ -212,6 +240,7 @@ public class MovieRuAllAdapter extends BaseQuickAdapter<PinoyAllBean, BaseViewHo
                 thumbnailUrl = fetchThumbnailFromHtml(item.getLink());
                 videoId = FetchVideoId(item.getLink());
                 videoId2 = FetchVideoId2(item.getLink());
+                downloadId = fetchDownloadId(item.getLink());
                 if (thumbnailUrl != null) {
                     item.setThumbnailUrl(thumbnailUrl);
                     THUMBNAIL_CACHE.put(item.getLink(), thumbnailUrl);
@@ -222,6 +251,10 @@ public class MovieRuAllAdapter extends BaseQuickAdapter<PinoyAllBean, BaseViewHo
                 }
                 if (videoId != null) {
                     item.setVideoId(videoId);
+                }
+                if (downloadId != null) {
+                    item.setDownloadId(downloadId);
+//                    Log.d("MovieRuAdapter", "Download ID for " + item.getTitle() + ": " + downloadId);
                 }
 
                 return thumbnailUrl;
@@ -250,7 +283,7 @@ public class MovieRuAllAdapter extends BaseQuickAdapter<PinoyAllBean, BaseViewHo
                                 .into(imageView);
                         imageView.setTag(R.id.iv_thumb, null);
                         if (item.getVideoId() != null) {
-                            android.util.Log.d("MovieRuAdapter", "Video ID for " + item.getTitle() + ": " + item.getVideoId());
+//                            android.util.Log.d("MovieRuAdapter", "Video ID for " + item.getTitle() + ": " + item.getVideoId());
                         }
                     }
                 }

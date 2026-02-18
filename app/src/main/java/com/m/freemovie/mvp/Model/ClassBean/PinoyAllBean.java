@@ -8,6 +8,7 @@ public class PinoyAllBean {
     private String videoId,videoIdSecond;
     private boolean isThumbnailLoaded;
     private int type;
+    private String downloadId;
 
     public PinoyAllBean(String link, String title, String id,int type) {
         this.link = link;
@@ -15,6 +16,15 @@ public class PinoyAllBean {
         this.id = id;
         this.type = type;
     }
+
+    public String getDownloadId() {
+        return downloadId;
+    }
+
+    public void setDownloadId(String downloadId) {
+        this.downloadId = downloadId;
+    }
+
 
     public int getType() {
         return type;

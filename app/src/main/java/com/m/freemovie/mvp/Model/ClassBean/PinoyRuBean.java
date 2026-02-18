@@ -7,13 +7,20 @@ public class PinoyRuBean {
     private String thumbnailUrl;
     private String videoId,videoIdSecond;
     private boolean isThumbnailLoaded;
+    private String downloadId;
 
     public PinoyRuBean(String link, String title, String id) {
         this.link = link;
         this.title = title;
         this.id = id;
     }
+    public String getDownloadId() {
+        return downloadId;
+    }
 
+    public void setDownloadId(String downloadId) {
+        this.downloadId = downloadId;
+    }
 
     public String getLink() {
         return link;

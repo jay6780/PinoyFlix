@@ -43,18 +43,21 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
     private KProgressHUD hud;
     private BookmarkDbHelper2 bookmarkDbHelper;
     private int type = 1;
+    private String downloadId;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityOthersDetailsBinding.inflate(getLayoutInflater());
         title = getIntent().getStringExtra("title");
+        downloadId = getIntent().getStringExtra("downloadId");
         videoId = getIntent().getStringExtra("videoId");
         videoId2 = getIntent().getStringExtra("videoId2");
         type = getIntent().getIntExtra("type", 1);
         image = getIntent().getStringExtra("image");
 
-//        Log.e("VideoId","1: "+videoId+"2: "+videoId2);
+//        Log.e("DownloadLink","val: "+link);
 
+//        Log.e("VideoId","1: "+videoId+"2: "+videoId2);
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
         new CountDownTimer(1500, 1000) {
@@ -178,7 +181,7 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tv_watch:
-                String[] option = {"Player 1", "Player 2"};
+                String[] option = {"Player 1", "Player 2","Download"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 TextView titleView = new TextView(this);
                 titleView.setText("Select player");
@@ -206,6 +209,18 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
                                         .putExtra("type", type)
                                         .putExtra("position", 2));
                                 break;
+                            case 2:
+                                if(downloadId == null){
+                                    Toast.makeText(getApplicationContext(),"No available links for download",Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                String link = "https://pinoymoviepedia.ru/links/"+downloadId+"/";
+                                Intent intent = new Intent(getApplicationContext(), DownloadWebview.class);
+                                intent.putExtra("DownloadUrl", link);
+                                intent.putExtra("EpisodeNum", "");
+                                intent.putExtra("title", title);
+                                startActivity(intent);
+                                break;
                         }
                     }
                 });
@@ -222,7 +237,7 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
 //                Log.d("VideoId","val1: "+primary);
 //                Log.d("VideoId","val2: "+secondary);
                 String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
-                DetailBean details = new DetailBean(primary, timestamp, image, title, "false", secondary);
+                DetailBean details = new DetailBean(primary, timestamp, image, title, "false", secondary,downloadId);
                 details.setVideoId(primary);
                 details.setTimeStamp(timestamp);
                 bookmarkDbHelper.toggleBookmark(details, 8);

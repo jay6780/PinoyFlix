@@ -408,7 +408,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
     private void savedBook() {
         String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
-        DetailBean details = new DetailBean(id, timestamp, image, title, "false","");
+        DetailBean details = new DetailBean(id, timestamp, image, title, "false","","");
         details.setVideoId(id);
         details.setTimeStamp(timestamp);
         bookmarkDbHelper.toggleBookmark(details, 7);

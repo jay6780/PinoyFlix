@@ -311,7 +311,6 @@ public class OtherWebviewActivity extends AppCompatActivity
     @Override
     public void getMovieId(String id,int position) {
         binding.webView.clearCache(true);
-        String videoUrl ="";
         switch (position){
             case 1:
                 videoUrl ="https://myvidplay.com/e/"+id;
@@ -353,7 +352,8 @@ public class OtherWebviewActivity extends AppCompatActivity
             return handleUrlLoading(view, url);
         }
         private boolean handleUrlLoading(WebView view, String url) {
-            if (url.contains(videoUrl) || url.contains("https://myvidplay.com/e/")) {
+//            Log.d("DownloadUrl","val: "+url);
+            if (url.contains(videoUrl) || url.contains("myvidplay.com")) {
                 return false;
             } else {
                 return true;

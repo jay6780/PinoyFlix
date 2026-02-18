@@ -10,19 +10,28 @@ public class DetailBean {
     private String tempImage;
     private String movieName;
     private String isMovie;
+    private String downloadId;
     public DetailBean() {
     }
 
-    public DetailBean(String videoId,String timeStamp,String tempImage,String movieName,String isMovie,String videoId2){
+    public DetailBean(String videoId,String timeStamp,String tempImage,String movieName,String isMovie,String videoId2, String downloadId){
         this.videoId = videoId;
         this.timeStamp = timeStamp;
         this.tempImage = tempImage;
         this.movieName = movieName;
         this.isMovie = isMovie;
         this.videoId2 = videoId2;
+        this.downloadId = downloadId;
 
     }
 
+    public String getDownloadId() {
+        return downloadId;
+    }
+
+    public void setDownloadId(String downloadId) {
+        this.downloadId = downloadId;
+    }
 
     public String getVideoId2() {
         return videoId2;

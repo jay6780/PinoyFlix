@@ -7,7 +7,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.webkit.CookieManager;
@@ -46,6 +45,7 @@ public class DownloadWebview extends AppCompatActivity {
     private KProgressHUD downloadHud;
     private String title,EpisodeNum;
     private boolean isFirstTask = false;
+    private String blockUrl ="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +88,8 @@ public class DownloadWebview extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
+
+
         binding.webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
@@ -110,17 +112,28 @@ public class DownloadWebview extends AppCompatActivity {
 //                Log.e("VideoSelect","val: "+url);
                 if (isAllowedUrl(url)) {
                     return false;
-                } else {
+                } else if (url.contains(blockUrl)) {
+                    if(!blockUrl.isEmpty()){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                }else{
+                    blockUrl = url;
                     view.stopLoading();
                     return true;
                 }
             }
+
         });
+
+
 
         binding.webView.setDownloadListener(new DownloadListener() {
             @Override
             public void onDownloadStart(String videoUrl, String userAgent, String contentDisposition, String mimetype, long contentLength) {
 //                Log.e("VideoSelect","val: "+videoUrl);
+
                 if (isAllowedUrl(videoUrl)) {
                     if(isFirstTask){
                         Toast.makeText(getApplicationContext(),"Download in progress",Toast.LENGTH_SHORT).show();
@@ -139,11 +152,11 @@ public class DownloadWebview extends AppCompatActivity {
 
     }
 
+
     private boolean isAllowedUrl(String url) {
         String[] allowedPatterns = {
                 "^https?://vidsrc\\..*",
                 "^https?://cardfightvanguard\\..*",
-                "^https?://workers\\.dev.*",
                 "^https?://mkv.dl5cg77imb\\..*",
                 "^https?://pahe\\.win.*",
                 "^https?://kwik\\.cx/f/.*",
@@ -155,18 +168,32 @@ public class DownloadWebview extends AppCompatActivity {
                 "^https?://.*\\.m3u8.*",
                 "^https?://.*\\.ts.*",
                 "^https?://.*/video/.*",
+                "^https?://.*myvidplay.*",
+                "^https?://.*dev.*",
+                "^https?://.*mkv.*",
+                "^https?://.*mixdrop.*",
+                "^https?://.*m1xdrop.*",
+                "^https?://.*voe.*",
+                "^https?://.*.cloudatacdn.*",
                 "^https?://.*/download/.*"
         };
 
         String lowerUrl = url.toLowerCase();
         if (lowerUrl.contains(".mp4") || lowerUrl.contains(".mkv") ||
-                lowerUrl.contains(".m3u8") || lowerUrl.contains(".ts")) {
+                lowerUrl.contains(".m3u8") || lowerUrl.contains(".ts")
+                || lowerUrl.contains(".dev")
+                || lowerUrl.contains("myvidplay.com/download")
+                || lowerUrl.contains(".cx")
+                ||lowerUrl.contains("abstream.to")
+                ||lowerUrl.contains("voe.sx")) {
             return true;
         }
 
         for (String pattern : allowedPatterns) {
             if (url.matches(pattern)) {
                 return true;
+            }else{
+                blockUrl = url;
             }
         }
         return false;
@@ -216,6 +243,7 @@ public class DownloadWebview extends AppCompatActivity {
             if (outputFile.exists()) {
                 outputFile.delete();
                 binding.webContainer.setVisibility(View.VISIBLE);
+                finish();
                 Toast.makeText(getApplicationContext(), "Download cancelled", Toast.LENGTH_SHORT).show();
             }
         });
@@ -312,6 +340,7 @@ public class DownloadWebview extends AppCompatActivity {
                                     "Download Complete!", Toast.LENGTH_LONG).show();
                             startActivity(new Intent(getApplicationContext(), Download_videoActivity.class));
                             binding.webContainer.setVisibility(View.VISIBLE);
+                            finish();
                         });
                     }
                 } else {
@@ -333,6 +362,7 @@ public class DownloadWebview extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(),
                                 "Error: " + (errorMsg != null ? errorMsg : "Unknown error"),
                                 Toast.LENGTH_LONG).show();
+                        finish();
                         binding.webContainer.setVisibility(View.VISIBLE);
                     });
                 }
@@ -455,6 +485,9 @@ public class DownloadWebview extends AppCompatActivity {
             webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            CookieManager.getInstance().setAcceptThirdPartyCookies(binding.webView, false);
+        }
     }
 
     @Override
@@ -473,8 +506,12 @@ public class DownloadWebview extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        isFirstTask = false;
-        finish();
+        if (binding.webView != null && binding.webView.canGoBack()) {
+            binding.webView.goBack();
+        }else{
+            super.onBackPressed();
+            isFirstTask = false;
+            finish();
+        }
     }
 }

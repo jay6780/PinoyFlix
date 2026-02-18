@@ -18,6 +18,7 @@ import com.m.freemovie.mvp.Model.ClassBean.PinoyRuBean;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,6 +41,8 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
     private static final Pattern THUMB_PATTERN = Pattern.compile("<img itemprop=\"image\" src=\"([^\"]+)\"");
     private static final Pattern VIDEO_PATTERN = Pattern.compile("https://voe\\.sx/e/([a-zA-Z0-9]+)");
     private static final Pattern VIDEO_PATTERN2 = Pattern.compile("https://myvidplay\\.com/e/([a-zA-Z0-9]+)");
+    private static final Pattern DOWNLOAD_PATTERN = Pattern.compile("https://pinoymoviepedia\\.ru/links/([a-zA-Z0-9]+)/");
+    private static final Pattern DOWNLOAD_TABLE_PATTERN = Pattern.compile("<a href='https://pinoymoviepedia\\.ru/links/([a-zA-Z0-9]+)/' target='_blank'>Download</a>");
 
     private static final RequestOptions GLIDE_OPTIONS = new RequestOptions()
             .placeholder(R.drawable.noimage)
@@ -48,7 +51,7 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
             .centerCrop()
             .timeout(10000);
 
-    private int type;
+    private int type = 0;
 
     public MovieRuAdapter() {
         super(R.layout.view_all_item);
@@ -66,11 +69,18 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
         if (oldTask != null) {
             oldTask.cancel(true);
         }
+        Random random = new Random();
+        if(type == 0){
+            int roll = random.nextInt(4) + 1;
+            type = roll;
+        }
+
 
         String cachedUrl = getThumbnailUrl(item);
         if (cachedUrl != null) {
             loadThumbnail(iv_thumb, cachedUrl);
         } else {
+
             ThumbnailFetchTask task = new ThumbnailFetchTask(iv_thumb, item);
             iv_thumb.setTag(R.id.iv_thumb, task);
             task.executeOnExecutor(THREAD_POOL);
@@ -87,7 +97,8 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
                         .putExtra("title", item.getTitle())
                         .putExtra("image", item.getThumbnailUrl())
                         .putExtra("videoId2", item.getVideoIdSecond())
-                        .putExtra("type", type));
+                        .putExtra("type", type)
+                        .putExtra("downloadId",item.getDownloadId()));
             }
         });
     }
@@ -120,6 +131,32 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
                 .apply(GLIDE_OPTIONS)
                 .thumbnail(0.25f)
                 .into(imageView);
+    }
+
+
+
+    private static String fetchDownloadId(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                .build();
+
+        try (Response response = OK_HTTP_CLIENT.newCall(request).execute()) {
+            if (!response.isSuccessful()) return null;
+
+            String html = response.body().string();
+
+            Matcher downloadMatcher = DOWNLOAD_TABLE_PATTERN.matcher(html);
+            if (downloadMatcher.find()) {
+                return downloadMatcher.group(1);
+            }
+
+            Matcher linkMatcher = DOWNLOAD_PATTERN.matcher(html);
+            if (linkMatcher.find()) {
+                return linkMatcher.group(1);
+            }
+        }
+        return null;
     }
 
 
@@ -185,7 +222,7 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
         private final WeakReference<ImageView> imageViewRef;
         private final PinoyRuBean item;
         private String thumbnailUrl;
-        private String videoId, videoId2;
+        private String videoId, videoId2, downloadId;
 
         ThumbnailFetchTask(ImageView imageView, PinoyRuBean item) {
             this.imageViewRef = new WeakReference<>(imageView);
@@ -193,6 +230,7 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
             this.thumbnailUrl = null;
             this.videoId = null;
             this.videoId2 = null;
+            this.downloadId = null;
         }
 
         @SuppressWarnings("deprecation")
@@ -212,9 +250,12 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
                     item.setThumbnailUrl(cached);
                     return cached;
                 }
+
                 thumbnailUrl = fetchThumbnailFromHtml(item.getLink());
                 videoId = FetchVideoId(item.getLink());
                 videoId2 = FetchVideoId2(item.getLink());
+                downloadId = fetchDownloadId(item.getLink());
+
                 if (thumbnailUrl != null) {
                     item.setThumbnailUrl(thumbnailUrl);
                     THUMBNAIL_CACHE.put(item.getLink(), thumbnailUrl);
@@ -226,7 +267,10 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
                 if (videoId != null) {
                     item.setVideoId(videoId);
                 }
-
+                if (downloadId != null) {
+                    item.setDownloadId(downloadId);
+//                    Log.d("MovieRuAdapter", "Download ID for " + item.getTitle() + ": " + downloadId);
+                }
                 return thumbnailUrl;
 
             } catch (Exception e) {
@@ -253,7 +297,10 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
                                 .into(imageView);
                         imageView.setTag(R.id.iv_thumb, null);
                         if (item.getVideoId() != null) {
-                            android.util.Log.d("MovieRuAdapter", "Video ID for " + item.getTitle() + ": " + item.getVideoId());
+//                            Log.d("MovieRuAdapter", "Video ID for " + item.getTitle() + ": " + item.getVideoId());
+                        }
+                        if (downloadId != null) {
+//                            Log.d("MovieRuAdapter", "Download ID for " + item.getTitle() + ": " + downloadId);
                         }
                     }
                 }
