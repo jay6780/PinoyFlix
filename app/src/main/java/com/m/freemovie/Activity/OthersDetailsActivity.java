@@ -74,21 +74,23 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
         type = getIntent().getIntExtra("type", 1);
         image = getIntent().getStringExtra("image");
 
-        new Thread(() -> {
-            try {
-                final String id = fetchDownloadId(link);
-                runOnUiThread(() -> {
-                    downloadId = id;
-                });
+        if(link !=null){
+            new Thread(() -> {
+                try {
+                    final String id = fetchDownloadId(link);
+                    runOnUiThread(() -> {
+                        downloadId = id;
+                    });
 
-            } catch (IOException e) {
-                e.printStackTrace();
-                runOnUiThread(() -> {
-                    Toast.makeText(OthersDetailsActivity.this, "Failed to load download link", Toast.LENGTH_SHORT).show();
-                });
-            }
-        }).start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    runOnUiThread(() -> {
+                        Toast.makeText(OthersDetailsActivity.this, "Failed to load download link", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }).start();
 
+        }
 
 
 //        Log.e("DownloadLink","val: "+link);
@@ -299,7 +301,7 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
 //                Log.d("VideoId","val1: "+primary);
 //                Log.d("VideoId","val2: "+secondary);
                 String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
-                DetailBean details = new DetailBean(primary, timestamp, image, title, "false", secondary,downloadId);
+                DetailBean details = new DetailBean(primary, timestamp, image, title, "false", secondary,link);
                 details.setVideoId(primary);
                 details.setTimeStamp(timestamp);
                 bookmarkDbHelper.toggleBookmark(details, 8);

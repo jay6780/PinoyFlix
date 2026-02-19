@@ -14,7 +14,7 @@ import java.util.List;
 public class BookmarkDbHelper2 extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "BookMarkTagalog1";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     // Bookmark table definition
     public static class BookmarkEntry {
