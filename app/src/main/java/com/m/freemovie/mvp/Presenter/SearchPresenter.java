@@ -6,11 +6,16 @@ import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.PinoyMovieRuBean;
+import com.m.freemovie.mvp.Model.ClassBean.SearchRuBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogSearchBean;
 import com.m.freemovie.mvp.Contract.SearchContract;
 import com.m.freemovie.mvp.Model.MovieModel;
+import com.m.freemovie.mvp.Model.PinoyRuModel;
+import com.m.freemovie.mvp.Model.SearchRuModel;
 
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Response;
@@ -161,4 +166,30 @@ public class SearchPresenter implements SearchContract.Presenter {
         });
     }
 
+    @Override
+    public void getTagalogMovieQuery(String query) {
+            view.showLoading();
+            SearchRuModel.getSearchRu(query, new Callback<List<SearchRuBean>>() {
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                }
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+                }
+
+                @Override
+                public void returnResult(List<SearchRuBean> apiBean) {
+                    view.hideLoading();
+                    view.getSearchList(apiBean);
+                }
+
+                @Override
+                public void returnError(String message) {
+                    view.hideLoading();
+                    view.showError(message);
+                }
+            });
+
+    }
 }

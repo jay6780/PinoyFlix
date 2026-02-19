@@ -15,13 +15,17 @@ import com.m.freemovie.mvp.Model.ClassBean.NineAnimeSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.OtherBean;
 import com.m.freemovie.mvp.Model.ClassBean.OthersDlBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
+import com.m.freemovie.mvp.Model.ClassBean.PinoyMovieRuBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
+import com.m.freemovie.mvp.Model.ClassBean.SearchRuBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogInfoBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.TvSeriesBean;
+
+import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
 import retrofit2.http.GET;
@@ -298,5 +302,36 @@ public interface MovieApi {
 
     @GET("/khflix/download")
     Observable<OthersDlBean> getOtherDownload(@Query("url") String url);
+
+
+    //tagalog movie
+
+    @GET("wp/v2/movies")
+    Observable<List<PinoyMovieRuBean>> getPiNoyRuPage(@Query("page") int page);
+
+    @GET("wp/v2/movies")
+    Observable<List<PinoyMovieRuBean>> getActionType(
+            @Query("genres") String genres,
+            @Query("per_page") int per_page,
+            @Query("page") int page);
+
+
+    @GET("wp/v2/movies")
+    Observable<List<PinoyMovieRuBean>> getRomanceType(
+            @Query("genres") String genres,
+            @Query("per_page") int per_page,
+            @Query("page") int page);
+
+
+    @GET("wp/v2/movies")
+    Observable<List<PinoyMovieRuBean>> getComedyType(
+            @Query("genres") String genres,
+            @Query("per_page") int per_page,
+            @Query("page") int page);
+
+
+
+    @GET("wp/v2/search")
+    Observable<List<SearchRuBean>> getSearchRu(@Query("search") String search);
 
 }

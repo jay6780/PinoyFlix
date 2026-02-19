@@ -160,7 +160,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
     private void savedBook() {
         String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
-        DetailBean details = new DetailBean(id, timestamp, lastImage, title,"false");
+        DetailBean details = new DetailBean(id, timestamp, lastImage, title,"false","","");
         details.setVideoId(id);
         details.setTimeStamp(timestamp);
         dbHelper.toggleBookmark(details, position);

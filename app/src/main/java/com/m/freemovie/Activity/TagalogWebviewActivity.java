@@ -359,7 +359,7 @@ public class TagalogWebviewActivity extends AppCompatActivity
         }else{
             type = "false";
         }
-        DetailBean details = new DetailBean(id, timestamp, image, title,type);
+        DetailBean details = new DetailBean(id, timestamp, image, title,type,"","");
         details.setVideoId(id);
         details.setTimeStamp(timestamp);
         bookmarkDbHelper.toggleBookmark(details, isMovie? 5:4);

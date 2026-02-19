@@ -1,12 +1,13 @@
 package com.m.freemovie.Activity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
@@ -44,6 +45,7 @@ public class DownloadWebview extends AppCompatActivity {
     private KProgressHUD downloadHud;
     private String title,EpisodeNum;
     private boolean isFirstTask = false;
+    private String blockUrl ="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,9 +74,10 @@ public class DownloadWebview extends AppCompatActivity {
         binding.webContainer.setVisibility(View.VISIBLE);
     }
     @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
+       NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
@@ -85,6 +88,8 @@ public class DownloadWebview extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
+
+
         binding.webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
@@ -94,7 +99,6 @@ public class DownloadWebview extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                blockAds(view);
                 hud.dismiss();
             }
 
@@ -108,17 +112,28 @@ public class DownloadWebview extends AppCompatActivity {
 //                Log.e("VideoSelect","val: "+url);
                 if (isAllowedUrl(url)) {
                     return false;
-                } else {
+                } else if (url.contains(blockUrl)) {
+                    if(!blockUrl.isEmpty()){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                }else{
+                    blockUrl = url;
                     view.stopLoading();
                     return true;
                 }
             }
+
         });
+
+
 
         binding.webView.setDownloadListener(new DownloadListener() {
             @Override
             public void onDownloadStart(String videoUrl, String userAgent, String contentDisposition, String mimetype, long contentLength) {
 //                Log.e("VideoSelect","val: "+videoUrl);
+
                 if (isAllowedUrl(videoUrl)) {
                     if(isFirstTask){
                         Toast.makeText(getApplicationContext(),"Download in progress",Toast.LENGTH_SHORT).show();
@@ -137,11 +152,12 @@ public class DownloadWebview extends AppCompatActivity {
 
     }
 
+
     private boolean isAllowedUrl(String url) {
         String[] allowedPatterns = {
                 "^https?://vidsrc\\..*",
                 "^https?://cardfightvanguard\\..*",
-                "^https?://workers\\.dev.*",
+                "^https?://mkv.dl5cg77imb\\..*",
                 "^https?://pahe\\.win.*",
                 "^https?://kwik\\.cx/f/.*",
                 "^https?://vault-.*\\.kwik\\.cx.*",
@@ -149,54 +165,65 @@ public class DownloadWebview extends AppCompatActivity {
                 "^https?://.*\\.mp4.*",
                 "^https?://.*/mp4/.*",
                 "^https?://.*/mkv/.*",
+                "^https?://.*\\.m3u8.*",
+                "^https?://.*\\.ts.*",
+                "^https?://.*/video/.*",
+                "^https?://.*myvidplay.*",
+                "^https?://.*dev.*",
+                "^https?://.*mkv.*",
+                "^https?://.*mixdrop.*",
+                "^https?://.*m1xdrop.*",
+                "^https?://.*voe.*",
+                "^https?://.*.cloudatacdn.*",
+                "^https?://.*/download/.*"
         };
+
+        String lowerUrl = url.toLowerCase();
+        if (lowerUrl.contains(".mp4") || lowerUrl.contains(".mkv") ||
+                lowerUrl.contains(".m3u8") || lowerUrl.contains(".ts")
+                || lowerUrl.contains(".dev")
+                || lowerUrl.contains("myvidplay.com/download")
+                || lowerUrl.contains(".cx")
+                ||lowerUrl.contains("abstream.to")
+                ||lowerUrl.contains("voe.sx")) {
+            return true;
+        }
 
         for (String pattern : allowedPatterns) {
             if (url.matches(pattern)) {
                 return true;
+            }else{
+                blockUrl = url;
             }
         }
         return false;
     }
-    private void blockAds(WebView view) {
-        String tags = view.getUrl();
-        StringBuilder sb = new StringBuilder();
-        sb.append("javascript: ");
-        String[] allTag = tags.split(",");
-        for (String tag : allTag) {
-            String adTag = tag;
-            if (adTag.trim().length() > 0) {
-                adTag = adTag.trim();
-                if (adTag.contains("#")) {
-                    adTag = adTag.substring(adTag.indexOf("#") + 1);
-                    sb.append("document.getElementById(\'").append(adTag).append("\').remove();");
-
-                } else if (adTag.contains(".")) {
-                    adTag = adTag.substring(adTag.indexOf(".") + 1);
-                    sb.append("var esc=document.getElementsByClassName(\'").append(adTag).append("\');for (var i = esc.length - 1; i >= 0; i--){esc[i].remove();};");
-
-                } else {
-                    sb.append("var esc=document.getElementsByTagName(\'").append(adTag).append("\');for (var i = esc.length - 1; i >= 0; i--){esc[i].remove();};");
-                }
-            }
-        }
-    }
 
     private File getLocalFile() {
         String safeTitle = title.replaceAll("[^a-zA-Z0-9.-]", "_");
-        String Episode = EpisodeNum.isEmpty()? safeTitle +".mp4" :safeTitle +"_Episode_"+EpisodeNum+"_"+".mp4";
-        String fileName = Episode;
-        String dirName = fileName;
+
+        String fileExtension = ".mp4";
+        if (downloadUrl != null && downloadUrl.toLowerCase().contains(".mkv")) {
+            fileExtension = ".mkv";
+        }
+
+        String fileName;
+        if (EpisodeNum.isEmpty()) {
+            fileName = safeTitle + fileExtension;
+        } else {
+            fileName = safeTitle + "_Episode_" + EpisodeNum + fileExtension;
+        }
+
         File freeMovieDir = new File(getFilesDir(), "FreeMovie");
         if (!freeMovieDir.exists()) {
             freeMovieDir.mkdirs();
         }
-
-        File movieDir = new File(freeMovieDir, dirName);
+        File movieDir = new File(freeMovieDir, safeTitle);
         if (!movieDir.exists()) {
             movieDir.mkdirs();
         }
-        return new File(movieDir, dirName);
+
+        return new File(movieDir, fileName);
     }
 
     private void downloadVideo(String videoUrl) {
@@ -216,6 +243,7 @@ public class DownloadWebview extends AppCompatActivity {
             if (outputFile.exists()) {
                 outputFile.delete();
                 binding.webContainer.setVisibility(View.VISIBLE);
+                finish();
                 Toast.makeText(getApplicationContext(), "Download cancelled", Toast.LENGTH_SHORT).show();
             }
         });
@@ -233,30 +261,55 @@ public class DownloadWebview extends AppCompatActivity {
                     existingLength = outputFile.length();
                 }
 
+                String cookies = CookieManager.getInstance().getCookie(videoUrl);
                 okhttp3.Request.Builder requestBuilder = new okhttp3.Request.Builder()
                         .url(videoUrl)
-                        .get();
+                        .get()
+                        .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                        .addHeader("Accept", "video/webm,video/mp4,video/*;q=0.9,application/ogg;q=0.7,audio/*;q=0.6,*/*;q=0.5")
+                        .addHeader("Accept-Language", "en-US,en;q=0.9")
+                        .addHeader("Accept-Encoding", "identity")
+                        .addHeader("Connection", "keep-alive")
+                        .addHeader("Range", "bytes=0-")
+                        .addHeader("Referer", downloadUrl)
+                        .addHeader("Sec-Fetch-Dest", "video")
+                        .addHeader("Sec-Fetch-Mode", "no-cors")
+                        .addHeader("Sec-Fetch-Site", "same-site")
+                        .addHeader("Origin", getDomainFromUrl(downloadUrl));
 
+                if (cookies != null && !cookies.isEmpty()) {
+                    requestBuilder.addHeader("Cookie", cookies);
+                }
                 if (existingLength > 0) {
-                    requestBuilder.addHeader("Range", "bytes=" + existingLength + "-");
+                    requestBuilder.header("Range", "bytes=" + existingLength + "-");
                 }
 
                 response = client.newCall(requestBuilder.build()).execute();
                 int responseCode = response.code();
-                boolean isResume = (responseCode == 206);
+                if (responseCode == 403) {
+                    throw new IOException("Access forbidden - Server rejected the request");
+                }
+
+                boolean isResume = (responseCode == 206 || responseCode == 200);
 
                 if (response.isSuccessful() || isResume) {
                     inputStream = response.body().byteStream();
-                    outputStream = new FileOutputStream(outputFile, isResume);
+                    outputStream = new FileOutputStream(outputFile, existingLength > 0);
 
                     long contentLength = response.body().contentLength();
-                    if (isResume) {
+                    if (contentLength == -1) {
+                        contentLength = response.header("Content-Length") != null ?
+                                Long.parseLong(response.header("Content-Length")) : -1;
+                    }
+
+                    if (isResume && contentLength != -1) {
                         contentLength += existingLength;
                     }
 
                     byte[] buffer = new byte[8192];
                     int bytesRead;
                     long totalBytesRead = existingLength;
+                    long lastProgressUpdate = 0;
 
                     while ((bytesRead = inputStream.read(buffer)) != -1) {
                         if (!isFirstTask) break;
@@ -264,9 +317,14 @@ public class DownloadWebview extends AppCompatActivity {
                         outputStream.write(buffer, 0, bytesRead);
                         totalBytesRead += bytesRead;
 
-                        if (contentLength > 0) {
+                        if (contentLength > 0 && (totalBytesRead - lastProgressUpdate) > contentLength / 100) {
                             final int progress = (int) ((totalBytesRead * 100) / contentLength);
-                            runOnUiThread(() -> downloadHud.setProgress(progress));
+                            runOnUiThread(() -> {
+                                if (downloadHud != null && downloadHud.isShowing()) {
+                                    downloadHud.setProgress(Math.min(progress, 100));
+                                }
+                            });
+                            lastProgressUpdate = totalBytesRead;
                         }
                     }
 
@@ -282,10 +340,11 @@ public class DownloadWebview extends AppCompatActivity {
                                     "Download Complete!", Toast.LENGTH_LONG).show();
                             startActivity(new Intent(getApplicationContext(), Download_videoActivity.class));
                             binding.webContainer.setVisibility(View.VISIBLE);
+                            finish();
                         });
                     }
                 } else {
-                    throw new IOException("Server returned code: " + responseCode);
+                    throw new IOException("Server returned code: " + responseCode + " - " + response.message());
                 }
 
             } catch (Exception e) {
@@ -296,7 +355,15 @@ public class DownloadWebview extends AppCompatActivity {
                             downloadHud.dismiss();
                         }
                         isFirstTask = false;
-                        Toast.makeText(getApplicationContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        String errorMsg = e.getMessage();
+                        if (errorMsg != null && errorMsg.contains("403")) {
+                            errorMsg = "Download failed: Access forbidden. The server rejected our request.";
+                        }
+                        Toast.makeText(getApplicationContext(),
+                                "Error: " + (errorMsg != null ? errorMsg : "Unknown error"),
+                                Toast.LENGTH_LONG).show();
+                        finish();
+                        binding.webContainer.setVisibility(View.VISIBLE);
                     });
                 }
             } finally {
@@ -309,6 +376,24 @@ public class DownloadWebview extends AppCompatActivity {
                 }
             }
         }).start();
+    }
+
+    // Helper method to get domain from URL
+    private String getDomainFromUrl(String url) {
+        try {
+            java.net.URL urlObj = new java.net.URL(url);
+            String protocol = urlObj.getProtocol();
+            String host = urlObj.getHost();
+            int port = urlObj.getPort();
+
+            if (port == -1) {
+                return protocol + "://" + host;
+            } else {
+                return protocol + "://" + host + ":" + port;
+            }
+        } catch (Exception e) {
+            return url;
+        }
     }
 
     public static OkHttpClient.Builder getUnsafeOkHttpClient() {
@@ -382,35 +467,27 @@ public class DownloadWebview extends AppCompatActivity {
 
     }
 
-    private void setSettings(WebSettings setting) {
-        setting.setJavaScriptEnabled(true);
-        setting.setJavaScriptCanOpenWindowsAutomatically(true);
-        setting.setAllowFileAccess(true);
-        setting.setSupportZoom(true);
-        setting.setBuiltInZoomControls(true);
-        setting.setDisplayZoomControls(false);
-        setting.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
-        setting.setSupportMultipleWindows(false);
-        String string = setting.getUserAgentString();
-        setting.setUserAgentString(string + "androidapp-v1.4");
-        setting.setGeolocationEnabled(true);
-        setting.setGeolocationDatabasePath(getDir("geolocation", 0).getPath());
-        setting.setSaveFormData(true);
-        setting.setDomStorageEnabled(true);
-        setting.setDatabaseEnabled(true);
-        setting.setCacheMode(WebSettings.LOAD_DEFAULT);
+    private void setSettings(WebSettings webSettings) {
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setDisplayZoomControls(false);
+        webSettings.setBuiltInZoomControls(false);
+        webSettings.setSupportZoom(false);
+//        String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+//        webSettings.setUserAgentString(userAgent);
+        webSettings.setMediaPlaybackRequiresUserGesture(false);
+        binding.webView.requestFocusFromTouch();
+
+        binding.webView.setFocusable(true);
+        binding.webView.setFocusableInTouchMode(true);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setting.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+            webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
 
-        CookieManager cookieManager = CookieManager.getInstance();
-        cookieManager.setAcceptCookie(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            cookieManager.setAcceptThirdPartyCookies(binding.webView, true);
+            CookieManager.getInstance().setAcceptThirdPartyCookies(binding.webView, false);
         }
-        setting.setUseWideViewPort(true);
-        setting.setTextZoom(Integer.valueOf(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("text_size", "100")));
     }
 
     @Override
@@ -429,8 +506,12 @@ public class DownloadWebview extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        isFirstTask = false;
-        finish();
+        if (binding.webView != null && binding.webView.canGoBack()) {
+            binding.webView.goBack();
+        }else{
+            super.onBackPressed();
+            isFirstTask = false;
+            finish();
+        }
     }
 }

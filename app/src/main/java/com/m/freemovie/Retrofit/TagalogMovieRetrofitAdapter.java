@@ -18,10 +18,10 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class FreeMovieRetrofitAdapter {
+public class TagalogMovieRetrofitAdapter {
     private static Retrofit retrofit;
     private static Gson gson;
-    private static final String BASE_URL = "https://api.themoviedb.org/3/";
+    private static final String BASE_URL = "https://pinoymoviepedia.ru/wp-json/";
     public static synchronized Retrofit getInstance() {
         if (retrofit == null) {
             if (gson == null) {
