@@ -22,25 +22,16 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.app.hubert.guide.NewbieGuide;
-import com.google.android.gms.ads.AdError;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.appopen.AppOpenAd;
-import com.m.freemovie.Fragment.BookmarkFragment;
 import com.m.freemovie.Fragment.HomeFragment;
-import com.m.freemovie.Fragment.SearchFragment;
 import com.m.freemovie.R;
-import com.m.freemovie.Retrofit.AppConstant;
-import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import meow.bottomnavigation.MeowBottomNavigation;
+import com.m.freemovie.Fragment.SearchFragment;
+import com.m.freemovie.Fragment.BookmarkFragment;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private ActivityMainBinding binding;
@@ -51,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int RESET_GUIDE_REQUEST_CODE = 100;
     private long pressedTime;
     private String TAG ="MainAd";
-    private AppOpenAd appOpenAd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ll_file.setOnClickListener(this);
         btn_back5.setOnClickListener(this);
         ll_guide.setOnClickListener(this);
-        startHourCount();
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
@@ -101,128 +90,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
         }.start();
-        if(!SPUtils.getInstance().getBoolean(AppConstant.adOpen)) {
-            initAd();
-        }
 
     }
 
-    private void startHourCount() {
-        try {
-            long lastResetTime = SPUtils.getInstance().getLong("last_reset_time", 0);
-            long currentTime = System.currentTimeMillis();
-            long twoHours = 2 * 60 * 60 * 1000;
-
-            long nextResetTime = lastResetTime + twoHours;
-
-            if (currentTime >= nextResetTime) {
-                resetAds();
-                SPUtils.getInstance().put("last_reset_time", currentTime);
-                nextResetTime = currentTime + twoHours;
-            }
-
-            long remainingTime = nextResetTime - currentTime;
-            start(remainingTime, 1000);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void resetAds() {
-        SPUtils.getInstance().put(AppConstant.adSeries, false);
-        SPUtils.getInstance().put(AppConstant.adMovies, false);
-        SPUtils.getInstance().put(AppConstant.adAnime, false);
-        SPUtils.getInstance().put(AppConstant.adOpen, false);
-    }
-
-
-    private void start(final long miliSecond, final int interval) {
-        try {
-            new CountDownTimer(miliSecond, interval) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    long day = TimeUnit.MILLISECONDS.toDays(millisUntilFinished);
-                    millisUntilFinished -= TimeUnit.DAYS.toMillis(day);
-
-                    long hour = TimeUnit.MILLISECONDS.toHours(millisUntilFinished);
-                    millisUntilFinished -= TimeUnit.HOURS.toMillis(hour);
-
-                    long minute = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
-                    millisUntilFinished -= TimeUnit.MINUTES.toMillis(minute);
-
-                    long second = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
-                    long totalSeconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
-
-                    if (totalSeconds % 10 == 0) {
-                        binding.time.setText("Welcome to PinoyFlix");
-                    } else {
-                        binding.time.setText("Ads reset in : " + String.format("%02d:%02d:%02d:%02d", day, hour, minute, second));
-                    }
-                }
-
-                @Override
-                public void onFinish() {
-                    resetAds();
-                    startHourCount();
-                }
-            }.start();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    private void initAd() {
-        AppOpenAd.load(
-                this,
-                AppConstant.OpenAppId,
-                new AdRequest.Builder().build(),
-                new AppOpenAd.AppOpenAdLoadCallback() {
-                    @Override
-                    public void onAdLoaded(AppOpenAd ad) {
-                        if(!AppConstant.isAddFree){
-                            appOpenAd = ad;
-//                            SPUtils.getInstance().put(AppConstant.isAddShow,true);
-                            showAdIfAvailable();
-                            SPUtils.getInstance().put(AppConstant.adOpen,true);
-                            Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-
-                    @Override
-                    public void onAdFailedToLoad(LoadAdError loadAdError) {
-//                        Log.d(TAG, "App open ad failed to load with error: " + loadAdError.getMessage());
-
-                    }
-                });
-
-    }
-
-
-    private void showAdIfAvailable() {
-        if (appOpenAd != null) {
-            appOpenAd.setFullScreenContentCallback(new FullScreenContentCallback() {
-                @Override
-                public void onAdDismissedFullScreenContent() {
-//                    Log.d(TAG, "Ad dismissed.");
-                }
-
-                @Override
-                public void onAdFailedToShowFullScreenContent(AdError adError) {
-//                    Log.d(TAG, "Ad failed to show.");
-                }
-
-                @Override
-                public void onAdShowedFullScreenContent() {
-//                    Log.d(TAG, "Ad showed successfully.");
-                }
-            });
-
-            // Show the ad
-            appOpenAd.show(MainActivity.this);
-        }
-    }
 
 
     private void initPermission() {
@@ -234,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         binding.nav.add(new MeowBottomNavigation.Model(3, R.drawable.unbooked));
 
         Fragment searchFragment = new SearchFragment();
-        Fragment movieFragment = new HomeFragment();
+        Fragment movieFragment =  new HomeFragment();
         Fragment bookmarkFragment = new BookmarkFragment();
 
         getSupportFragmentManager()

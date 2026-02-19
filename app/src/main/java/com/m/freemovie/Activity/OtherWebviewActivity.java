@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.media.AudioManager;
+import android.media.audiofx.LoudnessEnhancer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -12,6 +14,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
@@ -22,7 +25,6 @@ import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,23 +35,15 @@ import com.app.hubert.guide.core.Controller;
 import com.app.hubert.guide.listener.OnGuideChangedListener;
 import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.LoadAdError;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
-import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.MovieRuListAdapter;
 import com.m.freemovie.databinding.ActivityOtherWebview2Binding;
 import com.m.freemovie.mvp.Contract.PinoyRuMovieAllContract;
-import com.m.freemovie.mvp.Contract.PinoyRuMovieContract;
 import com.m.freemovie.mvp.Model.ClassBean.PinoyMovieRuBean;
 import com.m.freemovie.mvp.Model.ClassBean.PinoyRuBean;
 import com.m.freemovie.mvp.Presenter.PinoyRuAllPresenter;
-import com.m.freemovie.mvp.Presenter.PinoyRuPresenter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +62,6 @@ public class OtherWebviewActivity extends AppCompatActivity
     private String videoUrl;
     private int position;
     private RelativeLayout.LayoutParams params,params1;
-    private AdView adView;
     private boolean isRotate = false;
     private LoudnessEnhancer booster;
     private final int[] gainValues = {-3000, -2000, -1000, 0, 1000, 2000};
@@ -88,7 +81,7 @@ public class OtherWebviewActivity extends AppCompatActivity
         videoId = getIntent().getStringExtra("videoId");
         position = getIntent().getIntExtra("position",1);
         type = getIntent().getIntExtra("type",1);
-        Log.d("Type","val: "+type);
+//        Log.d("Type","val: "+type);
         defaultScreen();
         binding.llReset.setVisibility(View.GONE);
         initRecyclerMovie();
@@ -128,11 +121,6 @@ public class OtherWebviewActivity extends AppCompatActivity
         });
 
         binding.llReset.setVisibility(View.GONE);
-        if(!AppConstant.isAddFree){
-            loadAd();
-        }else{
-            loadAdsFailed();
-        }
 
         try {
             booster = new LoudnessEnhancer(0);
@@ -467,78 +455,6 @@ public class OtherWebviewActivity extends AppCompatActivity
     }
 
 
-    @SuppressLint("MissingPermission")
-    private void loadAd() {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView = new AdView(OtherWebviewActivity.this);
-        adView.setAdUnitId(getString(R.string.banner_adId));
-        adView.setAdSize(AdSize.BANNER);
-        binding.adMovie.removeAllViews();
-        binding.adMovie.addView(adView);
-
-        adView.loadAd(adRequest);
-        if (adView != null) {
-            adView.setAdListener(
-                    new AdListener() {
-                        @Override
-                        public void onAdClicked() {
-                        }
-
-                        @Override
-                        public void onAdClosed() {
-                        }
-
-                        @Override
-                        public void onAdFailedToLoad(@NonNull LoadAdError adError) {
-                            loadAdsFailed();
-                        }
-
-                        @Override
-                        public void onAdImpression() {
-                        }
-
-                        @Override
-                        public void onAdLoaded() {
-                            loadAdsSuccess();
-                        }
-
-                        @Override
-                        public void onAdOpened() {
-                        }
-                    });
-        }
-    }
-
-    private void loadAdsFailed(){
-        params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        params.addRule(RelativeLayout.BELOW,binding.rlWebview.getId());
-        binding.adMovie.setVisibility(View.GONE);
-        binding.episodeTxt.setLayoutParams(params);
-    }
-
-    private void loadAdsSuccess(){
-        binding.adMovie.setVisibility(View.VISIBLE);
-        params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        params1 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        params.addRule(RelativeLayout.BELOW,binding.rlWebview.getId());
-        params1.addRule(RelativeLayout.BELOW,binding.adMovie.getId());
-        binding.adMovie.setLayoutParams(params);
-        binding.episodeTxt.setLayoutParams(params1);
-
-        new CountDownTimer(10000, 1000) {
-
-            public void onTick(long millisUntilFinished) {
-            }
-
-            public void onFinish() {
-                loadAdsFailed();
-            }
-
-        }.start();
-    }
-
-
-
     private void rotateScreen() {
         finishing = false;
         isRotate = true;
@@ -549,7 +465,6 @@ public class OtherWebviewActivity extends AppCompatActivity
         binding.rlWebview.setLayoutParams(params);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         binding.swipe.setEnabled(false);
-        loadAdsFailed();
         binding.expand.setImageResource(R.mipmap.rotate_screen);
 
         RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(dip2px(30), dip2px(30));
