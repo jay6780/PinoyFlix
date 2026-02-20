@@ -83,7 +83,6 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
                 }else{
                     showOption(item,helper);
                 }
-                notifyDataSetChanged();
             }
         });
     }
