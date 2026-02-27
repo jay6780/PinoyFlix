@@ -223,6 +223,26 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
             }
         });
 
+        binding.volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser && booster != null && audioManager != null) {
+                    updateVolume(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                if (volumeTimer != null) volumeTimer.cancel();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                showVolumeUI();
+            }
+        });
+
+
         initTopPadding(70);
 
         binding.llVolume.setEnabled(false);

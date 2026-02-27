@@ -28,6 +28,7 @@ import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -182,6 +183,27 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+
+        binding.volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser && booster != null && audioManager != null) {
+                    updateVolume(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                if (volumeTimer != null) volumeTimer.cancel();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                showVolumeUI();
+            }
+        });
+
+
         binding.llVolume.setEnabled(false);
     }
     private void initializeSpinnerItems() {
@@ -215,11 +237,13 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
                 binding.llVolume.setVisibility(View.VISIBLE);
+                binding.swipe.setEnabled(false);
                 if (currentLevelIndex < 5) updateVolume(currentLevelIndex + 1);
                 showVolumeUI();
                 return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 binding.llVolume.setVisibility(View.VISIBLE);
+                binding.swipe.setEnabled(false);
                 if (currentLevelIndex > 0) updateVolume(currentLevelIndex - 1);
                 showVolumeUI();
                 return true;
@@ -235,6 +259,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         volumeTimer = new CountDownTimer(3500, 1000) {
             public void onTick(long millisUntilFinished) {}
             public void onFinish() {
+                binding.swipe.setEnabled(true);
                 binding.llVolume.setVisibility(View.GONE);
             }
         }.start();
