@@ -207,12 +207,11 @@ public class TagalogWebviewActivity extends AppCompatActivity
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
                 binding.llVolume.setVisibility(View.VISIBLE);
-                binding.swipe.setEnabled(false);
                 if (currentLevelIndex < 5) updateVolume(currentLevelIndex + 1);
                 showVolumeUI();
                 return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
-                binding.swipe.setEnabled(false);
+
                 binding.llVolume.setVisibility(View.VISIBLE);
                 if (currentLevelIndex > 0) updateVolume(currentLevelIndex - 1);
                 showVolumeUI();
@@ -229,7 +228,6 @@ public class TagalogWebviewActivity extends AppCompatActivity
         volumeTimer = new CountDownTimer(3500, 1000) {
             public void onTick(long millisUntilFinished) {}
             public void onFinish() {
-                binding.swipe.setEnabled(true);
                 binding.llVolume.setVisibility(View.GONE);
             }
         }.start();
@@ -426,6 +424,7 @@ public class TagalogWebviewActivity extends AppCompatActivity
 
     private void defaultScreen(){
         finishing = true;
+        binding.swipe.setEnabled(true);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         binding.expand.setVisibility(View.VISIBLE);
         if(isMovie){
@@ -480,7 +479,7 @@ public class TagalogWebviewActivity extends AppCompatActivity
         }else{
             type = "false";
         }
-        DetailBean details = new DetailBean(id, timestamp, image, title,type,"","");
+        DetailBean details = new DetailBean(id, timestamp, image, title,type);
         details.setVideoId(id);
         details.setTimeStamp(timestamp);
         bookmarkDbHelper.toggleBookmark(details, isMovie? 5:4);

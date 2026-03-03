@@ -2,6 +2,7 @@ package com.m.freemovie.Activity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -15,8 +16,10 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -47,32 +50,37 @@ import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.WindowUtils;
+import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.adapter.MovieRuListAdapter;
+import com.m.freemovie.adapter.PiNoyMediaListAdapter;
 import com.m.freemovie.databinding.ActivityOtherWebview2Binding;
+import com.m.freemovie.mvp.Contract.PinoyPediaContract;
 import com.m.freemovie.mvp.Contract.PinoyRuMovieAllContract;
-import com.m.freemovie.mvp.Contract.PinoyRuMovieContract;
+import com.m.freemovie.mvp.Model.ClassBean.PinoyMediaDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.PinoyMovieRuBean;
 import com.m.freemovie.mvp.Model.ClassBean.PinoyRuBean;
+import com.m.freemovie.mvp.Model.ClassBean.PinoyRuDetailBean;
+import com.m.freemovie.mvp.Presenter.PinoyPediaPresenter;
 import com.m.freemovie.mvp.Presenter.PinoyRuAllPresenter;
-import com.m.freemovie.mvp.Presenter.PinoyRuPresenter;
+import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.ViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class OtherWebviewActivity extends AppCompatActivity
-        implements View.OnClickListener, PinoyRuMovieAllContract.View, MovieRuListAdapter.MovieIdListener {
+        implements View.OnClickListener, PinoyRuMovieAllContract.View, MovieRuListAdapter.MovieIdListener, PinoyPediaContract.View, PiNoyMediaListAdapter.SourceListener {
     private ActivityOtherWebview2Binding binding;
     private int page = 1;
     private boolean isNomore = false;
     private boolean isLoading = false;
-    private String videoId;
     private MovieRuListAdapter movieAdapter;
     private List<PinoyRuBean> movieList = new ArrayList<>();
     private boolean finishing = true;
     private KProgressHUD hud;
     private String videoUrl;
     private int position;
-    private RelativeLayout.LayoutParams params,params1;
+    private RelativeLayout.LayoutParams params, params1;
     private AdView adView;
     private boolean isRotate = false;
     private LoudnessEnhancer booster;
@@ -84,16 +92,20 @@ public class OtherWebviewActivity extends AppCompatActivity
     private PinoyRuAllPresenter presenter;
     private int type = 1;
     private int perPage = 10;
+    private PinoyPediaPresenter pinoyPediaPresenter;
+    private List<PinoyRuDetailBean> pinoyRuDetailBeanList = new ArrayList<>();
+    private String link;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         binding = ActivityOtherWebview2Binding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        videoId = getIntent().getStringExtra("videoId");
-        position = getIntent().getIntExtra("position",1);
-        type = getIntent().getIntExtra("type",1);
-        Log.d("Type","val: "+type);
+        videoUrl = getIntent().getStringExtra("videoUrl");
+        position = getIntent().getIntExtra("position", 1);
+        type = getIntent().getIntExtra("type", 1);
+        Log.d("Type", "val: " + type);
         defaultScreen();
         binding.llReset.setVisibility(View.GONE);
         initRecyclerMovie();
@@ -106,15 +118,10 @@ public class OtherWebviewActivity extends AppCompatActivity
         binding.expand.setOnClickListener(this);
         binding.btnBackFinish.setOnClickListener(this);
 
-        if(position == 1){
-            videoUrl = "https://myvidplay.com/e/"+videoId;
-        }else{
-            videoUrl = "https://lauradaydo.com/e/"+videoId;
-        }
-
 //        Log.d("videoUrl: ",videoUrl);
         setupWebView(videoUrl);
         presenter = new PinoyRuAllPresenter(this);
+        pinoyPediaPresenter = new PinoyPediaPresenter(this);
         initApi();
         binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -122,10 +129,10 @@ public class OtherWebviewActivity extends AppCompatActivity
                 page = 1;
                 perPage = 10;
                 movieList.clear();
-                if(movieAdapter!=null){
+                if (movieAdapter != null) {
                     movieAdapter.setNewData(movieList);
                 }
-                if(binding.llReset.getVisibility() == View.VISIBLE){
+                if (binding.llReset.getVisibility() == View.VISIBLE) {
                     binding.llReset.setVisibility(View.GONE);
                 }
                 initApi();
@@ -133,9 +140,9 @@ public class OtherWebviewActivity extends AppCompatActivity
         });
 
         binding.llReset.setVisibility(View.GONE);
-        if(!AppConstant.isAddFree){
+        if (!AppConstant.isAddFree) {
             loadAd();
-        }else{
+        } else {
             loadAdsFailed();
         }
 
@@ -167,15 +174,15 @@ public class OtherWebviewActivity extends AppCompatActivity
         });
     }
 
-    private void reset(){
+    private void reset() {
         binding.rvMovielist.scrollToPosition(0);
         binding.llReset.setVisibility(View.GONE);
     }
 
 
     private void setupWebView(String videoUrl) {
-        if(!isNetworkAvailable()){
-            Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+        if (!isNetworkAvailable()) {
+            Toast.makeText(getApplicationContext(), "Please check internet and try again", Toast.LENGTH_SHORT).show();
             return;
         }
         binding.webView.setVisibility(View.VISIBLE);
@@ -213,12 +220,10 @@ public class OtherWebviewActivity extends AppCompatActivity
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
                 binding.llVolume.setVisibility(View.VISIBLE);
-                binding.swipe.setEnabled(false);
                 if (currentLevelIndex < 5) updateVolume(currentLevelIndex + 1);
                 showVolumeUI();
                 return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
-                binding.swipe.setEnabled(false);
                 binding.llVolume.setVisibility(View.VISIBLE);
                 if (currentLevelIndex > 0) updateVolume(currentLevelIndex - 1);
                 showVolumeUI();
@@ -233,9 +238,10 @@ public class OtherWebviewActivity extends AppCompatActivity
         if (volumeTimer != null) volumeTimer.cancel();
 
         volumeTimer = new CountDownTimer(3500, 1000) {
-            public void onTick(long millisUntilFinished) {}
+            public void onTick(long millisUntilFinished) {
+            }
+
             public void onFinish() {
-                binding.swipe.setEnabled(true);
                 binding.llVolume.setVisibility(View.GONE);
             }
         }.start();
@@ -252,7 +258,7 @@ public class OtherWebviewActivity extends AppCompatActivity
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getApplicationContext(),"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Error fetching data: " + error, Toast.LENGTH_SHORT).show();
                 binding.swipe.setRefreshing(false);
             }
         }, 500);
@@ -268,10 +274,58 @@ public class OtherWebviewActivity extends AppCompatActivity
         }, 500);
     }
 
+    private DialogPlus dialog;
+
+    @Override
+    public void getDetailSuccess(PinoyMediaDetailBean bean) {
+        if (bean != null && bean.getResults() != null) {
+            pinoyRuDetailBeanList.clear();
+
+            List<String> embedUrls = bean.getResults().getEmbedUrls();
+            pinoyRuDetailBeanList.add(new PinoyRuDetailBean(embedUrls, link));
+            if (pinoyRuDetailBeanList.isEmpty()) {
+                return;
+            }
+            dialog = DialogPlus.newDialog(this)
+                    .setContentHolder(new ViewHolder(R.layout.dialog_ru_pinoy))
+                    .setContentWidth(ViewGroup.LayoutParams.MATCH_PARENT)
+                    .setContentHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
+                    .setGravity(Gravity.CENTER)
+                    .setCancelable(true)
+                    .setPadding(10, 10, 10, 10)
+                    .create();
+
+            View dialogView = dialog.getHolderView();
+            RecyclerView recyclerView = dialogView.findViewById(R.id.rv_ru);
+            PiNoyMediaListAdapter dataAdapter = new PiNoyMediaListAdapter(this);
+
+
+            dataAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+                @Override
+                public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                    if (view.getId() == R.id.tv_download) {
+                        Intent intent = new Intent(getApplicationContext(), DownloadWebview.class);
+                        intent.putExtra("DownloadUrl", dataAdapter.getData().get(position).getLink());
+                        intent.putExtra("EpisodeNum", "");
+                        intent.putExtra("title", bean.getResults().getTitle());
+                        startActivity(intent);
+                    }
+                }
+            });
+
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setAdapter(dataAdapter);
+            dataAdapter.setNewData(pinoyRuDetailBeanList);
+            dialog.show();
+
+        }
+
+    }
+
 
     @Override
     public void getMovieList(List<PinoyMovieRuBean> bean) {
-        if(bean !=null) {
+        if (bean != null) {
             isLoading = false;
             for (PinoyMovieRuBean data : bean) {
                 movieList.add(new PinoyRuBean(data.getLink(), data.getTitle().getRendered(), data.getId()));
@@ -287,7 +341,7 @@ public class OtherWebviewActivity extends AppCompatActivity
 
     @Override
     public void getActionList(List<PinoyMovieRuBean> bean) {
-        if(bean !=null) {
+        if (bean != null) {
             isLoading = false;
             for (PinoyMovieRuBean data : bean) {
                 movieList.add(new PinoyRuBean(data.getLink(), data.getTitle().getRendered(), data.getId()));
@@ -302,7 +356,7 @@ public class OtherWebviewActivity extends AppCompatActivity
 
     @Override
     public void getRomanceList(List<PinoyMovieRuBean> bean) {
-        if(bean !=null) {
+        if (bean != null) {
             isLoading = false;
             for (PinoyMovieRuBean data : bean) {
                 movieList.add(new PinoyRuBean(data.getLink(), data.getTitle().getRendered(), data.getId()));
@@ -317,7 +371,7 @@ public class OtherWebviewActivity extends AppCompatActivity
 
     @Override
     public void getComedyList(List<PinoyMovieRuBean> bean) {
-        if(bean !=null) {
+        if (bean != null) {
             isLoading = false;
             for (PinoyMovieRuBean data : bean) {
                 movieList.add(new PinoyRuBean(data.getLink(), data.getTitle().getRendered(), data.getId()));
@@ -331,18 +385,18 @@ public class OtherWebviewActivity extends AppCompatActivity
     }
 
     @Override
-    public void getMovieId(String id,int position) {
-        binding.webView.clearCache(true);
-        switch (position){
-            case 1:
-                videoUrl ="https://myvidplay.com/e/"+id;
-                break;
-            case 2:
-                videoUrl ="https://lauradaydo.com/e/"+id;
-                break;
+    public void getMovieId(String link, String downloadId) {
+        pinoyPediaPresenter.getUrl(link);
+        this.link = downloadId;
+    }
+
+    @Override
+    public void getVideoUrl(String url) {
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
         }
-//        Log.d("VideoUrl","val: "+videoUrl);
-        setupWebView(videoUrl);
+        binding.webView.clearCache(true);
+        setupWebView(url);
     }
 
     private class CustomWebChromeClient extends WebChromeClient {
@@ -353,7 +407,7 @@ public class OtherWebviewActivity extends AppCompatActivity
 
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
-            if(!isNetworkAvailable()){
+            if (!isNetworkAvailable()) {
                 hud.dismiss();
                 return;
             }
@@ -373,14 +427,16 @@ public class OtherWebviewActivity extends AppCompatActivity
             String url = request.getUrl().toString();
             return handleUrlLoading(view, url);
         }
+
         private boolean handleUrlLoading(WebView view, String url) {
 //            Log.d("DownloadUrl","val: "+url);
-            if (url.contains(videoUrl) || url.contains("myvidplay.com")) {
+            if (url.contains(videoUrl)) {
                 return false;
             } else {
                 return true;
             }
         }
+
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
@@ -402,7 +458,7 @@ public class OtherWebviewActivity extends AppCompatActivity
                     int totalItemCount = layoutManager.getItemCount();
 
                     if (lastVisibleItemPosition > 10) {
-                        binding.llReset.setVisibility(isRotate?View.GONE:View.VISIBLE);
+                        binding.llReset.setVisibility(isRotate ? View.GONE : View.VISIBLE);
                         initGuide();
                     } else if (lastVisibleItemPosition == 0) {
                         binding.llReset.setVisibility(View.GONE);
@@ -423,15 +479,15 @@ public class OtherWebviewActivity extends AppCompatActivity
     }
 
     private void initApi() {
-        switch (type){
+        switch (type) {
             case 1:
-                presenter.getActionPageQuery("26",perPage,page);
+                presenter.getActionPageQuery("26", perPage, page);
                 break;
             case 2:
-                presenter.getRomanceQuery("52",perPage,page);
+                presenter.getRomanceQuery("52", perPage, page);
                 break;
             case 3:
-                presenter.getComedyQuery("15",perPage,page);
+                presenter.getComedyQuery("15", perPage, page);
                 break;
             case 4:
                 presenter.getPage(page);
@@ -470,18 +526,18 @@ public class OtherWebviewActivity extends AppCompatActivity
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.btn_back_finish:
-                if(finishing){
+                if (finishing) {
                     finish();
-                }else{
+                } else {
                     defaultScreen();
                 }
                 break;
             case R.id.expand:
-                if(isRotate){
+                if (isRotate) {
                     portraitFull();
-                }else{
+                } else {
                     rotateScreen();
                 }
                 break;
@@ -535,19 +591,19 @@ public class OtherWebviewActivity extends AppCompatActivity
         }
     }
 
-    private void loadAdsFailed(){
+    private void loadAdsFailed() {
         params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        params.addRule(RelativeLayout.BELOW,binding.rlWebview.getId());
+        params.addRule(RelativeLayout.BELOW, binding.rlWebview.getId());
         binding.adMovie.setVisibility(View.GONE);
         binding.episodeTxt.setLayoutParams(params);
     }
 
-    private void loadAdsSuccess(){
+    private void loadAdsSuccess() {
         binding.adMovie.setVisibility(View.VISIBLE);
         params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         params1 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        params.addRule(RelativeLayout.BELOW,binding.rlWebview.getId());
-        params1.addRule(RelativeLayout.BELOW,binding.adMovie.getId());
+        params.addRule(RelativeLayout.BELOW, binding.rlWebview.getId());
+        params1.addRule(RelativeLayout.BELOW, binding.adMovie.getId());
         binding.adMovie.setLayoutParams(params);
         binding.episodeTxt.setLayoutParams(params1);
 
@@ -562,7 +618,6 @@ public class OtherWebviewActivity extends AppCompatActivity
 
         }.start();
     }
-
 
 
     private void rotateScreen() {
@@ -581,31 +636,30 @@ public class OtherWebviewActivity extends AppCompatActivity
         RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(dip2px(30), dip2px(30));
         params2.addRule(RelativeLayout.ALIGN_PARENT_END);
         params2.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        params2.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
+        params2.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
         binding.expand.setLayoutParams(params2);
-        params2.setMargins(0,0,15,20);
-        new WindowUtils(this,true,false);
+        params2.setMargins(0, 0, 15, 20);
+        new WindowUtils(this, true, false);
     }
 
-    private void portraitFull(){
+    private void portraitFull() {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         binding.expand.setVisibility(View.VISIBLE);
         binding.rvMovielist.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         binding.rlWebview.setLayoutParams(params);
-        binding.swipe.setEnabled(true);
-
+        binding.swipe.setEnabled(false);
         RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(dip2px(30), dip2px(30));
         params2.addRule(RelativeLayout.ALIGN_PARENT_END);
         params2.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        params2.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
-        params2.setMargins(0,0,15,20);
+        params2.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+        params2.setMargins(0, 0, 15, 20);
         binding.expand.setLayoutParams(params2);
         isRotate = false;
-        new WindowUtils(this,true,false);
+        new WindowUtils(this, true, false);
     }
 
-    private void defaultScreen(){
+    private void defaultScreen() {
         isRotate = false;
         finishing = true;
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -618,16 +672,18 @@ public class OtherWebviewActivity extends AppCompatActivity
         RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(dip2px(25), dip2px(25));
         params2.addRule(RelativeLayout.ALIGN_PARENT_END);
         params2.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        params2.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
-        params2.setMargins(0,0,10,10);
+        params2.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+        params2.setMargins(0, 0, 10, 10);
         binding.expand.setLayoutParams(params2);
         binding.expand.setImageResource(R.mipmap.expand);
-        new WindowUtils(this,true,false);
+        new WindowUtils(this, true, false);
     }
+
     public int dip2px(float dpValue) {
         final float scale = getResources(this).getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
     }
+
     public static Resources getResources(Context context) {
         return context.getResources();
     }
@@ -644,12 +700,12 @@ public class OtherWebviewActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        if(!finishing){
+        if (!finishing) {
             defaultScreen();
-        }else{
+        } else {
             super.onBackPressed();
             finish();
-            if(binding.swipe != null &&binding.swipe.isRefreshing()){
+            if (binding.swipe != null && binding.swipe.isRefreshing()) {
                 binding.swipe.setRefreshing(false);
             }
             if (binding != null && binding.webView != null) {

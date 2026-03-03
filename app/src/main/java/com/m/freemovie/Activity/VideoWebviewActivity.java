@@ -311,13 +311,11 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
                 binding.llVolume.setVisibility(View.VISIBLE);
-                binding.swipe.setEnabled(false);
                 if (currentLevelIndex < 5) updateVolume(currentLevelIndex + 1);
                 showVolumeUI();
                 return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 binding.llVolume.setVisibility(View.VISIBLE);
-                binding.swipe.setEnabled(false);
                 if (currentLevelIndex > 0) updateVolume(currentLevelIndex - 1);
                 showVolumeUI();
                 return true;
@@ -333,7 +331,6 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         volumeTimer = new CountDownTimer(3500, 1000) {
             public void onTick(long millisUntilFinished) {}
             public void onFinish() {
-                binding.swipe.setEnabled(true);
                 binding.llVolume.setVisibility(View.GONE);
             }
         }.start();

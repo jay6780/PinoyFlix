@@ -619,7 +619,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
     }
     private void savedBook() {
         String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
-        DetailBean details = new DetailBean(url, timestamp, imageUrl, title,"false","","");
+        DetailBean details = new DetailBean(url, timestamp, imageUrl, title,"false");
         details.setVideoId(url);
         details.setTimeStamp(timestamp);
         bookmarkDbHelper.toggleBookmark(details, 3);

@@ -14,15 +14,12 @@ public class DetailBean {
     public DetailBean() {
     }
 
-    public DetailBean(String videoId,String timeStamp,String tempImage,String movieName,String isMovie,String videoId2, String downloadId){
+    public DetailBean(String videoId,String timeStamp,String tempImage,String movieName,String isMovie){
         this.videoId = videoId;
         this.timeStamp = timeStamp;
         this.tempImage = tempImage;
         this.movieName = movieName;
         this.isMovie = isMovie;
-        this.videoId2 = videoId2;
-        this.downloadId = downloadId;
-
     }
 
     public String getDownloadId() {

@@ -74,8 +74,8 @@ public class BookmarkFragment extends Fragment implements AdapterView.OnItemSele
                 StaggeredGridLayoutManager layoutManager = (StaggeredGridLayoutManager) recyclerView.getLayoutManager();
                     int[] lastVisiblePositions = layoutManager.findLastVisibleItemPositions(null);
                     if (lastVisiblePositions[0] > 5) {
-                        binding.llReset.setVisibility(View.VISIBLE);
-                        initGuide();
+//                        binding.llReset.setVisibility(View.VISIBLE);
+//                        initGuide();
                     } else if (lastVisiblePositions[0] == 0) {
                         binding.llReset.setVisibility(View.GONE);
                     }

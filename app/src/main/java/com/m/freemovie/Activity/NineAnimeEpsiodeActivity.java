@@ -188,7 +188,7 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
 
     private void savedBook() {
         String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
-        DetailBean details = new DetailBean(videoId, timestamp, tempImage, title,"false","","");
+        DetailBean details = new DetailBean(videoId, timestamp, tempImage, title,"false");
         details.setVideoId(videoId);
         details.setTimeStamp(timestamp);
         bookmarkDbHelper.toggleBookmark(details, 6);
