@@ -207,11 +207,12 @@ public class TagalogWebviewActivity extends AppCompatActivity
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
                 binding.llVolume.setVisibility(View.VISIBLE);
+                binding.swipe.setEnabled(false);
                 if (currentLevelIndex < 5) updateVolume(currentLevelIndex + 1);
                 showVolumeUI();
                 return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
-
+                binding.swipe.setEnabled(false);
                 binding.llVolume.setVisibility(View.VISIBLE);
                 if (currentLevelIndex > 0) updateVolume(currentLevelIndex - 1);
                 showVolumeUI();
@@ -556,6 +557,9 @@ public class TagalogWebviewActivity extends AppCompatActivity
 
     @Override
     public void showLoading() {
+        if(!binding.swipe.isEnabled()){
+            binding.swipe.setEnabled(true);
+        }
         binding.swipe.setRefreshing(true);
     }
 

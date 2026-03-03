@@ -289,6 +289,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
                 binding.llVolume.setVisibility(View.VISIBLE);
+                binding.swipe.setEnabled(false);
                 if (currentLevelIndex < 5) updateVolume(currentLevelIndex + 1);
                 showVolumeUI();
                 return true;
@@ -296,6 +297,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 binding.llVolume.setVisibility(View.VISIBLE);
                 if (currentLevelIndex > 0) updateVolume(currentLevelIndex - 1);
                 showVolumeUI();
+                binding.swipe.setEnabled(false);
                 return true;
             default:
                 return super.onKeyDown(keyCode, event);
@@ -509,6 +511,9 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
     @Override
     public void showLoading() {
+        if(!binding.swipe.isEnabled()){
+            binding.swipe.setEnabled(true);
+        }
         if (!isInit) {
             binding.swipe.setRefreshing(true);
         }
