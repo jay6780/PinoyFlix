@@ -81,5 +81,4 @@ dependencies {
 //    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
     implementation 'com.orhanobut:dialogplus:1.11@aar'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.25'
-    implementation 'com.google.android.gms:play-services-ads:24.9.0'
 }
