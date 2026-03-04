@@ -20,6 +20,8 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.hubert.guide.NewbieGuide;
 import com.google.android.gms.ads.AdError;
@@ -33,7 +35,10 @@ import com.m.freemovie.Fragment.SearchFragment;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.SPUtils;
+import com.m.freemovie.Utils.base.BaseQuickAdapter;
+import com.m.freemovie.adapter.OptionAdapter;
 import com.m.freemovie.databinding.ActivityMainBinding;
+import com.m.freemovie.mvp.Model.ClassBean.OptionBean;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -44,48 +49,74 @@ import meow.bottomnavigation.MeowBottomNavigation;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private ActivityMainBinding binding;
-    private LinearLayout ll_file,ll_guide;
-    private DrawerLayout drawerLayout;
-    private LinearLayout navigationView;
+
     private ImageView btn_back5;
     private static final int RESET_GUIDE_REQUEST_CODE = 100;
     private long pressedTime;
-    private String TAG ="MainAd";
+    private String TAG = "MainAd";
     private AppOpenAd appOpenAd;
+    private RecyclerView rv_option;
+    private OptionAdapter optionAdapter;
+    private List<OptionBean> optionBeanList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
-        ll_file = findViewById(R.id.ll_file);
         btn_back5 = findViewById(R.id.btn_back5);
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-        ll_guide = findViewById(R.id.ll_guide);
-        ll_file.setOnClickListener(this);
+        rv_option = findViewById(R.id.rv_option);
         btn_back5.setOnClickListener(this);
-        ll_guide.setOnClickListener(this);
         startHourCount();
-        drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
-            @Override
-            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-                binding.fragmentContainer.setVisibility(View.GONE);
-            }
+        optionAdapter = new OptionAdapter();
+        binding.rvOption.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvOption.setAdapter(optionAdapter);
+        optionBeanList.add(new OptionBean("file"));
+        optionBeanList.add(new OptionBean("guide"));
+        optionAdapter.setNewData(optionBeanList);
 
-            @Override
-            public void onDrawerOpened(@NonNull View drawerView) {
-                binding.fragmentContainer.setVisibility(View.GONE);
-            }
 
+        optionAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
-            public void onDrawerClosed(@NonNull View drawerView) {
-                binding.fragmentContainer.setVisibility(View.VISIBLE);
-            }
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                if (view.getId() == R.id.ll_file) {
+                    String name = optionAdapter.getData().get(position).getName();
+                    switch (name) {
+                        case "file":
+                            startActivity(new Intent(MainActivity.this, Download_videoActivity.class));
+                            break;
+                        case "guide":
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogTheme);
+                            builder.setTitle("Are you sure want to reset?");
+                            builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                                    intent.putExtra("resetGuide", true);
+                                    startActivityForResult(intent, RESET_GUIDE_REQUEST_CODE);
+                                    dialog.dismiss();
+                                }
+                            });
+                            builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
 
-            @Override
-            public void onDrawerStateChanged(int newState) {}
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            AlertDialog alert = builder.create();
+                            alert.setOnShowListener(dialog -> {
+                                alert.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK);
+                                alert.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
+                            });
+                            alert.show();
+                            break;
+                    }
+                }
+            }
         });
+
 
         if (getIntent().getBooleanExtra("resetGuide", false)) {
             resetGuideLabels();
@@ -101,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
         }.start();
-        if(!SPUtils.getInstance().getBoolean(AppConstant.adOpen)) {
+        if (!SPUtils.getInstance().getBoolean(AppConstant.adOpen)) {
             initAd();
         }
 
@@ -168,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     startHourCount();
                 }
             }.start();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -181,12 +212,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new AppOpenAd.AppOpenAdLoadCallback() {
                     @Override
                     public void onAdLoaded(AppOpenAd ad) {
-                        if(!AppConstant.isAddFree){
+                        if (!AppConstant.isAddFree) {
                             appOpenAd = ad;
 //                            SPUtils.getInstance().put(AppConstant.isAddShow,true);
                             showAdIfAvailable();
-                            SPUtils.getInstance().put(AppConstant.adOpen,true);
-                            Toast.makeText(getApplicationContext(),"Ads incoming",Toast.LENGTH_SHORT).show();
+                            SPUtils.getInstance().put(AppConstant.adOpen, true);
+                            Toast.makeText(getApplicationContext(), "Ads incoming", Toast.LENGTH_SHORT).show();
                         }
 
                     }
@@ -227,8 +258,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void initPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE,android.Manifest.permission.READ_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
+        ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
     }
+
     private void initializeBottomNavigation() {
         binding.nav.add(new MeowBottomNavigation.Model(1, R.drawable.ic_baseline_search_24));
         binding.nav.add(new MeowBottomNavigation.Model(2, R.drawable.ic_baseline_home_24));
@@ -273,51 +305,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.btn_back5:
-                if (drawerLayout.isDrawerOpen(navigationView)) {
-                    binding.fragmentContainer.setVisibility(View.VISIBLE);
-                    drawerLayout.closeDrawer(navigationView);
+                if (binding.drawerLayout.isDrawerOpen(binding.navView)) {
+                    binding.drawerLayout.closeDrawer(binding.navView);
                 } else {
-                    binding.fragmentContainer.setVisibility(View.GONE);
-                    drawerLayout.openDrawer(navigationView);
+                    binding.drawerLayout.openDrawer(binding.navView);
                 }
                 break;
-            case R.id.ll_file:
-                startActivity(new Intent(getApplicationContext(),Download_videoActivity.class));
-                break;
-            case R.id.ll_guide:
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
-                builder.setTitle("Are you sure want to reset?");
-                builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                        intent.putExtra("resetGuide", true);
-                        startActivityForResult(intent, RESET_GUIDE_REQUEST_CODE);
-                        dialog.dismiss();
-                    }
-                });
-                builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-
-                AlertDialog alert = builder.create();
-                alert.setOnShowListener(dialog -> {
-                    alert.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK);
-                    alert.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
-                });
-                alert.show();
-                break;
-
         }
 
     }
-
 
 
     @Override
@@ -361,10 +359,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START);
-            binding.fragmentContainer.setVisibility(View.GONE);
-            drawerLayout.requestDisallowInterceptTouchEvent(true);
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             if (pressedTime + 2000 > System.currentTimeMillis()) {
                 super.onBackPressed();

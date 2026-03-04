@@ -14,9 +14,10 @@
     <TextView
         android:id="@+id/tv_download"
         android:layout_below="@+id/rv_player"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
+        android:textSize="16sp"
         android:textColor="@color/black"/>
 
 
