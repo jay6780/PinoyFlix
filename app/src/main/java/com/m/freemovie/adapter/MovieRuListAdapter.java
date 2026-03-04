@@ -104,6 +104,7 @@ public class MovieRuListAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHo
                     if (item.getLink() == null) {
                         return;
                     }
+                    lastPosition = (helper.getAdapterPosition());
                     String link = "https://pinoymoviepedia.ru/links/" + item.getDownloadId() + "/";
                     movieIdListener.getMovieId(item.getLink(),link);
                 }
