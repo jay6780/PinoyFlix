@@ -243,9 +243,9 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 binding.llVolume.setVisibility(View.VISIBLE);
-                binding.swipe.setEnabled(false);
                 if (currentLevelIndex > 0) updateVolume(currentLevelIndex - 1);
                 showVolumeUI();
+                binding.swipe.setEnabled(false);
                 return true;
             default:
                 return super.onKeyDown(keyCode, event);
@@ -259,7 +259,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         volumeTimer = new CountDownTimer(3500, 1000) {
             public void onTick(long millisUntilFinished) {}
             public void onFinish() {
-                binding.swipe.setEnabled(true);
                 binding.llVolume.setVisibility(View.GONE);
             }
         }.start();
@@ -352,7 +351,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
     private void savedBook() {
         String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
-        DetailBean details = new DetailBean(id, timestamp, image, title, "false","","");
+        DetailBean details = new DetailBean(id, timestamp, image, title, "false");
         details.setVideoId(id);
         details.setTimeStamp(timestamp);
         bookmarkDbHelper.toggleBookmark(details, 7);
@@ -431,6 +430,9 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
     @Override
     public void showLoading() {
+        if(!binding.swipe.isEnabled()){
+            binding.swipe.setEnabled(true);
+        }
         if (!isInit) {
             binding.swipe.setRefreshing(true);
         }

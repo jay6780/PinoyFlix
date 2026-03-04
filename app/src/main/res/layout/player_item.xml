@@ -5,20 +5,20 @@
     android:id="@+id/ll_select"
     android:background="@color/white">
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_player"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+
     <TextView
-        android:id="@+id/tv_quality"
-        android:layout_width="wrap_content"
+        android:id="@+id/tv_download"
+        android:layout_below="@+id/rv_player"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
         android:textSize="16sp"
         android:textColor="@color/black"/>
-
-
-    <View
-        android:layout_below="@+id/tv_quality"
-        android:layout_width="match_parent"
-        android:background="@color/black"
-        android:layout_height="1dp"/>
 
 
 

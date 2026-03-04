@@ -15,6 +15,7 @@ import com.m.freemovie.mvp.Model.ClassBean.NineAnimeSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.OtherBean;
 import com.m.freemovie.mvp.Model.ClassBean.OthersDlBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
+import com.m.freemovie.mvp.Model.ClassBean.PinoyMediaDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.PinoyMovieRuBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
@@ -333,5 +334,9 @@ public interface MovieApi {
 
     @GET("wp/v2/search")
     Observable<List<SearchRuBean>> getSearchRu(@Query("search") String search);
+
+
+    @GET("pinoymoviepedia/download")
+    Observable<PinoyMediaDetailBean> getDetailRu(@Query("url") String url);
 
 }

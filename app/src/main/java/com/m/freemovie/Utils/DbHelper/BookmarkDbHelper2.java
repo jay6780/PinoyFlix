@@ -14,7 +14,7 @@ import java.util.List;
 public class BookmarkDbHelper2 extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "BookMarkTagalog1";
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
 
     // Bookmark table definition
     public static class BookmarkEntry {
@@ -26,8 +26,6 @@ public class BookmarkDbHelper2 extends SQLiteOpenHelper {
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_IS_TV = "is_tv";
         public static final String COLUMN_IS_MOVIE = "is_movie";
-        public static final String COLUMN_VIDEO_ID2 = "video_id2";
-        public static final String DOWNLOAD_ID = "download_id";
     }
 
     private static final String SQL_CREATE_ENTRIES =
@@ -38,9 +36,7 @@ public class BookmarkDbHelper2 extends SQLiteOpenHelper {
                     BookmarkEntry.COLUMN_IMAGE_URL + " TEXT," +
                     BookmarkEntry.COLUMN_TITLE + " TEXT," +
                     BookmarkEntry.COLUMN_IS_TV + " INTEGER DEFAULT 0," +
-                    BookmarkEntry.COLUMN_IS_MOVIE + " TEXT,"+
-                    BookmarkEntry.COLUMN_VIDEO_ID2 + " TEXT,"+
-                    BookmarkEntry.DOWNLOAD_ID + " TEXT)";
+                    BookmarkEntry.COLUMN_IS_MOVIE + " TEXT)";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + BookmarkEntry.TABLE_NAME;
@@ -89,8 +85,6 @@ public class BookmarkDbHelper2 extends SQLiteOpenHelper {
         values.put(BookmarkEntry.COLUMN_TITLE, detailBean.getMovieName());
         values.put(BookmarkEntry.COLUMN_IS_TV, position);
         values.put(BookmarkEntry.COLUMN_IS_MOVIE, detailBean.getIsMovie());
-        values.put(BookmarkEntry.COLUMN_VIDEO_ID2, detailBean.getVideoId2());
-        values.put(BookmarkEntry.DOWNLOAD_ID, detailBean.getDownloadId());
 
 //        Log.d("DB_DEBUG", "Adding bookmark: " +
 //                "videoId=" + detailBean.getVideoId() +
@@ -185,8 +179,6 @@ public class BookmarkDbHelper2 extends SQLiteOpenHelper {
                     BookmarkEntry.COLUMN_IMAGE_URL,
                     BookmarkEntry.COLUMN_TITLE,
                     BookmarkEntry.COLUMN_IS_MOVIE,
-                    BookmarkEntry.COLUMN_VIDEO_ID2,
-                    BookmarkEntry.DOWNLOAD_ID,
             };
 
             String selection = BookmarkEntry.COLUMN_IS_TV + " = ?";
@@ -210,8 +202,6 @@ public class BookmarkDbHelper2 extends SQLiteOpenHelper {
                 detail.setTempImage(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_IMAGE_URL)));
                 detail.setMovieName(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_TITLE)));
                 detail.setMovie(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_IS_MOVIE)));
-                detail.setVideoId2(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.COLUMN_VIDEO_ID2)));
-                detail.setDownloadId(cursor.getString(cursor.getColumnIndexOrThrow(BookmarkEntry.DOWNLOAD_ID)));
                 bookmarks.add(detail);
             }
         } catch (Exception e) {

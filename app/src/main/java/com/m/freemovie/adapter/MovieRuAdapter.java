@@ -39,8 +39,6 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
             .writeTimeout(10, TimeUnit.SECONDS)
             .build();
     private static final Pattern THUMB_PATTERN = Pattern.compile("<img itemprop=\"image\" src=\"([^\"]+)\"");
-    private static final Pattern VIDEO_PATTERN = Pattern.compile("https://voe\\.sx/e/([a-zA-Z0-9]+)");
-    private static final Pattern VIDEO_PATTERN2 = Pattern.compile("https://myvidplay\\.com/e/([a-zA-Z0-9]+)");
 
     private static final RequestOptions GLIDE_OPTIONS = new RequestOptions()
             .placeholder(R.drawable.noimage)
@@ -68,7 +66,7 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
             oldTask.cancel(true);
         }
         Random random = new Random();
-        if(type == 0){
+        if (type == 0) {
             int roll = random.nextInt(4) + 1;
             type = roll;
         }
@@ -87,16 +85,13 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
         helper.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (item.getVideoId() == null && item.getVideoIdSecond() == null) {
+                if (item.getLink() == null) {
                     return;
                 }
                 mContext.startActivity(new Intent(mContext, OthersDetailsActivity.class)
-                        .putExtra("videoId", item.getVideoId())
-                        .putExtra("title", item.getTitle())
-                        .putExtra("image", item.getThumbnailUrl())
-                        .putExtra("videoId2", item.getVideoIdSecond())
-                        .putExtra("type",type)
-                        .putExtra("link",item.getLink()));
+                        .putExtra("type", type)
+                        .putExtra("Image", item.getThumbnailUrl())
+                        .putExtra("link", item.getLink()));
             }
         });
     }
@@ -132,8 +127,6 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
     }
 
 
-
-
     private static String fetchThumbnailFromHtml(String url) throws IOException {
         Request request = new Request.Builder()
                 .url(url)
@@ -153,44 +146,6 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
         return null;
     }
 
-    private static String FetchVideoId2(String url) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
-                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                .build();
-
-        try (Response response = OK_HTTP_CLIENT.newCall(request).execute()) {
-            if (!response.isSuccessful()) return null;
-
-            String html = response.body().string();
-            Matcher thumbMatcher2 = VIDEO_PATTERN2.matcher(html);
-
-            if (thumbMatcher2.find()) {
-                return thumbMatcher2.group(1);
-            }
-
-        }
-        return null;
-    }
-
-
-    private static String FetchVideoId(String url) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
-                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                .build();
-
-        try (Response response = OK_HTTP_CLIENT.newCall(request).execute()) {
-            if (!response.isSuccessful()) return null;
-
-            String html = response.body().string();
-            Matcher thumbMatcher = VIDEO_PATTERN.matcher(html);
-            if (thumbMatcher.find()) {
-                return thumbMatcher.group(1);
-            }
-        }
-        return null;
-    }
 
     private static class ThumbnailFetchTask extends AsyncTask<Void, Void, String> {
         private final WeakReference<ImageView> imageViewRef;
@@ -226,19 +181,10 @@ public class MovieRuAdapter extends BaseQuickAdapter<PinoyRuBean, BaseViewHolder
                 }
 
                 thumbnailUrl = fetchThumbnailFromHtml(item.getLink());
-                videoId = FetchVideoId(item.getLink());
-                videoId2 = FetchVideoId2(item.getLink());
 
                 if (thumbnailUrl != null) {
                     item.setThumbnailUrl(thumbnailUrl);
                     THUMBNAIL_CACHE.put(item.getLink(), thumbnailUrl);
-                }
-
-                if (videoId2 != null) {
-                    item.setVideoIdSecond(videoId2);
-                }
-                if (videoId != null) {
-                    item.setVideoId(videoId);
                 }
                 return thumbnailUrl;
 

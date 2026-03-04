@@ -220,7 +220,6 @@ public class TagalogWebviewActivity extends AppCompatActivity
         volumeTimer = new CountDownTimer(3500, 1000) {
             public void onTick(long millisUntilFinished) {}
             public void onFinish() {
-                binding.swipe.setEnabled(true);
                 binding.llVolume.setVisibility(View.GONE);
             }
         }.start();
@@ -328,6 +327,7 @@ public class TagalogWebviewActivity extends AppCompatActivity
 
     private void defaultScreen(){
         finishing = true;
+        binding.swipe.setEnabled(true);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         binding.expand.setVisibility(View.VISIBLE);
         if(isMovie){
@@ -382,7 +382,7 @@ public class TagalogWebviewActivity extends AppCompatActivity
         }else{
             type = "false";
         }
-        DetailBean details = new DetailBean(id, timestamp, image, title,type,"","");
+        DetailBean details = new DetailBean(id, timestamp, image, title,type);
         details.setVideoId(id);
         details.setTimeStamp(timestamp);
         bookmarkDbHelper.toggleBookmark(details, isMovie? 5:4);
@@ -459,6 +459,9 @@ public class TagalogWebviewActivity extends AppCompatActivity
 
     @Override
     public void showLoading() {
+        if(!binding.swipe.isEnabled()){
+            binding.swipe.setEnabled(true);
+        }
         binding.swipe.setRefreshing(true);
     }
 

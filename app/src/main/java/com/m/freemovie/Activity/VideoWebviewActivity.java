@@ -173,6 +173,9 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
     private void reset(){
         binding.rvMovielist.scrollToPosition(0);
         binding.llReset.setVisibility(View.GONE);
+        if(!binding.swipe.isEnabled()){
+            binding.swipe.setEnabled(true);
+        }
     }
 
     private void initGuide() {
@@ -311,15 +314,15 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
                 binding.llVolume.setVisibility(View.VISIBLE);
-                binding.swipe.setEnabled(false);
                 if (currentLevelIndex < 5) updateVolume(currentLevelIndex + 1);
                 showVolumeUI();
+                binding.swipe.setEnabled(false);
                 return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 binding.llVolume.setVisibility(View.VISIBLE);
-                binding.swipe.setEnabled(false);
                 if (currentLevelIndex > 0) updateVolume(currentLevelIndex - 1);
                 showVolumeUI();
+                binding.swipe.setEnabled(false);
                 return true;
             default:
                 return super.onKeyDown(keyCode, event);
@@ -333,7 +336,6 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         volumeTimer = new CountDownTimer(3500, 1000) {
             public void onTick(long millisUntilFinished) {}
             public void onFinish() {
-                binding.swipe.setEnabled(true);
                 binding.llVolume.setVisibility(View.GONE);
             }
         }.start();
@@ -367,6 +369,9 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
 
     @Override
     public void showLoading() {
+        if(!binding.swipe.isEnabled()){
+            binding.swipe.setEnabled(true);
+        }
         binding.swipe.setRefreshing(true);
     }
 
