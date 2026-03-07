@@ -179,7 +179,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         binding.rvSeason.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(this));
         episodeAdapter = new AnimePaheDetailAdapter(this);
         binding.rvSeason.setAdapter(episodeAdapter);
-        episodeAdapter.setNewData(episodeBeanList);
         if (!AppConstant.isAddFree) {
             loadAd();
         } else {
@@ -573,6 +572,9 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         if (episodeBean != null && episodeBean.getResults() != null) {
             isLoading = false;
             isInit = false;
+            if(isPaging){
+                episodeBeanList.clear();
+            }
             if (episodeBean.getResults().getData() != null) {
                 for (AnimePaheEpisodeBean.ResultsBean.DataBean dataBean : episodeBean.getResults().getData()) {
                     AnimePaheBeanList detailBean = new AnimePaheBeanList(String.valueOf(dataBean.getId()), String.valueOf(dataBean.getEpisode()), dataBean.getSnapshot(), dataBean.getSession());
@@ -724,7 +726,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             isNomore = false;
             page = 1;
             episodeBeanList.clear();
-            episodeAdapter.setNewData(episodeBeanList);
             detailPresenter.getEpisodeQuery(animeId, page);
             binding.spinner.setSelection(0);
             return;
@@ -741,7 +742,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         }
 
         episodeBeanList.clear();
-        episodeAdapter.setNewData(episodeBeanList);
+        binding.rvSeason.scrollToPosition(0);
         detailPresenter.getEpisodeQuery(animeId, page);
     }
 
