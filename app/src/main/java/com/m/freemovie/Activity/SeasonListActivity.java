@@ -187,21 +187,24 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
             finish();
         }
     }
-
+    private int videoPosition;
     @Override
     public void getId(String id, int position, int seasonNum, int epNumber) {
         binding.webView.clearCache(true);
         switch (position) {
             case 1:
+                videoPosition = 1;
                 videoUrl = "https://player.videasy.net/tv/"+id+"/"+seasonNum+"/"+ epNumber;
                 setupWebView(videoUrl);
                 break;
             case 2:
+                videoPosition = 2;
                 videoUrl = "https://vidrock.net/tv/" + id + "/" + seasonNum + "/" + epNumber + "&download=false";
                 setupWebView(videoUrl);
                 break;
             case 3:
-                videoUrl = "https://moviesapi.club/tv/"+id+"-"+seasonNum+"-"+epNumber;
+                videoPosition = 3;
+                videoUrl = "https://vidfast.pro/tv/"+id+"/"+seasonNum+"/"+ epNumber;
                 setupWebView(videoUrl);
                 break;
         }
@@ -223,7 +226,43 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
-        binding.webView.loadUrl(videoUrl);
+        if(videoPosition == 3){
+            String htmlContent = "<!DOCTYPE html>" +
+                    "<html>" +
+                    "<head>" +
+                    "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
+                    "    <style>" +
+                    "        .video-player {" +
+                    "            position: fixed;" +
+                    "            top: 0;" +
+                    "            left: 0;" +
+                    "            width: 100%;" +
+                    "            height: 100%;" +
+                    "            border: none;" +
+                    "            object-fit: contain; /* Makes video fill while keeping aspect ratio */" +
+                    "            background-color: #000; /* Black background for letterboxing */" +
+                    "        }" +
+                    "    </style>" +
+                    "</head>" +
+                    "<body style=\"margin:0;padding:0;overflow:hidden;background:#000;\">" +
+                    "    <iframe src=\"" + videoUrl + "\"" +
+                    "            class=\"video-player\"" +
+                    "            allow=\"autoplay; encrypted-media; fullscreen\" " +
+                    "            allowfullscreen>" +
+                    "    </iframe>" +
+                    "</body>" +
+                    "</html>";
+
+            binding.webView.loadDataWithBaseURL(
+                    null,
+                    htmlContent,
+                    "text/html",
+                    "UTF-8",
+                    null
+            );
+        }else{
+            binding.webView.loadUrl(videoUrl);
+        }
 
     }
     private void updateVolume(int index) {

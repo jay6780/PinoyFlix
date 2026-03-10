@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.ConsoleMessage;
@@ -152,7 +153,8 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 videoUrl = "https://vidrock.net/movie/"+ videoId;
                 break;
             case 3:
-                videoUrl = "https://moviesapi.club/movie/"+ videoId;
+                videoUrl = "https://vidfast.pro/movie/"+ videoId;
+//                Log.d("VideoUrl","val: "+videoUrl);
                 break;
         }
         initApi();
@@ -363,7 +365,44 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
-        binding.webView.loadUrl(videoUrl);
+        if(videoPosition == 3){
+
+            String htmlContent = "<!DOCTYPE html>" +
+                    "<html>" +
+                    "<head>" +
+                    "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
+                    "    <style>" +
+                    "        .video-player {" +
+                    "            position: fixed;" +
+                    "            top: 0;" +
+                    "            left: 0;" +
+                    "            width: 100%;" +
+                    "            height: 100%;" +
+                    "            border: none;" +
+                    "            object-fit: contain; /* Makes video fill while keeping aspect ratio */" +
+                    "            background-color: #000; /* Black background for letterboxing */" +
+                    "        }" +
+                    "    </style>" +
+                    "</head>" +
+                    "<body style=\"margin:0;padding:0;overflow:hidden;background:#000;\">" +
+                    "    <iframe src=\"" + videoUrl + "\"" +
+                    "            class=\"video-player\"" +
+                    "            allow=\"autoplay; encrypted-media; fullscreen\" " +
+                    "            allowfullscreen>" +
+                    "    </iframe>" +
+                    "</body>" +
+                    "</html>";
+
+            binding.webView.loadDataWithBaseURL(
+                    null,
+                    htmlContent,
+                    "text/html",
+                    "UTF-8",
+                    null
+            );
+        }else{
+            binding.webView.loadUrl(videoUrl);
+        }
 
     }
 
@@ -435,15 +474,18 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         binding.webView.clearCache(true);
         switch (position){
             case 1:
+                videoPosition = 1;
                 videoUrl ="https://player.videasy.net/movie/"+id;
                 setupWebView(videoUrl);
                 break;
             case 2:
+                videoPosition = 2;
                 videoUrl = "https://vidrock.net/movie/"+ id;
                 setupWebView(videoUrl);
                 break;
             case 3:
-                videoUrl = "https://moviesapi.club/movie/"+ id;
+                videoPosition = 3;
+                videoUrl = "https://vidfast.pro/movie/"+ id;
                 setupWebView(videoUrl);
                 break;
         }
@@ -479,20 +521,25 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
             return handleUrlLoading(view, url);
         }
         private boolean handleUrlLoading(WebView view, String url) {
-            if (url.contains(videoUrl)) {
-                return false;
-            } else if (url.contains("dl.vidsrc.vip")) {
+            try {
+                if (url.contains(videoUrl)) {
+                    return false;
+                } else if (url.contains("dl.vidsrc.vip")) {
 //                Log.d("VideOUrl", "value: " + url);
-                String downloadUrl = "https://dl.vidsrc.vip/movie/" + videoId;
-                Intent intent = new Intent(getApplicationContext(), DownloadWebview.class);
-                intent.putExtra("DownloadUrl", downloadUrl);
-                intent.putExtra("EpisodeNum", "");
-                intent.putExtra("title", title);
-                startActivity(intent);
-                return true;
-            } else {
-                return true;
+                    String downloadUrl = "https://dl.vidsrc.vip/movie/" + videoId;
+                    Intent intent = new Intent(getApplicationContext(), DownloadWebview.class);
+                    intent.putExtra("DownloadUrl", downloadUrl);
+                    intent.putExtra("EpisodeNum", "");
+                    intent.putExtra("title", title);
+                    startActivity(intent);
+                    return true;
+                } else {
+                    return true;
+                }
+            }catch (Exception e){
+                e.printStackTrace();
             }
+            return false;
         }
         @Override
         public void onPageFinished(WebView view, String url) {

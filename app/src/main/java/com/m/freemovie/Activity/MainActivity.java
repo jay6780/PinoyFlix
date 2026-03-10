@@ -117,12 +117,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             public void onFinish() {
-                initializeBottomNavigation();
                 initPermission();
             }
 
         }.start();
 
+        initializeBottomNavigation();
     }
 
     private void startHourCount() {
@@ -196,45 +196,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE,android.Manifest.permission.READ_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
     }
     private void initializeBottomNavigation() {
-        binding.nav.add(new MeowBottomNavigation.Model(1, R.drawable.ic_baseline_search_24));
-        binding.nav.add(new MeowBottomNavigation.Model(2, R.drawable.ic_baseline_home_24));
-        binding.nav.add(new MeowBottomNavigation.Model(3, R.drawable.unbooked));
+        try {
+            Fragment searchFragment;
+            Fragment movieFragment;
+            Fragment bookmarkFragment;
 
-        Fragment searchFragment = new SearchFragment();
-        Fragment movieFragment = new HomeFragment();
-        Fragment bookmarkFragment = new BookmarkFragment();
+            if (getSupportFragmentManager().findFragmentByTag("movie") != null) {
+                searchFragment = getSupportFragmentManager().findFragmentByTag("search");
+                movieFragment = getSupportFragmentManager().findFragmentByTag("movie");
+                bookmarkFragment = getSupportFragmentManager().findFragmentByTag("bookmark");
+            } else {
+                searchFragment = new SearchFragment();
+                movieFragment = new HomeFragment();
+                bookmarkFragment = new BookmarkFragment();
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.fragment_container, movieFragment, "movie")
-                .add(R.id.fragment_container, searchFragment, "search")
-                .add(R.id.fragment_container, bookmarkFragment, "bookmark")
-                .hide(searchFragment)
-                .hide(bookmarkFragment)
-                .commit();
-
-        binding.nav.setOnClickMenuListener(model -> {
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.hide(searchFragment)
-                    .hide(movieFragment)
-                    .hide(bookmarkFragment);
-            switch (model.getId()) {
-                case 1:
-                    transaction.show(searchFragment);
-                    break;
-                case 2:
-                    transaction.show(movieFragment);
-                    break;
-                case 3:
-                    transaction.show(bookmarkFragment);
-                    break;
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container, searchFragment, "search").hide(searchFragment)
+                        .add(R.id.fragment_container, bookmarkFragment, "bookmark").hide(bookmarkFragment)
+                        .add(R.id.fragment_container, movieFragment, "movie")
+                        .commit();
             }
 
-            transaction.commit();
-            return null;
-        });
+            binding.nav.add(new MeowBottomNavigation.Model(1, R.drawable.ic_baseline_search_24));
+            binding.nav.add(new MeowBottomNavigation.Model(2, R.drawable.ic_baseline_home_24));
+            binding.nav.add(new MeowBottomNavigation.Model(3, R.drawable.unbooked));
 
-        binding.nav.show(2, true);
+            binding.nav.setOnClickMenuListener(model -> {
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+                switch (model.getId()) {
+                    case 1:
+                        transaction.show(searchFragment).hide(movieFragment).hide(bookmarkFragment);
+                        break;
+                    case 2:
+                        transaction.show(movieFragment).hide(searchFragment).hide(bookmarkFragment);
+                        break;
+                    case 3:
+                        transaction.show(bookmarkFragment).hide(searchFragment).hide(movieFragment);
+                        break;
+                }
+                transaction.commit();
+                return null;
+            });
+            binding.nav.show(2, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -25,12 +25,13 @@ public class DetailAdapter extends BaseQuickAdapter<DetailBean, BaseViewHolder> 
     @Override
 
     protected void convert(BaseViewHolder helper, DetailBean item) {
-        TextView tv_title  = helper.getView(R.id.tv_title);
+        TextView tv_title = helper.getView(R.id.tv_title);
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
 
         Glide.with(mContext)
-                .asBitmap().
-                load(item.getTempImage())
+                .asBitmap()
+                .load(item.getTempImage())
+                .placeholder(R.drawable.noimage)
                 .into(iv_thumb);
 
         tv_title.setText(item.getMovieName());
@@ -39,45 +40,45 @@ public class DetailAdapter extends BaseQuickAdapter<DetailBean, BaseViewHolder> 
             @Override
             public void onClick(View view) {
                 Intent intent = null;
-                switch (position){
+                switch (position) {
                     case 1:
                     case 2:
                         intent = new Intent(mContext, Details_activity.class);
-                        intent.putExtra("id",item.getVideoId());
-                        intent.putExtra("position",position);
+                        intent.putExtra("id", item.getVideoId());
+                        intent.putExtra("position", position);
                         break;
                     case 3:
                         intent = new Intent(mContext, AnimeDetailsActivity.class);
-                        intent.putExtra("imageUrl",item.getTempImage());
-                        intent.putExtra("url",item.getVideoId());
-                        intent.putExtra("title",item.getMovieName());
-                        intent.putExtra("apiPosition",2);
+                        intent.putExtra("imageUrl", item.getTempImage());
+                        intent.putExtra("url", item.getVideoId());
+                        intent.putExtra("title", item.getMovieName());
+                        intent.putExtra("apiPosition", 2);
                         break;
                     case 4:
                         intent = new Intent(mContext, AnimeDetailsActivity.class);
-                        intent.putExtra("apiPosition",3);
-                        intent.putExtra("id",item.getVideoId());
+                        intent.putExtra("apiPosition", 3);
+                        intent.putExtra("id", item.getVideoId());
                         break;
                     case 5:
                         intent = new Intent(mContext, AnimeDetailsActivity.class);
-                        intent.putExtra("apiPosition",4);
-                        intent.putExtra("id",item.getVideoId());
+                        intent.putExtra("apiPosition", 4);
+                        intent.putExtra("id", item.getVideoId());
                         break;
 
                     case 6:
                         intent = new Intent(mContext, AnimeDetailsActivity.class);
-                        intent.putExtra("videoId",item.getVideoId());
+                        intent.putExtra("videoId", item.getVideoId());
                         break;
                     case 7:
                         intent = new Intent(mContext, AnimeDetailsActivity.class);
-                        intent.putExtra("id",item.getVideoId());
-                        intent.putExtra("apiPosition",1);
+                        intent.putExtra("id", item.getVideoId());
+                        intent.putExtra("apiPosition", 1);
                         break;
 
                     case 8:
                         intent = new Intent(mContext, OthersDetailsActivity.class);
-                        intent.putExtra("link",item.getVideoId());
-                        intent.putExtra("Image",item.getTempImage());
+                        intent.putExtra("link", item.getVideoId());
+                        intent.putExtra("Image", item.getTempImage());
                         break;
 
                 }

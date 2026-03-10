@@ -42,6 +42,11 @@ import com.app.hubert.guide.core.Controller;
 import com.app.hubert.guide.listener.OnGuideChangedListener;
 import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
@@ -94,6 +99,8 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     private boolean isInit = true;
     private boolean isDownload = false;
     private String episode = "";
+    private AdView adView;
+    private RelativeLayout.LayoutParams params;
     private SpinnerTotalDbHelper spinnerTotalDbHelper;
     private int totalPages = 0;
     private List<String> spinnerItems = new ArrayList<>();
@@ -173,7 +180,11 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         episodeAdapter = new AnimePaheDetailAdapter(this);
         binding.rvSeason.setAdapter(episodeAdapter);
         episodeAdapter.setNewData(episodeBeanList);
-
+        if (!AppConstant.isAddFree) {
+            loadAd();
+        } else {
+            loadAdsFailed();
+        }
         try {
             booster = new LoudnessEnhancer(0);
             booster.setEnabled(true);
@@ -217,6 +228,47 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 R.layout.spinner_item, spinnerItems);
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         binding.spinner.setAdapter(adapter);
+    }
+
+    @SuppressLint("MissingPermission")
+    private void loadAd() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView = new AdView(AnimePaheWebviewActivity.this);
+        adView.setAdUnitId(getString(R.string.banner_adId));
+        adView.setAdSize(AdSize.BANNER);
+        binding.adTvSeries.removeAllViews();
+        binding.adTvSeries.addView(adView);
+        adView.loadAd(adRequest);
+        if (adView != null) {
+            adView.setAdListener(
+                    new AdListener() {
+                        @Override
+                        public void onAdClicked() {
+                        }
+
+                        @Override
+                        public void onAdClosed() {
+                        }
+
+                        @Override
+                        public void onAdFailedToLoad(@NonNull LoadAdError adError) {
+                            loadAdsFailed();
+                        }
+
+                        @Override
+                        public void onAdImpression() {
+                        }
+
+                        @Override
+                        public void onAdLoaded() {
+                            loadAdsSuccess();
+                        }
+
+                        @Override
+                        public void onAdOpened() {
+                        }
+                    });
+        }
     }
 
     private void updateVolume(int index) {
@@ -265,6 +317,34 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     }
 
 
+    private void loadAdsFailed() {
+        params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        params.addRule(RelativeLayout.BELOW, binding.rlOption.getId());
+        binding.rvSeason.setLayoutParams(params);
+        binding.adTvSeries.removeAllViews();
+        binding.adTvSeries.setVisibility(View.GONE);
+        binding.llAds.setVisibility(View.GONE);
+    }
+
+    private void loadAdsSuccess() {
+        binding.adTvSeries.setVisibility(View.VISIBLE);
+        binding.llAds.setVisibility(View.VISIBLE);
+        params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+        params.addRule(RelativeLayout.ABOVE, binding.llAds.getId());
+        params.addRule(RelativeLayout.BELOW, binding.rlOption.getId());
+        binding.rvSeason.setLayoutParams(params);
+
+        new CountDownTimer(10000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+            }
+
+            public void onFinish() {
+                loadAdsFailed();
+            }
+
+        }.start();
+    }
 
     private void initGuide() {
         NewbieGuide.with(this)
@@ -300,6 +380,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         binding.llBookmark.setVisibility(View.GONE);
         binding.swipe.setEnabled(false);
         binding.spinner.setVisibility(isPaging ? View.VISIBLE : View.GONE);
+        loadAdsFailed();
         new WindowUtils(this, true, false);
     }
 
@@ -492,6 +573,9 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         if (episodeBean != null && episodeBean.getResults() != null) {
             isLoading = false;
             isInit = false;
+            if(isPaging){
+                episodeBeanList.clear();
+            }
             if (episodeBean.getResults().getData() != null) {
                 for (AnimePaheEpisodeBean.ResultsBean.DataBean dataBean : episodeBean.getResults().getData()) {
                     AnimePaheBeanList detailBean = new AnimePaheBeanList(String.valueOf(dataBean.getId()), String.valueOf(dataBean.getEpisode()), dataBean.getSnapshot(), dataBean.getSession());
@@ -660,7 +744,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         }
 
         episodeBeanList.clear();
-        episodeAdapter.setNewData(episodeBeanList);
+        binding.rvSeason.scrollToPosition(0);
         detailPresenter.getEpisodeQuery(animeId, page);
     }
 
