@@ -2,6 +2,7 @@ package com.m.freemovie.Retrofit;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.m.freemovie.Utils.dns.IPv4FirstDns;
 
 import java.security.cert.CertificateException;
 import java.util.concurrent.TimeUnit;
@@ -77,6 +78,7 @@ public class Tagalogdubretrofitadapter {
             builder.connectTimeout(60, TimeUnit.SECONDS);
             builder.writeTimeout(60, TimeUnit.SECONDS);
             builder.readTimeout(120, TimeUnit.SECONDS);
+            builder.dns(new IPv4FirstDns());
             builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
             builder.hostnameVerifier(new HostnameVerifier() {
                 @Override
