@@ -480,7 +480,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 break;
             case 2:
                 videoPosition = 2;
-                videoUrl = "https://vidrock.net/movie/"+ id;
+                videoUrl = "https://vidrock.net/movie/&download=false"+ id;
                 setupWebView(videoUrl);
                 break;
             case 3:
@@ -518,21 +518,12 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
             String url = request.getUrl().toString();
-            return handleUrlLoading(view, url);
+            return handleUrlLoading(url);
         }
-        private boolean handleUrlLoading(WebView view, String url) {
+        private boolean handleUrlLoading( String url) {
             try {
                 if (url.contains(videoUrl)) {
                     return false;
-                } else if (url.contains("dl.vidsrc.vip")) {
-//                Log.d("VideOUrl", "value: " + url);
-                    String downloadUrl = "https://dl.vidsrc.vip/movie/" + videoId;
-                    Intent intent = new Intent(getApplicationContext(), DownloadWebview.class);
-                    intent.putExtra("DownloadUrl", downloadUrl);
-                    intent.putExtra("EpisodeNum", "");
-                    intent.putExtra("title", title);
-                    startActivity(intent);
-                    return true;
                 } else {
                     return true;
                 }

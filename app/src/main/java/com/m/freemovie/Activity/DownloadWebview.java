@@ -3,15 +3,21 @@ package com.m.freemovie.Activity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
+import android.webkit.JsPromptResult;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -89,8 +95,25 @@ public class DownloadWebview extends AppCompatActivity {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
 
+        binding.webView.setWebChromeClient(new CustomWebChromeClient() {
+        });
 
         binding.webView.setWebViewClient(new WebViewClient() {
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                String url = request.getUrl().toString().toLowerCase();
+                if (url.contains("adsystem") || url.contains("adservice") ||
+                        url.contains("popads") || url.contains("onclickads") ||
+                        url.contains("doublestack") || url.contains("propush")) {
+
+                    return new WebResourceResponse("text/plain", "utf-8",
+                            new java.io.ByteArrayInputStream("".getBytes()));
+                }
+
+                return super.shouldInterceptRequest(view, request);
+            }
+
             @Override
             public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
@@ -100,6 +123,20 @@ public class DownloadWebview extends AppCompatActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 hud.dismiss();
+                view.loadUrl("javascript:(function() { " +
+                        "var css = 'div[class*=\"modal\"], div[id*=\"modal\"], div[class*=\"popup\"], ' + " +
+                        "          'div[class*=\"overlay\"], section[class*=\"modal\"], .animated.fadeIn { display: none !important; }';" +
+                        "var head = document.getElementsByTagName('head')[0];" +
+                        "var style = document.createElement('style');" +
+                        "style.type = 'text/css';" +
+                        "style.appendChild(document.createTextNode(css));" +
+                        "head.appendChild(style);" +
+                        "var checkInterval = setInterval(function() { " +
+                        "  var elements = document.querySelectorAll(\"div[class*='modal'], div[id*='modal'], div[class*='popup']\");" +
+                        "  for (var i = 0; i < elements.length; i++) { elements[i].remove(); }" +
+                        "}, 1000);" +
+                        "setTimeout(function() { clearInterval(checkInterval); }, 5000);" +
+                        "})()");
             }
 
             @Override
@@ -110,10 +147,21 @@ public class DownloadWebview extends AppCompatActivity {
 
             private boolean handleUrlLoading(WebView view, String url) {
 //                Log.e("VideoSelect","val: "+url);
+                if (url.startsWith("intent://") || url.startsWith("market://") || !url.startsWith("http")) {
+                    Log.e("VideoSelect", "BLOCKED EXTERNAL INTENT: " + url);
+                    return true;
+                }
+
+                String path = url.toLowerCase();
+                if (path.contains("api/users") || path.contains("invoke_layer")) {
+                    return true;
+                }
+
                 if (isAllowedUrl(url)) {
                     return false;
                 } else if (url.contains(blockUrl)) {
                     if(!blockUrl.isEmpty()){
+                        view.stopLoading();
                         return true;
                     }else{
                         return false;
@@ -126,6 +174,10 @@ public class DownloadWebview extends AppCompatActivity {
             }
 
         });
+
+
+
+
 
 
 
@@ -152,10 +204,41 @@ public class DownloadWebview extends AppCompatActivity {
 
     }
 
+    private class CustomWebChromeClient extends WebChromeClient {
+        @Override
+        public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+            result.cancel();
+            return true;
+        }
+
+        @Override
+        public boolean onJsConfirm(WebView view, String url, String message, JsResult result) {
+            result.cancel();
+            return true;
+        }
+
+        @Override
+        public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+            result.cancel();
+            return true;
+        }
+        @Override
+        public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+            return true;
+        }
+
+        @Override
+        public Bitmap getDefaultVideoPoster() {
+            return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888);
+        }
+
+
+    }
 
     private boolean isAllowedUrl(String url) {
         String[] allowedPatterns = {
                 "^https?://vidsrc\\..*",
+                "^https?://vidvault\\.ru.*",
                 "^https?://cardfightvanguard\\..*",
                 "^https?://mkv.dl5cg77imb\\..*",
                 "^https?://pahe\\.win.*",
@@ -177,6 +260,7 @@ public class DownloadWebview extends AppCompatActivity {
                 "^https?://.*.cloudatacdn.*",
                 "^https?://.*/download/.*"
         };
+
 
         String lowerUrl = url.toLowerCase();
         if (lowerUrl.contains(".mp4") || lowerUrl.contains(".mkv") ||
@@ -473,6 +557,8 @@ public class DownloadWebview extends AppCompatActivity {
         webSettings.setDisplayZoomControls(false);
         webSettings.setBuiltInZoomControls(false);
         webSettings.setSupportZoom(false);
+        webSettings.setSupportMultipleWindows(false); // Make sure this is false
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(false);
 //        String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 //        webSettings.setUserAgentString(userAgent);
         webSettings.setMediaPlaybackRequiresUserGesture(false);

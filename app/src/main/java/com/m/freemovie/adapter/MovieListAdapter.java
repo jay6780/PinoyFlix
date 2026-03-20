@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.bumptech.glide.Glide;
 import com.m.freemovie.Activity.Details_activity;
+import com.m.freemovie.Activity.DownloadWebview;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
@@ -68,7 +69,7 @@ public class MovieListAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Ba
 
     private void showDialog(MovieBean.ResultsBean item, BaseViewHolder helper) {
 
-        String[] option = {"Player 1","Player 2","Player 3" ,"View Details"};
+        String[] option = {"Player 1","Player 2","Player 3" ,"View Details","Download"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setItems(option, new DialogInterface.OnClickListener() {
@@ -98,6 +99,14 @@ public class MovieListAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Ba
                         intent.putExtra("position",1);
                         intent.putExtra("apiPosition",apiPosition);
                         mContext.startActivity(intent);
+                        break;
+                    case 4:
+                        String downloadUrl = "https://vidvault.ru/movie/" + item.getId();
+                        Intent download = new Intent(mContext, DownloadWebview.class);
+                        download.putExtra("DownloadUrl", downloadUrl);
+                        download.putExtra("EpisodeNum", "");
+                        download.putExtra("title", item.getTitle());
+                        mContext.startActivity(download);
                         break;
                 }
             }
