@@ -104,7 +104,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
     private void initApi() {
         switch (apiPosition){
             case 1:
-                url = "https://animepahe.si/anime/"+id;
+                url = "https://animepahe.com/anime/"+id;
                 presenter.getDetailAnimePaHe(url);
                 break;
             case 2:

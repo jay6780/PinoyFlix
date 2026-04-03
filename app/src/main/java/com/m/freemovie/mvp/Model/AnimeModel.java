@@ -2,6 +2,7 @@ package com.m.freemovie.mvp.Model;
 
 import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.Retrofit.NetworkingUtils;
+import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
@@ -37,18 +38,18 @@ public class AnimeModel {
                 });
     }
 
-    public static void getHot(final Callback<TagalogBean> callback) {
+    public static void getHot(int page,final Callback<AnimoPageBean> callback) {
         NetworkingUtils.getTagalogDub()
-                .getTagalogSeries()
+                .getAnimoPage(page)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Observer<TagalogBean>() {
+                .subscribe(new Observer<AnimoPageBean>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                     }
 
                     @Override
-                    public void onNext(TagalogBean data) {
+                    public void onNext(AnimoPageBean data) {
                         callback.returnResult(data);
                     }
 

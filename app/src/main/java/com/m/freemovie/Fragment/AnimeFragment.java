@@ -25,6 +25,7 @@ import com.m.freemovie.adapter.AnimePopularAdapter;
 import com.m.freemovie.adapter.HotAdapter;
 import com.m.freemovie.adapter.NewestAdapter;
 import com.m.freemovie.databinding.FragmentAnimeBinding;
+import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
@@ -43,7 +44,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
     private AnimePopularAdapter animePopularAdapter;
     private AnimeMovieAdapter movieAdapter;
     private List<PaheLatestBean.ResultsBean.DataBean> newestList = new ArrayList<>();
-    private List<TagalogBean.ResultsBean> hotList = new ArrayList<>();
+    private List<AnimoPageBean.ResultsBean> hotList = new ArrayList<>();
     private List<RevivalSeriesBean.ResultsBean> popularList = new ArrayList<>();
     private List<RevivalSeriesBean.ResultsBean> movieList = new ArrayList<>();
     @Override
@@ -53,7 +54,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         presenter = new AnimePresenter(this);
         if(isNetworkAvailable()){
             presenter.getNewestPage(page);
-            presenter.getHotPage();
+//            presenter.getHotPage(page);
             presenter.getPopular(page);
             presenter.getMovie(page);
         }else{
@@ -94,7 +95,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         clearAllData();
         page = 1;
         presenter.getNewestPage(page);
-        presenter.getHotPage();
+        presenter.getHotPage(page);
         presenter.getPopular(page);
         presenter.getMovie(page);
     }
@@ -200,11 +201,11 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
     }
 
     @Override
-    public void getHot(TagalogBean tagalogBean) {
-        if(tagalogBean !=null && tagalogBean.getResults() !=null){
-            if(!tagalogBean.getResults().isEmpty()){
+    public void getHot(AnimoPageBean animoPageBean) {
+        if(animoPageBean !=null && animoPageBean.getResults() !=null){
+            if(!animoPageBean.getResults().isEmpty()){
                 for (int i = 0; i < 10 ; i ++){
-                    hotList.add(tagalogBean.getResults().get(i));
+                    hotList.add(animoPageBean.getResults().get(i));
                 }
                 hotAdapter.setNewData(hotList);
                 binding.rvHot.setVisibility(View.VISIBLE);

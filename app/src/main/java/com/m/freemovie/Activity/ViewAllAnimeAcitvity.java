@@ -24,6 +24,7 @@ import com.m.freemovie.R;
 import com.m.freemovie.adapter.ViewAllAnimeAdapter;
 import com.m.freemovie.databinding.ActivityViewAllAnimeAcitvityBinding;
 import com.m.freemovie.mvp.Model.ClassBean.AnimeItemBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
@@ -81,9 +82,6 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
 
                     if (lastVisiblePosition >= animeItemBeanList.size() - 1) {
                         if (isNomore) {
-                            return;
-                        }
-                        if(position == 2){
                             return;
                         }
                         isLoading = true;
@@ -156,7 +154,7 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
                 presenter.getNewestPage(page);
                 break;
             case 2:
-                presenter.getHotPage();
+                presenter.getHotPage(page);
                 break;
             case 3:
                 presenter.getPopular(page);
@@ -223,13 +221,13 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
     }
 
     @Override
-    public void getHot(TagalogBean tagalogBean) {
-        if(tagalogBean !=null && tagalogBean.getResults() !=null){
+    public void getHot(AnimoPageBean animoPageBean) {
+        if(animoPageBean !=null && animoPageBean.getResults() !=null){
             isLoading = false;
-            if(tagalogBean.getResults() !=null){
-                if(!tagalogBean.getResults().isEmpty()){
-                    for(TagalogBean.ResultsBean dataBean : tagalogBean.getResults()){
-                        animeItemBeanList.add(new AnimeItemBean(dataBean.getLink(),dataBean.getTitle(),dataBean.getImage()));
+            if(animoPageBean.getResults() !=null){
+                if(!animoPageBean.getResults().isEmpty()){
+                    for(AnimoPageBean.ResultsBean dataBean : animoPageBean.getResults()){
+                        animeItemBeanList.add(new AnimeItemBean(dataBean.getLink(),dataBean.getTitle(),dataBean.getImg()));
                     }
                     viewAllAnimeAdapter.setNewData(animeItemBeanList);
                 }else{

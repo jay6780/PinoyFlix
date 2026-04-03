@@ -641,6 +641,11 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             Toast.makeText(getContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
             return;
         }
+
+        if(position == 3 ){
+            Toast.makeText(getContext(),"We fix soon please wait for update!",Toast.LENGTH_SHORT).show();
+            return;
+        }
         switch (position){
             case 1:
                 et_search.setHint("Enter movie name");
