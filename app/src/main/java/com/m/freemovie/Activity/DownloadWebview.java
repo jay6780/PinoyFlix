@@ -146,7 +146,7 @@ public class DownloadWebview extends AppCompatActivity {
             }
 
             private boolean handleUrlLoading(WebView view, String url) {
-//                Log.e("VideoSelect","val: "+url);
+                Log.e("VideoSelect","val: "+url);
                 if (url.startsWith("intent://") || url.startsWith("market://") || !url.startsWith("http")) {
                     Log.e("VideoSelect", "BLOCKED EXTERNAL INTENT: " + url);
                     return true;

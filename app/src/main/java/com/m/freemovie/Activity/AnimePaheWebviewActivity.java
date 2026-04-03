@@ -127,7 +127,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         binding.expand.setOnClickListener(view -> rotateScreen());
         binding.llBookmark.setOnClickListener(view -> savedBook());
         detailPresenter = new AnimePaheDetailPresenter(this);
-        url = "https://animepahe.si/anime/" + id;
+        url = "https://animepahe.com/anime/" + id;
         spinnerTotalDbHelper = new SpinnerTotalDbHelper(this);
         if (isNetworkAvailable()) {
             detailPresenter.getDetailQuery(url);
@@ -713,7 +713,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             if (!streamingBeanList.isEmpty()) {
                 streamingBeanList.clear();
             }
-            String url = "https://animepahe.si/play/" + animeId + "/" + videoUrl;
+            String url = "https://animepahe.com/play/" + animeId + "/" + videoUrl;
             detailPresenter.getTrackQuery(url);
         }
     }
