@@ -3,6 +3,7 @@ package com.m.freemovie.mvp.Presenter;
 import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
+import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
@@ -46,9 +47,9 @@ public class AnimePresenter implements AnimeContract.Presenter {
     }
 
     @Override
-    public void getHotPage() {
+    public void getHotPage(int page) {
         view.showLoading();
-        AnimeModel.getHot(new Callback<TagalogBean>() {
+        AnimeModel.getHot(page,new Callback<AnimoPageBean>() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
             }
@@ -58,7 +59,7 @@ public class AnimePresenter implements AnimeContract.Presenter {
             }
 
             @Override
-            public void returnResult(TagalogBean apiBean) {
+            public void returnResult(AnimoPageBean apiBean) {
                 view.hideLoading();
                 view.getHot(apiBean);
             }

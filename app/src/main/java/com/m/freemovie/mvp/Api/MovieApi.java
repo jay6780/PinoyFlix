@@ -4,6 +4,7 @@ import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDownloadBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.DetailDownloadBean;
 import com.m.freemovie.mvp.Model.ClassBean.DetailTvBean;
@@ -338,5 +339,13 @@ public interface MovieApi {
 
     @GET("pinoymoviepedia/download")
     Observable<PinoyMediaDetailBean> getDetailRu(@Query("url") String url);
+
+
+    //animotv
+
+    @GET("animotvslash/latest-release")
+    Observable<AnimoPageBean> getAnimoPage(
+            @Query("page") int page);
+
 
 }
