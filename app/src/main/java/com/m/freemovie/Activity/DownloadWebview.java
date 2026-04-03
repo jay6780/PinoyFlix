@@ -99,16 +99,50 @@ public class DownloadWebview extends AppCompatActivity {
         });
 
         binding.webView.setWebViewClient(new WebViewClient() {
-
             @Override
-            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+            public android.webkit.WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString().toLowerCase();
-                if (url.contains("adsystem") || url.contains("adservice") ||
-                        url.contains("popads") || url.contains("onclickads") ||
-                        url.contains("doublestack") || url.contains("propush")) {
 
-                    return new WebResourceResponse("text/plain", "utf-8",
-                            new java.io.ByteArrayInputStream("".getBytes()));
+                String[] blockedDomains = {
+                        "bobapsoabauns.com",
+                        "stake.com",
+                        "doubleclick.net",
+                        "googlesyndication.com",
+                        "exoclick.com",
+                        "juicyads.com",
+                        "trafficstars.com",
+                        "popads.net",
+                        "propellerads.com",
+                        "adnium.com",
+                        "tsyndicate.com",
+                        "creative-sb1.com",
+                        "interstitial",
+                        "blockadsnot.com",
+                        "challenges.cloudflare.com",
+                        "pluckedflayers.cfd",
+                        "adsco.re",
+                        "ad.a-ads.com",
+                        "www.googletagmanager.com",
+                        "accounts.google.com",
+                        "www.facebook.com/login.php",
+                        "gz.shopebinful.cyou/sbx",
+                        "dnhfi5nn2dt67.cloudfront.net",
+                        "i.doodcdn.io",
+                        "www.bgspbutjffz.com","c.adsco.re",
+                        "bgspbutjffz.com",
+                        "aagldlagh.com"
+                };
+
+                for (String blocked : blockedDomains) {
+                    if (url.contains(blocked)) {
+//                        Log.e("VideoSelect", "INTERCEPTED & BLOCKED: " + url);
+                        return new android.webkit.WebResourceResponse(
+                                "text/plain", "utf-8",
+                                new java.io.ByteArrayInputStream("".getBytes())
+                        );
+                    }else{
+//                        Log.e("NotBlocked", "INTERCEPTED & BLOCKED: " + url);
+                    }
                 }
 
                 return super.shouldInterceptRequest(view, request);
@@ -146,7 +180,7 @@ public class DownloadWebview extends AppCompatActivity {
             }
 
             private boolean handleUrlLoading(WebView view, String url) {
-                Log.e("VideoSelect","val: "+url);
+//                Log.e("VideoSelect","val: "+url);
                 if (url.startsWith("intent://") || url.startsWith("market://") || !url.startsWith("http")) {
                     Log.e("VideoSelect", "BLOCKED EXTERNAL INTENT: " + url);
                     return true;
