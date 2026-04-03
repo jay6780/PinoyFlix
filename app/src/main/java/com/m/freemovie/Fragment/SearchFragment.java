@@ -49,7 +49,6 @@ import com.m.freemovie.mvp.Contract.SearchContract;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeSearchBean;
-import com.m.freemovie.mvp.Model.ClassBean.PinoyMovieRuBean;
 import com.m.freemovie.mvp.Model.ClassBean.PinoyRuBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.SearchRuBean;

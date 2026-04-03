@@ -9,26 +9,18 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.hubert.guide.NewbieGuide;
-import com.google.android.gms.ads.AdError;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.appopen.AppOpenAd;
 import com.m.freemovie.Fragment.BookmarkFragment;
 import com.m.freemovie.Fragment.HomeFragment;
 import com.m.freemovie.Fragment.SearchFragment;
@@ -41,7 +33,6 @@ import com.m.freemovie.databinding.ActivityMainBinding;
 import com.m.freemovie.mvp.Model.ClassBean.OptionBean;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -54,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int RESET_GUIDE_REQUEST_CODE = 100;
     private long pressedTime;
     private String TAG = "MainAd";
-    private AppOpenAd appOpenAd;
     private RecyclerView rv_option;
     private OptionAdapter optionAdapter;
     private List<OptionBean> optionBeanList = new ArrayList<>();
@@ -131,9 +121,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
         }.start();
-        if (!SPUtils.getInstance().getBoolean(AppConstant.adOpen)) {
-            initAd();
-        }
 
         initializeBottomNavigation();
     }
@@ -199,68 +186,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     startHourCount();
                 }
             }.start();
-        } catch (Exception e) {
+        }catch (Exception e){
             e.printStackTrace();
-        }
-    }
-
-    private void initAd() {
-        AppOpenAd.load(
-                this,
-                AppConstant.OpenAppId,
-                new AdRequest.Builder().build(),
-                new AppOpenAd.AppOpenAdLoadCallback() {
-                    @Override
-                    public void onAdLoaded(AppOpenAd ad) {
-                        if (!AppConstant.isAddFree) {
-                            appOpenAd = ad;
-//                            SPUtils.getInstance().put(AppConstant.isAddShow,true);
-                            showAdIfAvailable();
-                            SPUtils.getInstance().put(AppConstant.adOpen, true);
-                            Toast.makeText(getApplicationContext(), "Ads incoming", Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-
-                    @Override
-                    public void onAdFailedToLoad(LoadAdError loadAdError) {
-//                        Log.d(TAG, "App open ad failed to load with error: " + loadAdError.getMessage());
-
-                    }
-                });
-
-    }
-
-
-    private void showAdIfAvailable() {
-        if (appOpenAd != null) {
-            appOpenAd.setFullScreenContentCallback(new FullScreenContentCallback() {
-                @Override
-                public void onAdDismissedFullScreenContent() {
-//                    Log.d(TAG, "Ad dismissed.");
-                }
-
-                @Override
-                public void onAdFailedToShowFullScreenContent(AdError adError) {
-//                    Log.d(TAG, "Ad failed to show.");
-                }
-
-                @Override
-                public void onAdShowedFullScreenContent() {
-//                    Log.d(TAG, "Ad showed successfully.");
-                }
-            });
-
-            // Show the ad
-            appOpenAd.show(MainActivity.this);
         }
     }
 
 
     private void initPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
+        ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE,android.Manifest.permission.READ_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
     }
-
     private void initializeBottomNavigation() {
         try {
             Fragment searchFragment;
@@ -320,9 +254,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     binding.drawerLayout.openDrawer(binding.navView);
                 }
                 break;
+
         }
 
     }
+
 
 
     @Override
