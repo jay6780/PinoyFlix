@@ -24,10 +24,13 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.m.freemovie.R;
+import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.VideoDownloadAdapter;
 import com.m.freemovie.databinding.ActivityDownloadVideoViewBinding;
@@ -63,6 +66,7 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initStyle();
         getSupportActionBar().hide();
         binding = ActivityDownloadVideoViewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -77,6 +81,7 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
         viewList.add(binding.tenPositive);
         viewList.add(binding.btnPlay);
         viewList.add(binding.btnBack);
+        viewList.add(binding.title);
         for(View v : viewList){
             v.setOnClickListener(this);
         }
@@ -149,7 +154,6 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
             }
         });
         binding.player.setVideoPath(videopath);
-        initTopPadding(70);
         setupFileList();
         binding.llVolume.setEnabled(false);
         try {
@@ -180,6 +184,21 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
         });
     }
 
+    private void initStyle() {
+        WindowInsetsControllerCompat windowInsetsController =
+                WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        windowInsetsController.setSystemBarsBehavior(
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        );
+        ViewCompat.setOnApplyWindowInsetsListener(
+                getWindow().getDecorView(),
+                (view, windowInsets) -> {
+                    windowInsetsController.hide(WindowInsetsCompat.Type.statusBars());
+                    windowInsetsController.hide(WindowInsetsCompat.Type.navigationBars());
+                    return ViewCompat.onApplyWindowInsets(view, windowInsets);
+                });
+    }
+
 
     private void setupFileList() {
         FilesExtractor filesExtractor = new FilesExtractor(DownloadVideoViewActivity.this);
@@ -208,15 +227,6 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
         binding.rvDownloadvideo.setAdapter(videoDownloadAdapter);
     }
 
-
-    private void initTopPadding(int topPadding) {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.llRoot, (v, windowInsets) -> {
-            ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
-            mlp.topMargin = topPadding;
-            v.setLayoutParams(mlp);
-            return WindowInsetsCompat.CONSUMED;
-        });
-    }
 
 
     private void updateVolume(int index) {
@@ -266,6 +276,7 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
     @Override
     public void onClick(View view) {
         switch (view.getId()){
+            case R.id.title:
             case R.id.btn_back:
                 onBackPressed();
                 break;
@@ -281,12 +292,10 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
             case R.id.full_wide:
                 isLandScape = true;
                 binding.fullWide.setVisibility(View.GONE);
-                new WindowUtils(this, true,true);
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 binding.rvDownloadvideo.setVisibility(View.GONE);
                 binding.downloadTxt.setVisibility(View.GONE);
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-                initTopPadding(10);
                 binding.relativeVideo.setLayoutParams(params);
                 break;
             case R.id.ten_negative:
@@ -428,7 +437,6 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
     @Override
     protected void onStart() {
         super.onStart();
-        new WindowUtils(this,false,false);
     }
     @Override
     protected void onPause() {
@@ -467,7 +475,6 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             new WindowUtils(this,false,false);
             isLandScape = false;
-            initTopPadding(70);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dip2px(250));
             binding.relativeVideo.setLayoutParams(params);
             binding.fullWide.setVisibility(isFinish?View.GONE:View.VISIBLE);

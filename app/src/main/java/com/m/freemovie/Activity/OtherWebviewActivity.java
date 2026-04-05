@@ -49,6 +49,7 @@ import com.google.android.gms.ads.LoadAdError;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
+import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.adapter.MovieRuListAdapter;
@@ -102,6 +103,7 @@ public class OtherWebviewActivity extends AppCompatActivity
         getSupportActionBar().hide();
         binding = ActivityOtherWebview2Binding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        new GlobalWindowUtils(this);
         videoUrl = getIntent().getStringExtra("videoUrl");
         position = getIntent().getIntExtra("position", 1);
         type = getIntent().getIntExtra("type", 1);

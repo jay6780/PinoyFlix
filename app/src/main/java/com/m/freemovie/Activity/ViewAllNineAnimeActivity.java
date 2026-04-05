@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.adapter.NineAllAdapter;
 import com.m.freemovie.databinding.ActivityViewAllNineAnimeBinding;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeBean;
@@ -30,6 +31,7 @@ public class ViewAllNineAnimeActivity extends AppCompatActivity implements NineA
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new GlobalWindowUtils(this);
         binding = ActivityViewAllNineAnimeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getSupportActionBar().hide();

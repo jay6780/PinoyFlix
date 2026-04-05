@@ -95,7 +95,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         clearAllData();
         page = 1;
         presenter.getNewestPage(page);
-        presenter.getHotPage(page);
+//        presenter.getHotPage(page);
         presenter.getPopular(page);
         presenter.getMovie(page);
     }

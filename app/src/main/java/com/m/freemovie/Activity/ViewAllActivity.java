@@ -21,6 +21,7 @@ import com.app.hubert.guide.listener.OnGuideChangedListener;
 import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
+import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.adapter.SeriesAllAdapter;
 import com.m.freemovie.adapter.ViewAllAdapter;
 import com.m.freemovie.databinding.ActivityViewAllBinding;
@@ -50,6 +51,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityViewAllBinding.inflate(getLayoutInflater());
+        new GlobalWindowUtils(this);
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);

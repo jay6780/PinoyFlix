@@ -21,6 +21,7 @@ import com.app.hubert.guide.listener.OnGuideChangedListener;
 import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
+import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.adapter.MovieRuAdapter;
 import com.m.freemovie.databinding.ActivityMovieRuAllBinding;
 import com.m.freemovie.mvp.Contract.PinoyRuMovieAllContract;
@@ -47,6 +48,7 @@ public class MovieRuAllActivity extends AppCompatActivity implements PinoyRuMovi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
+        new GlobalWindowUtils(this);
         binding = ActivityMovieRuAllBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         presenter = new PinoyRuAllPresenter(this);

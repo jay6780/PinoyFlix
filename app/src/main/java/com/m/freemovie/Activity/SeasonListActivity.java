@@ -33,6 +33,7 @@ import com.google.android.gms.ads.LoadAdError;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.WatchHistoryDBHelper;
+import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.EpisodeAdapter;
@@ -63,6 +64,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         binding = ActivitySeasonListBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
+        new GlobalWindowUtils(this);
         dbHelper = new WatchHistoryDBHelper(this);
         new WindowUtils(this, true, false);
         title = getIntent().getStringExtra("title");

@@ -26,6 +26,7 @@ import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper2;
+import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
@@ -78,6 +79,7 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new GlobalWindowUtils(this);
         binding = ActivityOthersDetailsBinding.inflate(getLayoutInflater());
         link = getIntent().getStringExtra("link");
         Image = getIntent().getStringExtra("Image");

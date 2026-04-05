@@ -37,6 +37,7 @@ import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
+import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.SeasonsAdapter;
@@ -71,7 +72,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        new GlobalWindowUtils(this);
         id = getIntent().getStringExtra("id");
         position = getIntent().getIntExtra("position",2);
         apiPosition = getIntent().getIntExtra("apiPosition",1);

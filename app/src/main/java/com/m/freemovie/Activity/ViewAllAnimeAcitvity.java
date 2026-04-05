@@ -21,6 +21,7 @@ import com.app.hubert.guide.listener.OnGuideChangedListener;
 import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
+import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.adapter.ViewAllAnimeAdapter;
 import com.m.freemovie.databinding.ActivityViewAllAnimeAcitvityBinding;
 import com.m.freemovie.mvp.Model.ClassBean.AnimeItemBean;
@@ -48,6 +49,7 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
+        new GlobalWindowUtils(this);
         binding = ActivityViewAllAnimeAcitvityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         title = getIntent().getStringExtra("title");

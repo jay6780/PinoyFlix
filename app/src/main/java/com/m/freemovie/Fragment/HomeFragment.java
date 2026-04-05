@@ -19,7 +19,7 @@ import com.m.freemovie.databinding.FragmentHomeBinding;
 
 public class HomeFragment extends Fragment implements View.OnClickListener {
     private FragmentHomeBinding binding;
-    private Fragment movieFragment, tvSeriesFragment, animeFragment,tagalogMovieFragment;
+    private Fragment movieFragment, tvSeriesFragment, animeFragment, tagalogMovieFragment;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -41,12 +41,26 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         binding.tvMovies.setTextColor(getResources().getColor(R.color.SecondColor));
         binding.tvSeries.setTextColor(getResources().getColor(R.color.white));
         binding.tvTagalog.setTextColor(getResources().getColor(R.color.white));
-        initGuide();
+        binding.tvOthers.setTextColor(getResources().getColor(R.color.white));
 
+        initGuide();
 
         return binding.getRoot();
     }
 
+    private void hideAllFragments(FragmentTransaction transaction) {
+        if (movieFragment != null) transaction.hide(movieFragment);
+        if (tvSeriesFragment != null) transaction.hide(tvSeriesFragment);
+        if (animeFragment != null) transaction.hide(animeFragment);
+        if (tagalogMovieFragment != null) transaction.hide(tagalogMovieFragment);
+    }
+
+    private void resetTabColors() {
+        binding.tvMovies.setTextColor(getResources().getColor(R.color.white));
+        binding.tvSeries.setTextColor(getResources().getColor(R.color.white));
+        binding.tvTagalog.setTextColor(getResources().getColor(R.color.white));
+        binding.tvOthers.setTextColor(getResources().getColor(R.color.white));
+    }
 
     private void initGuide() {
         NewbieGuide.with(getActivity())
@@ -54,7 +68,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 .setOnGuideChangedListener(new OnGuideChangedListener() {
                     @Override
                     public void onShowed(Controller controller) {
-
                     }
 
                     @Override
@@ -83,6 +96,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        hideAllFragments(transaction);
+
+        resetTabColors();
 
         switch (view.getId()) {
             case R.id.tv_movies:
@@ -93,20 +109,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 } else {
                     transaction.show(movieFragment);
                 }
-                if (tvSeriesFragment != null) {
-                    transaction.hide(tvSeriesFragment);
-                }
-                if (animeFragment != null) {
-                    transaction.hide(animeFragment);
-                }
-
-                if (tagalogMovieFragment != null) {
-                    transaction.hide(tagalogMovieFragment);
-                }
                 binding.tvMovies.setTextColor(getResources().getColor(R.color.SecondColor));
-                binding.tvSeries.setTextColor(getResources().getColor(R.color.white));
-                binding.tvTagalog.setTextColor(getResources().getColor(R.color.white));
-                binding.tvOthers.setTextColor(getResources().getColor(R.color.white));
                 break;
 
             case R.id.tv_series:
@@ -117,19 +120,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 } else {
                     transaction.show(tvSeriesFragment);
                 }
-                if(movieFragment !=null){
-                    transaction.hide(movieFragment);
-                }
-                if (animeFragment != null) {
-                    transaction.hide(animeFragment);
-                }
-                if (tagalogMovieFragment != null) {
-                    transaction.hide(tagalogMovieFragment);
-                }
                 binding.tvSeries.setTextColor(getResources().getColor(R.color.SecondColor));
-                binding.tvMovies.setTextColor(getResources().getColor(R.color.white));
-                binding.tvTagalog.setTextColor(getResources().getColor(R.color.white));
-                binding.tvOthers.setTextColor(getResources().getColor(R.color.white));
                 break;
 
             case R.id.tv_tagalog:
@@ -140,19 +131,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 } else {
                     transaction.show(animeFragment);
                 }
-                if(movieFragment !=null){
-                    transaction.hide(movieFragment);
-                }
-                if (tvSeriesFragment != null) {
-                    transaction.hide(tvSeriesFragment);
-                }
-                if (tagalogMovieFragment != null) {
-                    transaction.hide(tagalogMovieFragment);
-                }
                 binding.tvTagalog.setTextColor(getResources().getColor(R.color.SecondColor));
-                binding.tvMovies.setTextColor(getResources().getColor(R.color.white));
-                binding.tvSeries.setTextColor(getResources().getColor(R.color.white));
-                binding.tvOthers.setTextColor(getResources().getColor(R.color.white));
                 break;
 
             case R.id.tv_others:
@@ -163,24 +142,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 } else {
                     transaction.show(tagalogMovieFragment);
                 }
-
-                if(movieFragment !=null){
-                    transaction.hide(movieFragment);
-                }
-                if (animeFragment != null) {
-                    transaction.hide(animeFragment);
-                }
-                if (tvSeriesFragment != null) {
-                    transaction.hide(tvSeriesFragment);
-                }
                 binding.tvOthers.setTextColor(getResources().getColor(R.color.SecondColor));
-                binding.tvTagalog.setTextColor(getResources().getColor(R.color.white));
-                binding.tvMovies.setTextColor(getResources().getColor(R.color.white));
-                binding.tvSeries.setTextColor(getResources().getColor(R.color.white));
                 break;
         }
 
         transaction.commit();
     }
-
 }
