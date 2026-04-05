@@ -39,6 +39,7 @@ import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
+import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.TagalogAnimeAdapter;
@@ -96,6 +97,7 @@ public class TagalogWebviewActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         binding = ActivityTagalogWebviewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        new GlobalWindowUtils(this);
         getSupportActionBar().hide();
         new WindowUtils(this, true, false);
         title = getIntent().getStringExtra("title");

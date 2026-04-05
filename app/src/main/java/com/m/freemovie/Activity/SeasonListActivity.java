@@ -24,6 +24,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.m.freemovie.Utils.DbHelper.WatchHistoryDBHelper;
+import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.EpisodeAdapter;
@@ -53,6 +54,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         binding = ActivitySeasonListBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
+        new GlobalWindowUtils(this);
         dbHelper = new WatchHistoryDBHelper(this);
         new WindowUtils(this, true, false);
         title = getIntent().getStringExtra("title");

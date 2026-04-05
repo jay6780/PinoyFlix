@@ -27,6 +27,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
+import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.TagalogDetailAdapter;
 import com.m.freemovie.databinding.ActivityNineAnimeEpsiodeBinding;
@@ -57,6 +58,7 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new GlobalWindowUtils(this);
         binding = ActivityNineAnimeEpsiodeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getSupportActionBar().hide();

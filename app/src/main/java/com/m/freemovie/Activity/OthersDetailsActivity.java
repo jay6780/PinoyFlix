@@ -1,21 +1,33 @@
 package com.m.freemovie.Activity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
+import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper2;
+import com.m.freemovie.Utils.GlobalWindowUtils;
+import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.adapter.PiNoyMediaAdapter;
@@ -45,6 +57,7 @@ import okhttp3.Response;
 public class OthersDetailsActivity extends AppCompatActivity implements View.OnClickListener, PinoyPediaContract.View {
     private ActivityOthersDetailsBinding binding;
     private String TAG = "OthersDetailsActivity";
+    private InterstitialAd mInterstitialAd;
     private KProgressHUD hud;
     private BookmarkDbHelper2 bookmarkDbHelper;
     private int type = 1;
@@ -66,6 +79,7 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new GlobalWindowUtils(this);
         binding = ActivityOthersDetailsBinding.inflate(getLayoutInflater());
         link = getIntent().getStringExtra("link");
         Image = getIntent().getStringExtra("Image");
@@ -107,10 +121,14 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
                 initViews();
                 presenter.getUrl(link);
                 hud.dismiss();
+
             }
 
         }.start();
 
+        if (!SPUtils.getInstance().getBoolean(AppConstant.adOther)) {
+            loadAd();
+        }
         bookmarkDbHelper = new BookmarkDbHelper2(this);
 
         hud = KProgressHUD.create(this)
@@ -147,7 +165,6 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
     }
 
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -157,6 +174,41 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
         if (dialog !=null && dialog.isShowing()){
             dialog.dismiss();
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void loadAd() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        InterstitialAd.load(this, AppConstant.InterstitialId, adRequest,
+                new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        if (!AppConstant.isAddFree) {
+                            mInterstitialAd = interstitialAd;
+//                        Log.i(TAG, "Ad Loaded. Showing it now automatically...");
+                            Toast.makeText(getApplicationContext(), "Ads incoming", Toast.LENGTH_SHORT).show();
+                            mInterstitialAd.show(OthersDetailsActivity.this);
+                            SPUtils.getInstance().put(AppConstant.adOther, true);
+                        }
+
+                        mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                            @Override
+                            public void onAdDismissedFullScreenContent() {
+                                Log.d(TAG, "Ad dismissed by user.");
+                            }
+
+                            @Override
+                            public void onAdFailedToShowFullScreenContent(AdError adError) {
+//                                Log.e(TAG, "Ad failed to show: " + adError.getMessage());
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+//                        Log.e(TAG, "Ad failed to load: " + loadAdError.getMessage());
+                    }
+                });
     }
 
     private void initViews() {

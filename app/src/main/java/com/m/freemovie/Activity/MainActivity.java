@@ -26,6 +26,7 @@ import com.m.freemovie.Fragment.HomeFragment;
 import com.m.freemovie.Fragment.SearchFragment;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
+import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.adapter.OptionAdapter;
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
+        new GlobalWindowUtils(this);
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
         btn_back5 = findViewById(R.id.btn_back5);

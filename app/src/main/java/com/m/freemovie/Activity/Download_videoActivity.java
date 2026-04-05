@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
+import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.adapter.FileAdapter;
 import com.m.freemovie.fileUtils.FilesExtractor;
 import com.m.freemovie.fileUtils.VideoFile;
@@ -41,6 +42,7 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new GlobalWindowUtils(this);
         setContentView(R.layout.activity_download_video);
         getSupportActionBar().hide();
         initializeViews();

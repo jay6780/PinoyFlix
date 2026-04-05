@@ -40,6 +40,7 @@ import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
+import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.MovieListAdapter;
 import com.m.freemovie.databinding.ActivityVideoWebviewBinding;
@@ -79,6 +80,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         binding = ActivityVideoWebviewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
+        new GlobalWindowUtils(this);
         defaultScreen();
         title = getIntent().getStringExtra("title");
         videoId = getIntent().getStringExtra("videoId");

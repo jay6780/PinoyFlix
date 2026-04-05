@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -46,6 +47,7 @@ import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
 import com.m.freemovie.Utils.DbHelper.SpinnerTotalDbHelper;
+import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
 import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.WindowUtils;
@@ -109,6 +111,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         binding = ActivityAnimePaheWebviewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
+        new GlobalWindowUtils(this);
         initGuide();
         new WindowUtils(this, true, false);
         title = getIntent().getStringExtra("title");
@@ -640,6 +643,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 streamingBeanList.clear();
             }
             String url = "https://animepahe.com/play/" + animeId + "/" + videoUrl;
+//            Log.d("Urldata","val: "+url);
             detailPresenter.getTrackQuery(url);
         }
     }

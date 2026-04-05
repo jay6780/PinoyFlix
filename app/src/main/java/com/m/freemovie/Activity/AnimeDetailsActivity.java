@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.bumptech.glide.Glide;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.Retrofit.AppConstant;
+import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.AnimeSeasonAdapter;
@@ -56,6 +57,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
+        new GlobalWindowUtils(this);
         binding = ActivityAnimeDetailsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         apiPosition = getIntent().getIntExtra("apiPosition",1);
