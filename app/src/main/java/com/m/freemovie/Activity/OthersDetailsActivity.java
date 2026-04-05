@@ -16,12 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.ads.AdError;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
@@ -57,7 +51,6 @@ import okhttp3.Response;
 public class OthersDetailsActivity extends AppCompatActivity implements View.OnClickListener, PinoyPediaContract.View {
     private ActivityOthersDetailsBinding binding;
     private String TAG = "OthersDetailsActivity";
-    private InterstitialAd mInterstitialAd;
     private KProgressHUD hud;
     private BookmarkDbHelper2 bookmarkDbHelper;
     private int type = 1;
@@ -126,9 +119,7 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
 
         }.start();
 
-        if (!SPUtils.getInstance().getBoolean(AppConstant.adOther)) {
-            loadAd();
-        }
+
         bookmarkDbHelper = new BookmarkDbHelper2(this);
 
         hud = KProgressHUD.create(this)
@@ -174,41 +165,6 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
         if (dialog !=null && dialog.isShowing()){
             dialog.dismiss();
         }
-    }
-
-    @SuppressLint("MissingPermission")
-    private void loadAd() {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        InterstitialAd.load(this, AppConstant.InterstitialId, adRequest,
-                new InterstitialAdLoadCallback() {
-                    @Override
-                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                        if (!AppConstant.isAddFree) {
-                            mInterstitialAd = interstitialAd;
-//                        Log.i(TAG, "Ad Loaded. Showing it now automatically...");
-                            Toast.makeText(getApplicationContext(), "Ads incoming", Toast.LENGTH_SHORT).show();
-                            mInterstitialAd.show(OthersDetailsActivity.this);
-                            SPUtils.getInstance().put(AppConstant.adOther, true);
-                        }
-
-                        mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
-                            @Override
-                            public void onAdDismissedFullScreenContent() {
-                                Log.d(TAG, "Ad dismissed by user.");
-                            }
-
-                            @Override
-                            public void onAdFailedToShowFullScreenContent(AdError adError) {
-//                                Log.e(TAG, "Ad failed to show: " + adError.getMessage());
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-//                        Log.e(TAG, "Ad failed to load: " + loadAdError.getMessage());
-                    }
-                });
     }
 
     private void initViews() {

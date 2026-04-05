@@ -541,7 +541,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             case 3:
                 tagaloglist.clear();
                 tagalogSearchAdapter.setNewData(new ArrayList<>());
-                searchPresenter.getTagalogQuery(query);
+//                searchPresenter.getTagalogQuery(query);
                 break;
             case 4:
             case 5:
