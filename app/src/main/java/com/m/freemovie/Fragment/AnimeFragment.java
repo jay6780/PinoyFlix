@@ -53,7 +53,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         binding = FragmentAnimeBinding.inflate(inflater);
         presenter = new AnimePresenter(this);
         if(isNetworkAvailable()){
-            presenter.getNewestPage(page);
+//            presenter.getNewestPage(page);
 //            presenter.getHotPage(page);
             presenter.getPopular(page);
             presenter.getMovie(page);
@@ -94,7 +94,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         }
         clearAllData();
         page = 1;
-        presenter.getNewestPage(page);
+//        presenter.getNewestPage(page);
 //        presenter.getHotPage(page);
         presenter.getPopular(page);
         presenter.getMovie(page);

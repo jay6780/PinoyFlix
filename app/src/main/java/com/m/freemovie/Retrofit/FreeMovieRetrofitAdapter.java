@@ -15,6 +15,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -32,6 +33,7 @@ public class FreeMovieRetrofitAdapter {
 
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
+
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
@@ -76,6 +78,14 @@ public class FreeMovieRetrofitAdapter {
             builder.writeTimeout(60, TimeUnit.SECONDS);
             builder.readTimeout(120, TimeUnit.SECONDS);
             builder.dns(new IPv4FirstDns());
+            builder.addNetworkInterceptor(chain -> {
+                Request request = chain.request().newBuilder()
+                        .removeHeader("Accept-Encoding")
+                        .removeHeader("User-Agent")
+                        .build();
+                return chain.proceed(request);
+            });
+
             builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
             builder.hostnameVerifier(new HostnameVerifier() {
                 @Override
