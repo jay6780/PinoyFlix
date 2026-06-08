@@ -482,7 +482,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 break;
             case 2:
                 videoPosition = 2;
-                videoUrl = "https://vidrock.ru/movie/&download=false"+ id;
+                videoUrl = "https://vidrock.ru/movie/"+ id;
                 setupWebView(videoUrl);
                 break;
             case 3:
