@@ -255,12 +255,12 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         switch (position) {
             case 1:
                 videoPosition = 1;
-                videoUrl = "https://player.videasy.net/tv/"+id+"/"+seasonNum+"/"+ epNumber;
+                videoUrl = "https://player.videasy.to/tv/"+id+"/"+seasonNum+"/"+ epNumber;
                 setupWebView(videoUrl);
                 break;
             case 2:
                 videoPosition = 2;
-                videoUrl = "https://vidrock.net/tv/" + id + "/" + seasonNum + "/" + epNumber + "&download=false";
+                videoUrl = "https://vidrock.ru/tv/" + id + "/" + seasonNum + "/" + epNumber + "&download=false";
                 setupWebView(videoUrl);
                 break;
             case 3:
