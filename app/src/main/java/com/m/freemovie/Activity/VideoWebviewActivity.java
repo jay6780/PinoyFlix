@@ -149,10 +149,10 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
 
         switch (videoPosition){
             case 1:
-                videoUrl ="https://player.videasy.net/movie/"+videoId;
+                videoUrl ="https://player.videasy.to/movie/"+videoId;
                 break;
             case 2:
-                videoUrl = "https://vidrock.net/movie/"+ videoId;
+                videoUrl = "https://vidrock.ru/movie/"+ videoId;
                 break;
             case 3:
                 videoUrl = "https://vidfast.pro/movie/"+ videoId;
@@ -477,12 +477,12 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         switch (position){
             case 1:
                 videoPosition = 1;
-                videoUrl ="https://player.videasy.net/movie/"+id;
+                videoUrl ="https://player.videasy.to/movie/"+id;
                 setupWebView(videoUrl);
                 break;
             case 2:
                 videoPosition = 2;
-                videoUrl = "https://vidrock.net/movie/&download=false"+ id;
+                videoUrl = "https://vidrock.ru/movie/&download=false"+ id;
                 setupWebView(videoUrl);
                 break;
             case 3:
