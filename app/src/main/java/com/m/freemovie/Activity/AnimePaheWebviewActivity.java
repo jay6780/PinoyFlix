@@ -162,6 +162,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 if (finishing) {
+                    shutdownGeckoSession();
                     finish();
                 } else {
                     defaultScreen();
