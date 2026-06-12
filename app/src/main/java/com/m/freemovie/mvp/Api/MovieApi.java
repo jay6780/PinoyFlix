@@ -28,7 +28,9 @@ import com.m.freemovie.mvp.Model.ClassBean.TagalogSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.TvSeriesBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoPageBean;
+import com.m.freemovie.mvp.Model.ClassBean.ZoRoSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoVideoUrlBean;
+import com.m.freemovie.mvp.Model.ZoroSearchModel;
 
 import java.util.List;
 
@@ -358,4 +360,8 @@ public interface MovieApi {
     @GET("zorotv/episode")
     Observable<ZoRoVideoUrlBean> getVideoZoRo(
             @Query("url") String url);
+
+    @GET("zorotv")
+    Observable<ZoRoSearchBean> getSearchZoro(
+            @Query("search") String search);
 }
