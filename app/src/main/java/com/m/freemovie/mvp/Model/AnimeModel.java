@@ -3,6 +3,7 @@ package com.m.freemovie.mvp.Model;
 import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.Retrofit.NetworkingUtils;
 import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
+import com.m.freemovie.mvp.Model.ClassBean.MiRuRoHomeBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
@@ -99,6 +100,31 @@ public class AnimeModel {
 
                     @Override
                     public void onNext(RevivalSeriesBean data) {
+                        callback.returnResult(data);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.returnError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {}
+                });
+    }
+
+
+    public static void getMiRuRo(final Callback<MiRuRoHomeBean> callback) {
+        NetworkingUtils.getTagalogDub()
+                .getMiruroHome()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<MiRuRoHomeBean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {}
+
+                    @Override
+                    public void onNext(MiRuRoHomeBean data) {
                         callback.returnResult(data);
                     }
 

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
+import com.m.freemovie.mvp.Model.ClassBean.MiRuRoHomeBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
@@ -114,6 +115,32 @@ public class AnimePresenter implements AnimeContract.Presenter {
             public void returnResult(RevivalSeriesBean apiBean) {
                 view.hideLoading();
                 view.getMovie(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getMiRuRoHomeData() {
+        view.showLoading();
+        AnimeModel.getMiRuRo( new Callback<MiRuRoHomeBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(MiRuRoHomeBean apiBean) {
+                view.hideLoading();
+                view.getMiRuRoHome(apiBean);
             }
 
             @Override

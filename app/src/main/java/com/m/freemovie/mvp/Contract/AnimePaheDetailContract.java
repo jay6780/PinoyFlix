@@ -4,6 +4,7 @@ package com.m.freemovie.mvp.Contract;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDownloadBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheEpisodeBean;
+import com.m.freemovie.mvp.Model.ClassBean.MiRuRoEpisodeBean;
 
 public interface AnimePaheDetailContract {
     interface View {
@@ -12,6 +13,7 @@ public interface AnimePaheDetailContract {
         void hideLoading();
         void getDetailData(AnimePaheDetailBean detailBean);
         void getEpisodes(AnimePaheEpisodeBean episodeBean);
+        void getEpisodesMiRuRo(MiRuRoEpisodeBean miRuRoEpisodeBean);
         void getTrack(AnimePaheDownloadBean downloadBean);
     }
 
@@ -19,5 +21,6 @@ public interface AnimePaheDetailContract {
         void getDetailQuery(String url);
         void getEpisodeQuery(String id,int page);
         void getTrackQuery(String url);
+        void getMiRuRoEpisodeQuery(String url);
     }
 }

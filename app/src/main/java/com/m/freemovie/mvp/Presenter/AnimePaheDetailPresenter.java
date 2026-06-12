@@ -8,6 +8,7 @@ import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDownloadBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheEpisodeBean;
 import com.m.freemovie.mvp.Contract.AnimePaheDetailContract;
 import com.m.freemovie.mvp.Model.AnimePaheDetailModel;
+import com.m.freemovie.mvp.Model.ClassBean.MiRuRoEpisodeBean;
 
 import java.io.IOException;
 
@@ -92,6 +93,33 @@ public class AnimePaheDetailPresenter implements AnimePaheDetailContract.Present
             public void returnResult(AnimePaheDownloadBean apiBean) {
                 view.hideLoading();
                 view.getTrack(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getMiRuRoEpisodeQuery(String url) {
+        view.showLoading();
+
+        AnimePaheDetailModel.getMiRuRoEpisode(url, new Callback<MiRuRoEpisodeBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(MiRuRoEpisodeBean apiBean) {
+                view.hideLoading();
+                view.getEpisodesMiRuRo(apiBean);
             }
 
             @Override

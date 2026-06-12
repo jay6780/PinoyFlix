@@ -5,6 +5,7 @@ import com.m.freemovie.Retrofit.NetworkingUtils;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDownloadBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheEpisodeBean;
+import com.m.freemovie.mvp.Model.ClassBean.MiRuRoEpisodeBean;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observer;
@@ -70,6 +71,30 @@ public class AnimePaheDetailModel {
 
                     @Override
                     public void onNext(AnimePaheDownloadBean data) {
+                        callback.returnResult(data);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.returnError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {}
+                });
+    }
+
+    public static void getMiRuRoEpisode( String url,final Callback<MiRuRoEpisodeBean> callback) {
+        NetworkingUtils.getTagalogDub()
+                .getMiRuRoEpisode(url)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<MiRuRoEpisodeBean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {}
+
+                    @Override
+                    public void onNext(MiRuRoEpisodeBean data) {
                         callback.returnResult(data);
                     }
 

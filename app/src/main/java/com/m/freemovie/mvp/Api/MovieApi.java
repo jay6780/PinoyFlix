@@ -9,6 +9,9 @@ import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.DetailDownloadBean;
 import com.m.freemovie.mvp.Model.ClassBean.DetailTvBean;
 import com.m.freemovie.mvp.Model.ClassBean.DownloadNineAnimeBean;
+import com.m.freemovie.mvp.Model.ClassBean.MiRuRoDetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.MiRuRoEpisodeBean;
+import com.m.freemovie.mvp.Model.ClassBean.MiRuRoHomeBean;
 import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeEpisodeBean;
@@ -56,7 +59,6 @@ public interface MovieApi {
             @Query("page") int page);
 
 
-
     @GET("movie/now_playing")
     Observable<MovieBean> getNow(
             @Query("language") String language,
@@ -85,14 +87,11 @@ public interface MovieApi {
             @Query("page") int page);
 
 
-
     @GET("tv/top_rated")
     Observable<TvSeriesBean> getTopRatedTv(
             @Query("language") String language,
             @Header("Authorization") String authHeader,
             @Query("page") int page);
-
-
 
 
     @GET("tv/{series_id}")
@@ -332,7 +331,6 @@ public interface MovieApi {
             @Query("page") int page);
 
 
-
     @GET("wp/v2/search")
     Observable<List<SearchRuBean>> getSearchRu(@Query("search") String search);
 
@@ -347,5 +345,16 @@ public interface MovieApi {
     Observable<AnimoPageBean> getAnimoPage(
             @Query("page") int page);
 
+
+    //miruro
+
+    @GET("miruro/home")
+    Observable<MiRuRoHomeBean> getMiruroHome();
+
+    @GET("miruro/info")
+    Observable<MiRuRoDetailBean> getMiRuRoDetails(@Query("url") String url);
+
+    @GET("miruro/episode")
+    Observable<MiRuRoEpisodeBean> getMiRuRoEpisode(@Query("url") String url);
 
 }

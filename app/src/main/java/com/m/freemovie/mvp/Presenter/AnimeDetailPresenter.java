@@ -4,10 +4,12 @@ import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.MiRuRoDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogInfoBean;
 import com.m.freemovie.mvp.Contract.AnimeDetailsContract;
 import com.m.freemovie.mvp.Model.AnimePaheDetailModel;
+import com.m.freemovie.mvp.Model.MiRuRoDetailsModel;
 import com.m.freemovie.mvp.Model.RevivalDetailModel;
 import com.m.freemovie.mvp.Model.TagalogEpisodeModel;
 
@@ -94,6 +96,33 @@ public class AnimeDetailPresenter implements AnimeDetailsContract.Presenter {
             public void returnResult(TagalogInfoBean apiBean) {
                 view.hideLoading();
                 view.getInfoTagalog(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getMiRuRoData(String url) {
+        view.showLoading();
+
+        MiRuRoDetailsModel.getMiRuRoDetails(url, new Callback<MiRuRoDetailBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(MiRuRoDetailBean apiBean) {
+                view.hideLoading();
+                view.getMiRuRoDetail(apiBean);
             }
 
             @Override

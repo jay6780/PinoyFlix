@@ -26,6 +26,7 @@ import com.m.freemovie.adapter.ViewAllAnimeAdapter;
 import com.m.freemovie.databinding.ActivityViewAllAnimeAcitvityBinding;
 import com.m.freemovie.mvp.Model.ClassBean.AnimeItemBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
+import com.m.freemovie.mvp.Model.ClassBean.MiRuRoHomeBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
@@ -45,6 +46,7 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
     private ViewAllAnimeAdapter viewAllAnimeAdapter;
     private boolean isLoading = false;
     private boolean isNomore = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +55,7 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
         binding = ActivityViewAllAnimeAcitvityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         title = getIntent().getStringExtra("title");
-        position = getIntent().getIntExtra("position",1);
+        position = getIntent().getIntExtra("position", 1);
         presenter = new AnimePresenter(this);
         binding.titleName.setText(title);
         binding.btnBack.setOnClickListener(view -> onBackPressed());
@@ -86,6 +88,9 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
                         if (isNomore) {
                             return;
                         }
+                        if (position == 1) {
+                            return;
+                        }
                         isLoading = true;
                         page++;
                         callApi();
@@ -93,6 +98,7 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
                     }
                 }
             }
+
             private int getMaxPosition(int[] positions) {
                 int max = positions[0];
                 for (int position : positions) {
@@ -107,19 +113,21 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
         binding.swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if(!isNetworkAvailable()){
+                if (!isNetworkAvailable()) {
                     binding.swipeRefreshLayout.setRefreshing(false);
-                    Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Please check internet and try again", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                page = 1;
-                animeItemBeanList.clear();
-                viewAllAnimeAdapter.setNewData(animeItemBeanList);
+                if(position != 1){
+                    page = 1;
+                }
+                viewAllAnimeAdapter.getData().clear();
                 callApi();
             }
         });
 
     }
+
     private void initGuide() {
         NewbieGuide.with(this)
                 .setLabel("view_all_reset_anime")
@@ -140,20 +148,20 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
                 .show();
     }
 
-    private void reset(){
+    private void reset() {
         binding.rvViewAll.scrollToPosition(0);
         binding.llReset.setVisibility(View.GONE);
     }
 
 
     private void callApi() {
-        if(!isNetworkAvailable()){
-            Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+        if (!isNetworkAvailable()) {
+            Toast.makeText(getApplicationContext(), "Please check internet and try again", Toast.LENGTH_SHORT).show();
             return;
         }
-        switch (position){
+        switch (position) {
             case 1:
-                presenter.getNewestPage(page);
+                presenter.getMiRuRoHomeData();
                 break;
             case 2:
                 presenter.getHotPage(page);
@@ -185,7 +193,7 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getApplicationContext(),"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Error fetching data: " + error, Toast.LENGTH_SHORT).show();
                 binding.swipeRefreshLayout.setRefreshing(false);
             }
         }, 500);
@@ -202,80 +210,93 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
     }
 
 
-
     @Override
     public void getNewest(PaheLatestBean paheLatestBean) {
-        if(paheLatestBean !=null && paheLatestBean.getResults() !=null){
+        if (paheLatestBean != null && paheLatestBean.getResults() != null) {
             isLoading = false;
-            if(paheLatestBean.getResults().getData()!=null){
-                if(!paheLatestBean.getResults().getData().isEmpty()){
-                    for(PaheLatestBean.ResultsBean.DataBean dataBean : paheLatestBean.getResults().getData()){
-                        animeItemBeanList.add(new AnimeItemBean(dataBean.getAnime_session(),dataBean.getAnime_title(),dataBean.getSnapshot()));
+            if (paheLatestBean.getResults().getData() != null) {
+                if (!paheLatestBean.getResults().getData().isEmpty()) {
+                    for (PaheLatestBean.ResultsBean.DataBean dataBean : paheLatestBean.getResults().getData()) {
+                        animeItemBeanList.add(new AnimeItemBean(dataBean.getAnime_session(), dataBean.getAnime_title(), dataBean.getSnapshot()));
                     }
                     viewAllAnimeAdapter.setNewData(animeItemBeanList);
-                }else{
+                } else {
                     isNomore = true;
                 }
             }
-        }else{
+        } else {
             isNomore = true;
         }
     }
 
     @Override
     public void getHot(AnimoPageBean animoPageBean) {
-        if(animoPageBean !=null && animoPageBean.getResults() !=null){
+        if (animoPageBean != null && animoPageBean.getResults() != null) {
             isLoading = false;
-            if(animoPageBean.getResults() !=null){
-                if(!animoPageBean.getResults().isEmpty()){
-                    for(AnimoPageBean.ResultsBean dataBean : animoPageBean.getResults()){
-                        animeItemBeanList.add(new AnimeItemBean(dataBean.getLink(),dataBean.getTitle(),dataBean.getImg()));
+            if (animoPageBean.getResults() != null) {
+                if (!animoPageBean.getResults().isEmpty()) {
+                    for (AnimoPageBean.ResultsBean dataBean : animoPageBean.getResults()) {
+                        animeItemBeanList.add(new AnimeItemBean(dataBean.getLink(), dataBean.getTitle(), dataBean.getImg()));
                     }
                     viewAllAnimeAdapter.setNewData(animeItemBeanList);
-                }else{
+                } else {
                     isNomore = true;
                 }
             }
-        }else{
+        } else {
             isNomore = true;
         }
     }
 
     @Override
     public void getPopular(RevivalSeriesBean revivalSeriesBean) {
-        if(revivalSeriesBean !=null && revivalSeriesBean.getResults() !=null){
+        if (revivalSeriesBean != null && revivalSeriesBean.getResults() != null) {
             isLoading = false;
-            if(revivalSeriesBean.getResults() !=null){
-                if(!revivalSeriesBean.getResults().isEmpty()){
-                    for(RevivalSeriesBean.ResultsBean dataBean : revivalSeriesBean.getResults()){
-                        animeItemBeanList.add(new AnimeItemBean(dataBean.getLink(),dataBean.getTitle(),dataBean.getPoster()));
+            if (revivalSeriesBean.getResults() != null) {
+                if (!revivalSeriesBean.getResults().isEmpty()) {
+                    for (RevivalSeriesBean.ResultsBean dataBean : revivalSeriesBean.getResults()) {
+                        animeItemBeanList.add(new AnimeItemBean(dataBean.getLink(), dataBean.getTitle(), dataBean.getPoster()));
                     }
                     viewAllAnimeAdapter.setNewData(animeItemBeanList);
-                }else{
+                } else {
                     isNomore = true;
                 }
             }
-        }else{
+        } else {
             isNomore = true;
         }
     }
 
     @Override
     public void getMovie(RevivalSeriesBean revivalSeriesBean) {
-        if(revivalSeriesBean !=null && revivalSeriesBean.getResults() !=null){
+        if (revivalSeriesBean != null && revivalSeriesBean.getResults() != null) {
             isLoading = false;
-            if(revivalSeriesBean.getResults() !=null){
-                if(!revivalSeriesBean.getResults().isEmpty()){
-                    for(RevivalSeriesBean.ResultsBean dataBean : revivalSeriesBean.getResults()){
-                        animeItemBeanList.add(new AnimeItemBean(dataBean.getLink(),dataBean.getTitle(),dataBean.getPoster()));
+            if (revivalSeriesBean.getResults() != null) {
+                if (!revivalSeriesBean.getResults().isEmpty()) {
+                    for (RevivalSeriesBean.ResultsBean dataBean : revivalSeriesBean.getResults()) {
+                        animeItemBeanList.add(new AnimeItemBean(dataBean.getLink(), dataBean.getTitle(), dataBean.getPoster()));
                     }
                     viewAllAnimeAdapter.setNewData(animeItemBeanList);
-                }else{
+                } else {
                     isNomore = true;
                 }
             }
-        }else{
+        } else {
             isNomore = true;
+        }
+    }
+
+    @Override
+    public void getMiRuRoHome(MiRuRoHomeBean miRuRoHomeBean) {
+        if (miRuRoHomeBean != null && miRuRoHomeBean.getLatestRelease() != null) {
+            if (!miRuRoHomeBean.getLatestRelease().isEmpty()) {
+                for (MiRuRoHomeBean.LatestReleaseBean dataBean : miRuRoHomeBean.getLatestRelease()) {
+                    animeItemBeanList.add(new AnimeItemBean(dataBean.getUrl(), dataBean.getTitle(), dataBean.getCover()));
+                }
+                viewAllAnimeAdapter.setNewData(animeItemBeanList);
+            } else {
+                isNomore = true;
+            }
         }
     }
 

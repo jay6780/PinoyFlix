@@ -23,9 +23,11 @@ import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.adapter.AnimeMovieAdapter;
 import com.m.freemovie.adapter.AnimePopularAdapter;
 import com.m.freemovie.adapter.HotAdapter;
+import com.m.freemovie.adapter.MiRuRoLatestAdapter;
 import com.m.freemovie.adapter.NewestAdapter;
 import com.m.freemovie.databinding.FragmentAnimeBinding;
 import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
+import com.m.freemovie.mvp.Model.ClassBean.MiRuRoHomeBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
@@ -43,7 +45,9 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
     private HotAdapter hotAdapter;
     private AnimePopularAdapter animePopularAdapter;
     private AnimeMovieAdapter movieAdapter;
+    private MiRuRoLatestAdapter miRuRoLatestAdapter;
     private List<PaheLatestBean.ResultsBean.DataBean> newestList = new ArrayList<>();
+    private List<MiRuRoHomeBean.LatestReleaseBean> miRuRoNewestList = new ArrayList<>();
     private List<AnimoPageBean.ResultsBean> hotList = new ArrayList<>();
     private List<RevivalSeriesBean.ResultsBean> popularList = new ArrayList<>();
     private List<RevivalSeriesBean.ResultsBean> movieList = new ArrayList<>();
@@ -55,6 +59,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         if(isNetworkAvailable()){
 //            presenter.getNewestPage(page);
 //            presenter.getHotPage(page);
+            presenter.getMiRuRoHomeData();
             presenter.getPopular(page);
             presenter.getMovie(page);
         }else{
@@ -96,6 +101,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         page = 1;
 //        presenter.getNewestPage(page);
 //        presenter.getHotPage(page);
+        presenter.getMiRuRoHomeData();
         presenter.getPopular(page);
         presenter.getMovie(page);
     }
@@ -110,15 +116,9 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         binding.rvMovies.setVisibility(View.GONE);
         binding.rlMovies.setVisibility(View.GONE);
 
-        newestList.clear();
-        hotList.clear();
-        popularList.clear();
-        movieList.clear();
-
-        newestAdapter.setNewData(newestList);
-        hotAdapter.setNewData(hotList);
-        animePopularAdapter.setNewData(popularList);
-        movieAdapter.setNewData(movieList);
+        miRuRoLatestAdapter.getData().clear();
+        animePopularAdapter.getData().clear();
+        movieAdapter.getData().clear();
 
         binding.rvNewest.scrollToPosition(0);
         binding.rvHot.scrollToPosition(0);
@@ -131,9 +131,10 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         hotAdapter = new HotAdapter();
         animePopularAdapter = new AnimePopularAdapter();
         movieAdapter = new AnimeMovieAdapter();
+        miRuRoLatestAdapter = new MiRuRoLatestAdapter();
 
         binding.rvNewest.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        binding.rvNewest.setAdapter(newestAdapter);
+        binding.rvNewest.setAdapter(miRuRoLatestAdapter);
 
         binding.rvHot.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.rvHot.setAdapter(hotAdapter);
@@ -247,6 +248,23 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
             }else{
                 binding.rvMovies.setVisibility(View.GONE);
                 binding.rlMovies.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    @Override
+    public void getMiRuRoHome(MiRuRoHomeBean miRuRoHomeBean) {
+        if(miRuRoHomeBean !=null && miRuRoHomeBean.getLatestRelease() !=null){
+            if(!miRuRoHomeBean.getLatestRelease().isEmpty()){
+                for (int i = 0; i < 10 ; i ++){
+                    miRuRoNewestList.add(miRuRoHomeBean.getLatestRelease().get(i));
+                }
+                miRuRoLatestAdapter.setNewData(miRuRoNewestList);
+                binding.rvNewest.setVisibility(View.VISIBLE);
+                binding.rlNew.setVisibility(View.VISIBLE);
+            }else{
+                binding.rvNewest.setVisibility(View.GONE);
+                binding.rlNew.setVisibility(View.GONE);
             }
         }
     }
