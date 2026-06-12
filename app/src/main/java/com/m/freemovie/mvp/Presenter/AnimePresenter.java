@@ -9,8 +9,10 @@ import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
 import com.m.freemovie.mvp.Contract.AnimeContract;
 import com.m.freemovie.mvp.Model.AnimeModel;
+import com.m.freemovie.mvp.Model.ClassBean.ZoRoPageBean;
 
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Response;
@@ -122,5 +124,33 @@ public class AnimePresenter implements AnimeContract.Presenter {
                 view.showError(message);
             }
         });
+    }
+
+    @Override
+    public void getZoRoPage(int page) {
+
+        view.showLoading();
+        AnimeModel.getZoRoPage(page, new Callback<List<ZoRoPageBean>>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(List<ZoRoPageBean> apiBean) {
+                view.hideLoading();
+                view.getZoRo(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+
     }
 }

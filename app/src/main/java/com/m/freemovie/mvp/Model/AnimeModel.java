@@ -6,6 +6,9 @@ import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
+import com.m.freemovie.mvp.Model.ClassBean.ZoRoPageBean;
+
+import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observer;
@@ -99,6 +102,30 @@ public class AnimeModel {
 
                     @Override
                     public void onNext(RevivalSeriesBean data) {
+                        callback.returnResult(data);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.returnError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {}
+                });
+    }
+
+    public static void getZoRoPage(int page,final Callback<List<ZoRoPageBean>> callback) {
+        NetworkingUtils.getTagalogDub()
+                .getZoroPage(page)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<List<ZoRoPageBean>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {}
+
+                    @Override
+                    public void onNext(List<ZoRoPageBean> data) {
                         callback.returnResult(data);
                     }
 

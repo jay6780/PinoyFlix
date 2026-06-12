@@ -11,31 +11,33 @@ import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
+import com.m.freemovie.mvp.Model.ClassBean.ZoRoPageBean;
 
-public class NewestAdapter extends BaseQuickAdapter<PaheLatestBean.ResultsBean.DataBean, BaseViewHolder> {
+public class NewestAdapter extends BaseQuickAdapter<ZoRoPageBean, BaseViewHolder> {
     public NewestAdapter() {
         super(R.layout.movie_item);
     }
     @Override
-    protected void convert(BaseViewHolder helper, PaheLatestBean.ResultsBean.DataBean item) {
+    protected void convert(BaseViewHolder helper, ZoRoPageBean item) {
         TextView tv_title  = helper.getView(R.id.tv_title);
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
 
         Glide.with(mContext)
                 .asBitmap().
-                load(item.getSnapshot())
+                load(item.getImage())
                 .placeholder(R.drawable.noimage)
                 .into(iv_thumb);
 
-        tv_title.setText(item.getAnime_title());
+        tv_title.setText(item.getTitle());
 
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, AnimeDetailsActivity.class);
-                intent.putExtra("id",item.getAnime_session());
-                intent.putExtra("title",item.getAnime_title());
+                intent.putExtra("id",item.getUrl());
+                intent.putExtra("title",item.getTitle());
                 intent.putExtra("ApiPosition",1);
+                intent.putExtra("imageUrl",item.getImage());
                 mContext.startActivity(intent);
             }
         });

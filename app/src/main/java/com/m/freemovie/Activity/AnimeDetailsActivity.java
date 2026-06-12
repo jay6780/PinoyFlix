@@ -27,6 +27,7 @@ import com.m.freemovie.mvp.Model.ClassBean.AnimeDetailsBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogInfoBean;
+import com.m.freemovie.mvp.Model.ClassBean.ZoRoDetailBean;
 import com.m.freemovie.mvp.Presenter.AnimeDetailPresenter;
 
 import java.util.ArrayList;
@@ -53,6 +54,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
     private Random random;
     private KProgressHUD hud;
     private String TAG = "AnimeDetailsActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +62,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
         new GlobalWindowUtils(this);
         binding = ActivityAnimeDetailsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        apiPosition = getIntent().getIntExtra("apiPosition",1);
+        apiPosition = getIntent().getIntExtra("apiPosition", 1);
         id = getIntent().getStringExtra("id");
         title = getIntent().getStringExtra("title");
         imageUrl = getIntent().getStringExtra("imageUrl");
@@ -70,7 +72,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
         hud = KProgressHUD.create(this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
-        if(isNetworkAvailable()){
+        if (isNetworkAvailable()) {
             new CountDownTimer(1500, 1000) {
                 public void onTick(long millisUntilFinished) {
                 }
@@ -82,10 +84,10 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
             }.start();
 
 
-        }else{
-            Toast.makeText(getApplicationContext(),"Please check connection and try again",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Please check connection and try again", Toast.LENGTH_SHORT).show();
         }
-        binding.ivBack.setOnClickListener(view ->onBackPressed());
+        binding.ivBack.setOnClickListener(view -> onBackPressed());
     }
 
     private void initRecycler() {
@@ -94,6 +96,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
         binding.rvSeasons.setLayoutManager(new LinearLayoutManager(this));
         binding.rvSeasons.setAdapter(animeSeasonAdapter);
     }
+
     @SuppressWarnings("deprecation")
     @SuppressLint("MissingPermission")
     private boolean isNetworkAvailable() {
@@ -104,10 +107,9 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
 
 
     private void initApi() {
-        switch (apiPosition){
+        switch (apiPosition) {
             case 1:
-                url = "https://animepahe.com/anime/"+id;
-                presenter.getDetailAnimePaHe(url);
+                presenter.getZoroUrl(id);
                 break;
             case 2:
                 presenter.getUrl(url);
@@ -121,7 +123,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
 
     @Override
     protected void onDestroy() {
-        if(hud!=null && hud.isShowing()){
+        if (hud != null && hud.isShowing()) {
             hud.dismiss();
             hud = null;
         }
@@ -132,7 +134,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
     public void showLoading() {
         try {
             hud.show();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -141,7 +143,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
     @Override
     public void showError(String error) {
         Log.d("ErrorData", "val: " + error);
-        Toast.makeText(getApplicationContext(),error,Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
         finish();
     }
 
@@ -152,7 +154,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
             if (hud != null && hud.isShowing()) {
                 hud.dismiss();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -162,8 +164,8 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
     @Override
     protected void onResume() {
         super.onResume();
-        new WindowUtils(this,false,false);
-        if(animeSeasonAdapter !=null){
+        new WindowUtils(this, false, false);
+        if (animeSeasonAdapter != null) {
             animeSeasonAdapter.recount();
         }
     }
@@ -171,25 +173,27 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
     @Override
     protected void onStart() {
         super.onStart();
-        new WindowUtils(this,false,false);
+        new WindowUtils(this, false, false);
     }
+
     private AnimePaheDetailBean detailBean;
+
     @Override
     public void getDetailData(AnimePaheDetailBean detailBean) {
-        if(detailBean!=null && detailBean.getResults() !=null){
+        if (detailBean != null && detailBean.getResults() != null) {
             try {
                 this.videoId = detailBean.getResults().getId();
                 this.imageUrl = detailBean.getResults().getPoster();
-                this.animeTitle  = detailBean.getResults().getTitle();
+                this.animeTitle = detailBean.getResults().getTitle();
                 this.episodes = detailBean.getResults().getEpisodes();
                 this.airDate = detailBean.getResults().getAired();
-                animeDetailsBeanList.add(new AnimeDetailsBean(videoId,imageUrl,animeTitle,Integer.parseInt(episodes),airDate));
+                animeDetailsBeanList.add(new AnimeDetailsBean(videoId, imageUrl, animeTitle, Integer.parseInt(episodes), airDate));
                 this.detailBean = detailBean;
                 detailsUis();
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 this.episodes = "0";
-                animeDetailsBeanList.add(new AnimeDetailsBean(videoId,imageUrl,animeTitle,Integer.parseInt(episodes),airDate));
+                animeDetailsBeanList.add(new AnimeDetailsBean(videoId, imageUrl, animeTitle, Integer.parseInt(episodes), airDate));
                 this.detailBean = detailBean;
                 detailsUis();
             }
@@ -199,17 +203,17 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
 
     @Override
     public void getTagalogEpisode(TagalogEpisodeBean tagalogEpisodeBean) {
-        if(tagalogEpisodeBean !=null && tagalogEpisodeBean.getResults() !=null){
+        if (tagalogEpisodeBean != null && tagalogEpisodeBean.getResults() != null) {
             Set<String> seenEpisodes = new HashSet<>();
-            for(TagalogEpisodeBean.ResultsBean data : tagalogEpisodeBean.getResults()){
-                if(!data.getEpisodes().isEmpty()){
-                    for(TagalogEpisodeBean.ResultsBean.EpisodesBean dataEpisode : data.getEpisodes()) {
+            for (TagalogEpisodeBean.ResultsBean data : tagalogEpisodeBean.getResults()) {
+                if (!data.getEpisodes().isEmpty()) {
+                    for (TagalogEpisodeBean.ResultsBean.EpisodesBean dataEpisode : data.getEpisodes()) {
                         String episode = dataEpisode.getEpisode();
                         if (!seenEpisodes.contains(episode)) {
                             seenEpisodes.add(episode);
                         }
                     }
-                    animeDetailsBeanList.add(new AnimeDetailsBean(url,imageUrl,title,seenEpisodes.size(),""));
+                    animeDetailsBeanList.add(new AnimeDetailsBean(url, imageUrl, title, seenEpisodes.size(), ""));
                     animeSeasonAdapter.setNewData(animeDetailsBeanList);
                     binding.tvDescription.setText("N/A");
                     binding.tvOriginal.setText(title);
@@ -232,12 +236,12 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
                                 .asBitmap()
                                 .load(imageUrl)
                                 .into(binding.ivBig);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 
-                }else{
-                    Toast.makeText(getApplicationContext(),"Episodes not found",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Episodes not found", Toast.LENGTH_SHORT).show();
                     finish();
                 }
             }
@@ -247,10 +251,10 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
     @Override
     public void getInfoTagalog(TagalogInfoBean tagalogInfoBean) {
         if (binding == null) return;
-        if(tagalogInfoBean != null && tagalogInfoBean.getResults() != null) {
+        if (tagalogInfoBean != null && tagalogInfoBean.getResults() != null) {
             Set<String> seenEpisodes = new HashSet<>();
             this.imageUrl = tagalogInfoBean.getResults().getPoster();
-            this.animeTitle  = tagalogInfoBean.getResults().getTitle();
+            this.animeTitle = tagalogInfoBean.getResults().getTitle();
             this.overView = tagalogInfoBean.getResults().getSynopsis();
             for (TagalogInfoBean.ResultsBean.EpisodesBean data : tagalogInfoBean.getResults().getEpisodes()) {
                 if (!tagalogInfoBean.getResults().getEpisodes().isEmpty()) {
@@ -260,7 +264,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
                     }
                 }
             }
-            animeDetailsBeanList.add(new AnimeDetailsBean(id,imageUrl,animeTitle,seenEpisodes.size(),""));
+            animeDetailsBeanList.add(new AnimeDetailsBean(id, imageUrl, animeTitle, seenEpisodes.size(), ""));
             animeSeasonAdapter.setNewData(animeDetailsBeanList);
             binding.tvDescription.setText(overView);
             binding.tvOriginal.setText(animeTitle);
@@ -283,13 +287,57 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
                         .asBitmap()
                         .load(imageUrl)
                         .into(binding.ivBig);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void detailsUis(){
+    @Override
+    public void getZoroDetail(ZoRoDetailBean zoRoDetailBean) {
+        if (binding == null) return;
+        if (zoRoDetailBean != null && zoRoDetailBean.getEpisodes() != null) {
+            Set<String> seenEpisodes = new HashSet<>();
+            this.animeTitle = zoRoDetailBean.getTitle();
+            this.overView = zoRoDetailBean.getDescription();
+            for (ZoRoDetailBean.EpisodesBean data : zoRoDetailBean.getEpisodes()) {
+                if (!zoRoDetailBean.getEpisodes().isEmpty()) {
+                    String episode = data.getNumber();
+                    if (!seenEpisodes.contains(episode)) {
+                        seenEpisodes.add(episode);
+                    }
+                }
+            }
+            animeDetailsBeanList.add(new AnimeDetailsBean(id, imageUrl, animeTitle, seenEpisodes.size(), ""));
+            animeSeasonAdapter.setNewData(animeDetailsBeanList);
+            binding.tvDescription.setText(overView);
+            binding.tvOriginal.setText(animeTitle);
+            binding.tvTitle.setText(animeTitle);
+            binding.language.setText("JP");
+            random = new Random();
+            int roll = random.nextInt(100000) + 1;
+            binding.tvVote.setText(String.valueOf(roll));
+            Double min = 0.0;
+            Double max = 10.0;
+            double x = (Math.random() * ((max - min) + 1)) + min;
+            double xrounded = Math.round(x * 100.0) / 100.0;
+            binding.tvRate.setText(String.valueOf(xrounded));
+            try {
+                Glide.with(this)
+                        .asBitmap()
+                        .load(imageUrl)
+                        .into(binding.ivSmallimg);
+                Glide.with(this)
+                        .asBitmap()
+                        .load(imageUrl)
+                        .into(binding.ivBig);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void detailsUis() {
         binding.tvDescription.setText(detailBean.getResults().getSynopsis());
         binding.tvOriginal.setText(detailBean.getResults().getTitle());
         binding.language.setText("JP");
@@ -311,7 +359,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
                     .asBitmap()
                     .load(detailBean.getResults().getPoster())
                     .into(binding.ivBig);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

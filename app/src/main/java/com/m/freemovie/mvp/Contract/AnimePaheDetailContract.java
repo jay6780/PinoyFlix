@@ -1,23 +1,20 @@
 package com.m.freemovie.mvp.Contract;
 
 
-import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
-import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDownloadBean;
-import com.m.freemovie.mvp.Model.ClassBean.AnimePaheEpisodeBean;
+import com.m.freemovie.mvp.Model.ClassBean.ZoRoDetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.ZoRoVideoUrlBean;
 
 public interface AnimePaheDetailContract {
     interface View {
         void showLoading();
         void showError(String error);
         void hideLoading();
-        void getDetailData(AnimePaheDetailBean detailBean);
-        void getEpisodes(AnimePaheEpisodeBean episodeBean);
-        void getTrack(AnimePaheDownloadBean downloadBean);
+        void getZoroDetail(ZoRoDetailBean zoRoDetailBean);
+        void getZoRoVideo(ZoRoVideoUrlBean zoRoVideoUrlBean);
     }
 
     interface Presenter {
-        void getDetailQuery(String url);
-        void getEpisodeQuery(String id,int page);
-        void getTrackQuery(String url);
+        void getZoroUrl(String Url);
+        void getZoRoVideoUrl(String Url);
     }
 }

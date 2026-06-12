@@ -32,11 +32,12 @@
                     android:src="@mipmap/icon_backwhite" />
             </LinearLayout>
 
-            <WebView
+            <org.mozilla.geckoview.GeckoView
                 android:id="@+id/webView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone" />
+                android:visibility="gone"
+                android:layout_height="match_parent" />
+
 
             <TextView
                 android:id="@+id/tv_select"

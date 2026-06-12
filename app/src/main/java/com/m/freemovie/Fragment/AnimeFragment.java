@@ -30,12 +30,13 @@ import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
 import com.m.freemovie.mvp.Contract.AnimeContract;
+import com.m.freemovie.mvp.Model.ClassBean.ZoRoPageBean;
 import com.m.freemovie.mvp.Presenter.AnimePresenter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AnimeFragment extends Fragment implements AnimeContract.View, View.OnClickListener{
+public class AnimeFragment extends Fragment implements AnimeContract.View, View.OnClickListener {
     private FragmentAnimeBinding binding;
     private AnimePresenter presenter;
     private int page = 1;
@@ -43,22 +44,24 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
     private HotAdapter hotAdapter;
     private AnimePopularAdapter animePopularAdapter;
     private AnimeMovieAdapter movieAdapter;
-    private List<PaheLatestBean.ResultsBean.DataBean> newestList = new ArrayList<>();
+    private List<ZoRoPageBean> newestList = new ArrayList<>();
     private List<AnimoPageBean.ResultsBean> hotList = new ArrayList<>();
     private List<RevivalSeriesBean.ResultsBean> popularList = new ArrayList<>();
     private List<RevivalSeriesBean.ResultsBean> movieList = new ArrayList<>();
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentAnimeBinding.inflate(inflater);
         presenter = new AnimePresenter(this);
-        if(isNetworkAvailable()){
+        if (isNetworkAvailable()) {
 //            presenter.getNewestPage(page);
 //            presenter.getHotPage(page);
             presenter.getPopular(page);
             presenter.getMovie(page);
-        }else{
-            Toast.makeText(getContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
+            presenter.getZoRoPage(page);
+        } else {
+            Toast.makeText(getContext(), "Please check internet and try again", Toast.LENGTH_SHORT).show();
         }
 
         List<View> viewsList = new ArrayList<>();
@@ -67,7 +70,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         viewsList.add(binding.tvPopular);
         viewsList.add(binding.tvMovies);
 
-        for(View view : viewsList){
+        for (View view : viewsList) {
             view.setOnClickListener(this);
         }
 
@@ -85,11 +88,11 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
     }
 
     private void refresh() {
-        if(!isNetworkAvailable()){
+        if (!isNetworkAvailable()) {
             if (binding.swipeRefreshLayout.isRefreshing()) {
                 binding.swipeRefreshLayout.setRefreshing(false);
             }
-            Toast.makeText(getContext(),"Please check network and try again",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Please check network and try again", Toast.LENGTH_SHORT).show();
             return;
         }
         clearAllData();
@@ -98,6 +101,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
 //        presenter.getHotPage(page);
         presenter.getPopular(page);
         presenter.getMovie(page);
+        presenter.getZoRoPage(page);
     }
 
     private void clearAllData() {
@@ -110,15 +114,10 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         binding.rvMovies.setVisibility(View.GONE);
         binding.rlMovies.setVisibility(View.GONE);
 
-        newestList.clear();
-        hotList.clear();
-        popularList.clear();
-        movieList.clear();
-
-        newestAdapter.setNewData(newestList);
-        hotAdapter.setNewData(hotList);
-        animePopularAdapter.setNewData(popularList);
-        movieAdapter.setNewData(movieList);
+        newestAdapter.getData().clear();
+        hotAdapter.getData().clear();
+        animePopularAdapter.getData().clear();
+        movieAdapter.getData().clear();
 
         binding.rvNewest.scrollToPosition(0);
         binding.rvHot.scrollToPosition(0);
@@ -147,6 +146,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         movieAdapter.isMovie(true);
 
     }
+
     @SuppressWarnings("deprecation")
     @SuppressLint("MissingPermission")
     private boolean isNetworkAvailable() {
@@ -166,7 +166,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getContext(),"Error fetching data: "+error,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Error fetching data: " + error, Toast.LENGTH_SHORT).show();
                 binding.swipeRefreshLayout.setRefreshing(false);
             }
         }, 500);
@@ -185,32 +185,20 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
     //limit list to 10 inside loop
     @Override
     public void getNewest(PaheLatestBean paheLatestBean) {
-        if(paheLatestBean !=null && paheLatestBean.getResults().getData() !=null){
-            if(!paheLatestBean.getResults().getData().isEmpty()){
-                for (int i = 0; i < 10 ; i ++){
-                    newestList.add(paheLatestBean.getResults().getData().get(i));
-                }
-                newestAdapter.setNewData(newestList);
-                binding.rvNewest.setVisibility(View.VISIBLE);
-                binding.rlNew.setVisibility(View.VISIBLE);
-            }else{
-                binding.rvNewest.setVisibility(View.GONE);
-                binding.rlNew.setVisibility(View.GONE);
-            }
-        }
+
     }
 
     @Override
     public void getHot(AnimoPageBean animoPageBean) {
-        if(animoPageBean !=null && animoPageBean.getResults() !=null){
-            if(!animoPageBean.getResults().isEmpty()){
-                for (int i = 0; i < 10 ; i ++){
+        if (animoPageBean != null && animoPageBean.getResults() != null) {
+            if (!animoPageBean.getResults().isEmpty()) {
+                for (int i = 0; i < 10; i++) {
                     hotList.add(animoPageBean.getResults().get(i));
                 }
                 hotAdapter.setNewData(hotList);
                 binding.rvHot.setVisibility(View.VISIBLE);
                 binding.rlHot.setVisibility(View.VISIBLE);
-            }else{
+            } else {
                 binding.rvHot.setVisibility(View.GONE);
                 binding.rlHot.setVisibility(View.GONE);
             }
@@ -219,15 +207,15 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
 
     @Override
     public void getPopular(RevivalSeriesBean revivalSeriesBean) {
-        if(revivalSeriesBean !=null && revivalSeriesBean.getResults()!=null){
-            if(!revivalSeriesBean.getResults().isEmpty()){
-                for (int i = 0; i < 10 ; i ++){
+        if (revivalSeriesBean != null && revivalSeriesBean.getResults() != null) {
+            if (!revivalSeriesBean.getResults().isEmpty()) {
+                for (int i = 0; i < 10; i++) {
                     popularList.add(revivalSeriesBean.getResults().get(i));
                 }
                 animePopularAdapter.setNewData(popularList);
                 binding.rvPopular.setVisibility(View.VISIBLE);
                 binding.rlPopular.setVisibility(View.VISIBLE);
-            }else{
+            } else {
                 binding.rvPopular.setVisibility(View.GONE);
                 binding.rlPopular.setVisibility(View.GONE);
             }
@@ -236,15 +224,15 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
 
     @Override
     public void getMovie(RevivalSeriesBean revivalSeriesBean) {
-        if(revivalSeriesBean !=null && revivalSeriesBean.getResults()!=null){
-            if(!revivalSeriesBean.getResults().isEmpty()){
-                for (int i = 0; i < 10 ; i ++){
+        if (revivalSeriesBean != null && revivalSeriesBean.getResults() != null) {
+            if (!revivalSeriesBean.getResults().isEmpty()) {
+                for (int i = 0; i < 10; i++) {
                     movieList.add(revivalSeriesBean.getResults().get(i));
                 }
                 movieAdapter.setNewData(movieList);
                 binding.rvMovies.setVisibility(View.VISIBLE);
                 binding.rlMovies.setVisibility(View.VISIBLE);
-            }else{
+            } else {
                 binding.rvMovies.setVisibility(View.GONE);
                 binding.rlMovies.setVisibility(View.GONE);
             }
@@ -252,31 +240,49 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
     }
 
     @Override
+    public void getZoRo(List<ZoRoPageBean> zoRoPageBean) {
+        if (zoRoPageBean != null) {
+            int limit = 10;
+            for (int i = 0; i < limit && i < zoRoPageBean.size(); i++) {
+                newestList.add(zoRoPageBean.get(i));
+
+            }
+            newestAdapter.setNewData(newestList);
+            binding.rvNewest.setVisibility(View.VISIBLE);
+            binding.rlNew.setVisibility(View.VISIBLE);
+        } else {
+            binding.rvNewest.setVisibility(View.GONE);
+            binding.rlNew.setVisibility(View.GONE);
+        }
+    }
+
+
+    @Override
     public void onClick(View view) {
         Intent intent;
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.tv_new:
-                 intent = new Intent(getActivity(), ViewAllAnimeAcitvity.class);
-                 intent.putExtra("title", AppConstant.NEWEST);
-                 intent.putExtra("position",1);
-                 startActivity(intent);
+                intent = new Intent(getActivity(), ViewAllAnimeAcitvity.class);
+                intent.putExtra("title", AppConstant.NEWEST);
+                intent.putExtra("position", 1);
+                startActivity(intent);
                 break;
             case R.id.tv_hot:
                 intent = new Intent(getActivity(), ViewAllAnimeAcitvity.class);
                 intent.putExtra("title", AppConstant.HOT);
-                intent.putExtra("position",2);
+                intent.putExtra("position", 2);
                 startActivity(intent);
                 break;
             case R.id.tv_popular:
                 intent = new Intent(getActivity(), ViewAllAnimeAcitvity.class);
                 intent.putExtra("title", AppConstant.POPULAR);
-                intent.putExtra("position",3);
+                intent.putExtra("position", 3);
                 startActivity(intent);
                 break;
             case R.id.tv_movies:
                 intent = new Intent(getActivity(), ViewAllAnimeAcitvity.class);
                 intent.putExtra("title", AppConstant.MOVIES);
-                intent.putExtra("position",4);
+                intent.putExtra("position", 4);
                 startActivity(intent);
                 break;
 

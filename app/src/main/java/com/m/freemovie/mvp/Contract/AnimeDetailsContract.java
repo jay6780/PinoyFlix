@@ -4,6 +4,7 @@ package com.m.freemovie.mvp.Contract;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogInfoBean;
+import com.m.freemovie.mvp.Model.ClassBean.ZoRoDetailBean;
 
 public interface AnimeDetailsContract {
     interface View {
@@ -13,11 +14,13 @@ public interface AnimeDetailsContract {
         void getDetailData(AnimePaheDetailBean detailBean);
         void getTagalogEpisode(TagalogEpisodeBean tagalogEpisodeBean);
         void getInfoTagalog(TagalogInfoBean tagalogInfoBean);
+        void getZoroDetail(ZoRoDetailBean zoRoDetailBean);
     }
 
     interface Presenter {
         void getDetailAnimePaHe(String url);
         void getUrl(String url);
         void getListTv(String Url);
+        void getZoroUrl(String Url);
     }
 }

@@ -71,6 +71,7 @@ public class DetailAdapter extends BaseQuickAdapter<DetailBean, BaseViewHolder> 
                         break;
                     case 7:
                         intent = new Intent(mContext, AnimeDetailsActivity.class);
+                        intent.putExtra("imageUrl", item.getTempImage());
                         intent.putExtra("id", item.getVideoId());
                         intent.putExtra("apiPosition", 1);
                         break;
