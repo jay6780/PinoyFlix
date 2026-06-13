@@ -2,7 +2,6 @@ package com.m.freemovie.Activity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -15,11 +14,8 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -33,9 +29,9 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.app.hubert.guide.NewbieGuide;
@@ -43,11 +39,6 @@ import com.app.hubert.guide.core.Controller;
 import com.app.hubert.guide.listener.OnGuideChangedListener;
 import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.LoadAdError;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
@@ -58,18 +49,20 @@ import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
 import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.AnimePaheDetailAdapter;
-import com.m.freemovie.adapter.DownloadAdapter;
-import com.m.freemovie.adapter.QualityAdapter;
 import com.m.freemovie.databinding.ActivityAnimePaheWebviewBinding;
 import com.m.freemovie.mvp.Contract.AnimePaheDetailContract;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheBeanList;
-import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDownloadBean;
-import com.m.freemovie.mvp.Model.ClassBean.AnimePaheEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.ZoRoDetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.ZoRoVideoUrlBean;
 import com.m.freemovie.mvp.Presenter.AnimePaheDetailPresenter;
-import com.orhanobut.dialogplus.DialogPlus;
-import com.orhanobut.dialogplus.ViewHolder;
+
+import org.mozilla.geckoview.AllowOrDeny;
+import org.mozilla.geckoview.GeckoResult;
+import org.mozilla.geckoview.GeckoRuntime;
+import org.mozilla.geckoview.GeckoSession;
+import org.mozilla.geckoview.GeckoSessionSettings;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -78,8 +71,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class AnimePaheWebviewActivity extends AppCompatActivity
-        implements AnimePaheDetailContract.View, AnimePaheDetailAdapter.EpisodeListener,
-        QualityAdapter.SrcListener, DownloadAdapter.DownListerner, AdapterView.OnItemSelectedListener {
+        implements AnimePaheDetailContract.View, AnimePaheDetailAdapter.EpisodeListener,AdapterView.OnItemSelectedListener {
     private ActivityAnimePaheWebviewBinding binding;
     private String id, title;
     private AnimePaheDetailAdapter episodeAdapter;
@@ -101,7 +93,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     private boolean isInit = true;
     private boolean isDownload = false;
     private String episode = "";
-    private AdView adView;
     private RelativeLayout.LayoutParams params;
     private SpinnerTotalDbHelper spinnerTotalDbHelper;
     private int totalPages = 0;
@@ -112,6 +103,10 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     private int currentLevelIndex = 3;
     private CountDownTimer volumeTimer;
     private AudioManager audioManager;
+    private String imageUrl;
+    private GeckoRuntime geckoRuntime;
+    private GeckoSession geckoSession;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,6 +117,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         initGuide();
         new WindowUtils(this, true, false);
         title = getIntent().getStringExtra("title");
+        imageUrl = getIntent().getStringExtra("imageUrl");
 //        Log.d("AnimeTitle","val: "+title);
         id = getIntent().getStringExtra("id");
 //        Log.d("SeasonList","ids"+" videoId: "+id + " SeasonId: "+seasonId);
@@ -130,10 +126,9 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         binding.expand.setOnClickListener(view -> rotateScreen());
         binding.llBookmark.setOnClickListener(view -> savedBook());
         detailPresenter = new AnimePaheDetailPresenter(this);
-        url = "https://animepahe.com/anime/" + id;
         spinnerTotalDbHelper = new SpinnerTotalDbHelper(this);
         if (isNetworkAvailable()) {
-            detailPresenter.getDetailQuery(url);
+            detailPresenter.getZoroUrl(id);
         } else {
             Toast.makeText(getApplicationContext(), "Please check internet and try again", Toast.LENGTH_SHORT).show();
         }
@@ -141,7 +136,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         setImageData(id);
         SPUtils.getInstance().put(AppConstant.isShow, false);
 
-
+        geckoRuntime = GeckoRuntime.getDefault(this);
         initializeSpinnerItems();
 
         if (isInit) {
@@ -158,20 +153,16 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 isNomore = false;
                 isInit = true;
                 SPUtils.getInstance().put(AppConstant.isShow, false);
-                detailPresenter.getDetailQuery(url);
+                detailPresenter.getZoroUrl(id);
                 episodeBeanList.clear();
                 episodeAdapter.setNewData(new ArrayList<>());
-                if(isPaging){
-                    detailPresenter.getEpisodeQuery(animeId,page);
-                    SPUtils.getInstance().put(AppConstant.SpinnerPosition,0);
-                    binding.spinner.setSelection(0);
-                }
             }
         });
         binding.btnBackFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (finishing) {
+                    shutdownGeckoSession();
                     finish();
                 } else {
                     defaultScreen();
@@ -182,11 +173,8 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         binding.rvSeason.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(this));
         episodeAdapter = new AnimePaheDetailAdapter(this);
         binding.rvSeason.setAdapter(episodeAdapter);
-        if (!AppConstant.isAddFree) {
-            loadAd();
-        } else {
-            loadAdsFailed();
-        }
+        episodeAdapter.setNewData(episodeBeanList);
+
         try {
             booster = new LoudnessEnhancer(0);
             booster.setEnabled(true);
@@ -219,10 +207,11 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
         binding.llVolume.setEnabled(false);
     }
+
     private void initializeSpinnerItems() {
         spinnerItems.clear();
 
-        totalPages = spinnerTotalDbHelper.getTotalPages(id) == 0? 5 : spinnerTotalDbHelper.getTotalPages(id);
+        totalPages = spinnerTotalDbHelper.getTotalPages(id) == 0 ? 5 : spinnerTotalDbHelper.getTotalPages(id);
         for (int i = 1; i <= totalPages; i++) {
             spinnerItems.add(String.valueOf(i));
         }
@@ -230,47 +219,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 R.layout.spinner_item, spinnerItems);
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         binding.spinner.setAdapter(adapter);
-    }
-
-    @SuppressLint("MissingPermission")
-    private void loadAd() {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView = new AdView(AnimePaheWebviewActivity.this);
-        adView.setAdUnitId(getString(R.string.banner_adId));
-        adView.setAdSize(AdSize.BANNER);
-        binding.adTvSeries.removeAllViews();
-        binding.adTvSeries.addView(adView);
-        adView.loadAd(adRequest);
-        if (adView != null) {
-            adView.setAdListener(
-                    new AdListener() {
-                        @Override
-                        public void onAdClicked() {
-                        }
-
-                        @Override
-                        public void onAdClosed() {
-                        }
-
-                        @Override
-                        public void onAdFailedToLoad(@NonNull LoadAdError adError) {
-                            loadAdsFailed();
-                        }
-
-                        @Override
-                        public void onAdImpression() {
-                        }
-
-                        @Override
-                        public void onAdLoaded() {
-                            loadAdsSuccess();
-                        }
-
-                        @Override
-                        public void onAdOpened() {
-                        }
-                    });
-        }
     }
 
     private void updateVolume(int index) {
@@ -311,7 +259,9 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         if (volumeTimer != null) volumeTimer.cancel();
 
         volumeTimer = new CountDownTimer(3500, 1000) {
-            public void onTick(long millisUntilFinished) {}
+            public void onTick(long millisUntilFinished) {
+            }
+
             public void onFinish() {
                 binding.llVolume.setVisibility(View.GONE);
             }
@@ -323,29 +273,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         params.addRule(RelativeLayout.BELOW, binding.rlOption.getId());
         binding.rvSeason.setLayoutParams(params);
-        binding.adTvSeries.removeAllViews();
-        binding.adTvSeries.setVisibility(View.GONE);
-        binding.llAds.setVisibility(View.GONE);
-    }
-
-    private void loadAdsSuccess() {
-        binding.adTvSeries.setVisibility(View.VISIBLE);
-        binding.llAds.setVisibility(View.VISIBLE);
-        params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        params.addRule(RelativeLayout.ABOVE, binding.llAds.getId());
-        params.addRule(RelativeLayout.BELOW, binding.rlOption.getId());
-        binding.rvSeason.setLayoutParams(params);
-
-        new CountDownTimer(10000, 1000) {
-
-            public void onTick(long millisUntilFinished) {
-            }
-
-            public void onFinish() {
-                loadAdsFailed();
-            }
-
-        }.start();
     }
 
     private void initGuide() {
@@ -370,7 +297,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     }
 
 
-
     private void rotateScreen() {
         finishing = false;
         binding.expand.setVisibility(View.INVISIBLE);
@@ -381,7 +307,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         binding.llBookmark.setVisibility(View.GONE);
         binding.swipe.setEnabled(false);
-        binding.spinner.setVisibility(isPaging ? View.VISIBLE : View.GONE);
         loadAdsFailed();
         new WindowUtils(this, true, false);
     }
@@ -396,7 +321,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         binding.rlWebview.setLayoutParams(params);
         binding.llBookmark.setVisibility(View.VISIBLE);
         binding.swipe.setEnabled(true);
-        binding.spinner.setVisibility(isPaging ? View.VISIBLE : View.GONE);
         new WindowUtils(this, true, false);
     }
 
@@ -409,32 +333,37 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         return context.getResources();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     public void onBackPressed() {
-        if (!finishing) {
+        if(!finishing){
             defaultScreen();
-        } else {
+        }else{
             super.onBackPressed();
-            if (binding.swipe != null && binding.swipe.isRefreshing()) {
-                binding.swipe.setRefreshing(false);
-            }
-            if (binding != null && binding.webView != null) {
-                binding.webView.stopLoading();
-                binding.webView.setWebChromeClient(null);
-                binding.webView.setWebViewClient(null);
-                binding.webView.destroy();
-                binding.webView.clearCache(true);
-                binding.webView.clearHistory();
-                binding.webView.reload();
-            }
+            shutdownGeckoSession();
             finish();
         }
     }
 
 
+    private void shutdownGeckoSession() {
+        if (geckoSession != null) {
+            try {
+                geckoSession.stop();
+                geckoSession.setNavigationDelegate(null);
+                geckoSession.setProgressDelegate(null);
+                geckoSession.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                geckoSession = null;
+            }
+        }
+    }
+
     private void savedBook() {
         String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
-        DetailBean details = new DetailBean(id, timestamp, image, title, "false");
+        DetailBean details = new DetailBean(id, timestamp, imageUrl, title, "false");
         details.setVideoId(id);
         details.setTimeStamp(timestamp);
         bookmarkDbHelper.toggleBookmark(details, 7);
@@ -455,65 +384,28 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     }
 
     private void setupWebView(String videoUrl) {
-        binding.webView.setWebViewClient(new CustomWebViewClient());
-        binding.webView.setWebChromeClient(new CustomWebChromeClient() {
-        });
-        WebSettings webSettings = binding.webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setDomStorageEnabled(true);
-        webSettings.setDisplayZoomControls(false);
-        webSettings.setBuiltInZoomControls(false);
-        webSettings.setSupportZoom(false);
-//        String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
-//        webSettings.setUserAgentString(userAgent);
-        webSettings.setMediaPlaybackRequiresUserGesture(false);
-        binding.webView.requestFocusFromTouch();
+        org.mozilla.geckoview.GeckoView geckoView = findViewById(R.id.webView);
 
-        binding.webView.setFocusable(true);
-        binding.webView.setFocusableInTouchMode(true);
+        if (geckoSession == null) {
+            GeckoSessionSettings settings = new GeckoSessionSettings.Builder()
+                    .usePrivateMode(false)
+                    .useTrackingProtection(true)
+                    .build();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            binding.webView.setWebContentsDebuggingEnabled(false);
+            geckoSession = new GeckoSession(settings);
+            geckoSession.open(geckoRuntime);
+
+            geckoView.setSession(geckoSession);
         }
 
-        String htmlContent = "<!DOCTYPE html>" +
-                "<html>" +
-                "<head>" +
-                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
-                "    <style>" +
-                "        .video-player {" +
-                "            position: fixed;" +
-                "            top: 0;" +
-                "            left: 0;" +
-                "            width: 100%;" +
-                "            height: 100%;" +
-                "            border: none;" +
-                "            object-fit: contain; /* Makes video fill while keeping aspect ratio */" +
-                "            background-color: #000; /* Black background for letterboxing */" +
-                "        }" +
-                "    </style>" +
-                "</head>" +
-                "<body style=\"margin:0;padding:0;overflow:hidden;background:#000;\">" +
-                "    <iframe src=\"" + videoUrl + "\"" +
-                "            class=\"video-player\"" +
-                "            allow=\"autoplay; encrypted-media; fullscreen\" " +
-                "            allowfullscreen>" +
-                "    </iframe>" +
-                "</body>" +
-                "</html>";
-
-        binding.webView.loadDataWithBaseURL(
-                null,
-                htmlContent,
-                "text/html",
-                "UTF-8",
-                null
-        );
+        geckoSession.setNavigationDelegate(new CustomNavigationDelegate());
+        geckoSession.setProgressDelegate(new CustomProgressDelegate());
+        geckoSession.loadUri(videoUrl);
     }
 
     @Override
     public void showLoading() {
-        if(!binding.swipe.isEnabled()){
+        if (!binding.swipe.isEnabled()) {
             binding.swipe.setEnabled(true);
         }
         if (!isInit) {
@@ -544,68 +436,38 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
     }
 
-
-    int pageSize = 0;
-    boolean isPaging = false;
-    @Override
-    public void getDetailData(AnimePaheDetailBean detailBean) {
-        if (detailBean != null && detailBean.getResults() != null) {
-            animeId = detailBean.getResults().getId();
-            image = detailBean.getResults().getPoster();
-            try {
-                if(!isPaging){
-                    detailPresenter.getEpisodeQuery(animeId,page);
-                    pageSize = Integer.parseInt(detailBean.getResults().getEpisodes());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                isPaging = true;
-                binding.spinner.setVisibility(View.VISIBLE);
-                binding.spinner.setOnItemSelectedListener(this);
-                binding.spinner.setSelection(0);
-            }
-        }
-    }
-
     int lastWatchedPosition = -1;
 
     @Override
-    public void getEpisodes(AnimePaheEpisodeBean episodeBean) {
+    public void getZoroDetail(ZoRoDetailBean zoRoDetailBean) {
         if (binding == null) return;
-        if (episodeBean != null && episodeBean.getResults() != null) {
+        if (zoRoDetailBean != null) {
             isLoading = false;
             isInit = false;
-            if(isPaging){
-                episodeBeanList.clear();
-            }
-            if (episodeBean.getResults().getData() != null) {
-                for (AnimePaheEpisodeBean.ResultsBean.DataBean dataBean : episodeBean.getResults().getData()) {
-                    AnimePaheBeanList detailBean = new AnimePaheBeanList(String.valueOf(dataBean.getId()), String.valueOf(dataBean.getEpisode()), dataBean.getSnapshot(), dataBean.getSession());
-                    boolean isWatched = dbHelper.isEpisodeWatched(id, String.valueOf(dataBean.getEpisode()));
+
+            if (zoRoDetailBean.getEpisodes() != null) {
+                for (ZoRoDetailBean.EpisodesBean dataBean : zoRoDetailBean.getEpisodes()) {
+                    AnimePaheBeanList detailBean = new AnimePaheBeanList(dataBean.getUrl(), String.valueOf(dataBean.getNumber()), imageUrl, "");
+                    boolean isWatched = dbHelper.isEpisodeWatched(id, String.valueOf(dataBean.getNumber()));
                     detailBean.setVideoId(id);
                     detailBean.setWatched(isWatched);
                     episodeBeanList.add(detailBean);
+
                     if (isWatched) {
                         lastWatchedPosition = episodeBeanList.size() - 1;
                     }
                 }
-                episodeAdapter.setNewData(episodeBeanList);
-                if (!isPaging) {
-                    if (episodeBeanList.size() < pageSize) {
-                        page++;
-                        isInit = true;
-                        detailPresenter.getEpisodeQuery(animeId, page);
-                    }
-                    if (lastWatchedPosition != -1) {
-                        if (!SPUtils.getInstance().getBoolean(AppConstant.isShow)) {
-                            Toast.makeText(getApplicationContext(), "Continuing from last watched episode", Toast.LENGTH_SHORT).show();
-                            SPUtils.getInstance().put(AppConstant.isShow, true);
-                        }
-                        binding.rvSeason.postDelayed(() -> {
-                            binding.rvSeason.smoothScrollToPosition(lastWatchedPosition);
 
-                        }, 300);
+                episodeAdapter.setNewData(episodeBeanList);
+                if (lastWatchedPosition != -1) {
+                    if (!SPUtils.getInstance().getBoolean(AppConstant.isShow)) {
+                        Toast.makeText(getApplicationContext(), "Continuing from last watched episode", Toast.LENGTH_SHORT).show();
+                        SPUtils.getInstance().put(AppConstant.isShow, true);
                     }
+                    binding.rvSeason.postDelayed(() -> {
+                        binding.rvSeason.smoothScrollToPosition(lastWatchedPosition);
+
+                    }, 300);
                 }
 
                 binding.episodeTxt.setText(episodeBeanList.size() > 1 ? "Episode's" : "Episode");
@@ -618,108 +480,16 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     }
 
     @Override
-    public void getTrack(AnimePaheDownloadBean downloadBean) {
-        if (downloadBean != null && downloadBean.getResults() != null) {
-            if (!downloadBean.getResults().getStreaming().isEmpty()) {
-                streamingBeanList.clear();
-                downloadBeanList.clear();
-                for (AnimePaheDownloadBean.ResultsBean.StreamingBean streamingBean : downloadBean.getResults().getStreaming()) {
-                    streamingBeanList.add(streamingBean);
-                }
-                for (AnimePaheDownloadBean.ResultsBean.DownloadBean downloadBean1 : downloadBean.getResults().getDownload()) {
-                    downloadBeanList.add(downloadBean1);
-                }
-                if (isDownload) {
-                    showDownloadList(downloadBeanList);
-                } else {
-                    ShowDialog(streamingBeanList);
-                }
-
+    public void getZoRoVideo(ZoRoVideoUrlBean zoRoVideoUrlBean) {
+        if(zoRoVideoUrlBean !=null && zoRoVideoUrlBean.getVideoUrl() !=null){
+            if(binding.webView.getVisibility() == View.GONE){
+                binding.webView.setVisibility(View.VISIBLE);
+                binding.tvSelect.setVisibility(View.GONE);
+                binding.expand.setVisibility(View.VISIBLE);
             }
+            setupWebView(zoRoVideoUrlBean.getVideoUrl());
         }
-    }
 
-    private DialogPlus dialog, dldialog;
-
-    private void ShowDialog(List<AnimePaheDownloadBean.ResultsBean.StreamingBean> streamingBeanList) {
-        dialog = DialogPlus.newDialog(this)
-                .setContentHolder(new ViewHolder(R.layout.dialog_select_quality))
-                .setContentWidth(ViewGroup.LayoutParams.MATCH_PARENT)
-                .setContentHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-                .setGravity(Gravity.CENTER)
-                .setCancelable(true)
-                .setPadding(10, 10, 10, 10)
-                .create();
-
-        View dialogView = dialog.getHolderView();
-        RecyclerView recyclerView = dialogView.findViewById(R.id.rv_quality);
-        QualityAdapter adapter = new QualityAdapter(this);
-
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
-
-        adapter.setNewData(streamingBeanList);
-
-        dialog.show();
-    }
-
-    private void showDownloadList(List<AnimePaheDownloadBean.ResultsBean.DownloadBean> downloadBeanList) {
-        dldialog = DialogPlus.newDialog(this)
-                .setContentHolder(new ViewHolder(R.layout.dialog_select_quality))
-                .setContentWidth(ViewGroup.LayoutParams.MATCH_PARENT)
-                .setContentHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-                .setGravity(Gravity.CENTER)
-                .setCancelable(true)
-                .setPadding(10, 10, 10, 10)
-                .create();
-
-        View dialogView = dldialog.getHolderView();
-        RecyclerView recyclerView = dialogView.findViewById(R.id.rv_quality);
-        DownloadAdapter adapter = new DownloadAdapter(this);
-
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
-
-        adapter.setNewData(downloadBeanList);
-
-        dldialog.show();
-    }
-
-    @Override
-    public void getSrc(String videoUrl) {
-        if (dialog != null) {
-            dialog.dismiss();
-        }
-        setupWebView(videoUrl);
-    }
-
-    @Override
-    public void getDownloadLink(String videoUrl) {
-        if (dldialog != null) {
-            isDownload = false;
-            dldialog.dismiss();
-        }
-        Intent intent = new Intent(getApplicationContext(), DownloadWebview.class);
-        intent.putExtra("DownloadUrl", videoUrl);
-        intent.putExtra("title", title);
-        intent.putExtra("EpisodeNum", episode);
-        startActivity(intent);
-    }
-
-
-    @Override
-    public void getVideoUrl(String videoUrl, boolean isDownload, String episode) {
-        this.isDownload = isDownload;
-        this.episode = episode;
-        if (!videoUrl.isEmpty()) {
-            isError = false;
-            if (!streamingBeanList.isEmpty()) {
-                streamingBeanList.clear();
-            }
-            String url = "https://animepahe.com/play/" + animeId + "/" + videoUrl;
-//            Log.d("Urldata","val: "+url);
-            detailPresenter.getTrackQuery(url);
-        }
     }
 
 
@@ -730,12 +500,11 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             isNomore = false;
             page = 1;
             episodeBeanList.clear();
-            detailPresenter.getEpisodeQuery(animeId, page);
+            episodeAdapter.setNewData(episodeBeanList);
             binding.spinner.setSelection(0);
             return;
         }
 
-        isPaging = true;
         page = position + 1;
         if (position == spinnerItems.size() - 1) {
             totalPages++;
@@ -747,7 +516,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
         episodeBeanList.clear();
         binding.rvSeason.scrollToPosition(0);
-        detailPresenter.getEpisodeQuery(animeId, page);
     }
 
     @Override
@@ -755,55 +523,30 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public void getVideoUrl(String videoUrl) {
+//        Log.d("VideoUrl","val: "+videoUrl);
+        detailPresenter.getZoRoVideoUrl(videoUrl);
+    }
 
-    private class CustomWebChromeClient extends WebChromeClient {
-        @Override
-        public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
-            return true;
-        }
 
+    private class CustomNavigationDelegate implements GeckoSession.NavigationDelegate {
+        @Nullable
         @Override
-        public Bitmap getDefaultVideoPoster() {
-            return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888);
+        public GeckoResult<AllowOrDeny> onLoadRequest(@NonNull GeckoSession session, @NonNull LoadRequest request) {
+            if (videoUrl != null && request.uri.contains(videoUrl)) {
+                return GeckoResult.fromValue(AllowOrDeny.ALLOW);
+            } else {
+                return GeckoResult.fromValue(AllowOrDeny.DENY);
+            }
         }
     }
 
-    private class CustomWebViewClient extends WebViewClient {
+    private class CustomProgressDelegate implements GeckoSession.ProgressDelegate {
         @Override
-        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-            String url = request.getUrl().toString();
-            return handleUrlLoading(view, url);
+        public void onPageStop(@NonNull GeckoSession session, boolean success) {
+            // Replaces onPageFinished
         }
-
-        private boolean handleUrlLoading(WebView view, String url) {
-            try {
-                if (url.contains(videoUrl)) {
-                    return false;
-                } else {
-                    return true;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                isError = true;
-                binding.tvSelect.setVisibility(View.VISIBLE);
-                binding.tvSelect.setText("video can't play");
-                binding.webView.setVisibility(View.GONE);
-                view.clearCache(true);
-            }
-            return false;
-        }
-
-        @Override
-        public void onPageFinished(WebView view, String url) {
-            if (isError) {
-                binding.webView.setVisibility(View.GONE);
-                return;
-            }
-            binding.webView.setVisibility(View.VISIBLE);
-            binding.tvSelect.setVisibility(View.GONE);
-            binding.expand.setVisibility(View.VISIBLE);
-            super.onPageFinished(view, url);
-        }
-
     }
+
 }

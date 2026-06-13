@@ -36,7 +36,7 @@ public class MovieListAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Ba
         TextView tv_date = helper.getView(R.id.tv_date);
         TextView tv_popularity = helper.getView(R.id.tv_popularity);
         ConstraintLayout clSelect = helper.getView(R.id.Cl_select);
-        String posterPath = "https://image.tmdb.org/t/p/w500/"+item.getPoster_path();
+        String posterPath = "http://image.tmdb.org/t/p/w500/"+item.getPoster_path();
 
         if(lastPosition == (helper.getAdapterPosition())){
             clSelect.setBackgroundColor(Color.parseColor("#050E3C"));

@@ -66,6 +66,7 @@ public class AnimeSeasonAdapter extends BaseQuickAdapter<AnimeDetailsBean, BaseV
                         intent = new Intent(mContext, AnimePaheWebviewActivity.class);
                         intent.putExtra("id",item.getId());
                         intent.putExtra("title",item.getTitle());
+                        intent.putExtra("imageUrl",item.getImageUrl());
                         break;
                     case 2:
                         intent = new Intent(mContext, TagalogEpisodeActivity.class);

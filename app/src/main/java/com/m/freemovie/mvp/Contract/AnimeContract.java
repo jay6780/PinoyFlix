@@ -5,6 +5,9 @@ import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
+import com.m.freemovie.mvp.Model.ClassBean.ZoRoPageBean;
+
+import java.util.List;
 
 public interface AnimeContract {
     interface View {
@@ -15,6 +18,7 @@ public interface AnimeContract {
         void getHot(AnimoPageBean animoPageBean);
         void getPopular(RevivalSeriesBean revivalSeriesBean);
         void getMovie(RevivalSeriesBean revivalSeriesBean);
+        void getZoRo(List<ZoRoPageBean> zoRoPageBean);
     }
 
     interface Presenter {
@@ -22,5 +26,6 @@ public interface AnimeContract {
         void getHotPage(int page);
         void getPopular(int page);
         void getMovie(int page);
+        void getZoRoPage(int page);
     }
 }

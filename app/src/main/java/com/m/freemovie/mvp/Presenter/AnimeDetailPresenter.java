@@ -8,8 +8,10 @@ import com.m.freemovie.mvp.Model.ClassBean.TagalogEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogInfoBean;
 import com.m.freemovie.mvp.Contract.AnimeDetailsContract;
 import com.m.freemovie.mvp.Model.AnimePaheDetailModel;
+import com.m.freemovie.mvp.Model.ClassBean.ZoRoDetailBean;
 import com.m.freemovie.mvp.Model.RevivalDetailModel;
 import com.m.freemovie.mvp.Model.TagalogEpisodeModel;
+import com.m.freemovie.mvp.Model.ZoroDetailModel;
 
 import java.io.IOException;
 
@@ -94,6 +96,33 @@ public class AnimeDetailPresenter implements AnimeDetailsContract.Presenter {
             public void returnResult(TagalogInfoBean apiBean) {
                 view.hideLoading();
                 view.getInfoTagalog(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getZoroUrl(String Url) {
+        view.showLoading();
+
+        ZoroDetailModel.getZoroUrl(Url, new Callback<ZoRoDetailBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(ZoRoDetailBean apiBean) {
+                view.hideLoading();
+                view.getZoroDetail(apiBean);
             }
 
             @Override

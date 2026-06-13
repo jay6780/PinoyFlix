@@ -26,7 +26,6 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,13 +36,7 @@ import com.app.hubert.guide.core.Controller;
 import com.app.hubert.guide.listener.OnGuideChangedListener;
 import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.LoadAdError;
 import com.m.freemovie.R;
-import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
 import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
 import com.m.freemovie.Utils.GlobalWindowUtils;
@@ -88,8 +81,6 @@ public class TagalogWebviewActivity extends AppCompatActivity
     private boolean isError =  false;
     private PinoyWatchHistoryHelper dbHelper;
     private BookmarkDbHelper bookmarkDbHelper;
-    private AdView adView;
-    private RelativeLayout.LayoutParams params;
     private int page = 1;
     private TagalogAnimeAdapter tagalogAnimeAdapter;
     private List<RevivalSeriesBean.ResultsBean> movieList = new ArrayList<>();
@@ -240,87 +231,6 @@ public class TagalogWebviewActivity extends AppCompatActivity
         savedBook();
     }
 
-    @SuppressLint("MissingPermission")
-    private void loadAd() {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView = new AdView(TagalogWebviewActivity.this);
-        adView.setAdUnitId(getString(R.string.banner_adId));
-        adView.setAdSize(AdSize.BANNER);
-        binding.adTvSeries.removeAllViews();
-        binding.adTvSeries.addView(adView);
-
-        adView.loadAd(adRequest);
-        if (adView != null) {
-            adView.setAdListener(
-                    new AdListener() {
-                        @Override
-                        public void onAdClicked() {
-                        }
-
-                        @Override
-                        public void onAdClosed() {
-                        }
-
-                        @Override
-                        public void onAdFailedToLoad(@NonNull LoadAdError adError) {
-                            loadAdsFailed();
-                        }
-
-                        @Override
-                        public void onAdImpression() {
-                        }
-
-                        @Override
-                        public void onAdLoaded() {
-                            loadAdsSuccess();
-                        }
-
-                        @Override
-                        public void onAdOpened() {
-                        }
-                    });
-        }
-    }
-
-    private void loadAdsFailed(){
-        params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        params.addRule(RelativeLayout.BELOW,binding.episodeTxt.getId());
-        if(isMovie){
-            binding.rvMovies.setLayoutParams(params);
-        }else{
-            binding.rvSeason.setLayoutParams(params);
-
-        }
-        binding.adTvSeries.setVisibility(View.GONE);
-        binding.llAds.setVisibility(View.GONE);
-    }
-
-    private void loadAdsSuccess(){
-        binding.adTvSeries.setVisibility(View.VISIBLE);
-        binding.llAds.setVisibility(View.VISIBLE);
-        params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        params.addRule(RelativeLayout.ABOVE,binding.llAds.getId());
-        params.addRule(RelativeLayout.BELOW,binding.episodeTxt.getId());
-        if(isMovie){
-            binding.rvMovies.setLayoutParams(params);
-        }else{
-            binding.rvSeason.setLayoutParams(params);
-
-        }
-
-
-        new CountDownTimer(10000, 1000) {
-
-            public void onTick(long millisUntilFinished) {
-            }
-
-            public void onFinish() {
-                loadAdsFailed();
-            }
-
-        }.start();
-    }
-
     private void initGuide(String label) {
         NewbieGuide.with(this)
                 .setLabel(label)
@@ -341,11 +251,6 @@ public class TagalogWebviewActivity extends AppCompatActivity
                 .show();
     }
     private void isMovieVideo() {
-        if(!AppConstant.isAddFree){
-            loadAd();
-        }else{
-            loadAdsFailed();
-        }
         binding.episodeTxt.setVisibility(View.VISIBLE);
         if(isMovie){
             if(isMovie){
@@ -418,9 +323,6 @@ public class TagalogWebviewActivity extends AppCompatActivity
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         binding.llBookmark.setVisibility(View.GONE);
         binding.swipe.setEnabled(false);
-        if(!isMovie){
-            loadAdsFailed();
-        }
         new WindowUtils(this,true,false);
     }
 

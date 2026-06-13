@@ -7,10 +7,10 @@ android {
 
     defaultConfig {
         applicationId "com.m.freemovie"
-        minSdk 23
+        minSdk 21
         targetSdk 34
-        versionCode 69
-        versionName "6.9"
+        versionCode 70
+        versionName "7.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -81,5 +81,5 @@ dependencies {
 //    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
     implementation 'com.orhanobut:dialogplus:1.11@aar'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.25'
-    implementation 'com.google.android.gms:play-services-ads:24.9.0'
+    implementation 'org.mozilla.geckoview:geckoview:93.0.20210927210923'
 }

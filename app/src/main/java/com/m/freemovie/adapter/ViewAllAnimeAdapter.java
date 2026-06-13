@@ -44,6 +44,7 @@ public class ViewAllAnimeAdapter extends BaseQuickAdapter<AnimeItemBean, BaseVie
                         intent = new Intent(mContext, AnimeDetailsActivity.class);
                         intent.putExtra("apiPosition",1);
                         intent.putExtra("id",item.getId());
+                        intent.putExtra("imageUrl",item.getImage());
                         break;
                     case 2:
                         intent = new Intent(mContext, AnimeDetailsActivity.class);

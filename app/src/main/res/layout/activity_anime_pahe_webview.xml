@@ -32,11 +32,12 @@
                     android:src="@mipmap/icon_backwhite" />
             </LinearLayout>
 
-            <WebView
+            <org.mozilla.geckoview.GeckoView
                 android:id="@+id/webView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone" />
+                android:visibility="gone"
+                android:layout_height="match_parent" />
+
 
             <TextView
                 android:id="@+id/tv_select"
@@ -94,7 +95,6 @@
             android:id="@+id/rv_season"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/ll_ads"
             android:layout_below="@+id/rl_option"
             android:layout_marginTop="2dp" />
 
@@ -108,21 +108,6 @@
             android:text="Enjoy watch movie" />
 
 
-        <LinearLayout
-            android:id="@+id/ll_ads"
-            android:layout_width="match_parent"
-            android:layout_centerHorizontal="true"
-            android:layout_above="@+id/ll_bookmark"
-            android:visibility="gone"
-            android:layout_marginBottom="5dp"
-            android:orientation="vertical"
-            android:layout_height="wrap_content">
-            <com.google.android.gms.ads.AdView
-                android:id="@+id/ad_tvSeries"
-                android:layout_width="match_parent"
-                android:visibility="gone"
-                android:layout_height="50dp"/>
-        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/ll_bookmark"

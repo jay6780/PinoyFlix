@@ -27,7 +27,7 @@ public class SeriesAllAdapter extends BaseQuickAdapter<TvSeriesBean.ResultsBean,
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
 
 
-        String posterPath = "https://image.tmdb.org/t/p/w500/"+item.getPoster_path();
+        String posterPath = "http://image.tmdb.org/t/p/w500/"+item.getPoster_path();
 
         Glide.with(mContext)
                 .asBitmap()

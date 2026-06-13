@@ -72,7 +72,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/episodeTxt"
-        android:layout_above="@+id/ll_ads"
         android:visibility="gone"
         android:layout_marginTop="2dp" />
 
@@ -81,25 +80,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/episodeTxt"
-            android:layout_above="@+id/ll_ads"
             android:visibility="gone"
             android:layout_marginTop="2dp" />
 
-        <LinearLayout
-            android:id="@+id/ll_ads"
-            android:layout_width="match_parent"
-            android:layout_centerHorizontal="true"
-            android:layout_above="@+id/ll_bookmark"
-            android:visibility="gone"
-            android:layout_marginBottom="5dp"
-            android:orientation="vertical"
-            android:layout_height="wrap_content">
-            <com.google.android.gms.ads.AdView
-                android:id="@+id/ad_tvSeries"
-                android:layout_width="match_parent"
-                android:visibility="gone"
-                android:layout_height="50dp"/>
-        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/ll_bookmark"

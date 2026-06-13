@@ -88,6 +88,7 @@ public class DownloadWebview extends AppCompatActivity {
     }
 
     private void setupWebView(String videoUrl) {
+//        Log.e("videoUrl", "videoUrl: " + videoUrl);
         WebSettings webSettings = binding.webView.getSettings();
         setSettings(webSettings);
 
@@ -182,7 +183,7 @@ public class DownloadWebview extends AppCompatActivity {
             private boolean handleUrlLoading(WebView view, String url) {
 //                Log.e("VideoSelect","val: "+url);
                 if (url.startsWith("intent://") || url.startsWith("market://") || !url.startsWith("http")) {
-                    Log.e("VideoSelect", "BLOCKED EXTERNAL INTENT: " + url);
+//                    Log.e("VideoSelect", "BLOCKED EXTERNAL INTENT: " + url);
                     return true;
                 }
 

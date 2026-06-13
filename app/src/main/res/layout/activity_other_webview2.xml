@@ -60,19 +60,12 @@
                 android:visibility="gone" />
         </RelativeLayout>
 
-        <com.google.android.gms.ads.AdView
-            android:layout_centerInParent="true"
-            android:id="@+id/ad_Movie"
-            android:layout_width="match_parent"
-            android:layout_below="@+id/rl_webview"
-            android:visibility="gone"
-            android:layout_height="50dp"/>
 
         <TextView
             android:id="@+id/episodeTxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ad_Movie"
+            android:layout_below="@+id/rl_webview"
             android:padding="7dp"
             android:text="Other movies" />
 

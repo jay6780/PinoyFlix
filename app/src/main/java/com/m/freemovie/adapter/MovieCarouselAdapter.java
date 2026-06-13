@@ -26,7 +26,7 @@ public class MovieCarouselAdapter extends BaseBannerAdapter<MovieBean.ResultsBea
         ImageView iv_thumb = holder.findViewById(R.id.iv_thumb);
         ImageView smallimg = holder.findViewById(R.id.smallimg);
 
-        String posterPath = "https://image.tmdb.org/t/p/w500/"+data.getPoster_path();
+        String posterPath = "http://image.tmdb.org/t/p/w500/"+data.getPoster_path();
 
         Glide.with(context)
                 .asBitmap().

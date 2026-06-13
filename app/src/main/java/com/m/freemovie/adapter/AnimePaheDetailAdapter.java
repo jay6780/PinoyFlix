@@ -25,10 +25,12 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
 
     private PinoyWatchHistoryHelper dbHelper;
     private EpisodeListener videoPlayListerner;
-    private  int lastPosition = -1;
-    public interface EpisodeListener{
-        void getVideoUrl(String videoUrl,boolean isDownload,String episodeNum);
+    private int lastPosition = -1;
+
+    public interface EpisodeListener {
+        void getVideoUrl(String videoUrl);
     }
+
     public AnimePaheDetailAdapter(EpisodeListener videoPlayListerner) {
         super(R.layout.episode_item);
         this.videoPlayListerner = videoPlayListerner;
@@ -47,9 +49,9 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
         RelativeLayout rl_select = helper.getView(R.id.rl_select);
         TextView tv_watched = helper.getView(R.id.tv_watched);
 
-        if(lastPosition == (helper.getAdapterPosition())){
+        if (lastPosition == (helper.getAdapterPosition())) {
             rl_select.setBackgroundColor(Color.parseColor("#050E3C"));
-        }else{
+        } else {
             rl_select.setBackgroundColor(Color.parseColor("#313647"));
         }
         tv_watched.setVisibility(item.isWatched() ? View.VISIBLE : View.GONE);
@@ -62,7 +64,6 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
                 .into(iv_thumb);
 
 
-
         iv_download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -73,43 +74,23 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!isNetworkAvailable()){
-                    Toast.makeText(mContext,"Please check internet and try again",Toast.LENGTH_SHORT).show();
+                if (!isNetworkAvailable()) {
+                    Toast.makeText(mContext, "Please check internet and try again", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if(lastPosition == (helper.getAdapterPosition())){
+                if (lastPosition != (helper.getAdapterPosition())) {
                     lastPosition = -1;
-                    videoPlayListerner.getVideoUrl("",false,"");
-                }else{
-                    showOption(item,helper);
+                    lastPosition = (helper.getAdapterPosition());
+                    dbHelper.markEpisodeAsWatched(item.getVideoId(), item.getEpisode());
+                    lastPosition = (helper.getAdapterPosition());
+                    videoPlayListerner.getVideoUrl(item.getEpisodeUrl());
+                    item.setWatched(true);
+                    notifyDataSetChanged();
                 }
             }
         });
     }
 
-    private void showOption(AnimePaheBeanList item,BaseViewHolder helper) {
-        String[] colors = {"Watch", "Download"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setItems(colors, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case 0:
-                        dbHelper.markEpisodeAsWatched(item.getVideoId(), item.getEpisode());
-                        lastPosition = (helper.getAdapterPosition());
-                        videoPlayListerner.getVideoUrl(item.getSession(),false,"");
-                        item.setWatched(true);
-                        notifyDataSetChanged();
-                        break;
-                    case 1:
-                        videoPlayListerner.getVideoUrl(item.getSession(),true,item.getEpisode());
-                        break;
-                }
-            }
-
-        });
-        builder.show();
-    }
 
     @SuppressWarnings("deprecation")
     @SuppressLint("MissingPermission")
