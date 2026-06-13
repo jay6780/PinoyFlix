@@ -30,6 +30,7 @@ import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
 import com.m.freemovie.mvp.Contract.AnimeContract;
+import com.m.freemovie.mvp.Model.ClassBean.ZoRoPageBean;
 import com.m.freemovie.mvp.Presenter.AnimePresenter;
 
 import java.util.ArrayList;
