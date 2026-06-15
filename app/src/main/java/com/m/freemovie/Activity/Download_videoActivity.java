@@ -42,7 +42,7 @@ public class Download_videoActivity extends AppCompatActivity implements FileAda
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new GlobalWindowUtils(this);
+        new GlobalWindowUtils(this,false);
         setContentView(R.layout.activity_download_video);
         getSupportActionBar().hide();
         initializeViews();

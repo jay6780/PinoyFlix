@@ -111,7 +111,7 @@ public class TagalogEpisodeActivity extends AppCompatActivity implements Tagalog
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new GlobalWindowUtils(this);
+        new GlobalWindowUtils(this,false);
         getWindow().setFlags(
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);

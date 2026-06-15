@@ -51,7 +51,7 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
-        new GlobalWindowUtils(this);
+        new GlobalWindowUtils(this,false);
         binding = ActivityViewAllAnimeAcitvityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         title = getIntent().getStringExtra("title");

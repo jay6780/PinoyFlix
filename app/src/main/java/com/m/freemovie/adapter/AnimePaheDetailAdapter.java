@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -78,15 +79,18 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
                     Toast.makeText(mContext, "Please check internet and try again", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (lastPosition != (helper.getAdapterPosition())) {
+                if (lastPosition == (helper.getAdapterPosition())) {
                     lastPosition = -1;
+                    videoPlayListerner.getVideoUrl("");
+                } else {
                     lastPosition = (helper.getAdapterPosition());
+//                    Log.d("EpisodeNum: ",item.getEpisode());
                     dbHelper.markEpisodeAsWatched(item.getVideoId(), item.getEpisode());
                     lastPosition = (helper.getAdapterPosition());
                     videoPlayListerner.getVideoUrl(item.getEpisodeUrl());
                     item.setWatched(true);
-                    notifyDataSetChanged();
                 }
+                notifyDataSetChanged();
             }
         });
     }

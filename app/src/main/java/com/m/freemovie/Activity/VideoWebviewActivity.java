@@ -80,7 +80,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         binding = ActivityVideoWebviewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
-        new GlobalWindowUtils(this);
+        new GlobalWindowUtils(this,false);
         defaultScreen();
         title = getIntent().getStringExtra("title");
         videoId = getIntent().getStringExtra("videoId");

@@ -92,7 +92,7 @@ public class OtherWebviewActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new GlobalWindowUtils(this);
+        new GlobalWindowUtils(this,false);
         getSupportActionBar().hide();
         binding = ActivityOtherWebview2Binding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

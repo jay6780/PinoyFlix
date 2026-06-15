@@ -48,7 +48,7 @@ public class MovieRuAllActivity extends AppCompatActivity implements PinoyRuMovi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
-        new GlobalWindowUtils(this);
+        new GlobalWindowUtils(this,false);
         binding = ActivityMovieRuAllBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         presenter = new PinoyRuAllPresenter(this);

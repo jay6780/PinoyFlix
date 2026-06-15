@@ -58,7 +58,7 @@ public class NineAnimeEpsiodeActivity extends AppCompatActivity implements NineA
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new GlobalWindowUtils(this);
+        new GlobalWindowUtils(this,false);
         binding = ActivityNineAnimeEpsiodeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getSupportActionBar().hide();

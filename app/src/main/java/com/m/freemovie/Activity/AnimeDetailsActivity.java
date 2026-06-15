@@ -59,7 +59,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
-        new GlobalWindowUtils(this);
+        new GlobalWindowUtils(this,false);
         binding = ActivityAnimeDetailsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         apiPosition = getIntent().getIntExtra("apiPosition", 1);

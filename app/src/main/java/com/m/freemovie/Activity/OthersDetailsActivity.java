@@ -72,7 +72,7 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new GlobalWindowUtils(this);
+        new GlobalWindowUtils(this,false);
         binding = ActivityOthersDetailsBinding.inflate(getLayoutInflater());
         link = getIntent().getStringExtra("link");
         Image = getIntent().getStringExtra("Image");

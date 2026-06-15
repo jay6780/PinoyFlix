@@ -54,7 +54,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         binding = ActivitySeasonListBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
-        new GlobalWindowUtils(this);
+        new GlobalWindowUtils(this,false);
         dbHelper = new WatchHistoryDBHelper(this);
         new WindowUtils(this, true, false);
         title = getIntent().getStringExtra("title");

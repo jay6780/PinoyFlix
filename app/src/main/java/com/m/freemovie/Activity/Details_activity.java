@@ -65,7 +65,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new GlobalWindowUtils(this);
+        new GlobalWindowUtils(this,false);
         id = getIntent().getStringExtra("id");
         position = getIntent().getIntExtra("position",2);
         apiPosition = getIntent().getIntExtra("apiPosition",1);

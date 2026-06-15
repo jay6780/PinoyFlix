@@ -51,7 +51,7 @@ public class ViewAllActivity extends AppCompatActivity implements MovieAllContra
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityViewAllBinding.inflate(getLayoutInflater());
-        new GlobalWindowUtils(this);
+        new GlobalWindowUtils(this,false);
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);

@@ -97,7 +97,7 @@ public class TagalogWebviewActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         binding = ActivityTagalogWebviewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        new GlobalWindowUtils(this);
+        new GlobalWindowUtils(this,false);
         getSupportActionBar().hide();
         new WindowUtils(this, true, false);
         title = getIntent().getStringExtra("title");

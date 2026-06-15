@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.audiofx.LoudnessEnhancer;
 import android.net.ConnectivityManager;
@@ -14,14 +13,10 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.webkit.ConsoleMessage;
-import android.webkit.WebChromeClient;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
@@ -66,33 +61,28 @@ import org.mozilla.geckoview.GeckoSessionSettings;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class AnimePaheWebviewActivity extends AppCompatActivity
-        implements AnimePaheDetailContract.View, AnimePaheDetailAdapter.EpisodeListener,AdapterView.OnItemSelectedListener {
+        implements AnimePaheDetailContract.View, AnimePaheDetailAdapter.EpisodeListener, AdapterView.OnItemSelectedListener {
     private ActivityAnimePaheWebviewBinding binding;
     private String id, title;
     private AnimePaheDetailAdapter episodeAdapter;
     private List<AnimePaheBeanList> episodeBeanList = new ArrayList<>();
     private boolean finishing = true;
     private String videoUrl = "";
-    private boolean isError = false;
     private PinoyWatchHistoryHelper dbHelper;
     private BookmarkDbHelper bookmarkDbHelper;
-    private String animeId = "";
-    private String image = "";
     private AnimePaheDetailPresenter detailPresenter;
-    private String url = "";
     private List<AnimePaheDownloadBean.ResultsBean.StreamingBean> streamingBeanList = new ArrayList<>();
     private List<AnimePaheDownloadBean.ResultsBean.DownloadBean> downloadBeanList = new ArrayList<>();
     private int page = 1;
     private boolean isNomore = false;
-    private boolean isLoading = false;
     private boolean isInit = true;
-    private boolean isDownload = false;
-    private String episode = "";
     private RelativeLayout.LayoutParams params;
     private SpinnerTotalDbHelper spinnerTotalDbHelper;
     private int totalPages = 0;
@@ -106,6 +96,9 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     private String imageUrl;
     private GeckoRuntime geckoRuntime;
     private GeckoSession geckoSession;
+    private Handler touchWatchdog = new Handler(Looper.getMainLooper());
+    private Runnable freezeDetector;
+    private boolean isPageLoaded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,7 +106,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         binding = ActivityAnimePaheWebviewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
-        new GlobalWindowUtils(this);
+        new GlobalWindowUtils(this, false);
         initGuide();
         new WindowUtils(this, true, false);
         title = getIntent().getStringExtra("title");
@@ -336,9 +329,9 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     public void onBackPressed() {
-        if(!finishing){
+        if (!finishing) {
             defaultScreen();
-        }else{
+        } else {
             super.onBackPressed();
             shutdownGeckoSession();
             finish();
@@ -384,11 +377,13 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     }
 
     private void setupWebView(String videoUrl) {
+        this.videoUrl = videoUrl;
         org.mozilla.geckoview.GeckoView geckoView = findViewById(R.id.webView);
 
         if (geckoSession == null) {
             GeckoSessionSettings settings = new GeckoSessionSettings.Builder()
                     .usePrivateMode(false)
+                    .allowJavascript(true)
                     .useTrackingProtection(true)
                     .build();
 
@@ -397,9 +392,10 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
             geckoView.setSession(geckoSession);
         }
-
+        geckoSession.setContentDelegate(new CustomContentDelegate());
         geckoSession.setNavigationDelegate(new CustomNavigationDelegate());
         geckoSession.setProgressDelegate(new CustomProgressDelegate());
+        geckoSession.setPromptDelegate(new CustomPromptDelegate());
         geckoSession.loadUri(videoUrl);
     }
 
@@ -440,33 +436,40 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
     @Override
     public void getZoroDetail(ZoRoDetailBean zoRoDetailBean) {
-        if (binding == null) return;
         if (zoRoDetailBean != null) {
-            isLoading = false;
-            isInit = false;
-
             if (zoRoDetailBean.getEpisodes() != null) {
+
                 for (ZoRoDetailBean.EpisodesBean dataBean : zoRoDetailBean.getEpisodes()) {
                     AnimePaheBeanList detailBean = new AnimePaheBeanList(dataBean.getUrl(), String.valueOf(dataBean.getNumber()), imageUrl, "");
                     boolean isWatched = dbHelper.isEpisodeWatched(id, String.valueOf(dataBean.getNumber()));
                     detailBean.setVideoId(id);
                     detailBean.setWatched(isWatched);
-                    episodeBeanList.add(detailBean);
 
-                    if (isWatched) {
-                        lastWatchedPosition = episodeBeanList.size() - 1;
+                    episodeBeanList.add(detailBean);
+                }
+
+                Collections.sort(episodeBeanList, new Comparator<AnimePaheBeanList>() {
+                    @Override
+                    public int compare(AnimePaheBeanList v1, AnimePaheBeanList v2) {
+                        return Long.compare(Long.parseLong(v1.getEpisode()), Long.parseLong(v2.getEpisode()));
+                    }
+                });
+
+                lastWatchedPosition = -1;
+                for (int i = 0; i < episodeBeanList.size(); i++) {
+                    if (episodeBeanList.get(i).isWatched()) {
+                        lastWatchedPosition = i;
                     }
                 }
 
                 episodeAdapter.setNewData(episodeBeanList);
-                if (lastWatchedPosition != -1) {
-                    if (!SPUtils.getInstance().getBoolean(AppConstant.isShow)) {
-                        Toast.makeText(getApplicationContext(), "Continuing from last watched episode", Toast.LENGTH_SHORT).show();
-                        SPUtils.getInstance().put(AppConstant.isShow, true);
-                    }
-                    binding.rvSeason.postDelayed(() -> {
-                        binding.rvSeason.smoothScrollToPosition(lastWatchedPosition);
 
+                if (lastWatchedPosition != -1) {
+                    binding.rvSeason.postDelayed(() -> {
+                        if (binding.rvSeason.getLayoutManager() != null) {
+                            Toast.makeText(getApplicationContext(), "Continuing from last watched episode", Toast.LENGTH_SHORT).show();
+                            binding.rvSeason.smoothScrollToPosition(lastWatchedPosition);
+                        }
                     }, 300);
                 }
 
@@ -474,15 +477,14 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
             } else {
                 isNomore = true;
-
             }
         }
     }
 
     @Override
     public void getZoRoVideo(ZoRoVideoUrlBean zoRoVideoUrlBean) {
-        if(zoRoVideoUrlBean !=null && zoRoVideoUrlBean.getVideoUrl() !=null){
-            if(binding.webView.getVisibility() == View.GONE){
+        if (zoRoVideoUrlBean != null && zoRoVideoUrlBean.getVideoUrl() != null) {
+            if (binding.webView.getVisibility() == View.GONE) {
                 binding.webView.setVisibility(View.VISIBLE);
                 binding.tvSelect.setVisibility(View.GONE);
                 binding.expand.setVisibility(View.VISIBLE);
@@ -525,28 +527,153 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
     @Override
     public void getVideoUrl(String videoUrl) {
+        if (TextUtils.isEmpty(videoUrl)) {
+            return;
+        }
 //        Log.d("VideoUrl","val: "+videoUrl);
         detailPresenter.getZoRoVideoUrl(videoUrl);
     }
 
-
+    private String url;
     private class CustomNavigationDelegate implements GeckoSession.NavigationDelegate {
+
         @Nullable
         @Override
-        public GeckoResult<AllowOrDeny> onLoadRequest(@NonNull GeckoSession session, @NonNull LoadRequest request) {
-            if (videoUrl != null && request.uri.contains(videoUrl)) {
-                return GeckoResult.fromValue(AllowOrDeny.ALLOW);
-            } else {
-                return GeckoResult.fromValue(AllowOrDeny.DENY);
+        public GeckoResult<AllowOrDeny> onLoadRequest(
+                @NonNull GeckoSession session,
+                @NonNull LoadRequest request) {
+
+            String uri = request.uri;
+            url = uri;
+
+            if (isAdUrl(uri)) {
+                session.stop();
             }
+            if (uri.equals("about:blank")) {
+                session.stop();
+            }
+
+            if (videoUrl != null && !videoUrl.isEmpty()) {
+                try {
+                    java.net.URI mainUri = new java.net.URI(videoUrl);
+                    java.net.URI reqUri = new java.net.URI(uri);
+                    String mainHost = mainUri.getHost();
+                    String reqHost = reqUri.getHost();
+                    if (reqHost != null && mainHost != null && reqHost.endsWith(mainHost)) {
+                        return GeckoResult.fromValue(AllowOrDeny.ALLOW);
+                    }
+                    if (uri.startsWith("data:") || uri.startsWith("blob:")) {
+                        return GeckoResult.fromValue(AllowOrDeny.ALLOW);
+                    }
+                } catch (Exception e) {
+//                    Log.e("NavDelegate", "URI parse error: " + e.getMessage());
+                }
+            }
+
+            if (uri.equals(videoUrl)) {
+                return GeckoResult.fromValue(AllowOrDeny.ALLOW);
+            }else{
+                session.stop();
+            }
+            return GeckoResult.fromValue(AllowOrDeny.DENY);
+        }
+
+        @Nullable
+        @Override
+        public GeckoResult<AllowOrDeny> onSubframeLoadRequest(
+                @NonNull GeckoSession session,
+                @NonNull LoadRequest request) {
+
+            String uri = request.uri;
+            if (uri.equals("about:blank")) {
+                session.stop();
+            }
+            if (isAdUrl(uri)) {
+                session.stop();
+            }
+            return GeckoResult.fromValue(AllowOrDeny.ALLOW);
         }
     }
+
+    private boolean isAdUrl(String uri) {
+        if (uri == null) return true;
+
+        String[] adDomains = {
+                "ak.itponytaa.com",
+                "071kk.com/clicks",
+                "bingoplus.com",
+                "www.okbet.com",
+                "064kk.com/clicks",
+                "1xlite-",
+                "b7510.com",
+                "clicks",
+                "064kk.com",
+                "doubleclick.net",
+                "googlesyndication.com",
+                "adservice.google.com",
+                "ads.yahoo.com",
+                "amazon-adsystem.com",
+                "outbrain.com",
+                "taboola.com",
+                "popads.net",
+                "popcash.net",
+                "trafficjunky.com",
+                "exoclick.com",
+                "juicyads.com",
+                "adsterra.com",
+                "propellerads.com"
+        };
+
+        for (String domain : adDomains) {
+            if (uri.contains(domain)) return true;
+        }
+        return false;
+    }
+
+    private class CustomPromptDelegate implements GeckoSession.PromptDelegate {
+
+        @Nullable
+        @Override
+        public GeckoResult<PromptResponse> onAlertPrompt(@NonNull GeckoSession session, @NonNull AlertPrompt prompt) {
+            return GeckoResult.fromValue(prompt.dismiss());
+        }
+
+        @Nullable
+        @Override
+        public GeckoResult<PromptResponse> onButtonPrompt(@NonNull GeckoSession session, @NonNull ButtonPrompt prompt) {
+            return GeckoResult.fromValue(prompt.dismiss());
+        }
+
+        @Nullable
+        @Override
+        public GeckoResult<PromptResponse> onTextPrompt(@NonNull GeckoSession session, @NonNull TextPrompt prompt) {
+            return GeckoResult.fromValue(prompt.dismiss());
+        }
+
+        @Nullable
+        @Override
+        public GeckoResult<PromptResponse> onBeforeUnloadPrompt(@NonNull GeckoSession session, @NonNull BeforeUnloadPrompt prompt) {
+            return GeckoResult.fromValue(prompt.dismiss());
+        }
+    }
+
 
     private class CustomProgressDelegate implements GeckoSession.ProgressDelegate {
         @Override
         public void onPageStop(@NonNull GeckoSession session, boolean success) {
-            // Replaces onPageFinished
+            if(success){
+                if(!url.equals(videoUrl)){
+                    session.stop();
+                }
+
+            }
         }
     }
 
+
+    private class CustomContentDelegate implements GeckoSession.ContentDelegate {
+        @Override
+        public void onFirstContentfulPaint(@NonNull GeckoSession session) {
+        }
+    }
 }

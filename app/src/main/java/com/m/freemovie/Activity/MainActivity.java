@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
-        new GlobalWindowUtils(this);
+        new GlobalWindowUtils(this,true);
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
         btn_back5 = findViewById(R.id.btn_back5);
