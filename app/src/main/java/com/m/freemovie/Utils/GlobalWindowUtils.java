@@ -1,6 +1,7 @@
 package com.m.freemovie.Utils;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.view.Window;
 
@@ -20,10 +21,15 @@ public class GlobalWindowUtils {
         );
         window.setNavigationBarColor(isHome ? Color.parseColor("#262626") : Color.parseColor("#313647"));
         activity.getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(
-                () -> applyWindowState(windowInsetsController));
+                () -> applyWindowState(windowInsetsController,activity));
     }
 
-    private void applyWindowState(WindowInsetsControllerCompat controller) {
-        controller.show(WindowInsetsCompat.Type.navigationBars());
+    private void applyWindowState(WindowInsetsControllerCompat controller,Activity activity) {
+        if (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            controller.show(WindowInsetsCompat.Type.navigationBars());
+        }else{
+            controller.hide(WindowInsetsCompat.Type.navigationBars());
+        }
+
     }
 }
