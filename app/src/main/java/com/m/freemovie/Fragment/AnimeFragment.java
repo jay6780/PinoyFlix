@@ -113,6 +113,9 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         binding.rlPopular.setVisibility(View.GONE);
         binding.rvMovies.setVisibility(View.GONE);
         binding.rlMovies.setVisibility(View.GONE);
+        movieList.clear();
+        popularList.clear();
+        newestList.clear();
 
         newestAdapter.getData().clear();
         hotAdapter.getData().clear();

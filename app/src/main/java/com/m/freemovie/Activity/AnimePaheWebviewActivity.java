@@ -14,9 +14,14 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.webkit.ConsoleMessage;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
@@ -53,12 +58,6 @@ import com.m.freemovie.mvp.Model.ClassBean.ZoRoDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoVideoUrlBean;
 import com.m.freemovie.mvp.Presenter.AnimePaheDetailPresenter;
 
-import org.mozilla.geckoview.AllowOrDeny;
-import org.mozilla.geckoview.GeckoResult;
-import org.mozilla.geckoview.GeckoRuntime;
-import org.mozilla.geckoview.GeckoSession;
-import org.mozilla.geckoview.GeckoSessionSettings;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,11 +93,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     private CountDownTimer volumeTimer;
     private AudioManager audioManager;
     private String imageUrl;
-    private GeckoRuntime geckoRuntime;
-    private GeckoSession geckoSession;
-    private Handler touchWatchdog = new Handler(Looper.getMainLooper());
-    private Runnable freezeDetector;
-    private boolean isPageLoaded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,8 +122,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
         setImageData(id);
         SPUtils.getInstance().put(AppConstant.isShow, false);
-
-        geckoRuntime = GeckoRuntime.getDefault(this);
         initializeSpinnerItems();
 
         if (isInit) {
@@ -155,7 +147,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 if (finishing) {
-                    shutdownGeckoSession();
                     finish();
                 } else {
                     defaultScreen();
@@ -332,27 +323,20 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         if (!finishing) {
             defaultScreen();
         } else {
+            if (binding != null && binding.webView != null) {
+                binding.webView.stopLoading();
+                binding.webView.setWebChromeClient(null);
+                binding.webView.setWebViewClient(null);
+                binding.webView.destroy();
+                binding.webView.clearCache(true);
+                binding.webView.clearHistory();
+                binding.webView.reload();
+            }
             super.onBackPressed();
-            shutdownGeckoSession();
             finish();
         }
     }
 
-
-    private void shutdownGeckoSession() {
-        if (geckoSession != null) {
-            try {
-                geckoSession.stop();
-                geckoSession.setNavigationDelegate(null);
-                geckoSession.setProgressDelegate(null);
-                geckoSession.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                geckoSession = null;
-            }
-        }
-    }
 
     private void savedBook() {
         String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
@@ -377,27 +361,103 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     }
 
     private void setupWebView(String videoUrl) {
-        this.videoUrl = videoUrl;
-        org.mozilla.geckoview.GeckoView geckoView = findViewById(R.id.webView);
-
-        if (geckoSession == null) {
-            GeckoSessionSettings settings = new GeckoSessionSettings.Builder()
-                    .usePrivateMode(false)
-                    .allowJavascript(true)
-                    .useTrackingProtection(true)
-                    .build();
-
-            geckoSession = new GeckoSession(settings);
-            geckoSession.open(geckoRuntime);
-
-            geckoView.setSession(geckoSession);
+        if (!isNetworkAvailable()) {
+            Toast.makeText(getApplicationContext(), "Please check internet and try again", Toast.LENGTH_SHORT).show();
+            return;
         }
-        geckoSession.setContentDelegate(new CustomContentDelegate());
-        geckoSession.setNavigationDelegate(new CustomNavigationDelegate());
-        geckoSession.setProgressDelegate(new CustomProgressDelegate());
-        geckoSession.setPromptDelegate(new CustomPromptDelegate());
-        geckoSession.loadUri(videoUrl);
+        binding.webView.setWebViewClient(new CustomWebViewClient());
+        binding.webView.setWebChromeClient(new CustomWebChromeClient() {
+        });
+        WebSettings webSettings = binding.webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setDisplayZoomControls(false);
+        webSettings.setBuiltInZoomControls(false);
+        webSettings.setSupportZoom(false);
+        webSettings.setMediaPlaybackRequiresUserGesture(false);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            binding.webView.setWebContentsDebuggingEnabled(false);
+        }
+        binding.webView.loadUrl(videoUrl);
+
     }
+    private class CustomWebChromeClient extends WebChromeClient {
+        @Override
+        public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+            return true;
+        }
+
+        @Override
+        public void onProgressChanged(WebView view, int newProgress) {
+            if (!isNetworkAvailable()) {
+                return;
+            }
+            if (newProgress == 100) {
+                binding.tvSelect.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private class CustomWebViewClient extends WebViewClient {
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            String url = request.getUrl().toString();
+            return handleUrlLoading(view, url);
+        }
+
+
+        private boolean handleUrlLoading(WebView view, String url) {
+//            Log.d("DownloadUrl","val: "+url);
+            if (url.contains(videoUrl) ) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+
+        }
+    }
+
+    private boolean isAdUrl(String uri) {
+        if (uri == null) return true;
+
+        String[] adDomains = {
+                "gcash.com",
+                "ak.itponytaa.com",
+                "071kk.com/clicks",
+                "bingoplus.com",
+                "www.okbet.com",
+                "064kk.com/clicks",
+                "1xlite-",
+                "b7510.com",
+                "clicks",
+                "064kk.com",
+                "doubleclick.net",
+                "googlesyndication.com",
+                "adservice.google.com",
+                "ads.yahoo.com",
+                "amazon-adsystem.com",
+                "outbrain.com",
+                "taboola.com",
+                "popads.net",
+                "popcash.net",
+                "trafficjunky.com",
+                "exoclick.com",
+                "juicyads.com",
+                "adsterra.com",
+                "propellerads.com"
+        };
+
+        for (String domain : adDomains) {
+            if (uri.contains(domain)) return true;
+        }
+        return false;
+    }
+
 
     @Override
     public void showLoading() {
@@ -489,6 +549,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 binding.tvSelect.setVisibility(View.GONE);
                 binding.expand.setVisibility(View.VISIBLE);
             }
+            this.videoUrl = zoRoVideoUrlBean.getVideoUrl();
             setupWebView(zoRoVideoUrlBean.getVideoUrl());
         }
 
@@ -532,148 +593,5 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         }
 //        Log.d("VideoUrl","val: "+videoUrl);
         detailPresenter.getZoRoVideoUrl(videoUrl);
-    }
-
-    private String url;
-    private class CustomNavigationDelegate implements GeckoSession.NavigationDelegate {
-
-        @Nullable
-        @Override
-        public GeckoResult<AllowOrDeny> onLoadRequest(
-                @NonNull GeckoSession session,
-                @NonNull LoadRequest request) {
-
-            String uri = request.uri;
-            url = uri;
-
-            if (isAdUrl(uri)) {
-                session.stop();
-            }
-            if (uri.equals("about:blank")) {
-                session.stop();
-            }
-
-            if (videoUrl != null && !videoUrl.isEmpty()) {
-                try {
-                    java.net.URI mainUri = new java.net.URI(videoUrl);
-                    java.net.URI reqUri = new java.net.URI(uri);
-                    String mainHost = mainUri.getHost();
-                    String reqHost = reqUri.getHost();
-                    if (reqHost != null && mainHost != null && reqHost.endsWith(mainHost)) {
-                        return GeckoResult.fromValue(AllowOrDeny.ALLOW);
-                    }
-                    if (uri.startsWith("data:") || uri.startsWith("blob:")) {
-                        return GeckoResult.fromValue(AllowOrDeny.ALLOW);
-                    }
-                } catch (Exception e) {
-//                    Log.e("NavDelegate", "URI parse error: " + e.getMessage());
-                }
-            }
-
-            if (uri.equals(videoUrl)) {
-                return GeckoResult.fromValue(AllowOrDeny.ALLOW);
-            }else{
-                session.stop();
-            }
-            return GeckoResult.fromValue(AllowOrDeny.DENY);
-        }
-
-        @Nullable
-        @Override
-        public GeckoResult<AllowOrDeny> onSubframeLoadRequest(
-                @NonNull GeckoSession session,
-                @NonNull LoadRequest request) {
-
-            String uri = request.uri;
-            if (uri.equals("about:blank")) {
-                session.stop();
-            }
-            if (isAdUrl(uri)) {
-                session.stop();
-            }
-            return GeckoResult.fromValue(AllowOrDeny.ALLOW);
-        }
-    }
-
-    private boolean isAdUrl(String uri) {
-        if (uri == null) return true;
-
-        String[] adDomains = {
-                "ak.itponytaa.com",
-                "071kk.com/clicks",
-                "bingoplus.com",
-                "www.okbet.com",
-                "064kk.com/clicks",
-                "1xlite-",
-                "b7510.com",
-                "clicks",
-                "064kk.com",
-                "doubleclick.net",
-                "googlesyndication.com",
-                "adservice.google.com",
-                "ads.yahoo.com",
-                "amazon-adsystem.com",
-                "outbrain.com",
-                "taboola.com",
-                "popads.net",
-                "popcash.net",
-                "trafficjunky.com",
-                "exoclick.com",
-                "juicyads.com",
-                "adsterra.com",
-                "propellerads.com"
-        };
-
-        for (String domain : adDomains) {
-            if (uri.contains(domain)) return true;
-        }
-        return false;
-    }
-
-    private class CustomPromptDelegate implements GeckoSession.PromptDelegate {
-
-        @Nullable
-        @Override
-        public GeckoResult<PromptResponse> onAlertPrompt(@NonNull GeckoSession session, @NonNull AlertPrompt prompt) {
-            return GeckoResult.fromValue(prompt.dismiss());
-        }
-
-        @Nullable
-        @Override
-        public GeckoResult<PromptResponse> onButtonPrompt(@NonNull GeckoSession session, @NonNull ButtonPrompt prompt) {
-            return GeckoResult.fromValue(prompt.dismiss());
-        }
-
-        @Nullable
-        @Override
-        public GeckoResult<PromptResponse> onTextPrompt(@NonNull GeckoSession session, @NonNull TextPrompt prompt) {
-            return GeckoResult.fromValue(prompt.dismiss());
-        }
-
-        @Nullable
-        @Override
-        public GeckoResult<PromptResponse> onBeforeUnloadPrompt(@NonNull GeckoSession session, @NonNull BeforeUnloadPrompt prompt) {
-            return GeckoResult.fromValue(prompt.dismiss());
-        }
-    }
-
-
-    private class CustomProgressDelegate implements GeckoSession.ProgressDelegate {
-        @Override
-        public void onPageStop(@NonNull GeckoSession session, boolean success) {
-            if(success){
-                if(!url.equals(videoUrl)){
-                    session.stop();
-                }
-
-            }
-        }
-    }
-
-
-    private class CustomContentDelegate implements GeckoSession.ContentDelegate {
-        @Override
-        public void onFirstContentfulPaint(@NonNull GeckoSession session) {
-        }
     }
 }

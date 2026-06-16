@@ -630,8 +630,6 @@ public class OtherWebviewActivity extends AppCompatActivity
         if (!finishing) {
             defaultScreen();
         } else {
-            super.onBackPressed();
-            finish();
             if (binding.swipe != null && binding.swipe.isRefreshing()) {
                 binding.swipe.setRefreshing(false);
             }
@@ -644,6 +642,8 @@ public class OtherWebviewActivity extends AppCompatActivity
                 binding.webView.clearHistory();
                 binding.webView.reload();
             }
+            super.onBackPressed();
+            finish();
         }
     }
 }
