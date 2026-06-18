@@ -24,6 +24,7 @@ import com.m.freemovie.R;
 import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.adapter.ViewAllAnimeAdapter;
 import com.m.freemovie.databinding.ActivityViewAllAnimeAcitvityBinding;
+import com.m.freemovie.mvp.Model.ClassBean.AniKoToPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimeItemBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
@@ -157,7 +158,7 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
         }
         switch (position) {
             case 1:
-                presenter.getZoRoPage(page);
+                presenter.getAniKoToPage(page);
                 break;
             case 2:
                 presenter.getHotPage(page);
@@ -284,11 +285,28 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
 
     @Override
     public void getZoRo(List<ZoRoPageBean> zoRoPageBean) {
-        if (zoRoPageBean != null) {
+//        if (zoRoPageBean != null) {
+//            isLoading = false;
+//            if (!zoRoPageBean.isEmpty()) {
+//                for (ZoRoPageBean zoRoPageBean1 : zoRoPageBean) {
+//                    animeItemBeanList.add(new AnimeItemBean(zoRoPageBean1.getUrl(), zoRoPageBean1.getTitle(), zoRoPageBean1.getImage()));
+//                }
+//                viewAllAnimeAdapter.setNewData(animeItemBeanList);
+//            } else {
+//                isNomore = true;
+//            }
+//        } else {
+//            isNomore = true;
+//        }
+    }
+
+    @Override
+    public void getAniKoTo(AniKoToPageBean aniKoToPageBean) {
+        if (aniKoToPageBean != null) {
             isLoading = false;
-            if (!zoRoPageBean.isEmpty()) {
-                for (ZoRoPageBean zoRoPageBean1 : zoRoPageBean) {
-                    animeItemBeanList.add(new AnimeItemBean(zoRoPageBean1.getUrl(), zoRoPageBean1.getTitle(), zoRoPageBean1.getImage()));
+            if (!aniKoToPageBean.getResults().isEmpty()) {
+                for (AniKoToPageBean.ResultsBean resultsBean : aniKoToPageBean.getResults()) {
+                    animeItemBeanList.add(new AnimeItemBean(resultsBean.getAnimeId(), resultsBean.getTitle(), resultsBean.getThumbnail()));
                 }
                 viewAllAnimeAdapter.setNewData(animeItemBeanList);
             } else {

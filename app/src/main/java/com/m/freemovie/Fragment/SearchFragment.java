@@ -46,6 +46,7 @@ import com.m.freemovie.adapter.TvRevivialSearchAdapter;
 import com.m.freemovie.adapter.ViewAllAdapter;
 import com.m.freemovie.mvp.Contract.RevivalSearchContract;
 import com.m.freemovie.mvp.Contract.SearchContract;
+import com.m.freemovie.mvp.Model.ClassBean.AniKoToSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeSearchBean;
@@ -80,7 +81,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
     private List<TagalogSearchBean.ResultsBean> tagaloglist = new ArrayList<>();
     private List<RevivalSearchBean.ResultsBean> revivalList = new ArrayList<>();
     private List<NineAnimeSearchBean.ResultsBean> nineList = new ArrayList<>();
-    private List<ZoRoSearchBean.ResultsBean> zoRoList = new ArrayList<>();
+    private List<AniKoToSearchBean.ResultsBean> zoRoList = new ArrayList<>();
     private List<PinoyRuBean> tagalogMovieList = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
     private int position = 1;
@@ -320,7 +321,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                 searchPresenter.getSearchSeries(getString(R.string.key), lastQuery, page);
                 break;
             case 7:
-                searchPresenter.getZoRoQuery(lastQuery);
+                searchPresenter.getAniKoToQuery(lastQuery);
                 break;
         }
     }
@@ -445,10 +446,25 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
 
     @Override
     public void getZoRoSearch(ZoRoSearchBean zoRoSearchBean) {
-        if (zoRoSearchBean != null && zoRoSearchBean.getResults() != null) {
+//        if (zoRoSearchBean != null && zoRoSearchBean.getResults() != null) {
+//            isLoading = false;
+//            if (!zoRoSearchBean.getResults().isEmpty()) {
+//                zoRoList.addAll(zoRoSearchBean.getResults());
+//                animePaheSearchAdapter.setNewData(zoRoList);
+//            } else {
+//                Toast.makeText(getContext(), "No more Anime Series", Toast.LENGTH_SHORT).show();
+//                isLoading = false;
+//                isNomore = true;
+//            }
+//        }
+    }
+
+    @Override
+    public void getAniKoToSearch(AniKoToSearchBean aniKoToSearchBean) {
+        if (aniKoToSearchBean != null && aniKoToSearchBean.getResults() != null) {
             isLoading = false;
-            if (!zoRoSearchBean.getResults().isEmpty()) {
-                zoRoList.addAll(zoRoSearchBean.getResults());
+            if (!aniKoToSearchBean.getResults().isEmpty()) {
+                zoRoList.addAll(aniKoToSearchBean.getResults());
                 animePaheSearchAdapter.setNewData(zoRoList);
             } else {
                 Toast.makeText(getContext(), "No more Anime Series", Toast.LENGTH_SHORT).show();
@@ -568,7 +584,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             case 7:
                 zoRoList.clear();
                 animePaheSearchAdapter.setNewData(new ArrayList<>());
-                searchPresenter.getZoRoQuery(query);
+                searchPresenter.getAniKoToQuery(query);
                 break;
             case 8:
                 tagalogMovieList.clear();

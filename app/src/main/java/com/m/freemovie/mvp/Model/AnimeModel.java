@@ -2,6 +2,7 @@ package com.m.freemovie.mvp.Model;
 
 import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.Retrofit.NetworkingUtils;
+import com.m.freemovie.mvp.Model.ClassBean.AniKoToPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
@@ -126,6 +127,30 @@ public class AnimeModel {
 
                     @Override
                     public void onNext(List<ZoRoPageBean> data) {
+                        callback.returnResult(data);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.returnError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {}
+                });
+    }
+
+    public static void getAniKoToPage(int page,final Callback<AniKoToPageBean> callback) {
+        NetworkingUtils.getTagalogDub()
+                .getAniKoToPage(page)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<AniKoToPageBean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {}
+
+                    @Override
+                    public void onNext(AniKoToPageBean data) {
                         callback.returnResult(data);
                     }
 

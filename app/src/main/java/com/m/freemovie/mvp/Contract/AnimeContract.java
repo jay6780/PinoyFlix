@@ -1,6 +1,7 @@
 package com.m.freemovie.mvp.Contract;
 
 
+import com.m.freemovie.mvp.Model.ClassBean.AniKoToPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
@@ -19,6 +20,7 @@ public interface AnimeContract {
         void getPopular(RevivalSeriesBean revivalSeriesBean);
         void getMovie(RevivalSeriesBean revivalSeriesBean);
         void getZoRo(List<ZoRoPageBean> zoRoPageBean);
+        void getAniKoTo(AniKoToPageBean aniKoToPageBean);
     }
 
     interface Presenter {
@@ -27,5 +29,6 @@ public interface AnimeContract {
         void getPopular(int page);
         void getMovie(int page);
         void getZoRoPage(int page);
+        void getAniKoToPage(int page);
     }
 }

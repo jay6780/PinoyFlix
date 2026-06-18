@@ -25,6 +25,7 @@ import com.m.freemovie.adapter.AnimePopularAdapter;
 import com.m.freemovie.adapter.HotAdapter;
 import com.m.freemovie.adapter.NewestAdapter;
 import com.m.freemovie.databinding.FragmentAnimeBinding;
+import com.m.freemovie.mvp.Model.ClassBean.AniKoToPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
@@ -44,7 +45,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
     private HotAdapter hotAdapter;
     private AnimePopularAdapter animePopularAdapter;
     private AnimeMovieAdapter movieAdapter;
-    private List<ZoRoPageBean> newestList = new ArrayList<>();
+    private List<AniKoToPageBean.ResultsBean> newestList = new ArrayList<>();
     private List<AnimoPageBean.ResultsBean> hotList = new ArrayList<>();
     private List<RevivalSeriesBean.ResultsBean> popularList = new ArrayList<>();
     private List<RevivalSeriesBean.ResultsBean> movieList = new ArrayList<>();
@@ -54,12 +55,12 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
                              Bundle savedInstanceState) {
         binding = FragmentAnimeBinding.inflate(inflater);
         presenter = new AnimePresenter(this);
-        if(isNetworkAvailable()){
+        if (isNetworkAvailable()) {
             presenter.getNewestPage(page);
 //            presenter.getHotPage(page);
             presenter.getPopular(page);
             presenter.getMovie(page);
-            presenter.getZoRoPage(page);
+            presenter.getAniKoToPage(page);
         } else {
             Toast.makeText(getContext(), "Please check internet and try again", Toast.LENGTH_SHORT).show();
         }
@@ -101,7 +102,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
 //        presenter.getHotPage(page);
         presenter.getPopular(page);
         presenter.getMovie(page);
-        presenter.getZoRoPage(page);
+        presenter.getAniKoToPage(page);
     }
 
     private void clearAllData() {
@@ -244,10 +245,27 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
 
     @Override
     public void getZoRo(List<ZoRoPageBean> zoRoPageBean) {
-        if (zoRoPageBean != null) {
+//        if (zoRoPageBean != null) {
+//            int limit = 10;
+//            for (int i = 0; i < limit && i < zoRoPageBean.size(); i++) {
+//                newestList.add(zoRoPageBean.get(i));
+//
+//            }
+//            newestAdapter.setNewData(newestList);
+//            binding.rvNewest.setVisibility(View.VISIBLE);
+//            binding.rlNew.setVisibility(View.VISIBLE);
+//        } else {
+//            binding.rvNewest.setVisibility(View.GONE);
+//            binding.rlNew.setVisibility(View.GONE);
+//        }
+    }
+
+    @Override
+    public void getAniKoTo(AniKoToPageBean aniKoToPageBean) {
+        if (aniKoToPageBean != null) {
             int limit = 10;
-            for (int i = 0; i < limit && i < zoRoPageBean.size(); i++) {
-                newestList.add(zoRoPageBean.get(i));
+            for (int i = 0; i < limit && i < aniKoToPageBean.getResults().size(); i++) {
+                newestList.add(aniKoToPageBean.getResults().get(i));
 
             }
             newestAdapter.setNewData(newestList);

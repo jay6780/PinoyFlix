@@ -3,6 +3,8 @@ package com.m.freemovie.mvp.Presenter;
 import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
+import com.m.freemovie.mvp.Model.AniKoToSearchModel;
+import com.m.freemovie.mvp.Model.ClassBean.AniKoToSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeSearchBean;
@@ -224,6 +226,33 @@ public class SearchPresenter implements SearchContract.Presenter {
             }
         });
 
+    }
+
+    @Override
+    public void getAniKoToQuery(String keyword) {
+        view.showLoading();
+        AniKoToSearchModel.getAniKoToSearch(keyword, new Callback<AniKoToSearchBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(AniKoToSearchBean apiBean) {
+                view.hideLoading();
+                view.getAniKoToSearch(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
     }
 
 

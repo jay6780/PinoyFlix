@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.m.freemovie.Activity.AnimeDetailsActivity;
+import com.m.freemovie.Activity.AnimePaheWebviewActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
@@ -41,10 +42,11 @@ public class ViewAllAnimeAdapter extends BaseQuickAdapter<AnimeItemBean, BaseVie
                 Intent intent = null;
                 switch (position){
                     case 1:
-                        intent = new Intent(mContext, AnimeDetailsActivity.class);
+                        intent = new Intent(mContext, AnimePaheWebviewActivity.class);
                         intent.putExtra("apiPosition",1);
                         intent.putExtra("id",item.getId());
                         intent.putExtra("imageUrl",item.getImage());
+                        intent.putExtra("title",item.getTitle());
                         break;
                     case 2:
                         intent = new Intent(mContext, AnimeDetailsActivity.class);

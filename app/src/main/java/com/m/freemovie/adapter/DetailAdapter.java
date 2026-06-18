@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.m.freemovie.Activity.AnimeDetailsActivity;
+import com.m.freemovie.Activity.AnimePaheWebviewActivity;
 import com.m.freemovie.Activity.Details_activity;
 import com.m.freemovie.Activity.OthersDetailsActivity;
 import com.m.freemovie.R;
@@ -70,10 +71,10 @@ public class DetailAdapter extends BaseQuickAdapter<DetailBean, BaseViewHolder> 
                         intent.putExtra("videoId", item.getVideoId());
                         break;
                     case 7:
-                        intent = new Intent(mContext, AnimeDetailsActivity.class);
-                        intent.putExtra("imageUrl", item.getTempImage());
-                        intent.putExtra("id", item.getVideoId());
-                        intent.putExtra("apiPosition", 1);
+                        intent = new Intent(mContext, AnimePaheWebviewActivity.class);
+                        intent.putExtra("id",item.getVideoId());
+                        intent.putExtra("imageUrl",item.getTempImage());
+                        intent.putExtra("title",item.getMovieName());
                         break;
 
                     case 8:

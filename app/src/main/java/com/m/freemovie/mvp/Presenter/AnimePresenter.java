@@ -3,6 +3,7 @@ package com.m.freemovie.mvp.Presenter;
 import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
+import com.m.freemovie.mvp.Model.ClassBean.AniKoToPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
@@ -19,16 +20,19 @@ import okhttp3.Response;
 
 public class AnimePresenter implements AnimeContract.Presenter {
     private AnimeContract.View view;
+
     public AnimePresenter(AnimeContract.View view) {
         this.view = view;
     }
+
     @Override
     public void getNewestPage(int page) {
         view.showLoading();
-            AnimeModel.getNewest(page, new Callback<PaheLatestBean>() {
+        AnimeModel.getNewest(page, new Callback<PaheLatestBean>() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
             }
+
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
 
@@ -51,10 +55,11 @@ public class AnimePresenter implements AnimeContract.Presenter {
     @Override
     public void getHotPage(int page) {
         view.showLoading();
-        AnimeModel.getHot(page,new Callback<AnimoPageBean>() {
+        AnimeModel.getHot(page, new Callback<AnimoPageBean>() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
             }
+
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
 
@@ -81,6 +86,7 @@ public class AnimePresenter implements AnimeContract.Presenter {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
             }
+
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
 
@@ -107,6 +113,7 @@ public class AnimePresenter implements AnimeContract.Presenter {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
             }
+
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
 
@@ -134,6 +141,7 @@ public class AnimePresenter implements AnimeContract.Presenter {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
             }
+
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
 
@@ -152,5 +160,32 @@ public class AnimePresenter implements AnimeContract.Presenter {
             }
         });
 
+    }
+
+    @Override
+    public void getAniKoToPage(int page) {
+        view.showLoading();
+        AnimeModel.getAniKoToPage(page, new Callback<AniKoToPageBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(AniKoToPageBean apiBean) {
+                view.hideLoading();
+                view.getAniKoTo(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
     }
 }

@@ -51,6 +51,7 @@ import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.AnimePaheDetailAdapter;
 import com.m.freemovie.databinding.ActivityAnimePaheWebviewBinding;
 import com.m.freemovie.mvp.Contract.AnimePaheDetailContract;
+import com.m.freemovie.mvp.Model.ClassBean.AniKoToWatchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheBeanList;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDownloadBean;
 import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
@@ -114,8 +115,16 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         binding.llBookmark.setOnClickListener(view -> savedBook());
         detailPresenter = new AnimePaheDetailPresenter(this);
         spinnerTotalDbHelper = new SpinnerTotalDbHelper(this);
+
+        if(id == null){
+            Toast.makeText(getApplicationContext(), "No Episode Available", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+
+        }
+
         if (isNetworkAvailable()) {
-            detailPresenter.getZoroUrl(id);
+            detailPresenter.getAniKoToID(id);
         } else {
             Toast.makeText(getApplicationContext(), "Please check internet and try again", Toast.LENGTH_SHORT).show();
         }
@@ -138,7 +147,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 isNomore = false;
                 isInit = true;
                 SPUtils.getInstance().put(AppConstant.isShow, false);
-                detailPresenter.getZoroUrl(id);
+                detailPresenter.getAniKoToID(id);
                 episodeBeanList.clear();
                 episodeAdapter.setNewData(new ArrayList<>());
             }
@@ -381,6 +390,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         binding.webView.loadUrl(videoUrl);
 
     }
+
     private class CustomWebChromeClient extends WebChromeClient {
         @Override
         public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
@@ -408,7 +418,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
         private boolean handleUrlLoading(WebView view, String url) {
 //            Log.d("DownloadUrl","val: "+url);
-            if (url.contains(videoUrl) ) {
+            if (url.contains(videoUrl)) {
                 return false;
             } else {
                 return true;
@@ -420,42 +430,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             super.onPageFinished(view, url);
 
         }
-    }
-
-    private boolean isAdUrl(String uri) {
-        if (uri == null) return true;
-
-        String[] adDomains = {
-                "gcash.com",
-                "ak.itponytaa.com",
-                "071kk.com/clicks",
-                "bingoplus.com",
-                "www.okbet.com",
-                "064kk.com/clicks",
-                "1xlite-",
-                "b7510.com",
-                "clicks",
-                "064kk.com",
-                "doubleclick.net",
-                "googlesyndication.com",
-                "adservice.google.com",
-                "ads.yahoo.com",
-                "amazon-adsystem.com",
-                "outbrain.com",
-                "taboola.com",
-                "popads.net",
-                "popcash.net",
-                "trafficjunky.com",
-                "exoclick.com",
-                "juicyads.com",
-                "adsterra.com",
-                "propellerads.com"
-        };
-
-        for (String domain : adDomains) {
-            if (uri.contains(domain)) return true;
-        }
-        return false;
     }
 
 
@@ -555,6 +529,53 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public void getAniKoToEpisode(AniKoToWatchBean aniKoToWatchBean) {
+        if (aniKoToWatchBean != null) {
+            if (aniKoToWatchBean.getEpisodes() != null) {
+
+                for (AniKoToWatchBean.EpisodesBean dataBean : aniKoToWatchBean.getEpisodes()) {
+                    AnimePaheBeanList detailBean = new AnimePaheBeanList(dataBean.getServers().get(0).getVideoUrl(), dataBean.getEpisodeNumber(), imageUrl, "");
+                    boolean isWatched = dbHelper.isEpisodeWatched(id, dataBean.getEpisodeNumber());
+                    detailBean.setVideoId(id);
+                    detailBean.setWatched(isWatched);
+
+                    episodeBeanList.add(detailBean);
+                }
+
+//                Collections.sort(episodeBeanList, new Comparator<AnimePaheBeanList>() {
+//                    @Override
+//                    public int compare(AnimePaheBeanList v1, AnimePaheBeanList v2) {
+//                        return Long.compare(Long.parseLong(v1.getEpisode()), Long.parseLong(v2.getEpisode()));
+//                    }
+//                });
+
+                lastWatchedPosition = -1;
+                for (int i = 0; i < episodeBeanList.size(); i++) {
+                    if (episodeBeanList.get(i).isWatched()) {
+                        lastWatchedPosition = i;
+                    }
+                }
+
+                episodeAdapter.setNewData(episodeBeanList);
+
+                if (lastWatchedPosition != -1) {
+                    binding.rvSeason.postDelayed(() -> {
+                        if (binding.rvSeason.getLayoutManager() != null) {
+                            Toast.makeText(getApplicationContext(), "Continuing from last watched episode", Toast.LENGTH_SHORT).show();
+                            binding.rvSeason.smoothScrollToPosition(lastWatchedPosition);
+                        }
+                    }, 300);
+                }
+
+                binding.episodeTxt.setText(episodeBeanList.size() > 1 ? "Episode's" : "Episode");
+
+            } else {
+                isNomore = true;
+            }
+        }
+    }
+
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
@@ -592,6 +613,12 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             return;
         }
 //        Log.d("VideoUrl","val: "+videoUrl);
-        detailPresenter.getZoRoVideoUrl(videoUrl);
+        if (binding.webView.getVisibility() == View.GONE) {
+            binding.webView.setVisibility(View.VISIBLE);
+            binding.tvSelect.setVisibility(View.GONE);
+            binding.expand.setVisibility(View.VISIBLE);
+        }
+        this.videoUrl = videoUrl;
+        setupWebView(videoUrl);
     }
 }

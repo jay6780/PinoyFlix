@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.mvp.Contract.AnimePaheDetailContract;
+import com.m.freemovie.mvp.Model.AniKoToWatchModel;
+import com.m.freemovie.mvp.Model.ClassBean.AniKoToWatchBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoVideoUrlBean;
 import com.m.freemovie.mvp.Model.ZoroDetailModel;
@@ -67,6 +69,34 @@ public class AnimePaheDetailPresenter implements AnimePaheDetailContract.Present
             public void returnResult(ZoRoVideoUrlBean apiBean) {
                 view.hideLoading();
                 view.getZoRoVideo(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getAniKoToID(String id) {
+        view.showLoading();
+
+        AniKoToWatchModel.getAniKoToEpisode(id, new Callback<AniKoToWatchBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(AniKoToWatchBean apiBean) {
+                view.hideLoading();
+                view.getAniKoToEpisode(apiBean);
             }
 
             @Override

@@ -1,5 +1,8 @@
 package com.m.freemovie.mvp.Api;
 
+import com.m.freemovie.mvp.Model.ClassBean.AniKoToPageBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniKoToSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniKoToWatchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDownloadBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheEpisodeBean;
@@ -364,4 +367,18 @@ public interface MovieApi {
     @GET("zorotv")
     Observable<ZoRoSearchBean> getSearchZoro(
             @Query("search") String search);
+
+    //anikoto
+
+    @GET("anikoto")
+    Observable<AniKoToPageBean> getAniKoToPage(
+            @Query("page") int page);
+
+    @GET("anikoto/watch")
+    Observable<AniKoToWatchBean> getAniKotoWatch(
+            @Query("id") String id);
+
+    @GET("anikoto/search")
+    Observable<AniKoToSearchBean> getAniKoToSearch(
+            @Query("keyword") String keyword);
 }
