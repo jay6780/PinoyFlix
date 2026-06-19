@@ -2,6 +2,7 @@ package com.m.freemovie.mvp.Contract;
 
 
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniNekoSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeSearchBean;
@@ -24,6 +25,7 @@ public interface SearchContract {
         void getSearchList(List<SearchRuBean> bean);
         void getZoRoSearch(ZoRoSearchBean zoRoSearchBean);
         void getAniKoToSearch(AniKoToSearchBean aniKoToSearchBean);
+        void getAniNeKoSearchData(AniNekoSearchBean aniNekoSearchBean);
     }
 
     interface Presenter {
@@ -35,5 +37,6 @@ public interface SearchContract {
         void getTagalogMovieQuery(String query);
         void getZoRoQuery(String search);
         void getAniKoToQuery(String keyword);
+        void getAniNeKoQuery(String q);
     }
 }

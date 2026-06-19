@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.mvp.Model.AniKoToSearchModel;
+import com.m.freemovie.mvp.Model.AniNekoSearchModel;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniNekoSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeSearchBean;
@@ -245,6 +247,33 @@ public class SearchPresenter implements SearchContract.Presenter {
             public void returnResult(AniKoToSearchBean apiBean) {
                 view.hideLoading();
                 view.getAniKoToSearch(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getAniNeKoQuery(String q) {
+        view.showLoading();
+        AniNekoSearchModel.getAniNeKoQuery(q, new Callback<AniNekoSearchBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(AniNekoSearchBean apiBean) {
+                view.hideLoading();
+                view.getAniNeKoSearchData(apiBean);
             }
 
             @Override

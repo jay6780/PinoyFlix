@@ -47,6 +47,7 @@ import com.m.freemovie.adapter.ViewAllAdapter;
 import com.m.freemovie.mvp.Contract.RevivalSearchContract;
 import com.m.freemovie.mvp.Contract.SearchContract;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniNekoSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeSearchBean;
@@ -78,7 +79,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
     private boolean isNomore = false;
     private ImageView btn_send;
     private List<MovieBean.ResultsBean> movieLists = new ArrayList<>();
-    private List<TagalogSearchBean.ResultsBean> tagaloglist = new ArrayList<>();
+    private List<AniNekoSearchBean.ResultsBean> hotList = new ArrayList<>();
     private List<RevivalSearchBean.ResultsBean> revivalList = new ArrayList<>();
     private List<NineAnimeSearchBean.ResultsBean> nineList = new ArrayList<>();
     private List<AniKoToSearchBean.ResultsBean> zoRoList = new ArrayList<>();
@@ -154,9 +155,6 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                         ll_reset.setVisibility(View.GONE);
                     }
                     if (lastVisiblePosition >= movieLists.size() - 1) {
-                        if (position > 3) {
-                            return;
-                        }
                         if (isNomore) {
                             return;
                         }
@@ -206,7 +204,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                     zoRoList.clear();
                     movieLists.clear();
                     nineList.clear();
-                    tagaloglist.clear();
+                    hotList.clear();
                     revivalList.clear();
                     tagalogMovieList.clear();
 
@@ -320,6 +318,9 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             case 2:
                 searchPresenter.getSearchSeries(getString(R.string.key), lastQuery, page);
                 break;
+            case 3:
+                searchPresenter.getAniNeKoQuery(lastQuery);
+                break;
             case 7:
                 searchPresenter.getAniKoToQuery(lastQuery);
                 break;
@@ -395,17 +396,17 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
 
     @Override
     public void getTagalogSearch(TagalogSearchBean tagalogSearchBean) {
-        if (tagalogSearchBean != null && tagalogSearchBean.getResults() != null) {
-            isLoading = false;
-            if (!tagalogSearchBean.getResults().isEmpty()) {
-                tagaloglist.addAll(tagalogSearchBean.getResults());
-                tagalogSearchAdapter.setNewData(tagaloglist);
-            } else {
-                Toast.makeText(getContext(), "No more Tv tagalog series", Toast.LENGTH_SHORT).show();
-                isLoading = false;
-                isNomore = true;
-            }
-        }
+//        if (tagalogSearchBean != null && tagalogSearchBean.getResults() != null) {
+//            isLoading = false;
+//            if (!tagalogSearchBean.getResults().isEmpty()) {
+//                tagaloglist.addAll(tagalogSearchBean.getResults());
+//                tagalogSearchAdapter.setNewData(tagaloglist);
+//            } else {
+//                Toast.makeText(getContext(), "No more Tv tagalog series", Toast.LENGTH_SHORT).show();
+//                isLoading = false;
+//                isNomore = true;
+//            }
+//        }
     }
 
     @Override
@@ -463,11 +464,26 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
     public void getAniKoToSearch(AniKoToSearchBean aniKoToSearchBean) {
         if (aniKoToSearchBean != null && aniKoToSearchBean.getResults() != null) {
             isLoading = false;
-            if (!aniKoToSearchBean.getResults().isEmpty()) {
+            if (!aniKoToSearchBean.getResults().isEmpty() && aniKoToSearchBean.getResults().size() != 0) {
                 zoRoList.addAll(aniKoToSearchBean.getResults());
                 animePaheSearchAdapter.setNewData(zoRoList);
             } else {
                 Toast.makeText(getContext(), "No more Anime Series", Toast.LENGTH_SHORT).show();
+                isLoading = false;
+                isNomore = true;
+            }
+        }
+    }
+
+    @Override
+    public void getAniNeKoSearchData(AniNekoSearchBean aniNekoSearchBean) {
+        if (aniNekoSearchBean != null && aniNekoSearchBean.getResults() != null) {
+            isLoading = false;
+            if (!aniNekoSearchBean.getResults().isEmpty() && aniNekoSearchBean.getResults().size() != 0) {
+                hotList.addAll(aniNekoSearchBean.getResults());
+                tagalogSearchAdapter.setNewData(hotList);
+            } else {
+                Toast.makeText(getContext(), "No more Tv tagalog series", Toast.LENGTH_SHORT).show();
                 isLoading = false;
                 isNomore = true;
             }
@@ -565,9 +581,9 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                 break;
 
             case 3:
-                tagaloglist.clear();
+                hotList.clear();
                 tagalogSearchAdapter.setNewData(new ArrayList<>());
-//                searchPresenter.getTagalogQuery(query);
+                searchPresenter.getAniNeKoQuery(query);
                 break;
             case 4:
             case 5:
@@ -602,12 +618,11 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             case 2:
                 toast = "Please enter Tv series";
                 break;
-
-            case 3:
             case 4:
             case 5:
                 toast = "Please enter tagalog series";
                 break;
+            case 3:
             case 6:
             case 7:
                 toast = "Please enter anime series";
@@ -668,10 +683,6 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             return;
         }
 
-        if (position == 3) {
-            Toast.makeText(getContext(), "We fix soon please wait for update!", Toast.LENGTH_SHORT).show();
-            return;
-        }
         switch (position) {
             case 1:
                 et_search.setHint("Enter movie name");
@@ -698,11 +709,11 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                 break;
 
             case 3:
-                et_search.setHint("Enter tagalog series");
+                et_search.setHint("Enter anime series");
                 rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
                 tagalogSearchAdapter = new TagalogSearchAdapter();
                 rv_search.setAdapter(tagalogSearchAdapter);
-                tagaloglist.clear();
+                hotList.clear();
                 if (ll_reset != null) {
                     ll_reset.setVisibility(View.GONE);
                 }

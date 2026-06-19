@@ -6,6 +6,7 @@ import com.m.freemovie.mvp.Model.ClassBean.AniKoToWatchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniNeKoInfoBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniNekoBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniNekoEpisodeBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniNekoSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDownloadBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheEpisodeBean;
@@ -399,4 +400,8 @@ public interface MovieApi {
     Observable<AniNekoEpisodeBean> getEpisodeAniNeko(
             @Query("url") String url);
 
+
+    @GET("anineko/search")
+    Observable<AniNekoSearchBean> getSearchAniNeko(
+            @Query("q") String q);
 }
