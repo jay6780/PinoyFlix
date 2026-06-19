@@ -30,18 +30,30 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         binding.tvTagalog.setOnClickListener(this);
         binding.tvOthers.setOnClickListener(this);
 
-        movieFragment = new MovieFragment();
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
 
-        getChildFragmentManager()
-                .beginTransaction()
-                .add(R.id.fragment_container, movieFragment, "movie")
-                .setMaxLifecycle(movieFragment, Lifecycle.State.STARTED)
-                .commit();
+        if (savedInstanceState != null) {
+            movieFragment = getChildFragmentManager().findFragmentByTag("movie");
+            tvSeriesFragment = getChildFragmentManager().findFragmentByTag("tvSeries");
+            animeFragment = getChildFragmentManager().findFragmentByTag("animeFragment");
+            tagalogMovieFragment = getChildFragmentManager().findFragmentByTag("tagalogFragment");
 
+            hideAllFragments(transaction);
+
+            if (movieFragment != null) {
+                transaction.show(movieFragment);
+            }
+            transaction.commit();
+        } else {
+
+            movieFragment = new MovieFragment();
+            transaction
+                    .add(R.id.fragment_container, movieFragment, "movie")
+                    .setMaxLifecycle(movieFragment, Lifecycle.State.STARTED)
+                    .commit();
+        }
+        resetTabColors();
         binding.tvMovies.setTextColor(getResources().getColor(R.color.SecondColor));
-        binding.tvSeries.setTextColor(getResources().getColor(R.color.white));
-        binding.tvTagalog.setTextColor(getResources().getColor(R.color.white));
-        binding.tvOthers.setTextColor(getResources().getColor(R.color.white));
 
         initGuide();
 

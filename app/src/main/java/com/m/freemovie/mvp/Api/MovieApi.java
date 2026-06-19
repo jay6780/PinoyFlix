@@ -3,6 +3,9 @@ package com.m.freemovie.mvp.Api;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToWatchBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniNeKoInfoBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniNekoBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniNekoEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDownloadBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheEpisodeBean;
@@ -381,4 +384,19 @@ public interface MovieApi {
     @GET("anikoto/search")
     Observable<AniKoToSearchBean> getAniKoToSearch(
             @Query("keyword") String keyword);
+
+    //anineko
+
+    @GET("anineko/browse")
+    Observable<AniNekoBean> getPageAniNeko(
+            @Query("page") int page);
+
+    @GET("anineko/info")
+    Observable<AniNeKoInfoBean> getInfoAniNeko(
+            @Query("url") String url);
+
+    @GET("anineko/episode")
+    Observable<AniNekoEpisodeBean> getEpisodeAniNeko(
+            @Query("url") String url);
+
 }

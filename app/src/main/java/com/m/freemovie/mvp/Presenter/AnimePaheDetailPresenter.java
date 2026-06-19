@@ -6,6 +6,9 @@ import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.mvp.Contract.AnimePaheDetailContract;
 import com.m.freemovie.mvp.Model.AniKoToWatchModel;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToWatchBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniNeKoDetailModel;
+import com.m.freemovie.mvp.Model.ClassBean.AniNeKoInfoBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniNekoEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoVideoUrlBean;
 import com.m.freemovie.mvp.Model.ZoroDetailModel;
@@ -97,6 +100,62 @@ public class AnimePaheDetailPresenter implements AnimePaheDetailContract.Present
             public void returnResult(AniKoToWatchBean apiBean) {
                 view.hideLoading();
                 view.getAniKoToEpisode(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getAniNekoUrl(String Url) {
+        view.showLoading();
+
+        AniNeKoDetailModel.getAniNekoUrl(Url, new Callback<AniNeKoInfoBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(AniNeKoInfoBean apiBean) {
+                view.hideLoading();
+                view.getAniNekoDetail(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getAniNekoEpisodeURL(String Url) {
+        view.showLoading();
+
+        AniNeKoDetailModel.getAniNekoEpisode(Url, new Callback<AniNekoEpisodeBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(AniNekoEpisodeBean apiBean) {
+                view.hideLoading();
+                view.getAniNekoEpisode(apiBean);
             }
 
             @Override

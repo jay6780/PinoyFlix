@@ -3,6 +3,8 @@ package com.m.freemovie.mvp.Presenter;
 import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
+import com.m.freemovie.mvp.Model.ClassBean.AniNeKoDetailModel;
+import com.m.freemovie.mvp.Model.ClassBean.AniNeKoInfoBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogInfoBean;
@@ -33,6 +35,7 @@ public class AnimeDetailPresenter implements AnimeDetailsContract.Presenter {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
             }
+
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
 
@@ -56,10 +59,11 @@ public class AnimeDetailPresenter implements AnimeDetailsContract.Presenter {
     public void getUrl(String url) {
         view.showLoading();
 
-        TagalogEpisodeModel.getTagalogEpisode(url,new Callback<TagalogEpisodeBean>() {
+        TagalogEpisodeModel.getTagalogEpisode(url, new Callback<TagalogEpisodeBean>() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
             }
+
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
 
@@ -87,6 +91,7 @@ public class AnimeDetailPresenter implements AnimeDetailsContract.Presenter {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
             }
+
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
 
@@ -114,6 +119,7 @@ public class AnimeDetailPresenter implements AnimeDetailsContract.Presenter {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
             }
+
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
 
@@ -123,6 +129,34 @@ public class AnimeDetailPresenter implements AnimeDetailsContract.Presenter {
             public void returnResult(ZoRoDetailBean apiBean) {
                 view.hideLoading();
                 view.getZoroDetail(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getAniNekoUrl(String Url) {
+        view.showLoading();
+
+        AniNeKoDetailModel.getAniNekoUrl(Url, new Callback<AniNeKoInfoBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(AniNeKoInfoBean apiBean) {
+                view.hideLoading();
+                view.getAniNekoDetail(apiBean);
             }
 
             @Override

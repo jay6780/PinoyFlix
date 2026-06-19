@@ -23,6 +23,7 @@ import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.AnimeSeasonAdapter;
 import com.m.freemovie.databinding.ActivityAnimeDetailsBinding;
 import com.m.freemovie.mvp.Contract.AnimeDetailsContract;
+import com.m.freemovie.mvp.Model.ClassBean.AniNeKoInfoBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimeDetailsBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogEpisodeBean;
@@ -59,7 +60,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
-        new GlobalWindowUtils(this,false);
+        new GlobalWindowUtils(this, false);
         binding = ActivityAnimeDetailsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         apiPosition = getIntent().getIntExtra("apiPosition", 1);
@@ -112,7 +113,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
                 presenter.getZoroUrl(id);
                 break;
             case 2:
-                presenter.getUrl(url);
+                presenter.getAniNekoUrl(id);
                 break;
             case 3:
             case 4:
@@ -335,6 +336,55 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void getAniNekoDetail(AniNeKoInfoBean aniNeKoInfoBean) {
+        if (binding == null) return;
+        if (aniNeKoInfoBean != null && aniNeKoInfoBean.getInfo() != null) {
+            this.imageUrl = aniNeKoInfoBean.getInfo().getImage();
+            this.animeTitle = aniNeKoInfoBean.getInfo().getTitle();
+            this.overView = aniNeKoInfoBean.getInfo().getDescription();
+            Set<String> seenEpisodes = new HashSet<>();
+            for (AniNeKoInfoBean.InfoBean.EpisodesBean data : aniNeKoInfoBean.getInfo().getEpisodes()) {
+                if (!data.getEpisodeTitle().isEmpty()) {
+                    String episode = data.getEpisodeTitle();
+                    if (!seenEpisodes.contains(episode)) {
+                        seenEpisodes.add(episode);
+                    }
+                }
+            }
+            animeDetailsBeanList.add(new AnimeDetailsBean(id, imageUrl, animeTitle, seenEpisodes.size(), ""));
+            animeSeasonAdapter.setNewData(animeDetailsBeanList);
+            binding.tvDescription.setText(overView);
+            binding.tvOriginal.setText(animeTitle);
+            binding.tvTitle.setText(animeTitle);
+            binding.language.setText("JP");
+            random = new Random();
+            int roll = random.nextInt(100000) + 1;
+            binding.tvVote.setText(String.valueOf(roll));
+            Double min = 0.0;
+            Double max = 10.0;
+            double x = (Math.random() * ((max - min) + 1)) + min;
+            double xrounded = Math.round(x * 100.0) / 100.0;
+            binding.tvRate.setText(String.valueOf(xrounded));
+            try {
+                Glide.with(this)
+                        .asBitmap()
+                        .load(imageUrl)
+                        .into(binding.ivSmallimg);
+                Glide.with(this)
+                        .asBitmap()
+                        .load(imageUrl)
+                        .into(binding.ivBig);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else{
+            Toast.makeText(getApplicationContext(),"Failed to fetch info",Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
     }
 
     private void detailsUis() {

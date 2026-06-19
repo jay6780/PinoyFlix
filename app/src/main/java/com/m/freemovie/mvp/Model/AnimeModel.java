@@ -3,6 +3,7 @@ package com.m.freemovie.mvp.Model;
 import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.Retrofit.NetworkingUtils;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToPageBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniNekoBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
@@ -151,6 +152,30 @@ public class AnimeModel {
 
                     @Override
                     public void onNext(AniKoToPageBean data) {
+                        callback.returnResult(data);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.returnError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {}
+                });
+    }
+
+    public static void getAniNekoPage(int page,final Callback<AniNekoBean> callback) {
+        NetworkingUtils.getTagalogDub()
+                .getPageAniNeko(page)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<AniNekoBean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {}
+
+                    @Override
+                    public void onNext(AniNekoBean data) {
                         callback.returnResult(data);
                     }
 

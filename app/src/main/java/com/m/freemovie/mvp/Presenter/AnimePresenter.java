@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToPageBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniNekoBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
@@ -179,6 +180,33 @@ public class AnimePresenter implements AnimeContract.Presenter {
             public void returnResult(AniKoToPageBean apiBean) {
                 view.hideLoading();
                 view.getAniKoTo(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getAniNekoPage(int page) {
+        view.showLoading();
+        AnimeModel.getAniNekoPage(page, new Callback<AniNekoBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(AniNekoBean apiBean) {
+                view.hideLoading();
+                view.getAniNeKo(apiBean);
             }
 
             @Override

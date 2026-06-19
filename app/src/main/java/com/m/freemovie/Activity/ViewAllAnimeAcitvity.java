@@ -25,6 +25,7 @@ import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.adapter.ViewAllAnimeAdapter;
 import com.m.freemovie.databinding.ActivityViewAllAnimeAcitvityBinding;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToPageBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniNekoBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimeItemBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
@@ -52,7 +53,7 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
-        new GlobalWindowUtils(this,false);
+        new GlobalWindowUtils(this, false);
         binding = ActivityViewAllAnimeAcitvityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         title = getIntent().getStringExtra("title");
@@ -161,7 +162,7 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
                 presenter.getAniKoToPage(page);
                 break;
             case 2:
-                presenter.getHotPage(page);
+                presenter.getAniNekoPage(page);
                 break;
             case 3:
                 presenter.getPopular(page);
@@ -307,6 +308,23 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
             if (!aniKoToPageBean.getResults().isEmpty()) {
                 for (AniKoToPageBean.ResultsBean resultsBean : aniKoToPageBean.getResults()) {
                     animeItemBeanList.add(new AnimeItemBean(resultsBean.getAnimeId(), resultsBean.getTitle(), resultsBean.getThumbnail()));
+                }
+                viewAllAnimeAdapter.setNewData(animeItemBeanList);
+            } else {
+                isNomore = true;
+            }
+        } else {
+            isNomore = true;
+        }
+    }
+
+    @Override
+    public void getAniNeKo(AniNekoBean aniNekoBean) {
+        if (aniNekoBean != null) {
+            isLoading = false;
+            if (!aniNekoBean.getData().isEmpty()) {
+                for (AniNekoBean.DataBean resultsBean : aniNekoBean.getData()) {
+                    animeItemBeanList.add(new AnimeItemBean(resultsBean.getUrl(), resultsBean.getTitle(), resultsBean.getImage()));
                 }
                 viewAllAnimeAdapter.setNewData(animeItemBeanList);
             } else {

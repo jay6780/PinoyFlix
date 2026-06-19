@@ -27,14 +27,16 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
     private PinoyWatchHistoryHelper dbHelper;
     private EpisodeListener videoPlayListerner;
     private int lastPosition = -1;
+    private boolean isAniNeko = false;
 
     public interface EpisodeListener {
         void getVideoUrl(String videoUrl);
     }
 
-    public AnimePaheDetailAdapter(EpisodeListener videoPlayListerner) {
+    public AnimePaheDetailAdapter(EpisodeListener videoPlayListerner, boolean isAniNeko) {
         super(R.layout.episode_item);
         this.videoPlayListerner = videoPlayListerner;
+        this.isAniNeko = isAniNeko;
     }
 
     @Override
@@ -56,7 +58,7 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
             rl_select.setBackgroundColor(Color.parseColor("#313647"));
         }
         tv_watched.setVisibility(item.isWatched() ? View.VISIBLE : View.GONE);
-        tv_season.setText("Episode: " + item.getEpisode());
+        tv_season.setText(isAniNeko ? item.getEpisode() : "Episode: " + item.getEpisode());
 
         Glide.with(mContext)
                 .asBitmap()

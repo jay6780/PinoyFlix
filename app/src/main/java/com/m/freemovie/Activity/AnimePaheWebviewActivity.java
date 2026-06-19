@@ -14,8 +14,11 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -32,6 +35,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.app.hubert.guide.NewbieGuide;
@@ -49,15 +54,20 @@ import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
 import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.AnimePaheDetailAdapter;
+import com.m.freemovie.adapter.QualityAdapter;
 import com.m.freemovie.databinding.ActivityAnimePaheWebviewBinding;
 import com.m.freemovie.mvp.Contract.AnimePaheDetailContract;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToWatchBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniNeKoInfoBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniNekoEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheBeanList;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDownloadBean;
 import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoVideoUrlBean;
 import com.m.freemovie.mvp.Presenter.AnimePaheDetailPresenter;
+import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.ViewHolder;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -68,7 +78,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class AnimePaheWebviewActivity extends AppCompatActivity
-        implements AnimePaheDetailContract.View, AnimePaheDetailAdapter.EpisodeListener, AdapterView.OnItemSelectedListener {
+        implements AnimePaheDetailContract.View, AnimePaheDetailAdapter.EpisodeListener, AdapterView.OnItemSelectedListener, QualityAdapter.SrcListener {
     private ActivityAnimePaheWebviewBinding binding;
     private String id, title;
     private AnimePaheDetailAdapter episodeAdapter;
@@ -94,6 +104,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     private CountDownTimer volumeTimer;
     private AudioManager audioManager;
     private String imageUrl;
+    private boolean isAniNeko;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +117,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         new WindowUtils(this, true, false);
         title = getIntent().getStringExtra("title");
         imageUrl = getIntent().getStringExtra("imageUrl");
+        isAniNeko = getIntent().getBooleanExtra("isAniNeko", false);
 //        Log.d("AnimeTitle","val: "+title);
         id = getIntent().getStringExtra("id");
 //        Log.d("SeasonList","ids"+" videoId: "+id + " SeasonId: "+seasonId);
@@ -116,7 +128,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         detailPresenter = new AnimePaheDetailPresenter(this);
         spinnerTotalDbHelper = new SpinnerTotalDbHelper(this);
 
-        if(id == null){
+        if (id == null) {
             Toast.makeText(getApplicationContext(), "No Episode Available", Toast.LENGTH_SHORT).show();
             finish();
             return;
@@ -124,7 +136,11 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         }
 
         if (isNetworkAvailable()) {
-            detailPresenter.getAniKoToID(id);
+            if (isAniNeko) {
+                detailPresenter.getAniNekoUrl(id);
+            } else {
+                detailPresenter.getAniKoToID(id);
+            }
         } else {
             Toast.makeText(getApplicationContext(), "Please check internet and try again", Toast.LENGTH_SHORT).show();
         }
@@ -164,7 +180,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         });
 
         binding.rvSeason.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(this));
-        episodeAdapter = new AnimePaheDetailAdapter(this);
+        episodeAdapter = new AnimePaheDetailAdapter(this, isAniNeko);
         binding.rvSeason.setAdapter(episodeAdapter);
         episodeAdapter.setNewData(episodeBeanList);
 
@@ -352,7 +368,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         DetailBean details = new DetailBean(id, timestamp, imageUrl, title, "false");
         details.setVideoId(id);
         details.setTimeStamp(timestamp);
-        bookmarkDbHelper.toggleBookmark(details, 7);
+        bookmarkDbHelper.toggleBookmark(details, isAniNeko ? 3 : 7);
         setImageData(id);
     }
 
@@ -389,6 +405,22 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         }
         binding.webView.loadUrl(videoUrl);
 
+    }
+
+    @Override
+    public void getSrc(String videoUrl) {
+        if (TextUtils.isEmpty(videoUrl)) {
+            return;
+        }
+        if (binding.webView.getVisibility() == View.GONE) {
+            binding.webView.setVisibility(View.VISIBLE);
+            binding.tvSelect.setVisibility(View.GONE);
+            binding.expand.setVisibility(View.VISIBLE);
+        }
+        if(sourceDialog !=null){
+            sourceDialog.dismiss();
+        }
+        setupWebView(videoUrl);
     }
 
     private class CustomWebChromeClient extends WebChromeClient {
@@ -482,12 +514,12 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                     episodeBeanList.add(detailBean);
                 }
 
-                Collections.sort(episodeBeanList, new Comparator<AnimePaheBeanList>() {
-                    @Override
-                    public int compare(AnimePaheBeanList v1, AnimePaheBeanList v2) {
-                        return Long.compare(Long.parseLong(v1.getEpisode()), Long.parseLong(v2.getEpisode()));
-                    }
-                });
+//                Collections.sort(episodeBeanList, new Comparator<AnimePaheBeanList>() {
+//                    @Override
+//                    public int compare(AnimePaheBeanList v1, AnimePaheBeanList v2) {
+//                        return Long.compare(Long.parseLong(v1.getEpisode()), Long.parseLong(v2.getEpisode()));
+//                    }
+//                });
 
                 lastWatchedPosition = -1;
                 for (int i = 0; i < episodeBeanList.size(); i++) {
@@ -495,23 +527,23 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                         lastWatchedPosition = i;
                     }
                 }
-
-                episodeAdapter.setNewData(episodeBeanList);
-
-                if (lastWatchedPosition != -1) {
-                    binding.rvSeason.postDelayed(() -> {
-                        if (binding.rvSeason.getLayoutManager() != null) {
-                            Toast.makeText(getApplicationContext(), "Continuing from last watched episode", Toast.LENGTH_SHORT).show();
-                            binding.rvSeason.smoothScrollToPosition(lastWatchedPosition);
-                        }
-                    }, 300);
-                }
-
-                binding.episodeTxt.setText(episodeBeanList.size() > 1 ? "Episode's" : "Episode");
-
-            } else {
-                isNomore = true;
             }
+
+            episodeAdapter.setNewData(episodeBeanList);
+
+            if (lastWatchedPosition != -1) {
+                binding.rvSeason.postDelayed(() -> {
+                    if (binding.rvSeason.getLayoutManager() != null) {
+                        Toast.makeText(getApplicationContext(), "Continuing from last watched episode", Toast.LENGTH_SHORT).show();
+                        binding.rvSeason.smoothScrollToPosition(lastWatchedPosition);
+                    }
+                }, 300);
+            }
+
+            binding.episodeTxt.setText(episodeBeanList.size() > 1 ? "Episode's" : "Episode");
+
+        } else {
+            isNomore = true;
         }
     }
 
@@ -532,15 +564,16 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     @Override
     public void getAniKoToEpisode(AniKoToWatchBean aniKoToWatchBean) {
         if (aniKoToWatchBean != null) {
-            if (aniKoToWatchBean.getEpisodes() != null) {
+            if (aniKoToWatchBean.getEpisodes().size() != 0) {
 
                 for (AniKoToWatchBean.EpisodesBean dataBean : aniKoToWatchBean.getEpisodes()) {
-                    AnimePaheBeanList detailBean = new AnimePaheBeanList(dataBean.getServers().get(0).getVideoUrl(), dataBean.getEpisodeNumber(), imageUrl, "");
-                    boolean isWatched = dbHelper.isEpisodeWatched(id, dataBean.getEpisodeNumber());
-                    detailBean.setVideoId(id);
-                    detailBean.setWatched(isWatched);
-
-                    episodeBeanList.add(detailBean);
+                    if (dataBean.getServers().size() != 0) {
+                        AnimePaheBeanList detailBean = new AnimePaheBeanList(dataBean.getServers().get(0).getVideoUrl(), dataBean.getEpisodeNumber(), imageUrl, "");
+                        boolean isWatched = dbHelper.isEpisodeWatched(id, dataBean.getEpisodeNumber());
+                        detailBean.setVideoId(id);
+                        detailBean.setWatched(isWatched);
+                        episodeBeanList.add(detailBean);
+                    }
                 }
 
 //                Collections.sort(episodeBeanList, new Comparator<AnimePaheBeanList>() {
@@ -576,6 +609,98 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void getAniNekoDetail(AniNeKoInfoBean aniNeKoInfoBean) {
+        if (aniNeKoInfoBean != null) {
+            if (aniNeKoInfoBean.getInfo().getEpisodes().size() != 0) {
+
+                for (AniNeKoInfoBean.InfoBean.EpisodesBean dataBean : aniNeKoInfoBean.getInfo().getEpisodes()) {
+                    AnimePaheBeanList detailBean = new AnimePaheBeanList(dataBean.getEpisodeUrl(), dataBean.getEpisodeTitle(), imageUrl, "");
+                    boolean isWatched = dbHelper.isEpisodeWatched(id, dataBean.getEpisodeTitle());
+                    detailBean.setVideoId(id);
+                    detailBean.setWatched(isWatched);
+                    episodeBeanList.add(detailBean);
+                }
+            }
+
+//                Collections.sort(episodeBeanList, new Comparator<AnimePaheBeanList>() {
+//                    @Override
+//                    public int compare(AnimePaheBeanList v1, AnimePaheBeanList v2) {
+//                        return Long.compare(Long.parseLong(v1.getEpisode()), Long.parseLong(v2.getEpisode()));
+//                    }
+//                });
+
+            lastWatchedPosition = -1;
+            for (int i = 0; i < episodeBeanList.size(); i++) {
+                if (episodeBeanList.get(i).isWatched()) {
+                    lastWatchedPosition = i;
+                }
+            }
+
+            episodeAdapter.setNewData(episodeBeanList);
+
+            if (lastWatchedPosition != -1) {
+                binding.rvSeason.postDelayed(() -> {
+                    if (binding.rvSeason.getLayoutManager() != null) {
+                        Toast.makeText(getApplicationContext(), "Continuing from last watched episode", Toast.LENGTH_SHORT).show();
+                        binding.rvSeason.smoothScrollToPosition(lastWatchedPosition);
+                    }
+                }, 300);
+            }
+
+            binding.episodeTxt.setText(episodeBeanList.size() > 1 ? "Episode's" : "Episode");
+
+        } else {
+            isNomore = true;
+        }
+
+    }
+
+    @Override
+    public void getAniNekoEpisode(AniNekoEpisodeBean aniNekoEpisodeBean) {
+        if (aniNekoEpisodeBean != null && aniNekoEpisodeBean.getEpisode().getPlayer().getServers() != null) {
+
+            List<AniNekoEpisodeBean.EpisodeBean.PlayerBean.ServersBeanX.ServerGroupsBean.ServersBean> allServers = new ArrayList<>();
+
+            for (AniNekoEpisodeBean.EpisodeBean.PlayerBean.ServersBeanX serversBeanX
+                    : aniNekoEpisodeBean.getEpisode().getPlayer().getServers()) {
+                if (!serversBeanX.getServerGroups().isEmpty()) {
+                    for (AniNekoEpisodeBean.EpisodeBean.PlayerBean.ServersBeanX.ServerGroupsBean group
+                            : serversBeanX.getServerGroups()) {
+                        allServers.addAll(group.getServers());
+                    }
+                }
+            }
+
+            if (!allServers.isEmpty()) {
+                ShowDialog(allServers);
+            } else {
+                Toast.makeText(this, "No Server Data", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private DialogPlus sourceDialog;
+
+    private void ShowDialog(List<AniNekoEpisodeBean.EpisodeBean.PlayerBean.ServersBeanX.ServerGroupsBean.ServersBean> stereamBeanList) {
+        sourceDialog = DialogPlus.newDialog(AnimePaheWebviewActivity.this)
+                .setContentHolder(new ViewHolder(R.layout.dialog_select_quality))
+                .setContentWidth(ViewGroup.LayoutParams.MATCH_PARENT)
+                .setContentHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
+                .setGravity(Gravity.CENTER)
+                .setCancelable(true)
+                .setPadding(10, 10, 10, 10)
+                .create();
+
+        View dialogView = sourceDialog.getHolderView();
+        RecyclerView recyclerView = dialogView.findViewById(R.id.rv_quality);
+        QualityAdapter adapter = new QualityAdapter(this);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+        adapter.setNewData(stereamBeanList);
+        sourceDialog.show();
+    }
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
@@ -613,12 +738,17 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             return;
         }
 //        Log.d("VideoUrl","val: "+videoUrl);
-        if (binding.webView.getVisibility() == View.GONE) {
-            binding.webView.setVisibility(View.VISIBLE);
-            binding.tvSelect.setVisibility(View.GONE);
-            binding.expand.setVisibility(View.VISIBLE);
-        }
         this.videoUrl = videoUrl;
-        setupWebView(videoUrl);
+        if (isAniNeko) {
+            detailPresenter.getAniNekoEpisodeURL(videoUrl);
+        } else {
+            if (binding.webView.getVisibility() == View.GONE) {
+                binding.webView.setVisibility(View.VISIBLE);
+                binding.tvSelect.setVisibility(View.GONE);
+                binding.expand.setVisibility(View.VISIBLE);
+            }
+            setupWebView(videoUrl);
+        }
+
     }
 }

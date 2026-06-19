@@ -10,20 +10,21 @@ import com.m.freemovie.Activity.AnimeDetailsActivity;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
+import com.m.freemovie.mvp.Model.ClassBean.AniNekoBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
 
-public class HotAdapter extends BaseQuickAdapter<AnimoPageBean.ResultsBean, BaseViewHolder> {
+public class HotAdapter extends BaseQuickAdapter<AniNekoBean.DataBean, BaseViewHolder> {
     public HotAdapter() {
         super(R.layout.movie_item);
     }
     @Override
-    protected void convert(BaseViewHolder helper, AnimoPageBean.ResultsBean item) {
+    protected void convert(BaseViewHolder helper, AniNekoBean.DataBean item) {
         TextView tv_title  = helper.getView(R.id.tv_title);
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
 
         Glide.with(mContext)
                 .asBitmap().
-                load(item.getImg())
+                load(item.getImage())
                 .placeholder(R.drawable.noimage)
                 .into(iv_thumb);
 
@@ -33,9 +34,7 @@ public class HotAdapter extends BaseQuickAdapter<AnimoPageBean.ResultsBean, Base
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, AnimeDetailsActivity.class);
-                intent.putExtra("imageUrl",item.getImg());
-                intent.putExtra("url",item.getLink().trim());
-                intent.putExtra("title",item.getTitle());
+                intent.putExtra("id",item.getUrl());
                 intent.putExtra("apiPosition",2);
                 mContext.startActivity(intent);
             }
