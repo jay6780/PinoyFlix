@@ -155,7 +155,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                         ll_reset.setVisibility(View.GONE);
                     }
                     if (lastVisiblePosition >= movieLists.size() - 1) {
-                        if (position > 3) {
+                        if (position > 3 && position < 7) {
                             return;
                         }
                         if (isNomore) {
@@ -320,12 +320,6 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                 break;
             case 2:
                 searchPresenter.getSearchSeries(getString(R.string.key), lastQuery, page);
-                break;
-            case 3:
-                searchPresenter.getAniNeKoQuery(lastQuery);
-                break;
-            case 7:
-                searchPresenter.getAniKoToQuery(lastQuery);
                 break;
         }
     }
