@@ -155,6 +155,9 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                         ll_reset.setVisibility(View.GONE);
                     }
                     if (lastVisiblePosition >= movieLists.size() - 1) {
+                        if (position > 3) {
+                            return;
+                        }
                         if (isNomore) {
                             return;
                         }
