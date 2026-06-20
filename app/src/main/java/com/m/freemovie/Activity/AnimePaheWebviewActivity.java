@@ -163,7 +163,11 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 isNomore = false;
                 isInit = true;
                 SPUtils.getInstance().put(AppConstant.isShow, false);
-                detailPresenter.getAniKoToID(id);
+                if(isAniNeko){
+                    detailPresenter.getAniNekoEpisodeURL(id);
+                }else{
+                    detailPresenter.getAniKoToID(id);
+                }
                 episodeBeanList.clear();
                 episodeAdapter.setNewData(new ArrayList<>());
             }
