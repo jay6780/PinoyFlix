@@ -66,14 +66,14 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initStyle();
         getSupportActionBar().hide();
         binding = ActivityDownloadVideoViewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         title = getIntent().getStringExtra("title");
         videopath = getIntent().getStringExtra("videopath");
         binding.title.setText(title);
-
+        new GlobalWindowUtils(this,false);
+        new WindowUtils(this, true, false);
         List<View> viewList = new ArrayList<>();
         viewList.add(binding.fullWide);
         viewList.add(binding.player);
@@ -184,21 +184,6 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
         });
     }
 
-    private void initStyle() {
-        WindowInsetsControllerCompat windowInsetsController =
-                WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
-        windowInsetsController.setSystemBarsBehavior(
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        );
-        ViewCompat.setOnApplyWindowInsetsListener(
-                getWindow().getDecorView(),
-                (view, windowInsets) -> {
-                    windowInsetsController.hide(WindowInsetsCompat.Type.statusBars());
-                    windowInsetsController.hide(WindowInsetsCompat.Type.navigationBars());
-                    return ViewCompat.onApplyWindowInsets(view, windowInsets);
-                });
-    }
-
 
     private void setupFileList() {
         FilesExtractor filesExtractor = new FilesExtractor(DownloadVideoViewActivity.this);
@@ -272,7 +257,6 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
         }.start();
     }
 
-
     @Override
     public void onClick(View view) {
         switch (view.getId()){
@@ -295,6 +279,7 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 binding.rvDownloadvideo.setVisibility(View.GONE);
                 binding.downloadTxt.setVisibility(View.GONE);
+                new WindowUtils(this,true,false);
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
                 binding.relativeVideo.setLayoutParams(params);
                 break;
@@ -434,10 +419,7 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
             return String.format("%02d:%02d", minutes, secs);
         }
     }
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -473,7 +455,7 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
     public void onBackPressed() {
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            new WindowUtils(this,false,false);
+            new WindowUtils(this,true,false);
             isLandScape = false;
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dip2px(250));
             binding.relativeVideo.setLayoutParams(params);
