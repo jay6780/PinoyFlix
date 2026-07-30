@@ -14,7 +14,6 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -31,8 +30,6 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -53,6 +50,7 @@ import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
 import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.WindowUtils;
+import com.m.freemovie.adapter.AniKoToSourceAdapter;
 import com.m.freemovie.adapter.AnimePaheDetailAdapter;
 import com.m.freemovie.adapter.QualityAdapter;
 import com.m.freemovie.databinding.ActivityAnimePaheWebviewBinding;
@@ -71,14 +69,12 @@ import com.orhanobut.dialogplus.ViewHolder;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class AnimePaheWebviewActivity extends AppCompatActivity
-        implements AnimePaheDetailContract.View, AnimePaheDetailAdapter.EpisodeListener, AdapterView.OnItemSelectedListener, QualityAdapter.SrcListener {
+        implements AnimePaheDetailContract.View, AnimePaheDetailAdapter.EpisodeListener, AdapterView.OnItemSelectedListener, QualityAdapter.SrcListener, AniKoToSourceAdapter.AniKoToSourceListener {
     private ActivityAnimePaheWebviewBinding binding;
     private String id, title;
     private AnimePaheDetailAdapter episodeAdapter;
@@ -421,9 +417,13 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             binding.tvSelect.setVisibility(View.GONE);
             binding.expand.setVisibility(View.VISIBLE);
         }
-        if(sourceDialog !=null){
+        if(sourceDialog !=null && sourceDialog.isShowing()){
             sourceDialog.dismiss();
         }
+        if(anikoToSourceDialog !=null && anikoToSourceDialog.isShowing()){
+            anikoToSourceDialog.dismiss();
+        }
+        this.videoUrl = videoUrl;
         setupWebView(videoUrl);
     }
 
@@ -510,7 +510,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             if (zoRoDetailBean.getEpisodes() != null) {
 
                 for (ZoRoDetailBean.EpisodesBean dataBean : zoRoDetailBean.getEpisodes()) {
-                    AnimePaheBeanList detailBean = new AnimePaheBeanList(dataBean.getUrl(), String.valueOf(dataBean.getNumber()), imageUrl, "");
+                    AnimePaheBeanList detailBean = new AnimePaheBeanList(dataBean.getUrl(), String.valueOf(dataBean.getNumber()), imageUrl, "",new ArrayList<>());
                     boolean isWatched = dbHelper.isEpisodeWatched(id, String.valueOf(dataBean.getNumber()));
                     detailBean.setVideoId(id);
                     detailBean.setWatched(isWatched);
@@ -572,7 +572,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
                 for (AniKoToWatchBean.EpisodesBean dataBean : aniKoToWatchBean.getEpisodes()) {
                     if (dataBean.getServers().size() != 0) {
-                        AnimePaheBeanList detailBean = new AnimePaheBeanList(dataBean.getServers().get(0).getVideoUrl(), dataBean.getEpisodeNumber(), imageUrl, "");
+                        AnimePaheBeanList detailBean = new AnimePaheBeanList("", dataBean.getEpisodeNumber(), imageUrl, "",dataBean.getServers());
                         boolean isWatched = dbHelper.isEpisodeWatched(id, dataBean.getEpisodeNumber());
                         detailBean.setVideoId(id);
                         detailBean.setWatched(isWatched);
@@ -619,7 +619,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             if (aniNeKoInfoBean.getInfo().getEpisodes().size() != 0) {
 
                 for (AniNeKoInfoBean.InfoBean.EpisodesBean dataBean : aniNeKoInfoBean.getInfo().getEpisodes()) {
-                    AnimePaheBeanList detailBean = new AnimePaheBeanList(dataBean.getEpisodeUrl(), dataBean.getEpisodeTitle(), imageUrl, "");
+                    AnimePaheBeanList detailBean = new AnimePaheBeanList(dataBean.getEpisodeUrl(), dataBean.getEpisodeTitle(), imageUrl, "",new ArrayList<>());
                     boolean isWatched = dbHelper.isEpisodeWatched(id, dataBean.getEpisodeTitle());
                     detailBean.setVideoId(id);
                     detailBean.setWatched(isWatched);
@@ -684,7 +684,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         }
     }
 
-    private DialogPlus sourceDialog;
+    private DialogPlus sourceDialog,anikoToSourceDialog;
 
     private void ShowDialog(List<AniNekoEpisodeBean.EpisodeBean.PlayerBean.ServersBeanX.ServerGroupsBean.ServersBean> stereamBeanList) {
         sourceDialog = DialogPlus.newDialog(AnimePaheWebviewActivity.this)
@@ -737,22 +737,39 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     }
 
     @Override
-    public void getVideoUrl(String videoUrl) {
-        if (TextUtils.isEmpty(videoUrl)) {
-            return;
-        }
+    public void getVideoUrl(List<AniKoToWatchBean.EpisodesBean.ServersBean> serversBeanList,String videoUrl) {
 //        Log.d("VideoUrl","val: "+videoUrl);
-        this.videoUrl = videoUrl;
         if (isAniNeko) {
+            if(videoUrl.isEmpty()){
+                return;
+            }
             detailPresenter.getAniNekoEpisodeURL(videoUrl);
         } else {
-            if (binding.webView.getVisibility() == View.GONE) {
-                binding.webView.setVisibility(View.VISIBLE);
-                binding.tvSelect.setVisibility(View.GONE);
-                binding.expand.setVisibility(View.VISIBLE);
+            if (serversBeanList.isEmpty()) {
+                return;
             }
-            setupWebView(videoUrl);
+            showAnikotoSource(serversBeanList);
         }
 
+    }
+
+    private void showAnikotoSource(List<AniKoToWatchBean.EpisodesBean.ServersBean> serversBeansList) {
+        anikoToSourceDialog = DialogPlus.newDialog(AnimePaheWebviewActivity.this)
+                .setContentHolder(new ViewHolder(R.layout.dialog_select_quality))
+                .setContentWidth(ViewGroup.LayoutParams.MATCH_PARENT)
+                .setContentHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
+                .setGravity(Gravity.CENTER)
+                .setCancelable(true)
+                .setPadding(10, 10, 10, 10)
+                .create();
+
+        View dialogView = anikoToSourceDialog.getHolderView();
+        RecyclerView recyclerView = dialogView.findViewById(R.id.rv_quality);
+        AniKoToSourceAdapter adapter = new AniKoToSourceAdapter(this);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+        adapter.setNewData(serversBeansList);
+        anikoToSourceDialog.show();
     }
 }

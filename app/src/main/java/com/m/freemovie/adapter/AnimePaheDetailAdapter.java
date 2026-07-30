@@ -20,7 +20,11 @@ import com.m.freemovie.R;
 import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
+import com.m.freemovie.mvp.Model.ClassBean.AniKoToWatchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheBeanList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, BaseViewHolder> {
 
@@ -30,7 +34,7 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
     private boolean isAniNeko = false;
 
     public interface EpisodeListener {
-        void getVideoUrl(String videoUrl);
+        void getVideoUrl(List<AniKoToWatchBean.EpisodesBean.ServersBean> serversBeanList,String videoUrl);
     }
 
     public AnimePaheDetailAdapter(EpisodeListener videoPlayListerner, boolean isAniNeko) {
@@ -83,13 +87,13 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
                 }
                 if (lastPosition == (helper.getAdapterPosition())) {
                     lastPosition = -1;
-                    videoPlayListerner.getVideoUrl("");
+                    videoPlayListerner.getVideoUrl(new ArrayList<>(),"");
                 } else {
                     lastPosition = (helper.getAdapterPosition());
 //                    Log.d("EpisodeNum: ",item.getEpisode());
                     dbHelper.markEpisodeAsWatched(item.getVideoId(), item.getEpisode());
                     lastPosition = (helper.getAdapterPosition());
-                    videoPlayListerner.getVideoUrl(item.getEpisodeUrl());
+                    videoPlayListerner.getVideoUrl(item.getServersBeans(),item.getEpisodeUrl());
                     item.setWatched(true);
                 }
                 notifyDataSetChanged();
