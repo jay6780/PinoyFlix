@@ -209,6 +209,11 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                 videoUrl = "https://vidfast.vc/tv/"+id+"/"+seasonNum+"/"+ epNumber;
                 setupWebView(videoUrl);
                 break;
+            case 4:
+                videoPosition = 4;
+                videoUrl = "https://moviesapi.to/tv/"+id+"/"+seasonNum+"/"+ epNumber;
+                setupWebView(videoUrl);
+                break;
         }
     }
 

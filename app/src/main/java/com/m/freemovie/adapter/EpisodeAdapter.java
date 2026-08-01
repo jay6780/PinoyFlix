@@ -86,7 +86,7 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
     }
 
     private void showVideoOptions(EpisodeBean item, Context mContext, BaseViewHolder helper) {
-        String[] videoPlayer = {"Player 1", "Player 2","Player 3"};
+        String[] videoPlayer = {"Player 1", "Player 2","Player 3","Player 4"};
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         TextView titleView = new TextView(mContext);
         titleView.setText("Select player");
@@ -125,6 +125,14 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
                     case 2:
                         lastPosition = (helper.getAdapterPosition());
                         sourceListener.getId(item.getId(), 3, item.getSeasonNum(), item.getEpisodeNum());
+                        dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
+                                item.getSeasonNum(), item.getEpisodeNum(), item.getSeasonId());
+                        item.setWatched(true);
+                        notifyDataSetChanged();
+                        break;
+                    case 3:
+                        lastPosition = (helper.getAdapterPosition());
+                        sourceListener.getId(item.getId(), 4, item.getSeasonNum(), item.getEpisodeNum());
                         dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
                                 item.getSeasonNum(), item.getEpisodeNum(), item.getSeasonId());
                         item.setWatched(true);

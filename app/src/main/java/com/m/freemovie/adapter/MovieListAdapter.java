@@ -69,7 +69,7 @@ public class MovieListAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Ba
 
     private void showDialog(MovieBean.ResultsBean item, BaseViewHolder helper) {
 
-        String[] option = {"Player 1","Player 2","Player 3" ,"View Details","Download"};
+        String[] option = {"Player 1","Player 2","Player 3","Player 4" ,"View Details","Download"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setItems(option, new DialogInterface.OnClickListener() {
@@ -94,13 +94,19 @@ public class MovieListAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Ba
                         notifyDataSetChanged();
                         break;
                     case 3:
+                        movieIdListener.getMovieId(item.getId(),item.getTitle(),4);
+                        lastPosition = (helper.getAdapterPosition());
+                        notifyItemChanged(helper.getAdapterPosition());
+                        notifyDataSetChanged();
+                        break;
+                    case 4:
                         Intent intent = new Intent(mContext, Details_activity.class);
                         intent.putExtra("id",item.getId());
                         intent.putExtra("position",1);
                         intent.putExtra("apiPosition",apiPosition);
                         mContext.startActivity(intent);
                         break;
-                    case 4:
+                    case 5:
                         String downloadUrl = "https://vidvault.ru/movie/" + item.getId();
                         Intent download = new Intent(mContext, DownloadWebview.class);
                         download.putExtra("DownloadUrl", downloadUrl);

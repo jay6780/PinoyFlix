@@ -181,7 +181,7 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
         if(title == null || id == null){
             return;
         }
-        String[] option = {"Player 1","Player 2","Player 3","Download"};
+        String[] option = {"Player 1","Player 2","Player 3","Player 4","Download"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         TextView titleView = new TextView(this);
         titleView.setText("Select player");
@@ -216,6 +216,12 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
                         intent.putExtra("videoId", id);
                         break;
                     case 3:
+                        intent = new Intent(Details_activity.this, VideoWebviewActivity.class);
+                        intent.putExtra("title", title);
+                        intent.putExtra("videoPosition", 4);
+                        intent.putExtra("videoId", id);
+                        break;
+                    case 4:
                         String downloadUrl = "https://vidvault.ru/movie/" +id;
                         intent = new Intent(getApplicationContext(), DownloadWebview.class);
                         intent.putExtra("DownloadUrl", downloadUrl);

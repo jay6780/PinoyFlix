@@ -158,6 +158,10 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 videoUrl = "https://vidfast.vc/movie/"+ videoId;
 //                Log.d("VideoUrl","val: "+videoUrl);
                 break;
+            case 4:
+                videoUrl = "https://moviesapi.to/movie/"+ videoId;
+//                Log.d("VideoUrl","val: "+videoUrl);
+                break;
         }
         initApi();
         initStart();
@@ -488,6 +492,11 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
             case 3:
                 videoPosition = 3;
                 videoUrl = "https://vidfast.vc/movie/"+ id;
+                setupWebView(videoUrl);
+                break;
+            case 4:
+                videoPosition = 4;
+                videoUrl = "https://moviesapi.to/movie/"+ id;
                 setupWebView(videoUrl);
                 break;
         }
