@@ -28,13 +28,12 @@ import java.util.List;
 
 public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, BaseViewHolder> {
 
-    private PinoyWatchHistoryHelper dbHelper;
     private EpisodeListener videoPlayListerner;
     private int lastPosition = -1;
     private boolean isAniNeko = false;
 
     public interface EpisodeListener {
-        void getVideoUrl(List<AniKoToWatchBean.EpisodesBean.ServersBean> serversBeanList,String videoUrl);
+        void getVideoUrl(List<AniKoToWatchBean.EpisodesBean.ServersBean> serversBeanList,String videoUrl ,AnimePaheBeanList animePaheBeanList);
     }
 
     public AnimePaheDetailAdapter(EpisodeListener videoPlayListerner, boolean isAniNeko) {
@@ -45,9 +44,6 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
 
     @Override
     protected void convert(BaseViewHolder helper, AnimePaheBeanList item) {
-        if (dbHelper == null) {
-            dbHelper = new PinoyWatchHistoryHelper(mContext);
-        }
         TextView tv_season = helper.getView(R.id.tv_season);
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
         ImageView iv_download = helper.getView(R.id.iv_download);
@@ -56,7 +52,7 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
         RelativeLayout rl_select = helper.getView(R.id.rl_select);
         TextView tv_watched = helper.getView(R.id.tv_watched);
 
-        if (lastPosition == (helper.getAdapterPosition())) {
+        if (lastPosition == (helper.getAdapterPosition()) && item.isWatched()) {
             rl_select.setBackgroundColor(Color.parseColor("#050E3C"));
         } else {
             rl_select.setBackgroundColor(Color.parseColor("#313647"));
@@ -87,14 +83,12 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
                 }
                 if (lastPosition == (helper.getAdapterPosition())) {
                     lastPosition = -1;
-                    videoPlayListerner.getVideoUrl(new ArrayList<>(),"");
+                    videoPlayListerner.getVideoUrl(new ArrayList<>(),"",item);
                 } else {
                     lastPosition = (helper.getAdapterPosition());
 //                    Log.d("EpisodeNum: ",item.getEpisode());
-                    dbHelper.markEpisodeAsWatched(item.getVideoId(), item.getEpisode());
                     lastPosition = (helper.getAdapterPosition());
-                    videoPlayListerner.getVideoUrl(item.getServersBeans(),item.getEpisodeUrl());
-                    item.setWatched(true);
+                    videoPlayListerner.getVideoUrl(item.getServersBeans(),item.getEpisodeUrl(),item);
                 }
                 notifyDataSetChanged();
             }

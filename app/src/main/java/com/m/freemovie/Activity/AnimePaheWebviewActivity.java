@@ -417,9 +417,15 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             binding.tvSelect.setVisibility(View.GONE);
             binding.expand.setVisibility(View.VISIBLE);
         }
-        if(sourceDialog !=null && sourceDialog.isShowing()){
+        if (sourceDialog != null && sourceDialog.isShowing()) {
+            dbHelper.markEpisodeAsWatched(animePaheBeanList.getVideoId(), animePaheBeanList.getEpisode());
+            animePaheBeanList.setWatched(true);
             sourceDialog.dismiss();
+            if(episodeAdapter !=null){
+                episodeAdapter.notifyDataSetChanged();
+            }
         }
+
         if(anikoToSourceDialog !=null && anikoToSourceDialog.isShowing()){
             anikoToSourceDialog.dismiss();
         }
@@ -735,14 +741,15 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
-
+    private AnimePaheBeanList animePaheBeanList;
     @Override
-    public void getVideoUrl(List<AniKoToWatchBean.EpisodesBean.ServersBean> serversBeanList,String videoUrl) {
+    public void getVideoUrl(List<AniKoToWatchBean.EpisodesBean.ServersBean> serversBeanList,String videoUrl,AnimePaheBeanList animePaheBeanList) {
 //        Log.d("VideoUrl","val: "+videoUrl);
         if (isAniNeko) {
             if(videoUrl.isEmpty()){
                 return;
             }
+            this.animePaheBeanList = animePaheBeanList;
             detailPresenter.getAniNekoEpisodeURL(videoUrl);
         } else {
             if (serversBeanList.isEmpty()) {
