@@ -344,24 +344,24 @@ public class DetailTvBean {
          * still_path : /zBi2O5EJfgTS6Ae0HdAYLm9o2nf.jpg
          */
 
-        private int id;
+        private String id;
         private String name;
         private String overview;
-        private double vote_average;
-        private int vote_count;
+        private String vote_average;
+        private String vote_count;
         private String air_date;
-        private int episode_number;
+        private String episode_number;
         private String production_code;
-        private int runtime;
-        private int season_number;
-        private int show_id;
+        private String runtime;
+        private String season_number;
+        private String show_id;
         private String still_path;
 
-        public int getId() {
+        public String getId() {
             return id;
         }
 
-        public void setId(int id) {
+        public void setId(int String) {
             this.id = id;
         }
 
@@ -381,19 +381,19 @@ public class DetailTvBean {
             this.overview = overview;
         }
 
-        public double getVote_average() {
+        public String getVote_average() {
             return vote_average;
         }
 
-        public void setVote_average(double vote_average) {
+        public void setVote_average(String vote_average) {
             this.vote_average = vote_average;
         }
 
-        public int getVote_count() {
+        public String getVote_count() {
             return vote_count;
         }
 
-        public void setVote_count(int vote_count) {
+        public void setVote_count(String vote_count) {
             this.vote_count = vote_count;
         }
 
@@ -405,11 +405,11 @@ public class DetailTvBean {
             this.air_date = air_date;
         }
 
-        public int getEpisode_number() {
+        public String getEpisode_number() {
             return episode_number;
         }
 
-        public void setEpisode_number(int episode_number) {
+        public void setEpisode_number(String episode_number) {
             this.episode_number = episode_number;
         }
 
@@ -421,27 +421,27 @@ public class DetailTvBean {
             this.production_code = production_code;
         }
 
-        public int getRuntime() {
+        public String getRuntime() {
             return runtime;
         }
 
-        public void setRuntime(int runtime) {
+        public void setRuntime(String runtime) {
             this.runtime = runtime;
         }
 
-        public int getSeason_number() {
+        public String getSeason_number() {
             return season_number;
         }
 
-        public void setSeason_number(int season_number) {
+        public void setSeason_number(String season_number) {
             this.season_number = season_number;
         }
 
-        public int getShow_id() {
+        public String getShow_id() {
             return show_id;
         }
 
-        public void setShow_id(int show_id) {
+        public void setShow_id(String show_id) {
             this.show_id = show_id;
         }
 

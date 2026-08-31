@@ -290,11 +290,11 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
             binding.tvInfo.setText(sb.toString());
             binding.tvDate.setText(movieBean.getRelease_date());
-            binding.tvRate.setText(String.format("%.2f", movieBean.getVote_average()));
+            binding.tvRate.setText(movieBean.getVote_average());
             binding.language.setText(movieBean.getOriginal_language());
-            binding.tvVote.setText(String.valueOf(movieBean.getVote_count()));
+            binding.tvVote.setText(movieBean.getVote_count());
             binding.tvStatus.setText(movieBean.getStatus());
-            binding.tvRevenue.setText(String.valueOf(movieBean.getRevenue()));
+            binding.tvRevenue.setText(movieBean.getRevenue());
             binding.tvDescription.setText(movieBean.getOverview());
             binding.tvOriginal.setText(movieBean.getOriginal_title());
             this.title = movieBean.getTitle();
@@ -343,9 +343,9 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
 
                 seriesBinding.tvInfo.setText(sb.toString());
 
-                seriesBinding.tvRate.setText(String.format("%.2f", detailTvBean.getLast_episode_to_air().getVote_average()));
+                seriesBinding.tvRate.setText(detailTvBean.getLast_episode_to_air().getVote_average());
                 seriesBinding.language.setText(detailTvBean.getOrigin_country().get(0));
-                seriesBinding.tvVote.setText(String.valueOf(detailTvBean.getLast_episode_to_air().getVote_count()));
+                seriesBinding.tvVote.setText(detailTvBean.getLast_episode_to_air().getVote_count());
                 seriesBinding.tvDescription.setText(detailTvBean.getLast_episode_to_air().getOverview());
                 seriesBinding.overView.setVisibility(detailTvBean.getLast_episode_to_air().getOverview().isEmpty() ? View.GONE : View.VISIBLE);
                 seriesBinding.tvOriginal.setText(detailTvBean.getName());

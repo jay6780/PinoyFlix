@@ -110,9 +110,9 @@ public class DetailBean {
     private boolean adult;
     private String backdrop_path;
     private BelongsToCollectionBean belongs_to_collection;
-    private int budget;
+    private String budget;
     private String homepage;
-    private int id;
+    private String id;
     private String imdb_id;
     private String original_language;
     private String original_title;
@@ -120,19 +120,28 @@ public class DetailBean {
     private double popularity;
     private String poster_path;
     private String release_date;
-    private int revenue;
-    private int runtime;
+    private String revenue;
+    private String runtime;
     private String status;
     private String tagline;
     private String title;
     private boolean video;
-    private double vote_average;
-    private int vote_count;
+    private boolean softcore;
+    private String vote_average;
+    private String vote_count;
     private List<GenresBean> genres;
     private List<String> origin_country;
     private List<ProductionCompaniesBean> production_companies;
     private List<ProductionCountriesBean> production_countries;
     private List<SpokenLanguagesBean> spoken_languages;
+
+    public boolean isSoftcore() {
+        return softcore;
+    }
+
+    public void setSoftcore(boolean softcore) {
+        this.softcore = softcore;
+    }
 
     public String getName() {
         return name;
@@ -166,11 +175,11 @@ public class DetailBean {
         this.belongs_to_collection = belongs_to_collection;
     }
 
-    public int getBudget() {
+    public String getBudget() {
         return budget;
     }
 
-    public void setBudget(int budget) {
+    public void setBudget(String budget) {
         this.budget = budget;
     }
 
@@ -182,11 +191,11 @@ public class DetailBean {
         this.homepage = homepage;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -246,19 +255,19 @@ public class DetailBean {
         this.release_date = release_date;
     }
 
-    public int getRevenue() {
+    public String getRevenue() {
         return revenue;
     }
 
-    public void setRevenue(int revenue) {
+    public void setRevenue(String revenue) {
         this.revenue = revenue;
     }
 
-    public int getRuntime() {
+    public String getRuntime() {
         return runtime;
     }
 
-    public void setRuntime(int runtime) {
+    public void setRuntime(String runtime) {
         this.runtime = runtime;
     }
 
@@ -294,19 +303,19 @@ public class DetailBean {
         this.video = video;
     }
 
-    public double getVote_average() {
+    public String getVote_average() {
         return vote_average;
     }
 
-    public void setVote_average(double vote_average) {
+    public void setVote_average(String vote_average) {
         this.vote_average = vote_average;
     }
 
-    public int getVote_count() {
+    public String getVote_count() {
         return vote_count;
     }
 
-    public void setVote_count(int vote_count) {
+    public void setVote_count(String vote_count) {
         this.vote_count = vote_count;
     }
 

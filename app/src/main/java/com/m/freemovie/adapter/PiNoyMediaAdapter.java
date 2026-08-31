@@ -26,6 +26,7 @@ public class PiNoyMediaAdapter extends BaseQuickAdapter<PinoyRuDetailBean, BaseV
     protected void convert(BaseViewHolder helper, PinoyRuDetailBean item) {
         RecyclerView rv_player = helper.getView(R.id.rv_player);
         TextView tv_download = helper.getView(R.id.tv_download);
+        tv_download.setVisibility(View.GONE);
         helper.addOnClickListener(R.id.tv_download);
         rv_player.setLayoutManager(new LinearLayoutManager(mContext));
         pinoyPlayerAdapter = new PinoyPlayerAdapter();
