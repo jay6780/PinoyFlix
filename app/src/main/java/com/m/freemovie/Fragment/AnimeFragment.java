@@ -61,7 +61,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
             presenter.getAniNekoPage(page);
             presenter.getPopular(page);
             presenter.getMovie(page);
-//            presenter.getAniKoToPage(page);
+            presenter.getAniKoToPage(page);
         } else {
             Toast.makeText(getContext(), "Please check internet and try again", Toast.LENGTH_SHORT).show();
         }
@@ -103,7 +103,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         presenter.getAniNekoPage(page);
         presenter.getPopular(page);
         presenter.getMovie(page);
-//        presenter.getAniKoToPage(page);
+        presenter.getAniKoToPage(page);
     }
 
     private void clearAllData() {

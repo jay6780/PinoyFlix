@@ -139,23 +139,23 @@ public class BookmarkFragment extends Fragment implements AdapterView.OnItemSele
                 bookmarkposition = 2;
                 loadBookmarkData();
                 break;
-//            case 2:
-//                bookmarkposition = 7;
-//                loadBookmarkData();
-//                break;
             case 2:
-                bookmarkposition = 3;
+                bookmarkposition = 7;
                 loadBookmarkData();
                 break;
             case 3:
-                bookmarkposition = 4;
+                bookmarkposition = 3;
                 loadBookmarkData();
                 break;
             case 4:
+                bookmarkposition = 4;
+                loadBookmarkData();
+                break;
+            case 6:
                 bookmarkposition = 5;
                 loadBookmarkData();
                 break;
-            case 5:
+            case 7:
                 bookmarkposition = 8;
                 loadBookmarkData2();
                 break;

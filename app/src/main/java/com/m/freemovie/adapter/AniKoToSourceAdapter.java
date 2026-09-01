@@ -1,6 +1,7 @@
 package com.m.freemovie.adapter;
 
 
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -23,7 +24,9 @@ public class AniKoToSourceAdapter extends BaseQuickAdapter<AniKoToWatchBean.Epis
     @Override
     protected void convert(BaseViewHolder helper, AniKoToWatchBean.EpisodesBean.ServersBean item) {
         TextView tv_quality  = helper.getView(R.id.tv_quality);
-        tv_quality.setText(item.getName());
+        String type = item.getType().equals("dub")? "English Dub" : "English Sub";
+        String sourceName = item.getName()+" "+type;
+        tv_quality.setText(TextUtils.isEmpty(type)? item.getName() : sourceName);
 
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override

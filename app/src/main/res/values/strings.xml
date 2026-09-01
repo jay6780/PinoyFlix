@@ -12,6 +12,7 @@
     <string-array name="Select_bookmark">
         <item>Movies</item>
         <item>Tv Series</item>
+        <item>Newest anime</item>
         <item>Hot anime</item>
         <item>Popular anime</item>
         <item>Movie anime</item>
@@ -22,6 +23,7 @@
     <string-array name="search">
         <item>Movies</item>
         <item>Tv Series</item>
+        <item>Newest anime</item>
         <item>Hot anime</item>
         <item>Popular anime</item>
         <item>Movie anime</item>
