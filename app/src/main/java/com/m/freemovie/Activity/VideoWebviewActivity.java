@@ -1,11 +1,14 @@
 package com.m.freemovie.Activity;
 
 import android.annotation.SuppressLint;
+import android.app.PictureInPictureParams;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Point;
 import android.media.AudioManager;
 import android.media.audiofx.LoudnessEnhancer;
 import android.net.ConnectivityManager;
@@ -15,7 +18,10 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.Rational;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.ConsoleMessage;
@@ -28,6 +34,7 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -68,6 +75,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
     private boolean isNomore = false;
     private boolean isLoading = false;
     private int lastScroll;
+    private boolean isPictureMode = false;
     private LoudnessEnhancer booster;
     private final int[] gainValues = {-3000, -2000, -1000, 0, 1000, 2000};
     private final String[] labels = {"0%", "25%", "50%", "100%", "150%", "200%"};
@@ -503,6 +511,70 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
+
+        if (isInPictureInPictureMode) {
+            binding.rvMovielist.setVisibility(View.GONE);
+            binding.expand.setVisibility(View.GONE);
+            binding.btnBackFinish.setVisibility(View.GONE);
+            binding.tvSelect.setVisibility(View.GONE);
+            binding.swipe.setEnabled(false);
+            isPictureMode = true;
+
+            RelativeLayout.LayoutParams pipParams = new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+            binding.rlWebview.setLayoutParams(pipParams);
+
+        } else {
+            binding.rvMovielist.setVisibility(View.VISIBLE);
+            binding.tvSelect.setVisibility(binding.webView.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+            binding.swipe.setEnabled(finishing);
+            binding.btnBackFinish.setVisibility(View.VISIBLE);
+            isPictureMode = false;
+            if (finishing) {
+                defaultScreen();
+            } else {
+                binding.expand.setVisibility(View.INVISIBLE);
+                rotateScreen();
+            }
+        }
+    }
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                && !TextUtils.isEmpty(videoUrl)
+                && binding.webView.getVisibility() == View.VISIBLE) {
+            enterPip();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void enterPip() {
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
+            return;
+        }
+
+        Display d = getWindowManager().getDefaultDisplay();
+        Point p = new Point();
+        d.getSize(p);
+        int width = p.x;
+        int height = p.y;
+
+        Rational ratio = new Rational(width, height);
+
+        PictureInPictureParams.Builder pipBuilder = new PictureInPictureParams.Builder();
+        pipBuilder.setAspectRatio(ratio);
+
+        try {
+            enterPictureInPictureMode(pipBuilder.build());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     private class CustomWebChromeClient extends WebChromeClient {
         @Override
         public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
@@ -550,6 +622,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
 
     }
 
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -558,7 +631,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
             binding.llReset.setVisibility(View.GONE);
         }else{
             if(lastScroll > 5){
-                binding.llReset.setVisibility(View.VISIBLE);
+                binding.llReset.setVisibility(isPictureMode ? View.GONE : View.VISIBLE);
             }
         }
         if (videoPosition == 6 && binding != null && binding.webView != null) {

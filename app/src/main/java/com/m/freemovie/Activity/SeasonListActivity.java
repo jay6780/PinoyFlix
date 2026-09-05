@@ -1,14 +1,21 @@
 package com.m.freemovie.Activity;
 
+import android.app.PictureInPictureParams;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.media.AudioManager;
 import android.media.audiofx.LoudnessEnhancer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.text.TextUtils;
+import android.util.Rational;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.ConsoleMessage;
@@ -21,6 +28,7 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.m.freemovie.Utils.DbHelper.WatchHistoryDBHelper;
@@ -272,6 +280,69 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         }
 
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
+
+        if (isInPictureInPictureMode) {
+            binding.rvSeason.setVisibility(View.GONE);
+            binding.expand.setVisibility(View.GONE);
+            binding.btnBackFinish.setVisibility(View.GONE);
+            binding.tvSelect.setVisibility(View.GONE);
+
+            RelativeLayout.LayoutParams pipParams = new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+            binding.rlWebview.setLayoutParams(pipParams);
+
+        } else {
+            binding.rvSeason.setVisibility(View.VISIBLE);
+            binding.tvSelect.setVisibility(binding.webView.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+            binding.btnBackFinish.setVisibility(View.VISIBLE);
+            if (finishing) {
+                defaultScreen();
+            } else {
+                binding.expand.setVisibility(View.INVISIBLE);
+                rotateScreen();
+            }
+        }
+    }
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                && !TextUtils.isEmpty(videoUrl)
+                && binding.webView.getVisibility() == View.VISIBLE) {
+            enterPip();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void enterPip() {
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
+            return;
+        }
+
+        Display d = getWindowManager().getDefaultDisplay();
+        Point p = new Point();
+        d.getSize(p);
+        int width = p.x;
+        int height = p.y;
+
+        Rational ratio = new Rational(width, height);
+
+        PictureInPictureParams.Builder pipBuilder = new PictureInPictureParams.Builder();
+        pipBuilder.setAspectRatio(ratio);
+
+        try {
+            enterPictureInPictureMode(pipBuilder.build());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     private void updateVolume(int index) {
         if (index < 0 || index >= gainValues.length) return;
 

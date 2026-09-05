@@ -32,7 +32,8 @@
 
         <activity
             android:name=".Activity.OtherWebviewActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:supportsPictureInPicture="true"
+            android:configChanges="screenSize|screenLayout|orientation|smallestScreenSize"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -49,12 +50,14 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".Activity.DownloadVideoViewActivity"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|keyboardHidden|uiMode"
+            android:supportsPictureInPicture="true"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
             android:name=".Activity.AnimePaheWebviewActivity"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
+            android:supportsPictureInPicture="true"
+            android:configChanges="screenSize|screenLayout|orientation|smallestScreenSize"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -77,7 +80,8 @@
 
         <activity
             android:name=".Activity.TagalogWebviewActivity"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
+            android:supportsPictureInPicture="true"
+            android:configChanges="screenSize|screenLayout|orientation|smallestScreenSize"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -87,7 +91,8 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".Activity.SeasonListActivity"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
+            android:supportsPictureInPicture="true"
+            android:configChanges="screenSize|screenLayout|orientation|smallestScreenSize"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -113,7 +118,8 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".Activity.VideoWebviewActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:supportsPictureInPicture="true"
+            android:configChanges="screenSize|screenLayout|orientation|smallestScreenSize"
             android:exported="false" />
         <activity
             android:name=".Activity.MainActivity"

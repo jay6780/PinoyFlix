@@ -1,18 +1,25 @@
 package com.m.freemovie.Activity;
 
 import android.annotation.SuppressLint;
+import android.app.PictureInPictureParams;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Point;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.audiofx.LoudnessEnhancer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
+import android.util.Rational;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +29,7 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
@@ -69,6 +77,11 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
         getSupportActionBar().hide();
         binding = ActivityDownloadVideoViewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        final int restoredPosition = savedInstanceState != null
+                ? savedInstanceState.getInt("saved_position", 0)
+                : 0;
+
         title = getIntent().getStringExtra("title");
         videopath = getIntent().getStringExtra("videopath");
         binding.title.setText(title);
@@ -92,6 +105,10 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
             public void onPrepared(MediaPlayer mediaPlayer) {
                 mDuration = mediaPlayer.getDuration();
                 binding.seekBar.setMax(mDuration);
+                if (restoredPosition > 0) {
+                    mediaPlayer.seekTo(restoredPosition);
+                }
+
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -419,32 +436,33 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
             return String.format("%02d:%02d", minutes, secs);
         }
     }
-
     @Override
     protected void onPause() {
         super.onPause();
-        if(binding.btnRefresh !=null){
+        if (binding.btnRefresh != null) {
             binding.btnRefresh.setVisibility(View.GONE);
         }
-        if (binding.player != null && binding.player.isPlaying()) {
+        boolean inPip = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode();
+        if (binding.player != null) {
             currentPosition = binding.player.getCurrentPosition();
-            binding.player.pause();
+            if (!inPip && binding.player.isPlaying()) {
+                binding.player.pause();
+            }
         }
         if (mSeekRunnable != null) {
             mSeekHandler.removeCallbacks(mSeekRunnable);
         }
     }
+
     @Override
     protected void onResume() {
         super.onResume();
-        if(binding.btnRefresh !=null){
+        if (binding.btnRefresh != null) {
             binding.btnRefresh.setVisibility(View.GONE);
         }
-        if (binding.player != null) {
-            if (currentPosition > 0) {
-                binding.player.seekTo(currentPosition);
-            }
-            if (!binding.player.isPlaying() && currentPosition > 0) {
+        if (binding.player != null && currentPosition > 0) {
+            binding.player.seekTo(currentPosition);
+            if (!binding.player.isPlaying()) {
                 binding.player.start();
                 startSeekUpdates();
             }
@@ -467,6 +485,71 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
             finish();
         }
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
+        if (isInPictureInPictureMode) {
+            binding.rvDownloadvideo.setVisibility(View.GONE);
+            binding.downloadTxt.setVisibility(View.GONE);
+            binding.btnBack.setVisibility(View.GONE);
+            binding.title.setVisibility(View.GONE);
+            binding.fullWide.setVisibility(View.GONE);
+            binding.time.setVisibility(View.GONE);
+            binding.tenNegative.setVisibility(View.GONE);
+            binding.tenPositive.setVisibility(View.GONE);
+            binding.seekBar.setVisibility(View.GONE);
+            binding.btnPlay.setVisibility(View.GONE);
+        } else {
+            binding.rvDownloadvideo.setVisibility(View.VISIBLE);
+            binding.downloadTxt.setVisibility(View.VISIBLE);
+            binding.btnBack.setVisibility(View.VISIBLE);
+            binding.title.setVisibility(View.VISIBLE);
+            binding.fullWide.setVisibility(View.VISIBLE);
+            binding.time.setVisibility(View.VISIBLE);
+            binding.tenNegative.setVisibility(View.VISIBLE);
+            binding.tenPositive.setVisibility(View.VISIBLE);
+            binding.seekBar.setVisibility(View.VISIBLE);
+            binding.btnPlay.setVisibility(View.VISIBLE);
+        }
+    }
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            if(binding.player.isPlaying()){
+                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    enterPip();
+                }
+            }
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void enterPip() {
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
+            return;
+        }
+
+        Display d = getWindowManager().getDefaultDisplay();
+        Point p = new Point();
+        d.getSize(p);
+        int width = p.x;
+        int height = p.y;
+
+        Rational ratio = new Rational(width, height);
+
+        PictureInPictureParams.Builder pipBuilder = new PictureInPictureParams.Builder();
+        pipBuilder.setAspectRatio(ratio);
+
+        try {
+            enterPictureInPictureMode(pipBuilder.build());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public int dip2px(float dpValue) {
         final float scale = getResources(this).getDisplayMetrics().density;
