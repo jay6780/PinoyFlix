@@ -262,7 +262,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             binding.expand.setVisibility(View.GONE);
             binding.btnBackFinish.setVisibility(View.GONE);
             binding.tvSelect.setVisibility(View.GONE);
-            binding.spinner.setVisibility(View.GONE);
             binding.rlOption.setVisibility(View.GONE);
             binding.swipe.setEnabled(false);
 
@@ -274,7 +273,6 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             binding.rvSeason.setVisibility(View.VISIBLE);
             binding.llBookmark.setVisibility(View.VISIBLE);
             binding.tvSelect.setVisibility(binding.webView.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
-            binding.spinner.setVisibility(View.VISIBLE);
             binding.rlOption.setVisibility(View.VISIBLE);
             binding.swipe.setEnabled(finishing);
             binding.btnBackFinish.setVisibility(View.VISIBLE);
@@ -501,6 +499,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         if (TextUtils.isEmpty(videoUrl)) {
             return;
         }
+        clearCache();
         if (binding.webView.getVisibility() == View.GONE) {
             binding.webView.setVisibility(View.VISIBLE);
             binding.tvSelect.setVisibility(View.GONE);
@@ -521,8 +520,16 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         if(episodeAdapter !=null){
             episodeAdapter.notifyDataSetChanged();
         }
+
         this.videoUrl = videoUrl;
         setupWebView(videoUrl);
+    }
+
+    private void clearCache(){
+        if (binding != null && binding.webView != null) {
+            binding.webView.clearCache(true);
+            binding.webView.clearHistory();
+        }
     }
 
     private class CustomWebChromeClient extends WebChromeClient {

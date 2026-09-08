@@ -483,9 +483,9 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
             Toast.makeText(getApplicationContext(),"Please check internet and try again",Toast.LENGTH_SHORT).show();
             return;
         }
+        clearCache();
         this.title = title;
         this.videoId = id;
-        binding.webView.clearCache(true);
         switch (position){
             case 1:
                 videoPosition = 1;
@@ -509,6 +509,13 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 break;
         }
 
+    }
+
+    private void clearCache(){
+        if (binding != null && binding.webView != null) {
+            binding.webView.clearCache(true);
+            binding.webView.clearHistory();
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

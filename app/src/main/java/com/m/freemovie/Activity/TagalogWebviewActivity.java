@@ -586,11 +586,18 @@ public class TagalogWebviewActivity extends AppCompatActivity
     public void getTrack(DetailDownloadBean tagalogInfoBean) {
         if(tagalogInfoBean !=null){
 //            Log.d("VideoUrl","val: "+videoUrl);
+            clearCache();
             isError = false;
             videoUrl = tagalogInfoBean.getMetaframe();
             setupWebView(videoUrl);
         }
 
+    }
+    private void clearCache(){
+        if (binding != null && binding.webView != null) {
+            binding.webView.clearCache(true);
+            binding.webView.clearHistory();
+        }
     }
 
     @Override

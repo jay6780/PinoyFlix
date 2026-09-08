@@ -13,6 +13,8 @@ import android.media.audiofx.LoudnessEnhancer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Rational;
 import android.view.Display;
@@ -185,22 +187,23 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
             if (dbHelper != null) {
                 dbHelper.close();
             }
-            if (binding != null && binding.webView != null) {
-                binding.webView.stopLoading();
-                binding.webView.setWebChromeClient(null);
-                binding.webView.setWebViewClient(null);
-                binding.webView.destroy();
-                binding.webView.clearCache(true);
-                binding.webView.clearHistory();
-                binding.webView.reload();
-            }
+            clearCache();
             finish();
         }
     }
+
+    private void clearCache(){
+        if (binding != null && binding.webView != null) {
+            binding.webView.clearCache(true);
+            binding.webView.clearHistory();
+        }
+    }
+
     private int videoPosition;
     @Override
     public void getId(String id, int position, int seasonNum, int epNumber) {
-        binding.webView.clearCache(true);
+        clearCache();
+
         switch (position) {
             case 1:
                 videoPosition = 1;

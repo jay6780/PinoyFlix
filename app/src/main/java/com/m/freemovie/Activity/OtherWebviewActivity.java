@@ -468,10 +468,16 @@ public class OtherWebviewActivity extends AppCompatActivity
         if (dialog != null && dialog.isShowing()) {
             dialog.dismiss();
         }
-        binding.webView.clearCache(true);
+        clearCache();
         setupWebView(url);
     }
 
+    private void clearCache(){
+        if (binding != null && binding.webView != null) {
+            binding.webView.clearCache(true);
+            binding.webView.clearHistory();
+        }
+    }
     private class CustomWebChromeClient extends WebChromeClient {
         @Override
         public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
