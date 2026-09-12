@@ -66,6 +66,8 @@ import com.m.freemovie.mvp.Presenter.PinoyRuAllPresenter;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.ViewHolder;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -200,8 +202,24 @@ public class OtherWebviewActivity extends AppCompatActivity
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
-        binding.webView.loadUrl(videoUrl);
+        String baseUrl = getBaseUrl(videoUrl);
+        String html = "<!DOCTYPE html><html>" +
+                "<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">" +
+                "<style>body,html{margin:0;padding:0;width:100%;height:100%;background-color:#000;overflow:hidden;}" +
+                "iframe{border:none;width:100%;height:100%;}</style></head>" +
+                "<body><iframe src=\"" + videoUrl + "\" allow=\"autoplay; fullscreen\" allowfullscreen=\"true\"></iframe></body></html>";
+        binding.webView.loadDataWithBaseURL(baseUrl, html, "text/html", "UTF-8", null);
 
+
+    }
+
+    private String getBaseUrl(String url) {
+        try {
+            URL parsedUrl = new URL(url);
+            return parsedUrl.getProtocol() + "://" + parsedUrl.getHost() + "/";
+        } catch (MalformedURLException e) {
+            return "https://";
+        }
     }
 
     private void updateVolume(int index) {
@@ -465,6 +483,7 @@ public class OtherWebviewActivity extends AppCompatActivity
 
     @Override
     public void getVideoUrl(String url) {
+//        Log.d("OtherVideoUrl","val: "+url);
         if (dialog != null && dialog.isShowing()) {
             dialog.dismiss();
         }
@@ -646,7 +665,7 @@ public class OtherWebviewActivity extends AppCompatActivity
         params2.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         params2.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
         binding.expand.setLayoutParams(params2);
-        params2.setMargins(0, 0, 15, 20);
+        params2.setMargins(0, 0, 50, 35);
         new WindowUtils(this, true, false);
     }
 
