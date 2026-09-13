@@ -3,6 +3,8 @@ package com.m.freemovie.mvp.Api;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToWatchBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniMoTvEpisodeBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniMoTvSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniNeKoInfoBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniNekoBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniNekoEpisodeBean;
@@ -11,6 +13,7 @@ import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDownloadBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimoDetailsBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.DetailDownloadBean;
@@ -353,6 +356,20 @@ public interface MovieApi {
     @GET("animotvslash/latest-release")
     Observable<AnimoPageBean> getAnimoPage(
             @Query("page") int page);
+
+    @GET("animotvslash/info")
+    Observable<AnimoDetailsBean> getAnimoDetails(
+            @Query("url") String url);
+
+    @GET("animotvslash/download")
+    Observable<AniMoTvEpisodeBean> getAniMoDownload(
+            @Query("url") String url);
+
+    @GET("animotvslash")
+    Observable<AniMoTvSearchBean> getAnimoSearch(
+            @Query("search") String search);
+
+
 
     //zoroTv
 

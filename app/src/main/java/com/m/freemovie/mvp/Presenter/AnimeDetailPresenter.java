@@ -3,9 +3,11 @@ package com.m.freemovie.mvp.Presenter;
 import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
+import com.m.freemovie.mvp.Model.AniMoDetailModel;
 import com.m.freemovie.mvp.Model.ClassBean.AniNeKoDetailModel;
 import com.m.freemovie.mvp.Model.ClassBean.AniNeKoInfoBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimoDetailsBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogInfoBean;
 import com.m.freemovie.mvp.Contract.AnimeDetailsContract;
@@ -157,6 +159,34 @@ public class AnimeDetailPresenter implements AnimeDetailsContract.Presenter {
             public void returnResult(AniNeKoInfoBean apiBean) {
                 view.hideLoading();
                 view.getAniNekoDetail(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getAniMoTvUrl(String Url) {
+        view.showLoading();
+
+        AniMoDetailModel.getAniMoDetailData(Url, new Callback<AnimoDetailsBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(AnimoDetailsBean apiBean) {
+                view.hideLoading();
+                view.getAniMoTvDetail(apiBean);
             }
 
             @Override

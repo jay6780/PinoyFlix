@@ -30,16 +30,16 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
 
     private EpisodeListener videoPlayListerner;
     private int lastPosition = -1;
-    private boolean isAniNeko = false;
+    private int animePosition;
 
     public interface EpisodeListener {
         void getVideoUrl(List<AniKoToWatchBean.EpisodesBean.ServersBean> serversBeanList,String videoUrl ,AnimePaheBeanList animePaheBeanList);
     }
 
-    public AnimePaheDetailAdapter(EpisodeListener videoPlayListerner, boolean isAniNeko) {
+    public AnimePaheDetailAdapter(EpisodeListener videoPlayListerner, int animePosition) {
         super(R.layout.episode_item);
         this.videoPlayListerner = videoPlayListerner;
-        this.isAniNeko = isAniNeko;
+        this.animePosition = animePosition;
     }
 
     @Override
@@ -58,7 +58,7 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
             rl_select.setBackgroundColor(Color.parseColor("#313647"));
         }
         tv_watched.setVisibility(item.isWatched() ? View.VISIBLE : View.GONE);
-        tv_season.setText(isAniNeko ? item.getEpisode() : "Episode: " + item.getEpisode());
+        tv_season.setText(animePosition == 2 ? item.getEpisode() : "Episode: " + item.getEpisode());
 
         Glide.with(mContext)
                 .asBitmap()

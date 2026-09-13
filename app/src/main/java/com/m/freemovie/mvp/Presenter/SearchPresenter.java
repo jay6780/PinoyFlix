@@ -4,8 +4,10 @@ import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.mvp.Model.AniKoToSearchModel;
+import com.m.freemovie.mvp.Model.AniMoTvSearchModel;
 import com.m.freemovie.mvp.Model.AniNekoSearchModel;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniMoTvSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniNekoSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
@@ -274,6 +276,33 @@ public class SearchPresenter implements SearchContract.Presenter {
             public void returnResult(AniNekoSearchBean apiBean) {
                 view.hideLoading();
                 view.getAniNeKoSearchData(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getAniMoTvQuery(String search) {
+        view.showLoading();
+        AniMoTvSearchModel.getAniMoSearch(search, new Callback<AniMoTvSearchBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(AniMoTvSearchBean apiBean) {
+                view.hideLoading();
+                view.getAniMoTvSearch(apiBean);
             }
 
             @Override

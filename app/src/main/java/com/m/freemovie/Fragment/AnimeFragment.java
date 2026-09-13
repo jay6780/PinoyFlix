@@ -20,6 +20,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.m.freemovie.Activity.ViewAllAnimeAcitvity;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
+import com.m.freemovie.adapter.AniMoTvAdapter;
 import com.m.freemovie.adapter.AnimeMovieAdapter;
 import com.m.freemovie.adapter.AnimePopularAdapter;
 import com.m.freemovie.adapter.HotAdapter;
@@ -46,8 +47,10 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
     private HotAdapter hotAdapter;
     private AnimePopularAdapter animePopularAdapter;
     private AnimeMovieAdapter movieAdapter;
+    private AniMoTvAdapter aniMoTvAdapter;
     private List<AniKoToPageBean.ResultsBean> newestList = new ArrayList<>();
     private List<AniNekoBean.DataBean> hotList = new ArrayList<>();
+    private List<AnimoPageBean.ResultsBean> AniMoList = new ArrayList<>();
     private List<RevivalSeriesBean.ResultsBean> popularList = new ArrayList<>();
     private List<RevivalSeriesBean.ResultsBean> movieList = new ArrayList<>();
 
@@ -62,6 +65,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
             presenter.getPopular(page);
             presenter.getMovie(page);
             presenter.getAniKoToPage(page);
+            presenter.getAniMoPage(page);
         } else {
             Toast.makeText(getContext(), "Please check internet and try again", Toast.LENGTH_SHORT).show();
         }
@@ -71,6 +75,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         viewsList.add(binding.tvHot);
         viewsList.add(binding.tvPopular);
         viewsList.add(binding.tvMovies);
+        viewsList.add(binding.tvAniMo);
 
         for (View view : viewsList) {
             view.setOnClickListener(this);
@@ -104,6 +109,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         presenter.getPopular(page);
         presenter.getMovie(page);
         presenter.getAniKoToPage(page);
+        presenter.getAniMoPage(page);
     }
 
     private void clearAllData() {
@@ -115,20 +121,25 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         binding.rlPopular.setVisibility(View.GONE);
         binding.rvMovies.setVisibility(View.GONE);
         binding.rlMovies.setVisibility(View.GONE);
+        binding.rlAniMo.setVisibility(View.GONE);
+        binding.rvAniMo.setVisibility(View.GONE);
         movieList.clear();
         popularList.clear();
         newestList.clear();
         hotList.clear();
+        AniMoList.clear();
 
         newestAdapter.getData().clear();
         hotAdapter.getData().clear();
         animePopularAdapter.getData().clear();
         movieAdapter.getData().clear();
+        aniMoTvAdapter.getData().clear();
 
         binding.rvNewest.scrollToPosition(0);
         binding.rvHot.scrollToPosition(0);
         binding.rvPopular.scrollToPosition(0);
         binding.rvMovies.scrollToPosition(0);
+        binding.rvAniMo.scrollToPosition(0);
     }
 
     private void initRecycler() {
@@ -136,6 +147,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         hotAdapter = new HotAdapter();
         animePopularAdapter = new AnimePopularAdapter();
         movieAdapter = new AnimeMovieAdapter();
+        aniMoTvAdapter = new AniMoTvAdapter();
 
         binding.rvNewest.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.rvNewest.setAdapter(newestAdapter);
@@ -150,6 +162,9 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         binding.rvMovies.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.rvMovies.setAdapter(movieAdapter);
         movieAdapter.isMovie(true);
+
+        binding.rvAniMo.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        binding.rvAniMo.setAdapter(aniMoTvAdapter);
 
     }
 
@@ -195,20 +210,20 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
     }
 
     @Override
-    public void getHot(AnimoPageBean animoPageBean) {
-//        if (animoPageBean != null && animoPageBean.getResults() != null) {
-//            if (!animoPageBean.getResults().isEmpty()) {
-//                for (int i = 0; i < 10; i++) {
-//                    hotList.add(animoPageBean.getResults().get(i));
-//                }
-//                hotAdapter.setNewData(hotList);
-//                binding.rvHot.setVisibility(View.VISIBLE);
-//                binding.rlHot.setVisibility(View.VISIBLE);
-//            } else {
-//                binding.rvHot.setVisibility(View.GONE);
-//                binding.rlHot.setVisibility(View.GONE);
-//            }
-//        }
+    public void getAniMoData(AnimoPageBean animoPageBean) {
+        if (animoPageBean != null && animoPageBean.getResults() != null) {
+            if (!animoPageBean.getResults().isEmpty()) {
+                for (int i = 0; i < 10; i++) {
+                    AniMoList.add(animoPageBean.getResults().get(i));
+                }
+                aniMoTvAdapter.setNewData(AniMoList);
+                binding.rvAniMo.setVisibility(View.VISIBLE);
+                binding.rlAniMo.setVisibility(View.VISIBLE);
+            } else {
+                binding.rvAniMo.setVisibility(View.GONE);
+                binding.rlAniMo.setVisibility(View.GONE);
+            }
+        }
     }
 
     @Override
@@ -323,6 +338,13 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
                 intent = new Intent(getActivity(), ViewAllAnimeAcitvity.class);
                 intent.putExtra("title", AppConstant.MOVIES);
                 intent.putExtra("position", 4);
+                startActivity(intent);
+                break;
+
+            case R.id.tv_aniMo:
+                intent = new Intent(getActivity(), ViewAllAnimeAcitvity.class);
+                intent.putExtra("title", AppConstant.AniMoTv);
+                intent.putExtra("position", 5);
                 startActivity(intent);
                 break;
 

@@ -17,7 +17,7 @@ public interface AnimeContract {
         void showError(String error);
         void hideLoading();
         void getNewest(PaheLatestBean paheLatestBean);
-        void getHot(AnimoPageBean animoPageBean);
+        void getAniMoData(AnimoPageBean animoPageBean);
         void getPopular(RevivalSeriesBean revivalSeriesBean);
         void getMovie(RevivalSeriesBean revivalSeriesBean);
         void getZoRo(List<ZoRoPageBean> zoRoPageBean);
@@ -27,7 +27,7 @@ public interface AnimeContract {
 
     interface Presenter {
         void getNewestPage(int page);
-        void getHotPage(int page);
+        void getAniMoPage(int page);
         void getPopular(int page);
         void getMovie(int page);
         void getZoRoPage(int page);

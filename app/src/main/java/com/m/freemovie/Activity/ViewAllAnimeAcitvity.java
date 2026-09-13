@@ -170,6 +170,9 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
             case 4:
                 presenter.getMovie(page);
                 break;
+            case 5:
+                presenter.getAniMoPage(page);
+                break;
         }
     }
 
@@ -228,13 +231,13 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
     }
 
     @Override
-    public void getHot(AnimoPageBean animoPageBean) {
+    public void getAniMoData(AnimoPageBean animoPageBean) {
         if (animoPageBean != null && animoPageBean.getResults() != null) {
             isLoading = false;
             if (animoPageBean.getResults() != null) {
                 if (!animoPageBean.getResults().isEmpty()) {
                     for (AnimoPageBean.ResultsBean dataBean : animoPageBean.getResults()) {
-                        animeItemBeanList.add(new AnimeItemBean(dataBean.getLink(), dataBean.getTitle(), dataBean.getImg()));
+                        animeItemBeanList.add(new AnimeItemBean(dataBean.getUrl(), dataBean.getTitle(), dataBean.getImage()));
                     }
                     viewAllAnimeAdapter.setNewData(animeItemBeanList);
                 } else {

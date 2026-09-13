@@ -134,6 +134,36 @@
                 android:layout_marginTop="5dp"
                 android:layout_height="wrap_content"/>
 
+            <RelativeLayout
+                android:id="@+id/rl_aniMo"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AniMoTv"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/tv_aniMo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="See all"
+                    android:textColor="@color/SecondColor"
+                    android:textSize="18sp" />
+            </RelativeLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_aniMo"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_marginTop="5dp"
+                android:layout_height="wrap_content"/>
+
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

@@ -43,7 +43,7 @@ public class AnimeModel {
                 });
     }
 
-    public static void getHot(int page,final Callback<AnimoPageBean> callback) {
+    public static void getAniMoPage(int page,final Callback<AnimoPageBean> callback) {
         NetworkingUtils.getTagalogDub()
                 .getAnimoPage(page)
                 .observeOn(AndroidSchedulers.mainThread())

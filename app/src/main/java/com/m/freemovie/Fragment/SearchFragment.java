@@ -37,6 +37,7 @@ import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.SharedPreferencesHelper;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
+import com.m.freemovie.adapter.AniMoTvSearchAdapter;
 import com.m.freemovie.adapter.AnimePaheSearchAdapter;
 import com.m.freemovie.adapter.MovieRuAdapter;
 import com.m.freemovie.adapter.NineAnimeSearchAdapter;
@@ -47,6 +48,7 @@ import com.m.freemovie.adapter.ViewAllAdapter;
 import com.m.freemovie.mvp.Contract.RevivalSearchContract;
 import com.m.freemovie.mvp.Contract.SearchContract;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniMoTvSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniNekoSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
@@ -74,6 +76,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
     private NineAnimeSearchAdapter nineAnimeSearchAdapter;
     private AnimePaheSearchAdapter animePaheSearchAdapter;
     private MovieRuAdapter movieRuAdapter;
+    private AniMoTvSearchAdapter aniMoTvSearchAdapter;
     private boolean isLoading = false;
     private String lastQuery;
     private boolean isNomore = false;
@@ -84,6 +87,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
     private List<NineAnimeSearchBean.ResultsBean> nineList = new ArrayList<>();
     private List<AniKoToSearchBean.ResultsBean> zoRoList = new ArrayList<>();
     private List<PinoyRuBean> tagalogMovieList = new ArrayList<>();
+    private List<AniMoTvSearchBean.ResultsBean> aniMoSearchList = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
     private int position = 1;
     private RevivalSearchPresenter revivalSearchPresenter;
@@ -121,6 +125,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
         nineAnimeSearchAdapter = new NineAnimeSearchAdapter();
         animePaheSearchAdapter = new AnimePaheSearchAdapter();
         movieRuAdapter = new MovieRuAdapter();
+        aniMoTvSearchAdapter = new AniMoTvSearchAdapter();
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.search, R.layout.spinner_item);
@@ -210,6 +215,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                     hotList.clear();
                     revivalList.clear();
                     tagalogMovieList.clear();
+                    aniMoSearchList.clear();
 
                 }
             }
@@ -295,6 +301,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
         nineAnimeSearchAdapter.setNewData(new ArrayList<>());
         animePaheSearchAdapter.setNewData(new ArrayList<>());
         movieRuAdapter.setNewData(new ArrayList<>());
+        aniMoTvSearchAdapter.setNewData(new ArrayList<>());
         lastQuery = "";
         page = 1;
         String query = et_search.getText().toString().trim();
@@ -487,6 +494,21 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
         }
     }
 
+    @Override
+    public void getAniMoTvSearch(AniMoTvSearchBean aniMoTvSearchBean) {
+        if (aniMoTvSearchBean != null && aniMoTvSearchBean.getResults() != null) {
+            isLoading = false;
+            if (!aniMoTvSearchBean.getResults().isEmpty() && aniMoTvSearchBean.getResults().size() != 0) {
+                aniMoSearchList.addAll(aniMoTvSearchBean.getResults());
+                aniMoTvSearchAdapter.setNewData(aniMoSearchList);
+            } else {
+                Toast.makeText(getContext(), "No more Tv tagalog series", Toast.LENGTH_SHORT).show();
+                isLoading = false;
+                isNomore = true;
+            }
+        }
+    }
+
     @SuppressWarnings("deprecation")
     @Override
     public void onClick(View view) {
@@ -604,6 +626,11 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                 movieRuAdapter.clearCache();
                 searchPresenter.getTagalogMovieQuery(query);
                 break;
+            case 9:
+                aniMoSearchList.clear();
+                aniMoTvSearchAdapter.setNewData(new ArrayList<>());
+                searchPresenter.getAniMoTvQuery(query);
+                break;
         }
     }
 
@@ -622,6 +649,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             case 3:
             case 6:
             case 7:
+            case 9:
                 toast = "Please enter anime series";
                 break;
             case 8:
@@ -656,6 +684,9 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                 break;
             case 6:
                 position = 8;
+                break;
+            case 7:
+                position = 9;
                 break;
         }
 
@@ -752,6 +783,16 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                 movieRuAdapter = new MovieRuAdapter();
                 rv_search.setAdapter(movieRuAdapter);
                 tagalogMovieList.clear();
+                if (ll_reset != null) {
+                    ll_reset.setVisibility(View.GONE);
+                }
+                break;
+            case 9:
+                et_search.setHint("Enter anime series");
+                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+                aniMoTvSearchAdapter = new AniMoTvSearchAdapter();
+                rv_search.setAdapter(aniMoTvSearchAdapter);
+                aniMoSearchList.clear();
                 if (ll_reset != null) {
                     ll_reset.setVisibility(View.GONE);
                 }

@@ -5,10 +5,13 @@ import androidx.annotation.NonNull;
 import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.mvp.Contract.AnimePaheDetailContract;
 import com.m.freemovie.mvp.Model.AniKoToWatchModel;
+import com.m.freemovie.mvp.Model.AniMoDetailModel;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToWatchBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniMoTvEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniNeKoDetailModel;
 import com.m.freemovie.mvp.Model.ClassBean.AniNeKoInfoBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniNekoEpisodeBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimoDetailsBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoVideoUrlBean;
 import com.m.freemovie.mvp.Model.ZoroDetailModel;
@@ -156,6 +159,62 @@ public class AnimePaheDetailPresenter implements AnimePaheDetailContract.Present
             public void returnResult(AniNekoEpisodeBean apiBean) {
                 view.hideLoading();
                 view.getAniNekoEpisode(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getAniMoTvUrl(String Url) {
+        view.showLoading();
+
+        AniMoDetailModel.getAniMoDetailData(Url, new Callback<AnimoDetailsBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(AnimoDetailsBean apiBean) {
+                view.hideLoading();
+                view.getAniMoTvDetail(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getAniMoEpisodeUrl(String Url) {
+        view.showLoading();
+
+        AniMoDetailModel.getEpisodesAniMo(Url, new Callback<AniMoTvEpisodeBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(AniMoTvEpisodeBean apiBean) {
+                view.hideLoading();
+                view.getAniMoEpisodes(apiBean);
             }
 
             @Override

@@ -64,14 +64,14 @@ public class AnimeSeasonAdapter extends BaseQuickAdapter<AnimeDetailsBean, BaseV
                 switch (position){
                     case 1:
                         intent = new Intent(mContext, AnimePaheWebviewActivity.class);
-                        intent.putExtra("isAniNeko",false);
+                        intent.putExtra("position",1);
                         intent.putExtra("id",item.getId());
                         intent.putExtra("title",item.getTitle());
                         intent.putExtra("imageUrl",item.getImageUrl());
                         break;
                     case 2:
                         intent = new Intent(mContext, AnimePaheWebviewActivity.class);
-                        intent.putExtra("isAniNeko",true);
+                        intent.putExtra("position",2);
                         intent.putExtra("id",item.getId());
                         intent.putExtra("title",item.getTitle());
                         intent.putExtra("imageUrl",item.getImageUrl());
@@ -89,6 +89,13 @@ public class AnimeSeasonAdapter extends BaseQuickAdapter<AnimeDetailsBean, BaseV
                         intent.putExtra("title",item.getTitle());
                         intent.putExtra("image",item.getImageUrl());
                         intent.putExtra("isMovie", position == 4);
+                        break;
+                    case 5:
+                        intent = new Intent(mContext, AnimePaheWebviewActivity.class);
+                        intent.putExtra("position",3);
+                        intent.putExtra("id",item.getId());
+                        intent.putExtra("title",item.getTitle());
+                        intent.putExtra("imageUrl",item.getImageUrl());
                         break;
 
                 }

@@ -54,9 +54,9 @@ public class AnimePresenter implements AnimeContract.Presenter {
     }
 
     @Override
-    public void getHotPage(int page) {
+    public void getAniMoPage(int page) {
         view.showLoading();
-        AnimeModel.getHot(page, new Callback<AnimoPageBean>() {
+        AnimeModel.getAniMoPage(page, new Callback<AnimoPageBean>() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
             }
@@ -69,7 +69,7 @@ public class AnimePresenter implements AnimeContract.Presenter {
             @Override
             public void returnResult(AnimoPageBean apiBean) {
                 view.hideLoading();
-                view.getHot(apiBean);
+                view.getAniMoData(apiBean);
             }
 
             @Override
