@@ -1,6 +1,7 @@
 package com.m.freemovie.adapter;
 
 
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -23,7 +24,8 @@ public class AllSourceAdapter extends BaseQuickAdapter<AllSourceBean, BaseViewHo
     @Override
     protected void convert(BaseViewHolder helper, AllSourceBean item) {
         TextView tv_quality  = helper.getView(R.id.tv_quality);
-        tv_quality.setText(item.getQualityName());
+        String type = item.getType().equals("dub")? " English Dub" : " English Sub";
+        tv_quality.setText(TextUtils.isEmpty(item.getType())? item.getQualityName() : item.getQualityName() +type);
 
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override

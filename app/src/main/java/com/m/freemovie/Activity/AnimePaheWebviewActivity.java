@@ -884,7 +884,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 allSourceBeanList.clear();
             }
             for (AniMoTvEpisodeBean.ResultsBean resultsBean : aniMoTvEpisodeBean.getResults()) {
-                allSourceBeanList.add(new AllSourceBean(resultsBean.getName(), resultsBean.getUrl()));
+                allSourceBeanList.add(new AllSourceBean(resultsBean.getName(), resultsBean.getUrl(),""));
             }
         }
         aniMoSourceDialog = new DialogSourceUtils().ShowAniMoAdapter(this, AnimePaheWebviewActivity.this, allSourceBeanList);
@@ -948,10 +948,10 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             }
             if(downloadBean.getResults().getStreaming().size() !=0 && !downloadBean.getResults().getStreaming().isEmpty()){
                 for(AnimePaheDownloadBean.ResultsBean.StreamingBean streamingBean : downloadBean.getResults().getStreaming()){
-                    allSourceBeanList.add(new AllSourceBean(streamingBean.getQuality(),streamingBean.getUrl()));
+                    allSourceBeanList.add(new AllSourceBean(streamingBean.getQuality(),streamingBean.getUrl(),""));
                 }
             }else{
-                allSourceBeanList.add(new AllSourceBean("HD",downloadBean.getResults().getVideo().getUrl()));
+                allSourceBeanList.add(new AllSourceBean("HD",downloadBean.getResults().getVideo().getUrl(),""));
             }
         }
         PaHeSourceDialog = new DialogSourceUtils().ShowAnimePaHeSoruce(this,AnimePaheWebviewActivity.this,allSourceBeanList);
@@ -1011,7 +1011,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                     allSourceBeanList.clear();
                 }
                 for(AniKoToWatchBean.EpisodesBean.ServersBean serversBean : serversBeanList){
-                    allSourceBeanList.add(new AllSourceBean(serversBean.getName(),serversBean.getVideoUrl()));
+                    allSourceBeanList.add(new AllSourceBean(serversBean.getName(),serversBean.getVideoUrl(),serversBean.getType()));
                 }
                 anikoToSourceDialog = new DialogSourceUtils().showAnikotoSource(this,AnimePaheWebviewActivity.this,allSourceBeanList);
                 break;

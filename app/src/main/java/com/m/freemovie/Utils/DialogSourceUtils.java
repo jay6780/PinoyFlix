@@ -36,7 +36,7 @@ public class DialogSourceUtils {
         AllSourceAdapter adapter = new AllSourceAdapter(srcListener);
 
         for (AniNekoEpisodeBean.EpisodeBean.PlayerBean.ServersBeanX.ServerGroupsBean.ServersBean sourceBean : stereamBeanList) {
-            allSourceBeans.add(new AllSourceBean(sourceBean.getText(), sourceBean.getVideoUrl()));
+            allSourceBeans.add(new AllSourceBean(sourceBean.getText(), sourceBean.getVideoUrl(),""));
         }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
