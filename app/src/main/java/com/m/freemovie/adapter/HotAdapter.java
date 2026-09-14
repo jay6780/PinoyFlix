@@ -12,13 +12,14 @@ import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
 import com.m.freemovie.mvp.Model.ClassBean.AniNekoBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimoPageBean;
+import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 
-public class HotAdapter extends BaseQuickAdapter<AniNekoBean.DataBean, BaseViewHolder> {
+public class HotAdapter extends BaseQuickAdapter<PaheLatestBean.DataBean, BaseViewHolder> {
     public HotAdapter() {
         super(R.layout.movie_item);
     }
     @Override
-    protected void convert(BaseViewHolder helper, AniNekoBean.DataBean item) {
+    protected void convert(BaseViewHolder helper, PaheLatestBean.DataBean item) {
         TextView tv_title  = helper.getView(R.id.tv_title);
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
 

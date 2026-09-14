@@ -49,7 +49,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
     private AnimeMovieAdapter movieAdapter;
     private AniMoTvAdapter aniMoTvAdapter;
     private List<AniKoToPageBean.ResultsBean> newestList = new ArrayList<>();
-    private List<AniNekoBean.DataBean> hotList = new ArrayList<>();
+    private List<PaheLatestBean.DataBean> hotList = new ArrayList<>();
     private List<AnimoPageBean.ResultsBean> AniMoList = new ArrayList<>();
     private List<RevivalSeriesBean.ResultsBean> popularList = new ArrayList<>();
     private List<RevivalSeriesBean.ResultsBean> movieList = new ArrayList<>();
@@ -61,7 +61,6 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         presenter = new AnimePresenter(this);
         if (isNetworkAvailable()) {
             presenter.getNewestPage(page);
-            presenter.getAniNekoPage(page);
             presenter.getPopular(page);
             presenter.getMovie(page);
             presenter.getAniKoToPage(page);
@@ -104,8 +103,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
         }
         clearAllData();
         page = 1;
-//        presenter.getNewestPage(page);
-        presenter.getAniNekoPage(page);
+        presenter.getNewestPage(page);
         presenter.getPopular(page);
         presenter.getMovie(page);
         presenter.getAniKoToPage(page);
@@ -206,6 +204,19 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
     //limit list to 10 inside loop
     @Override
     public void getNewest(PaheLatestBean paheLatestBean) {
+        if (paheLatestBean != null && paheLatestBean.getData() != null) {
+            if (!paheLatestBean.getData().isEmpty()) {
+                for (int i = 0; i < 10; i++) {
+                    hotList.add(paheLatestBean.getData().get(i));
+                }
+                hotAdapter.setNewData(hotList);
+                binding.rvHot.setVisibility(View.VISIBLE);
+                binding.rlHot.setVisibility(View.VISIBLE);
+            } else {
+                binding.rvHot.setVisibility(View.GONE);
+                binding.rlHot.setVisibility(View.GONE);
+            }
+        }
 
     }
 
@@ -296,19 +307,7 @@ public class AnimeFragment extends Fragment implements AnimeContract.View, View.
 
     @Override
     public void getAniNeKo(AniNekoBean aniNekoBean) {
-        if (aniNekoBean != null && aniNekoBean.getData() != null) {
-            if (!aniNekoBean.getData().isEmpty()) {
-                for (int i = 0; i < 10; i++) {
-                    hotList.add(aniNekoBean.getData().get(i));
-                }
-                hotAdapter.setNewData(hotList);
-                binding.rvHot.setVisibility(View.VISIBLE);
-                binding.rlHot.setVisibility(View.VISIBLE);
-            } else {
-                binding.rvHot.setVisibility(View.GONE);
-                binding.rlHot.setVisibility(View.GONE);
-            }
-        }
+
     }
 
 

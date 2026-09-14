@@ -12,9 +12,10 @@ import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
 import com.m.freemovie.mvp.Model.ClassBean.AniNekoSearchBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogSearchBean;
 
-public class TagalogSearchAdapter extends BaseQuickAdapter<AniNekoSearchBean.ResultsBean, BaseViewHolder> {
+public class TagalogSearchAdapter extends BaseQuickAdapter<AnimePaheSearchBean.DataBean, BaseViewHolder> {
 
     public TagalogSearchAdapter() {
         super(R.layout.view_all_item);
@@ -23,7 +24,7 @@ public class TagalogSearchAdapter extends BaseQuickAdapter<AniNekoSearchBean.Res
 
     @Override
 
-    protected void convert(BaseViewHolder helper, AniNekoSearchBean.ResultsBean item) {
+    protected void convert(BaseViewHolder helper, AnimePaheSearchBean.DataBean item) {
         TextView tv_title = helper.getView(R.id.tv_title);
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
 

@@ -45,12 +45,9 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
     private String title;
     private AnimeSeasonAdapter animeSeasonAdapter;
     private List<AnimeDetailsBean> animeDetailsBeanList = new ArrayList<>();
-    private String episodes;
-    private String videoId;
     private String imageUrl;
     private String animeTitle;
     private String overView;
-    private String airDate;
     private Random random;
     private KProgressHUD hud;
     private String TAG = "AnimeDetailsActivity";
@@ -112,7 +109,7 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
                 presenter.getZoroUrl(id);
                 break;
             case 2:
-                presenter.getAniNekoUrl(id);
+                presenter.getDetailAnimePaHe(id);
                 break;
             case 3:
             case 4:
@@ -179,28 +176,52 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
         new WindowUtils(this, false, false);
     }
 
-    private AnimePaheDetailBean detailBean;
 
     @Override
     public void getDetailData(AnimePaheDetailBean detailBean) {
+        if (binding == null) return;
         if (detailBean != null && detailBean.getResults() != null) {
+            this.imageUrl = detailBean.getResults().getPoster();
+            this.animeTitle =  detailBean.getResults().getTitle();
+            this.overView = detailBean.getResults().getSynopsis();
+            Set<String> seenEpisodes = new HashSet<>();
+            for (AnimePaheDetailBean.ResultsBean.EpisodeListBean data : detailBean.getResults().getEpisode_list()) {
+                if (!data.getTitle().isEmpty()) {
+                    String episode = data.getTitle();
+                    if (!seenEpisodes.contains(episode)) {
+                        seenEpisodes.add(episode);
+                    }
+                }
+            }
+            animeDetailsBeanList.add(new AnimeDetailsBean(id, imageUrl, animeTitle, seenEpisodes.size(), ""));
+            animeSeasonAdapter.setNewData(animeDetailsBeanList);
+            binding.tvDescription.setText(overView);
+            binding.tvOriginal.setText(animeTitle);
+            binding.tvTitle.setText(animeTitle);
+            binding.language.setText("JP");
+            random = new Random();
+            int roll = random.nextInt(100000) + 1;
+            binding.tvVote.setText(String.valueOf(roll));
+            Double min = 0.0;
+            Double max = 10.0;
+            double x = (Math.random() * ((max - min) + 1)) + min;
+            double xrounded = Math.round(x * 100.0) / 100.0;
+            binding.tvRate.setText(String.valueOf(xrounded));
             try {
-                this.videoId = detailBean.getResults().getId();
-                this.imageUrl = detailBean.getResults().getPoster();
-                this.animeTitle = detailBean.getResults().getTitle();
-                this.episodes = detailBean.getResults().getEpisodes();
-                this.airDate = detailBean.getResults().getAired();
-                animeDetailsBeanList.add(new AnimeDetailsBean(videoId, imageUrl, animeTitle, Integer.parseInt(episodes), airDate));
-                this.detailBean = detailBean;
-                detailsUis();
+                Glide.with(this)
+                        .asBitmap()
+                        .load(imageUrl)
+                        .into(binding.ivSmallimg);
+                Glide.with(this)
+                        .asBitmap()
+                        .load(imageUrl)
+                        .into(binding.ivBig);
             } catch (Exception e) {
                 e.printStackTrace();
-                this.episodes = "0";
-                animeDetailsBeanList.add(new AnimeDetailsBean(videoId, imageUrl, animeTitle, Integer.parseInt(episodes), airDate));
-                this.detailBean = detailBean;
-                detailsUis();
             }
-            animeSeasonAdapter.setNewData(animeDetailsBeanList);
+        }else{
+            Toast.makeText(getApplicationContext(),"Failed to fetch info",Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 
@@ -435,33 +456,6 @@ public class AnimeDetailsActivity extends AppCompatActivity implements AnimeDeta
         }else{
             Toast.makeText(getApplicationContext(),"Failed to fetch info",Toast.LENGTH_SHORT).show();
             finish();
-        }
-    }
-
-    private void detailsUis() {
-        binding.tvDescription.setText(detailBean.getResults().getSynopsis());
-        binding.tvOriginal.setText(detailBean.getResults().getTitle());
-        binding.language.setText("JP");
-        random = new Random();
-        int roll = random.nextInt(100000) + 1;
-        binding.tvVote.setText(String.valueOf(roll));
-        binding.tvTitle.setText(detailBean.getResults().getTitle());
-        Double min = 0.0;
-        Double max = 10.0;
-        double x = (Math.random() * ((max - min) + 1)) + min;
-        double xrounded = Math.round(x * 100.0) / 100.0;
-        binding.tvRate.setText(String.valueOf(xrounded));
-        try {
-            Glide.with(this)
-                    .asBitmap()
-                    .load(detailBean.getResults().getPoster())
-                    .into(binding.ivSmallimg);
-            Glide.with(this)
-                    .asBitmap()
-                    .load(detailBean.getResults().getPoster())
-                    .into(binding.ivBig);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
     }

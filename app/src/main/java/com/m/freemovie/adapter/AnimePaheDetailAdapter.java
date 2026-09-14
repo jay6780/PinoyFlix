@@ -58,7 +58,7 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
             rl_select.setBackgroundColor(Color.parseColor("#313647"));
         }
         tv_watched.setVisibility(item.isWatched() ? View.VISIBLE : View.GONE);
-        tv_season.setText(animePosition == 2 ? item.getEpisode() : "Episode: " + item.getEpisode());
+        tv_season.setText("Episode: " + item.getEpisode());
 
         Glide.with(mContext)
                 .asBitmap()

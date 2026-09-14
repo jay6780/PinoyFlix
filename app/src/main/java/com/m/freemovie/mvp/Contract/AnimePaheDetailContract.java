@@ -5,6 +5,8 @@ import com.m.freemovie.mvp.Model.ClassBean.AniKoToWatchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniMoTvEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniNeKoInfoBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniNekoEpisodeBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDownloadBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimoDetailsBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoVideoUrlBean;
@@ -21,9 +23,12 @@ public interface AnimePaheDetailContract {
         void getAniNekoEpisode(AniNekoEpisodeBean aniNekoEpisodeBean);
         void getAniMoTvDetail(AnimoDetailsBean animoDetailsBean);
         void getAniMoEpisodes(AniMoTvEpisodeBean aniMoTvEpisodeBean);
+        void getDetailData(AnimePaheDetailBean detailBean);
+        void getPaHeTrack(AnimePaheDownloadBean downloadBean);
     }
 
     interface Presenter {
+        void getDetailAnimePaHe(String url);
         void getZoroUrl(String Url);
         void getZoRoVideoUrl(String Url);
         void getAniKoToID(String id);
@@ -31,5 +36,6 @@ public interface AnimePaheDetailContract {
         void getAniNekoEpisodeURL(String Url);
         void getAniMoTvUrl(String Url);
         void getAniMoEpisodeUrl(String Url);
+        void getTrackPaHeUrl(String Url);
     }
 }

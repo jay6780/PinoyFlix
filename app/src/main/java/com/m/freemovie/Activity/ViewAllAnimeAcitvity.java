@@ -162,7 +162,7 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
                 presenter.getAniKoToPage(page);
                 break;
             case 2:
-                presenter.getAniNekoPage(page);
+                presenter.getNewestPage(page);
                 break;
             case 3:
                 presenter.getPopular(page);
@@ -213,12 +213,12 @@ public class ViewAllAnimeAcitvity extends AppCompatActivity implements AnimeCont
 
     @Override
     public void getNewest(PaheLatestBean paheLatestBean) {
-        if (paheLatestBean != null && paheLatestBean.getResults() != null) {
+        if (paheLatestBean != null && paheLatestBean.getData() != null) {
             isLoading = false;
-            if (paheLatestBean.getResults().getData() != null) {
-                if (!paheLatestBean.getResults().getData().isEmpty()) {
-                    for (PaheLatestBean.ResultsBean.DataBean dataBean : paheLatestBean.getResults().getData()) {
-                        animeItemBeanList.add(new AnimeItemBean(dataBean.getAnime_session(), dataBean.getAnime_title(), dataBean.getSnapshot()));
+            if (paheLatestBean.getData() != null) {
+                if (!paheLatestBean.getData().isEmpty()) {
+                    for (PaheLatestBean.DataBean dataBean : paheLatestBean.getData()) {
+                        animeItemBeanList.add(new AnimeItemBean(dataBean.getUrl(), dataBean.getTitle(), dataBean.getImage()));
                     }
                     viewAllAnimeAdapter.setNewData(animeItemBeanList);
                 } else {

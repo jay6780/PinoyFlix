@@ -7,28 +7,28 @@ import android.widget.TextView;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
-import com.m.freemovie.mvp.Model.ClassBean.AniNekoEpisodeBean;
-import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDownloadBean;
+import com.m.freemovie.mvp.Model.ClassBean.AllSourceBean;
+import com.m.freemovie.mvp.Model.ClassBean.AniMoTvEpisodeBean;
 
-public class QualityAdapter extends BaseQuickAdapter<AniNekoEpisodeBean.EpisodeBean.PlayerBean.ServersBeanX.ServerGroupsBean.ServersBean, BaseViewHolder> {
+public class AllSourceAdapter extends BaseQuickAdapter<AllSourceBean, BaseViewHolder> {
     private SrcListener srcListener;
     public interface SrcListener{
         void getSrc(String videoUrl);
     }
-    public QualityAdapter( SrcListener srcListener) {
+    public AllSourceAdapter(SrcListener srcListener) {
         super(R.layout.quality_item);
         this.srcListener = srcListener;
     }
 
     @Override
-    protected void convert(BaseViewHolder helper, AniNekoEpisodeBean.EpisodeBean.PlayerBean.ServersBeanX.ServerGroupsBean.ServersBean item) {
+    protected void convert(BaseViewHolder helper, AllSourceBean item) {
         TextView tv_quality  = helper.getView(R.id.tv_quality);
-        tv_quality.setText(item.getText());
+        tv_quality.setText(item.getQualityName());
 
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                srcListener.getSrc(item.getVideoUrl());
+                srcListener.getSrc(item.getUrl());
             }
         });
     }

@@ -7,11 +7,21 @@ public class AnimePaheSearchBean {
 
     /**
      * author : yazky
-     * results : {"total":139,"per_page":8,"current_page":1,"last_page":18,"from":1,"to":8,"data":[{"id":5201,"title":"The Dangers in My Heart","type":"TV","episodes":12,"status":"Finished Airing","season":"Spring","year":2023,"score":8.21,"poster":"https://i.animepahe.si/posters/ccdb7ad1d6ebfbebf55949a2fdf7a0ade8304d6b662c2a80e0b515e1ea511671.jpg","session":"d0784446-5683-4d3c-1415-0ce1c8e7d678"},{"id":5426,"title":"The Dangers in My Heart Season 2","type":"TV","episodes":13,"status":"Finished Airing","season":"Winter","year":2024,"score":8.71,"poster":"https://i.animepahe.si/posters/ec72e6248df26cca27f5b0e22744b9a1cdb62e4ea2045709ec4539335983a8b9.jpg","session":"86a84da0-c042-a393-1f94-bb705b14d55d"},{"id":5474,"title":"The Dangers in My Heart: Twi-Yaba","type":"ONA","episodes":1,"status":"Finished Airing","season":"Winter","year":2024,"score":7.67,"poster":"https://i.animepahe.si/posters/4b8ae868ef3af878509e72e44b7f6089225e96079c03a6d9e1c6b089dfd8d00f.jpg","session":"0ed6edc6-bd0b-6083-8ca4-ee73760703d0"},{"id":4814,"title":"My Isekai Life: I Gained a Second Character Class and Became the Strongest Sage in the World","type":"TV","episodes":12,"status":"Finished Airing","season":"Summer","year":2022,"score":6.32,"poster":"https://i.animepahe.si/posters/f371c6cab345923b694a71cee642931af0ad38a54ae31e2cea49f66ea0967151.jpg","session":"b8a7da74-150f-e76b-287b-6341e2fa50ff"},{"id":770,"title":"Mai-Otome","type":"TV","episodes":26,"status":"Finished Airing","season":"Fall","year":2005,"score":7.27,"poster":"https://i.animepahe.si/posters/fe32f99ccf81e4946469c56c02459f2916e21ab132138c6a82f714085d4246c8.jpg","session":"491ee4bf-2f2a-80eb-c684-41a5a078ed47"},{"id":5212,"title":"My One-Hit Kill Sister","type":"TV","episodes":12,"status":"Finished Airing","season":"Spring","year":2023,"score":6.3,"poster":"https://i.animepahe.si/posters/8fab0a71036c007999cdfd05fee29a9f0c05072c13f8f0fa8ed052abd04c35b4.jpg","session":"2559a932-ee55-426d-50c2-07f513d949f9"},{"id":1418,"title":"Ao Oni The Animation","type":"TV","episodes":13,"status":"Finished Airing","season":"Fall","year":2016,"score":5.11,"poster":"https://i.animepahe.si/posters/ccf13bdb9ff20dbd6c3c626afa3c1003f4692d5517f0f27c6c72b8e3bb47972e.jpg","session":"6649c03c-533a-408f-cc05-f4c10a27e7b5"},{"id":44,"title":"Dragon Ball Super","type":"TV","episodes":131,"status":"Finished Airing","season":"Summer","year":2015,"score":7.47,"poster":"https://i.animepahe.si/posters/ef832b4f00f29f90a50821c3b7743225b2a34b5dd3d4290f31b1bf1c4a5e74de.jpg","session":"a5144c3b-804d-8faf-f2d1-dd318376777b"}]}
+     * status : true
+     * page : 1
+     * total : 30
+     * next_page_url : null
+     * prev_page_url : null
+     * data : [{"title":"Azur Lane: Slow Ahead! Season 2","url":"https://animepahe.ch/series/azur-lane-slow-ahead-season-2/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783280821-4729-158715-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"One Piece","url":"https://animepahe.ch/series/one-piece/","image":"https://animepahe.ch/wp-content/uploads/2024/05/1715447128-1616-138851-193x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Though I Am an Inept Villainess","url":"https://animepahe.ch/series/though-i-am-an-inept-villainess/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783871808-7195-158341-214x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Goodbye, Lara","url":"https://animepahe.ch/series/goodbye-lara/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783266995-4715-156343-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"The Classroom of a Black Cat and a Witch","url":"https://animepahe.ch/series/the-classroom-of-a-black-cat-and-a-witch/","image":"https://animepahe.ch/wp-content/uploads/2026/04/1776007676-2397-153989-213x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Mushoku Tensei: Jobless Reincarnation Season 3","url":"https://animepahe.ch/series/mushoku-tensei-jobless-reincarnation-season-3/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783165730-1761-158340-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Sparks of Tomorrow","url":"https://animepahe.ch/series/sparks-of-tomorrow/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783245829-9392-158475-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"The 100 Girlfriends Who Really, Really, Really, Really, Really Love You Season 3","url":"https://animepahe.ch/series/the-100-girlfriends-who-really-really-really-really-really-love-you-season-3/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783261907-2446-157174-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"The World\u2019s Strongest Rearguard","url":"https://animepahe.ch/series/the-worlds-strongest-rearguard/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783257322-1997-157378-205x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Iron Wok Jan!","url":"https://animepahe.ch/series/iron-wok-jan/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783243416-4820-158686-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Let\u2019s Go Kaikigumi","url":"https://animepahe.ch/series/lets-go-kaikigumi/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783243190-9317-158581-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"You and I Are Polar Opposites Season 2","url":"https://animepahe.ch/series/you-and-i-are-polar-opposites-season-2/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783845935-6898-158409-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Digimon Beatbreak","url":"https://animepahe.ch/series/digimon-beatbreak/","image":"https://animepahe.ch/wp-content/uploads/2025/10/1759652049-9274-151242-213x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Rich Girl Caretaker: I\u2019m Secretly the Caregiver of the Most Popular Girl in This Rich Kid School","url":"https://animepahe.ch/series/rich-girl-caretaker-im-secretly-the-caregiver-of-the-most-popular-girl-in-this-rich-kid-school/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783189907-9523-157083-214x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Hanaori-san Still Wants to Fight in the Next Life","url":"https://animepahe.ch/series/hanaori-san-still-wants-to-fight-in-the-next-life/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783792355-3049-156331-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Magilumiere Magical Girls Inc. Season 2","url":"https://animepahe.ch/series/magilumiere-magical-girls-inc-season-2/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783189706-7541-156186-214x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"The Duke\u2019s Son Claims He Won\u2019t Love Me Yet Showers Me with Adoration","url":"https://animepahe.ch/series/the-dukes-son-claims-he-wont-love-me-yet-showers-me-with-adoration/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783185850-6315-158710-214x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Violet Evergarden: Eternity and the Auto Memory Doll","url":"https://animepahe.ch/series/violet-evergarden-eternity-and-the-auto-memory-doll/","image":"https://animepahe.ch/wp-content/uploads/2026/09/1789233798-2345-112943-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"The Ogre\u2019s Bride","url":"https://animepahe.ch/series/the-ogres-bride/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783185594-7299-158708-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Magical Girl Lyrical Nanoha EXCEEDS Gun Blaze Vengeance","url":"https://animepahe.ch/series/magical-girl-lyrical-nanoha-exceeds-gun-blaze-vengeance/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783187069-3368-158611-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Grow Up Show: Sunflower Circus","url":"https://animepahe.ch/series/grow-up-show-sunflower-circus/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783181983-2095-158716-215x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Jaadugar: A Witch in Mongolia","url":"https://animepahe.ch/series/jaadugar-a-witch-in-mongolia/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783182208-1348-158227-212x300.jpg","status":"Completed","type":"Anime","language":"Sub"},{"title":"Daemons of the Shadow Realm","url":"https://animepahe.ch/series/daemons-of-the-shadow-realm/","image":"https://animepahe.ch/wp-content/uploads/2026/04/1775240551-3554-156397-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Mao","url":"https://animepahe.ch/series/mao/","image":"https://animepahe.ch/wp-content/uploads/2026/04/1775240406-9170-156386-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Bleach: Thousand-Year Blood War \u2013 The Calamity","url":"https://animepahe.ch/series/bleach-thousand-year-blood-war-the-calamity/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1784993406-1474-158595-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"The Cat and the Dragon","url":"https://animepahe.ch/series/the-cat-and-the-dragon/","image":"https://animepahe.ch/wp-content/uploads/2026/06/1782571636-5949-157796-212x300.jpg","status":"Completed","type":"Anime","language":"Sub"},{"title":"Recommendations from Iwamoto-Senpai","url":"https://animepahe.ch/series/recommendations-from-iwamoto-senpai/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783174684-1863-158450-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Black Torch","url":"https://animepahe.ch/series/black-torch/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783171772-8023-158363-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Kaiju No. 8: Narumi\u2019s Week at Work","url":"https://animepahe.ch/series/kaiju-no-8-narumis-week-at-work/","image":"https://animepahe.ch/wp-content/uploads/2026/09/1789216239-5551-159343.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Welcome to Demon School! Iruma-kun Season 4","url":"https://animepahe.ch/series/welcome-to-demon-school-iruma-kun-season-4/","image":"https://animepahe.ch/wp-content/uploads/2026/04/1775240825-1607-154048-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"}]
      */
 
     private String author;
-    private ResultsBean results;
+    private boolean status;
+    private int page;
+    private int total;
+    private Object next_page_url;
+    private Object prev_page_url;
+    private List<DataBean> data;
 
     public String getAuthor() {
         return author;
@@ -21,193 +31,117 @@ public class AnimePaheSearchBean {
         this.author = author;
     }
 
-    public ResultsBean getResults() {
-        return results;
+    public boolean isStatus() {
+        return status;
     }
 
-    public void setResults(ResultsBean results) {
-        this.results = results;
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 
-    public static class ResultsBean {
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public void setTotal(int total) {
+        this.total = total;
+    }
+
+    public Object getNext_page_url() {
+        return next_page_url;
+    }
+
+    public void setNext_page_url(Object next_page_url) {
+        this.next_page_url = next_page_url;
+    }
+
+    public Object getPrev_page_url() {
+        return prev_page_url;
+    }
+
+    public void setPrev_page_url(Object prev_page_url) {
+        this.prev_page_url = prev_page_url;
+    }
+
+    public List<DataBean> getData() {
+        return data;
+    }
+
+    public void setData(List<DataBean> data) {
+        this.data = data;
+    }
+
+    public static class DataBean {
         /**
-         * total : 139
-         * per_page : 8
-         * current_page : 1
-         * last_page : 18
-         * from : 1
-         * to : 8
-         * data : [{"id":5201,"title":"The Dangers in My Heart","type":"TV","episodes":12,"status":"Finished Airing","season":"Spring","year":2023,"score":8.21,"poster":"https://i.animepahe.si/posters/ccdb7ad1d6ebfbebf55949a2fdf7a0ade8304d6b662c2a80e0b515e1ea511671.jpg","session":"d0784446-5683-4d3c-1415-0ce1c8e7d678"},{"id":5426,"title":"The Dangers in My Heart Season 2","type":"TV","episodes":13,"status":"Finished Airing","season":"Winter","year":2024,"score":8.71,"poster":"https://i.animepahe.si/posters/ec72e6248df26cca27f5b0e22744b9a1cdb62e4ea2045709ec4539335983a8b9.jpg","session":"86a84da0-c042-a393-1f94-bb705b14d55d"},{"id":5474,"title":"The Dangers in My Heart: Twi-Yaba","type":"ONA","episodes":1,"status":"Finished Airing","season":"Winter","year":2024,"score":7.67,"poster":"https://i.animepahe.si/posters/4b8ae868ef3af878509e72e44b7f6089225e96079c03a6d9e1c6b089dfd8d00f.jpg","session":"0ed6edc6-bd0b-6083-8ca4-ee73760703d0"},{"id":4814,"title":"My Isekai Life: I Gained a Second Character Class and Became the Strongest Sage in the World","type":"TV","episodes":12,"status":"Finished Airing","season":"Summer","year":2022,"score":6.32,"poster":"https://i.animepahe.si/posters/f371c6cab345923b694a71cee642931af0ad38a54ae31e2cea49f66ea0967151.jpg","session":"b8a7da74-150f-e76b-287b-6341e2fa50ff"},{"id":770,"title":"Mai-Otome","type":"TV","episodes":26,"status":"Finished Airing","season":"Fall","year":2005,"score":7.27,"poster":"https://i.animepahe.si/posters/fe32f99ccf81e4946469c56c02459f2916e21ab132138c6a82f714085d4246c8.jpg","session":"491ee4bf-2f2a-80eb-c684-41a5a078ed47"},{"id":5212,"title":"My One-Hit Kill Sister","type":"TV","episodes":12,"status":"Finished Airing","season":"Spring","year":2023,"score":6.3,"poster":"https://i.animepahe.si/posters/8fab0a71036c007999cdfd05fee29a9f0c05072c13f8f0fa8ed052abd04c35b4.jpg","session":"2559a932-ee55-426d-50c2-07f513d949f9"},{"id":1418,"title":"Ao Oni The Animation","type":"TV","episodes":13,"status":"Finished Airing","season":"Fall","year":2016,"score":5.11,"poster":"https://i.animepahe.si/posters/ccf13bdb9ff20dbd6c3c626afa3c1003f4692d5517f0f27c6c72b8e3bb47972e.jpg","session":"6649c03c-533a-408f-cc05-f4c10a27e7b5"},{"id":44,"title":"Dragon Ball Super","type":"TV","episodes":131,"status":"Finished Airing","season":"Summer","year":2015,"score":7.47,"poster":"https://i.animepahe.si/posters/ef832b4f00f29f90a50821c3b7743225b2a34b5dd3d4290f31b1bf1c4a5e74de.jpg","session":"a5144c3b-804d-8faf-f2d1-dd318376777b"}]
+         * title : Azur Lane: Slow Ahead! Season 2
+         * url : https://animepahe.ch/series/azur-lane-slow-ahead-season-2/
+         * image : https://animepahe.ch/wp-content/uploads/2026/07/1783280821-4729-158715-212x300.jpg
+         * status : Ongoing
+         * type : Anime
+         * language : Sub
          */
 
-        private int total;
-        private int per_page;
-        private int current_page;
-        private int last_page;
-        private int from;
-        private int to;
-        private List<DataBean> data;
+        private String title;
+        private String url;
+        private String image;
+        private String status;
+        private String type;
+        private String language;
 
-        public int getTotal() {
-            return total;
+        public String getTitle() {
+            return title;
         }
 
-        public void setTotal(int total) {
-            this.total = total;
+        public void setTitle(String title) {
+            this.title = title;
         }
 
-        public int getPer_page() {
-            return per_page;
+        public String getUrl() {
+            return url;
         }
 
-        public void setPer_page(int per_page) {
-            this.per_page = per_page;
+        public void setUrl(String url) {
+            this.url = url;
         }
 
-        public int getCurrent_page() {
-            return current_page;
+        public String getImage() {
+            return image;
         }
 
-        public void setCurrent_page(int current_page) {
-            this.current_page = current_page;
+        public void setImage(String image) {
+            this.image = image;
         }
 
-        public int getLast_page() {
-            return last_page;
+        public String getStatus() {
+            return status;
         }
 
-        public void setLast_page(int last_page) {
-            this.last_page = last_page;
+        public void setStatus(String status) {
+            this.status = status;
         }
 
-        public int getFrom() {
-            return from;
+        public String getType() {
+            return type;
         }
 
-        public void setFrom(int from) {
-            this.from = from;
+        public void setType(String type) {
+            this.type = type;
         }
 
-        public int getTo() {
-            return to;
+        public String getLanguage() {
+            return language;
         }
 
-        public void setTo(int to) {
-            this.to = to;
-        }
-
-        public List<DataBean> getData() {
-            return data;
-        }
-
-        public void setData(List<DataBean> data) {
-            this.data = data;
-        }
-
-        public static class DataBean {
-            /**
-             * id : 5201
-             * title : The Dangers in My Heart
-             * type : TV
-             * episodes : 12
-             * status : Finished Airing
-             * season : Spring
-             * year : 2023
-             * score : 8.21
-             * poster : https://i.animepahe.si/posters/ccdb7ad1d6ebfbebf55949a2fdf7a0ade8304d6b662c2a80e0b515e1ea511671.jpg
-             * session : d0784446-5683-4d3c-1415-0ce1c8e7d678
-             */
-
-            private int id;
-            private String title;
-            private String type;
-            private int episodes;
-            private String status;
-            private String season;
-            private int year;
-            private double score;
-            private String poster;
-            private String session;
-
-            public int getId() {
-                return id;
-            }
-
-            public void setId(int id) {
-                this.id = id;
-            }
-
-            public String getTitle() {
-                return title;
-            }
-
-            public void setTitle(String title) {
-                this.title = title;
-            }
-
-            public String getType() {
-                return type;
-            }
-
-            public void setType(String type) {
-                this.type = type;
-            }
-
-            public int getEpisodes() {
-                return episodes;
-            }
-
-            public void setEpisodes(int episodes) {
-                this.episodes = episodes;
-            }
-
-            public String getStatus() {
-                return status;
-            }
-
-            public void setStatus(String status) {
-                this.status = status;
-            }
-
-            public String getSeason() {
-                return season;
-            }
-
-            public void setSeason(String season) {
-                this.season = season;
-            }
-
-            public int getYear() {
-                return year;
-            }
-
-            public void setYear(int year) {
-                this.year = year;
-            }
-
-            public double getScore() {
-                return score;
-            }
-
-            public void setScore(double score) {
-                this.score = score;
-            }
-
-            public String getPoster() {
-                return poster;
-            }
-
-            public void setPoster(String poster) {
-                this.poster = poster;
-            }
-
-            public String getSession() {
-                return session;
-            }
-
-            public void setSession(String session) {
-                this.session = session;
-            }
+        public void setLanguage(String language) {
+            this.language = language;
         }
     }
 }

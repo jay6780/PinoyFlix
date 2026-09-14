@@ -3,6 +3,7 @@ package com.m.freemovie.mvp.Presenter;
 import androidx.annotation.NonNull;
 
 import com.m.freemovie.Retrofit.Callback;
+import com.m.freemovie.mvp.Contract.SearchContract;
 import com.m.freemovie.mvp.Model.AniKoToSearchModel;
 import com.m.freemovie.mvp.Model.AniMoTvSearchModel;
 import com.m.freemovie.mvp.Model.AniNekoSearchModel;
@@ -12,13 +13,10 @@ import com.m.freemovie.mvp.Model.ClassBean.AniNekoSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimePaheSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeSearchBean;
-import com.m.freemovie.mvp.Model.ClassBean.PinoyMovieRuBean;
 import com.m.freemovie.mvp.Model.ClassBean.SearchRuBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogSearchBean;
-import com.m.freemovie.mvp.Contract.SearchContract;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoSearchBean;
 import com.m.freemovie.mvp.Model.MovieModel;
-import com.m.freemovie.mvp.Model.PinoyRuModel;
 import com.m.freemovie.mvp.Model.SearchRuModel;
 import com.m.freemovie.mvp.Model.ZoroSearchModel;
 

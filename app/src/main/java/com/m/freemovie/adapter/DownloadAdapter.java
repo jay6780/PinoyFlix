@@ -22,12 +22,12 @@ public class DownloadAdapter extends BaseQuickAdapter<AnimePaheDownloadBean.Resu
     @Override
     protected void convert(BaseViewHolder helper, AnimePaheDownloadBean.ResultsBean.DownloadBean item) {
         TextView tv_quality  = helper.getView(R.id.tv_quality);
-        tv_quality.setText(item.getText());
+        tv_quality.setText(item.getQuality());
 
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                downListerner.getDownloadLink(item.getHref());
+                downListerner.getDownloadLink(item.getUrl());
             }
         });
     }

@@ -13,31 +13,31 @@ import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
 import com.m.freemovie.mvp.Model.ClassBean.PaheLatestBean;
 
-public class AnimePaheAdapter extends BaseQuickAdapter<PaheLatestBean.ResultsBean.DataBean, BaseViewHolder> {
+public class AnimePaheAdapter extends BaseQuickAdapter<PaheLatestBean.DataBean, BaseViewHolder> {
     public AnimePaheAdapter() {
         super(R.layout.view_all_item);
     }
 
     @Override
-    protected void convert(BaseViewHolder helper, PaheLatestBean.ResultsBean.DataBean item) {
+    protected void convert(BaseViewHolder helper, PaheLatestBean.DataBean item) {
         TextView tv_title  = helper.getView(R.id.tv_title);
         ImageView iv_thumb = helper.getView(R.id.iv_thumb);
 
 
         Glide.with(mContext)
                 .asBitmap()
-                .load(item.getSnapshot())
+                .load(item.getImage())
                 .placeholder(R.drawable.noimage)
                 .into(iv_thumb);
 
-        tv_title.setText(item.getAnime_title());
+        tv_title.setText(item.getTitle());
 
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, AnimePaheWebviewActivity.class);
-                intent.putExtra("id",item.getAnime_session());
-                intent.putExtra("title",item.getAnime_title());
+                intent.putExtra("id",item.getUrl());
+                intent.putExtra("title",item.getTitle());
                 mContext.startActivity(intent);
             }
 

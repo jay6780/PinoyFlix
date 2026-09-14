@@ -6,11 +6,14 @@ import com.m.freemovie.Retrofit.Callback;
 import com.m.freemovie.mvp.Contract.AnimePaheDetailContract;
 import com.m.freemovie.mvp.Model.AniKoToWatchModel;
 import com.m.freemovie.mvp.Model.AniMoDetailModel;
+import com.m.freemovie.mvp.Model.AnimePaheDetailModel;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToWatchBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniMoTvEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniNeKoDetailModel;
 import com.m.freemovie.mvp.Model.ClassBean.AniNeKoInfoBean;
 import com.m.freemovie.mvp.Model.ClassBean.AniNekoEpisodeBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDetailBean;
+import com.m.freemovie.mvp.Model.ClassBean.AnimePaheDownloadBean;
 import com.m.freemovie.mvp.Model.ClassBean.AnimoDetailsBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoVideoUrlBean;
@@ -28,6 +31,34 @@ public class AnimePaheDetailPresenter implements AnimePaheDetailContract.Present
         this.view = view;
     }
 
+
+    @Override
+    public void getDetailAnimePaHe(String url) {
+        view.showLoading();
+
+        AnimePaheDetailModel.getDetailData(url, new Callback<AnimePaheDetailBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(AnimePaheDetailBean apiBean) {
+                view.hideLoading();
+                view.getDetailData(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
 
     @Override
     public void getZoroUrl(String Url) {
@@ -215,6 +246,34 @@ public class AnimePaheDetailPresenter implements AnimePaheDetailContract.Present
             public void returnResult(AniMoTvEpisodeBean apiBean) {
                 view.hideLoading();
                 view.getAniMoEpisodes(apiBean);
+            }
+
+            @Override
+            public void returnError(String message) {
+                view.hideLoading();
+                view.showError(message);
+            }
+        });
+    }
+
+    @Override
+    public void getTrackPaHeUrl(String Url) {
+        view.showLoading();
+
+        AnimePaheDetailModel.getTrack(Url, new Callback<AnimePaheDownloadBean>() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void returnResult(AnimePaheDownloadBean apiBean) {
+                view.hideLoading();
+                view.getPaHeTrack(apiBean);
             }
 
             @Override

@@ -65,6 +65,8 @@ import com.m.freemovie.mvp.Presenter.RevivalInfoDetailPresenter;
 import com.m.freemovie.mvp.Presenter.RevivalMoviesPresenter;
 import com.m.freemovie.mvp.Presenter.RevivalTrackPresenter;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -499,39 +501,22 @@ public class TagalogWebviewActivity extends AppCompatActivity
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
 
-        String htmlContent = "<!DOCTYPE html>" +
-                "<html>" +
-                "<head>" +
-                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
-                "    <style>" +
-                "        .video-player {" +
-                "            position: fixed;" +
-                "            top: 0;" +
-                "            left: 0;" +
-                "            width: 100%;" +
-                "            height: 100%;" +
-                "            border: none;" +
-                "            object-fit: contain; /* Makes video fill while keeping aspect ratio */" +
-                "            background-color: #000; /* Black background for letterboxing */" +
-                "        }" +
-                "    </style>" +
-                "</head>" +
-                "<body style=\"margin:0;padding:0;overflow:hidden;background:#000;\">" +
-                "    <iframe src=\"" + videoUrl + "\"" +
-                "            class=\"video-player\"" +
-                "            allow=\"autoplay; encrypted-media; fullscreen\" " +
-                "            allowfullscreen>" +
-                "    </iframe>" +
-                "</body>" +
-                "</html>";
+        String baseUrl = getBaseUrl(videoUrl);
+        String html = "<!DOCTYPE html><html>" +
+                "<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">" +
+                "<style>body,html{margin:0;padding:0;width:100%;height:100%;background-color:#000;overflow:hidden;}" +
+                "iframe{border:none;width:100%;height:100%;}</style></head>" +
+                "<body><iframe src=\"" + videoUrl + "\" allow=\"autoplay; fullscreen\" allowfullscreen=\"true\"></iframe></body></html>";
+        binding.webView.loadDataWithBaseURL(baseUrl, html, "text/html", "UTF-8", null);
+    }
 
-        binding.webView.loadDataWithBaseURL(
-                "https://abysscdn.com/",
-                htmlContent,
-                "text/html",
-                "UTF-8",
-                null
-        );
+    private String getBaseUrl(String url) {
+        try {
+            URL parsedUrl = new URL(url);
+            return parsedUrl.getProtocol() + "://" + parsedUrl.getHost() + "/";
+        } catch (MalformedURLException e) {
+            return "https://";
+        }
     }
 
     @Override

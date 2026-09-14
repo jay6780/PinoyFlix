@@ -82,7 +82,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
     private boolean isNomore = false;
     private ImageView btn_send;
     private List<MovieBean.ResultsBean> movieLists = new ArrayList<>();
-    private List<AniNekoSearchBean.ResultsBean> hotList = new ArrayList<>();
+    private List<AnimePaheSearchBean.DataBean> hotList = new ArrayList<>();
     private List<RevivalSearchBean.ResultsBean> revivalList = new ArrayList<>();
     private List<NineAnimeSearchBean.ResultsBean> nineList = new ArrayList<>();
     private List<AniKoToSearchBean.ResultsBean> zoRoList = new ArrayList<>();
@@ -430,7 +430,15 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
 
     @Override
     public void getSearchPahe(AnimePaheSearchBean animePaheSearchBean) {
-
+        if (animePaheSearchBean != null && animePaheSearchBean.getData().size() != 0) {
+            isLoading = false;
+                hotList.addAll(animePaheSearchBean.getData());
+                tagalogSearchAdapter.setNewData(hotList);
+            } else {
+                Toast.makeText(getContext(), "No more Tv tagalog series", Toast.LENGTH_SHORT).show();
+                isLoading = false;
+                isNomore = true;
+            }
     }
 
     @Override
@@ -481,17 +489,6 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
 
     @Override
     public void getAniNeKoSearchData(AniNekoSearchBean aniNekoSearchBean) {
-        if (aniNekoSearchBean != null && aniNekoSearchBean.getResults() != null) {
-            isLoading = false;
-            if (!aniNekoSearchBean.getResults().isEmpty() && aniNekoSearchBean.getResults().size() != 0) {
-                hotList.addAll(aniNekoSearchBean.getResults());
-                tagalogSearchAdapter.setNewData(hotList);
-            } else {
-                Toast.makeText(getContext(), "No more Tv tagalog series", Toast.LENGTH_SHORT).show();
-                isLoading = false;
-                isNomore = true;
-            }
-        }
     }
 
     @Override
@@ -602,7 +599,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             case 3:
                 hotList.clear();
                 tagalogSearchAdapter.setNewData(new ArrayList<>());
-                searchPresenter.getAniNeKoQuery(query);
+                searchPresenter.getAnimePaheQuery(query);
                 break;
             case 4:
             case 5:

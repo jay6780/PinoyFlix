@@ -6,11 +6,21 @@ public class PaheLatestBean {
 
     /**
      * author : yazky
-     * results : {"total":6024,"per_page":12,"current_page":1,"last_page":502,"next_page_url":"https://animepahe.si/api?page=2","prev_page_url":null,"from":1,"to":12,"data":[{"id":73024,"anime_id":6446,"anime_title":"Journal with Witch","anime_session":"2383da24-221b-915c-48c4-bcd910cdda99","episode":1,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/cd7deee6d9a78ab81144763b4841b48abad0132da68993447ad83dbd0a192f9b.jpg","disc":"","session":"c26ec92b9a60fbc2a6aa7a70e389e3187f56bd8d657d63befbd8c7c5c6f7f4ee","filler":0,"created_at":"2026-01-04 15:39:44","completed":0},{"id":73023,"anime_id":6474,"anime_title":"Goumon Baito-kun no Nichijou","anime_session":"8643e7a4-3d72-12f8-3094-c769d5a30527","episode":1,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/da8f233b91f7798e6b3741c7fb439061660b2a17054dc3aa7dcac1f703c3dcc3.jpg","disc":"","session":"b82013e83f07efd037f1ccb9ccf514712fbeb786da967906d650231cb48ae16b","filler":0,"created_at":"2026-01-04 15:36:16","completed":0},{"id":73022,"anime_id":6456,"anime_title":"Noble Reincarnation: Born Blessed, So I'll Obtain Ultimate Power","anime_session":"a361b5dd-e478-b40e-972d-1bf414b39668","episode":1,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/af805e0c80bebed51c4a871999302126efb321a8d47b044929efb0cc11e1f1c5.jpg","disc":"","session":"73376905e323199940b33b525996ace516585620d42399e925e422a7f0694f47","filler":0,"created_at":"2026-01-04 15:10:12","completed":0},{"id":73021,"anime_id":6463,"anime_title":"Kunon the Sorcerer Can See","anime_session":"2a2c0932-36ab-9d20-0e37-b14489d08232","episode":2,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/74011c681cd06441a481094989a8215c8bd9e879c108fc0a64c5269071c959e7.jpg","disc":"","session":"43f751583cf51a9d70a18852a352bf4059ef837d60c81898d00b1bb0667f3ae3","filler":0,"created_at":"2026-01-04 14:19:06","completed":0},{"id":73020,"anime_id":6455,"anime_title":"Hana-Kimi","anime_session":"897652cd-5fe5-fae7-b087-fe43cc619770","episode":2,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/1736101c11f36f65bccedf4d2d92594a17c34370b53fbc839dae9146399a51b1.jpg","disc":"","session":"41e47c232a560d9f1cc9dc24e0100e6c45cf647f5999ca77ce1cf53d7c2736b9","filler":0,"created_at":"2026-01-04 14:15:22","completed":0},{"id":73017,"anime_id":6394,"anime_title":"Digimon Beatbreak","anime_session":"e308e5cb-1c1a-3f2c-0519-27ade6aa47df","episode":13,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/0dd3a9dcc5b95470b6d0f4cd834e8446a722b7a165b4db6f065dde337dd031de.jpg","disc":"","session":"596b32189793e065c495d8f042b20ad7593009ea124855d2bd5978092178c00a","filler":0,"created_at":"2026-01-04 03:04:46","completed":0},{"id":73016,"anime_id":6486,"anime_title":"The Daily Life of the Immortal King 5","anime_session":"2a541bf9-b6a4-03be-61ef-9061778f782a","episode":5,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/b541c38ead4dadfb59ded500393cbdfe8fa4317e87762aed26b59f6023791c4a.jpg","disc":"","session":"491b4f2bd32449b34e4d32749eb98d0db489560d6df4f84b833e45261692fa64","filler":0,"created_at":"2026-01-04 02:33:17","completed":0},{"id":73015,"anime_id":6404,"anime_title":"SI-VIS: The Sound of Heroes","anime_session":"30c57a4b-bc4b-6516-b77e-86aef3ae5bb8","episode":13,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/29c6147b98aba8e012be018b015d874dd84c8f36f3c798c5d5f57fb5d9eb0dc5.jpg","disc":"","session":"cb30099db49a09ca881bb346b284a706010a0cf27f4bd516be02f05183eda1a0","filler":0,"created_at":"2026-01-04 02:04:02","completed":0},{"id":73014,"anime_id":6035,"anime_title":"You and Idol Precure♪","anime_session":"56a7bc00-e3af-df58-d755-8cb081686539","episode":46,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/81f87c27b987928944b08bdd9238d1bbf97edb5a35a112f5473336b9f0cf202b.jpg","disc":"","session":"c10b3dc68a88e713a17274b50e27af9386bc04717c91f8df3d1f409507b03da3","filler":0,"created_at":"2026-01-04 01:34:12","completed":0},{"id":73013,"anime_id":6435,"anime_title":"Sentenced to Be a Hero","anime_session":"4a9abc55-0a54-c544-3e14-736c79ddafe7","episode":1,"episode2":0,"edition":"","fansub":"Yameii","snapshot":"https://i.animepahe.si/snapshots/317acf7fea5d695d79188907ea8dcab99c366129c99efe9ecb5a972a0e732084.jpg","disc":"","session":"2cf23d4925e68735eb57c06ed5e48f078b888e0b090a51e5c77bb289394a182a","filler":0,"created_at":"2026-01-04 00:14:07","completed":0},{"id":73012,"anime_id":3,"anime_title":"Meitantei Conan","anime_session":"f4fd317a-6233-a018-8b6e-e632bf750bdb","episode":1187,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/c5dab432be2470367d718de751ae784f4ed6dbd570709aabc7c65386d811c376.jpg","disc":"","session":"5994d10c5f1ca8ba907b36c3464869096505718386df100bac5e968cee9fddce","filler":0,"created_at":"2026-01-04 00:13:48","completed":0},{"id":73011,"anime_id":6211,"anime_title":"Demon Slayer: Kimetsu no Yaiba - The Movie: Infinity Castle - Part 1: Akaza Returns","anime_session":"b45d57c5-32f8-2eed-4440-319137d71e9a","episode":1,"episode2":0,"edition":"","fansub":"YG","snapshot":"https://i.animepahe.si/snapshots/433d3beaccfeb24940b12399bfbee207c6c9878f32906b05c5a43fa5ce3f5b86.jpg","disc":"","session":"d2b321eb54013d3aa6ec1d2289c54d64cc6af8dfdb8be26c061ed60740138bc1","filler":0,"created_at":"2026-01-03 07:34:56","completed":1}]}
+     * status : true
+     * page : 1
+     * total : 30
+     * next_page_url : null
+     * prev_page_url : null
+     * data : [{"title":"Azur Lane: Slow Ahead! Season 2","url":"https://animepahe.ch/series/azur-lane-slow-ahead-season-2/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783280821-4729-158715-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"One Piece","url":"https://animepahe.ch/series/one-piece/","image":"https://animepahe.ch/wp-content/uploads/2024/05/1715447128-1616-138851-193x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Though I Am an Inept Villainess","url":"https://animepahe.ch/series/though-i-am-an-inept-villainess/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783871808-7195-158341-214x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Goodbye, Lara","url":"https://animepahe.ch/series/goodbye-lara/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783266995-4715-156343-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"The Classroom of a Black Cat and a Witch","url":"https://animepahe.ch/series/the-classroom-of-a-black-cat-and-a-witch/","image":"https://animepahe.ch/wp-content/uploads/2026/04/1776007676-2397-153989-213x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Mushoku Tensei: Jobless Reincarnation Season 3","url":"https://animepahe.ch/series/mushoku-tensei-jobless-reincarnation-season-3/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783165730-1761-158340-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Sparks of Tomorrow","url":"https://animepahe.ch/series/sparks-of-tomorrow/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783245829-9392-158475-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"The 100 Girlfriends Who Really, Really, Really, Really, Really Love You Season 3","url":"https://animepahe.ch/series/the-100-girlfriends-who-really-really-really-really-really-love-you-season-3/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783261907-2446-157174-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"The World\u2019s Strongest Rearguard","url":"https://animepahe.ch/series/the-worlds-strongest-rearguard/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783257322-1997-157378-205x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Iron Wok Jan!","url":"https://animepahe.ch/series/iron-wok-jan/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783243416-4820-158686-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Let\u2019s Go Kaikigumi","url":"https://animepahe.ch/series/lets-go-kaikigumi/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783243190-9317-158581-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"You and I Are Polar Opposites Season 2","url":"https://animepahe.ch/series/you-and-i-are-polar-opposites-season-2/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783845935-6898-158409-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Digimon Beatbreak","url":"https://animepahe.ch/series/digimon-beatbreak/","image":"https://animepahe.ch/wp-content/uploads/2025/10/1759652049-9274-151242-213x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Rich Girl Caretaker: I\u2019m Secretly the Caregiver of the Most Popular Girl in This Rich Kid School","url":"https://animepahe.ch/series/rich-girl-caretaker-im-secretly-the-caregiver-of-the-most-popular-girl-in-this-rich-kid-school/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783189907-9523-157083-214x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Hanaori-san Still Wants to Fight in the Next Life","url":"https://animepahe.ch/series/hanaori-san-still-wants-to-fight-in-the-next-life/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783792355-3049-156331-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Magilumiere Magical Girls Inc. Season 2","url":"https://animepahe.ch/series/magilumiere-magical-girls-inc-season-2/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783189706-7541-156186-214x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"The Duke\u2019s Son Claims He Won\u2019t Love Me Yet Showers Me with Adoration","url":"https://animepahe.ch/series/the-dukes-son-claims-he-wont-love-me-yet-showers-me-with-adoration/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783185850-6315-158710-214x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Violet Evergarden: Eternity and the Auto Memory Doll","url":"https://animepahe.ch/series/violet-evergarden-eternity-and-the-auto-memory-doll/","image":"https://animepahe.ch/wp-content/uploads/2026/09/1789233798-2345-112943-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"The Ogre\u2019s Bride","url":"https://animepahe.ch/series/the-ogres-bride/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783185594-7299-158708-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Magical Girl Lyrical Nanoha EXCEEDS Gun Blaze Vengeance","url":"https://animepahe.ch/series/magical-girl-lyrical-nanoha-exceeds-gun-blaze-vengeance/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783187069-3368-158611-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Grow Up Show: Sunflower Circus","url":"https://animepahe.ch/series/grow-up-show-sunflower-circus/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783181983-2095-158716-215x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Jaadugar: A Witch in Mongolia","url":"https://animepahe.ch/series/jaadugar-a-witch-in-mongolia/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783182208-1348-158227-212x300.jpg","status":"Completed","type":"Anime","language":"Sub"},{"title":"Daemons of the Shadow Realm","url":"https://animepahe.ch/series/daemons-of-the-shadow-realm/","image":"https://animepahe.ch/wp-content/uploads/2026/04/1775240551-3554-156397-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Mao","url":"https://animepahe.ch/series/mao/","image":"https://animepahe.ch/wp-content/uploads/2026/04/1775240406-9170-156386-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Bleach: Thousand-Year Blood War \u2013 The Calamity","url":"https://animepahe.ch/series/bleach-thousand-year-blood-war-the-calamity/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1784993406-1474-158595-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"The Cat and the Dragon","url":"https://animepahe.ch/series/the-cat-and-the-dragon/","image":"https://animepahe.ch/wp-content/uploads/2026/06/1782571636-5949-157796-212x300.jpg","status":"Completed","type":"Anime","language":"Sub"},{"title":"Recommendations from Iwamoto-Senpai","url":"https://animepahe.ch/series/recommendations-from-iwamoto-senpai/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783174684-1863-158450-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Black Torch","url":"https://animepahe.ch/series/black-torch/","image":"https://animepahe.ch/wp-content/uploads/2026/07/1783171772-8023-158363-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Kaiju No. 8: Narumi\u2019s Week at Work","url":"https://animepahe.ch/series/kaiju-no-8-narumis-week-at-work/","image":"https://animepahe.ch/wp-content/uploads/2026/09/1789216239-5551-159343.jpg","status":"Ongoing","type":"Anime","language":"Sub"},{"title":"Welcome to Demon School! Iruma-kun Season 4","url":"https://animepahe.ch/series/welcome-to-demon-school-iruma-kun-season-4/","image":"https://animepahe.ch/wp-content/uploads/2026/04/1775240825-1607-154048-212x300.jpg","status":"Ongoing","type":"Anime","language":"Sub"}]
      */
 
     private String author;
-    private ResultsBean results;
+    private boolean status;
+    private int page;
+    private int total;
+    private Object next_page_url;
+    private Object prev_page_url;
+    private List<DataBean> data;
 
     public String getAuthor() {
         return author;
@@ -20,253 +30,117 @@ public class PaheLatestBean {
         this.author = author;
     }
 
-    public ResultsBean getResults() {
-        return results;
+    public boolean isStatus() {
+        return status;
     }
 
-    public void setResults(ResultsBean results) {
-        this.results = results;
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 
-    public static class ResultsBean {
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public void setTotal(int total) {
+        this.total = total;
+    }
+
+    public Object getNext_page_url() {
+        return next_page_url;
+    }
+
+    public void setNext_page_url(Object next_page_url) {
+        this.next_page_url = next_page_url;
+    }
+
+    public Object getPrev_page_url() {
+        return prev_page_url;
+    }
+
+    public void setPrev_page_url(Object prev_page_url) {
+        this.prev_page_url = prev_page_url;
+    }
+
+    public List<DataBean> getData() {
+        return data;
+    }
+
+    public void setData(List<DataBean> data) {
+        this.data = data;
+    }
+
+    public static class DataBean {
         /**
-         * total : 6024
-         * per_page : 12
-         * current_page : 1
-         * last_page : 502
-         * next_page_url : https://animepahe.si/api?page=2
-         * prev_page_url : null
-         * from : 1
-         * to : 12
-         * data : [{"id":73024,"anime_id":6446,"anime_title":"Journal with Witch","anime_session":"2383da24-221b-915c-48c4-bcd910cdda99","episode":1,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/cd7deee6d9a78ab81144763b4841b48abad0132da68993447ad83dbd0a192f9b.jpg","disc":"","session":"c26ec92b9a60fbc2a6aa7a70e389e3187f56bd8d657d63befbd8c7c5c6f7f4ee","filler":0,"created_at":"2026-01-04 15:39:44","completed":0},{"id":73023,"anime_id":6474,"anime_title":"Goumon Baito-kun no Nichijou","anime_session":"8643e7a4-3d72-12f8-3094-c769d5a30527","episode":1,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/da8f233b91f7798e6b3741c7fb439061660b2a17054dc3aa7dcac1f703c3dcc3.jpg","disc":"","session":"b82013e83f07efd037f1ccb9ccf514712fbeb786da967906d650231cb48ae16b","filler":0,"created_at":"2026-01-04 15:36:16","completed":0},{"id":73022,"anime_id":6456,"anime_title":"Noble Reincarnation: Born Blessed, So I'll Obtain Ultimate Power","anime_session":"a361b5dd-e478-b40e-972d-1bf414b39668","episode":1,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/af805e0c80bebed51c4a871999302126efb321a8d47b044929efb0cc11e1f1c5.jpg","disc":"","session":"73376905e323199940b33b525996ace516585620d42399e925e422a7f0694f47","filler":0,"created_at":"2026-01-04 15:10:12","completed":0},{"id":73021,"anime_id":6463,"anime_title":"Kunon the Sorcerer Can See","anime_session":"2a2c0932-36ab-9d20-0e37-b14489d08232","episode":2,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/74011c681cd06441a481094989a8215c8bd9e879c108fc0a64c5269071c959e7.jpg","disc":"","session":"43f751583cf51a9d70a18852a352bf4059ef837d60c81898d00b1bb0667f3ae3","filler":0,"created_at":"2026-01-04 14:19:06","completed":0},{"id":73020,"anime_id":6455,"anime_title":"Hana-Kimi","anime_session":"897652cd-5fe5-fae7-b087-fe43cc619770","episode":2,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/1736101c11f36f65bccedf4d2d92594a17c34370b53fbc839dae9146399a51b1.jpg","disc":"","session":"41e47c232a560d9f1cc9dc24e0100e6c45cf647f5999ca77ce1cf53d7c2736b9","filler":0,"created_at":"2026-01-04 14:15:22","completed":0},{"id":73017,"anime_id":6394,"anime_title":"Digimon Beatbreak","anime_session":"e308e5cb-1c1a-3f2c-0519-27ade6aa47df","episode":13,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/0dd3a9dcc5b95470b6d0f4cd834e8446a722b7a165b4db6f065dde337dd031de.jpg","disc":"","session":"596b32189793e065c495d8f042b20ad7593009ea124855d2bd5978092178c00a","filler":0,"created_at":"2026-01-04 03:04:46","completed":0},{"id":73016,"anime_id":6486,"anime_title":"The Daily Life of the Immortal King 5","anime_session":"2a541bf9-b6a4-03be-61ef-9061778f782a","episode":5,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/b541c38ead4dadfb59ded500393cbdfe8fa4317e87762aed26b59f6023791c4a.jpg","disc":"","session":"491b4f2bd32449b34e4d32749eb98d0db489560d6df4f84b833e45261692fa64","filler":0,"created_at":"2026-01-04 02:33:17","completed":0},{"id":73015,"anime_id":6404,"anime_title":"SI-VIS: The Sound of Heroes","anime_session":"30c57a4b-bc4b-6516-b77e-86aef3ae5bb8","episode":13,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/29c6147b98aba8e012be018b015d874dd84c8f36f3c798c5d5f57fb5d9eb0dc5.jpg","disc":"","session":"cb30099db49a09ca881bb346b284a706010a0cf27f4bd516be02f05183eda1a0","filler":0,"created_at":"2026-01-04 02:04:02","completed":0},{"id":73014,"anime_id":6035,"anime_title":"You and Idol Precure♪","anime_session":"56a7bc00-e3af-df58-d755-8cb081686539","episode":46,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/81f87c27b987928944b08bdd9238d1bbf97edb5a35a112f5473336b9f0cf202b.jpg","disc":"","session":"c10b3dc68a88e713a17274b50e27af9386bc04717c91f8df3d1f409507b03da3","filler":0,"created_at":"2026-01-04 01:34:12","completed":0},{"id":73013,"anime_id":6435,"anime_title":"Sentenced to Be a Hero","anime_session":"4a9abc55-0a54-c544-3e14-736c79ddafe7","episode":1,"episode2":0,"edition":"","fansub":"Yameii","snapshot":"https://i.animepahe.si/snapshots/317acf7fea5d695d79188907ea8dcab99c366129c99efe9ecb5a972a0e732084.jpg","disc":"","session":"2cf23d4925e68735eb57c06ed5e48f078b888e0b090a51e5c77bb289394a182a","filler":0,"created_at":"2026-01-04 00:14:07","completed":0},{"id":73012,"anime_id":3,"anime_title":"Meitantei Conan","anime_session":"f4fd317a-6233-a018-8b6e-e632bf750bdb","episode":1187,"episode2":0,"edition":"","fansub":"SubsPlease","snapshot":"https://i.animepahe.si/snapshots/c5dab432be2470367d718de751ae784f4ed6dbd570709aabc7c65386d811c376.jpg","disc":"","session":"5994d10c5f1ca8ba907b36c3464869096505718386df100bac5e968cee9fddce","filler":0,"created_at":"2026-01-04 00:13:48","completed":0},{"id":73011,"anime_id":6211,"anime_title":"Demon Slayer: Kimetsu no Yaiba - The Movie: Infinity Castle - Part 1: Akaza Returns","anime_session":"b45d57c5-32f8-2eed-4440-319137d71e9a","episode":1,"episode2":0,"edition":"","fansub":"YG","snapshot":"https://i.animepahe.si/snapshots/433d3beaccfeb24940b12399bfbee207c6c9878f32906b05c5a43fa5ce3f5b86.jpg","disc":"","session":"d2b321eb54013d3aa6ec1d2289c54d64cc6af8dfdb8be26c061ed60740138bc1","filler":0,"created_at":"2026-01-03 07:34:56","completed":1}]
+         * title : Azur Lane: Slow Ahead! Season 2
+         * url : https://animepahe.ch/series/azur-lane-slow-ahead-season-2/
+         * image : https://animepahe.ch/wp-content/uploads/2026/07/1783280821-4729-158715-212x300.jpg
+         * status : Ongoing
+         * type : Anime
+         * language : Sub
          */
 
-        private int total;
-        private int per_page;
-        private int current_page;
-        private int last_page;
-        private String next_page_url;
-        private Object prev_page_url;
-        private int from;
-        private int to;
-        private List<DataBean> data;
+        private String title;
+        private String url;
+        private String image;
+        private String status;
+        private String type;
+        private String language;
 
-        public int getTotal() {
-            return total;
+        public String getTitle() {
+            return title;
         }
 
-        public void setTotal(int total) {
-            this.total = total;
+        public void setTitle(String title) {
+            this.title = title;
         }
 
-        public int getPer_page() {
-            return per_page;
+        public String getUrl() {
+            return url;
         }
 
-        public void setPer_page(int per_page) {
-            this.per_page = per_page;
+        public void setUrl(String url) {
+            this.url = url;
         }
 
-        public int getCurrent_page() {
-            return current_page;
+        public String getImage() {
+            return image;
         }
 
-        public void setCurrent_page(int current_page) {
-            this.current_page = current_page;
+        public void setImage(String image) {
+            this.image = image;
         }
 
-        public int getLast_page() {
-            return last_page;
+        public String getStatus() {
+            return status;
         }
 
-        public void setLast_page(int last_page) {
-            this.last_page = last_page;
+        public void setStatus(String status) {
+            this.status = status;
         }
 
-        public String getNext_page_url() {
-            return next_page_url;
+        public String getType() {
+            return type;
         }
 
-        public void setNext_page_url(String next_page_url) {
-            this.next_page_url = next_page_url;
+        public void setType(String type) {
+            this.type = type;
         }
 
-        public Object getPrev_page_url() {
-            return prev_page_url;
+        public String getLanguage() {
+            return language;
         }
 
-        public void setPrev_page_url(Object prev_page_url) {
-            this.prev_page_url = prev_page_url;
-        }
-
-        public int getFrom() {
-            return from;
-        }
-
-        public void setFrom(int from) {
-            this.from = from;
-        }
-
-        public int getTo() {
-            return to;
-        }
-
-        public void setTo(int to) {
-            this.to = to;
-        }
-
-        public List<DataBean> getData() {
-            return data;
-        }
-
-        public void setData(List<DataBean> data) {
-            this.data = data;
-        }
-
-        public static class DataBean {
-            /**
-             * id : 73024
-             * anime_id : 6446
-             * anime_title : Journal with Witch
-             * anime_session : 2383da24-221b-915c-48c4-bcd910cdda99
-             * episode : 1
-             * episode2 : 0
-             * edition :
-             * fansub : SubsPlease
-             * snapshot : https://i.animepahe.si/snapshots/cd7deee6d9a78ab81144763b4841b48abad0132da68993447ad83dbd0a192f9b.jpg
-             * disc :
-             * session : c26ec92b9a60fbc2a6aa7a70e389e3187f56bd8d657d63befbd8c7c5c6f7f4ee
-             * filler : 0
-             * created_at : 2026-01-04 15:39:44
-             * completed : 0
-             */
-
-            private int id;
-            private int anime_id;
-            private String anime_title;
-            private String anime_session;
-            private double episode;
-            private int episode2;
-            private String edition;
-            private String fansub;
-            private String snapshot;
-            private String disc;
-            private String session;
-            private int filler;
-            private String created_at;
-            private int completed;
-
-            public int getId() {
-                return id;
-            }
-
-            public void setId(int id) {
-                this.id = id;
-            }
-
-            public int getAnime_id() {
-                return anime_id;
-            }
-
-            public void setAnime_id(int anime_id) {
-                this.anime_id = anime_id;
-            }
-
-            public String getAnime_title() {
-                return anime_title;
-            }
-
-            public void setAnime_title(String anime_title) {
-                this.anime_title = anime_title;
-            }
-
-            public String getAnime_session() {
-                return anime_session;
-            }
-
-            public void setAnime_session(String anime_session) {
-                this.anime_session = anime_session;
-            }
-
-            public double getEpisode() {
-                return episode;
-            }
-
-            public void setEpisode(double episode) {
-                this.episode = episode;
-            }
-
-            public int getEpisode2() {
-                return episode2;
-            }
-
-            public void setEpisode2(int episode2) {
-                this.episode2 = episode2;
-            }
-
-            public String getEdition() {
-                return edition;
-            }
-
-            public void setEdition(String edition) {
-                this.edition = edition;
-            }
-
-            public String getFansub() {
-                return fansub;
-            }
-
-            public void setFansub(String fansub) {
-                this.fansub = fansub;
-            }
-
-            public String getSnapshot() {
-                return snapshot;
-            }
-
-            public void setSnapshot(String snapshot) {
-                this.snapshot = snapshot;
-            }
-
-            public String getDisc() {
-                return disc;
-            }
-
-            public void setDisc(String disc) {
-                this.disc = disc;
-            }
-
-            public String getSession() {
-                return session;
-            }
-
-            public void setSession(String session) {
-                this.session = session;
-            }
-
-            public int getFiller() {
-                return filler;
-            }
-
-            public void setFiller(int filler) {
-                this.filler = filler;
-            }
-
-            public String getCreated_at() {
-                return created_at;
-            }
-
-            public void setCreated_at(String created_at) {
-                this.created_at = created_at;
-            }
-
-            public int getCompleted() {
-                return completed;
-            }
-
-            public void setCompleted(int completed) {
-                this.completed = completed;
-            }
+        public void setLanguage(String language) {
+            this.language = language;
         }
     }
 }

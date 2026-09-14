@@ -36,7 +36,7 @@ public class AnimePaheFragment extends Fragment implements AnimePaheContract.Vie
     private boolean isLoading = false;
     private boolean isNomore = false;
     private AnimePaheAdapter animePaheAdapter;
-    private List<PaheLatestBean.ResultsBean.DataBean> dataBeanList = new ArrayList<>();
+    private List<PaheLatestBean.DataBean> dataBeanList = new ArrayList<>();
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -161,10 +161,10 @@ public class AnimePaheFragment extends Fragment implements AnimePaheContract.Vie
     @Override
     public void getLatestData(PaheLatestBean paheLatestBean) {
         if (binding == null) return;
-        if(paheLatestBean !=null && paheLatestBean.getResults()!=null){
+        if(paheLatestBean !=null && paheLatestBean.getData()!=null){
             isLoading = false;
-            if(!paheLatestBean.getResults().getData().isEmpty()){
-                dataBeanList.addAll(paheLatestBean.getResults().getData());
+            if(!paheLatestBean.getData().isEmpty()){
+                dataBeanList.addAll(paheLatestBean.getData());
                 animePaheAdapter.setNewData(dataBeanList);
             }else{
                 Toast.makeText(getContext(), "No more in the list", Toast.LENGTH_SHORT).show();

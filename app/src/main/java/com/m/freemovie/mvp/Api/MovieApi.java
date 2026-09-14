@@ -197,7 +197,7 @@ public interface MovieApi {
 
 
     //animepahe
-    @GET("animepahe/latest_release")
+    @GET("animepahe/api")
     Observable<PaheLatestBean> getLatestAnimePahe(
             @Query("page") int page);
 
