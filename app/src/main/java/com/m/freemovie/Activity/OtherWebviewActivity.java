@@ -49,6 +49,7 @@ import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
+import com.m.freemovie.Utils.DialogSourceUtils;
 import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
@@ -99,6 +100,7 @@ public class OtherWebviewActivity extends AppCompatActivity
     private String link;
     private int lastScroll;
     private boolean isPictureMode = false;
+    private DialogPlus dialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -365,52 +367,18 @@ public class OtherWebviewActivity extends AppCompatActivity
         }, 500);
     }
 
-    private DialogPlus dialog;
-
     @Override
     public void getDetailSuccess(PinoyMediaDetailBean bean) {
         if (bean != null && bean.getResults() != null) {
             pinoyRuDetailBeanList.clear();
-
             List<String> embedUrls = bean.getResults().getEmbedUrls();
             pinoyRuDetailBeanList.add(new PinoyRuDetailBean(embedUrls, link));
             if (pinoyRuDetailBeanList.isEmpty()) {
                 return;
             }
-            dialog = DialogPlus.newDialog(this)
-                    .setContentHolder(new ViewHolder(R.layout.dialog_ru_pinoy))
-                    .setContentWidth(ViewGroup.LayoutParams.MATCH_PARENT)
-                    .setContentHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-                    .setGravity(Gravity.CENTER)
-                    .setCancelable(true)
-                    .setPadding(10, 10, 10, 10)
-                    .create();
-
-            View dialogView = dialog.getHolderView();
-            RecyclerView recyclerView = dialogView.findViewById(R.id.rv_ru);
-            PiNoyMediaListAdapter dataAdapter = new PiNoyMediaListAdapter(this);
-
-
-            dataAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
-                @Override
-                public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                    if (view.getId() == R.id.tv_download) {
-                        Intent intent = new Intent(getApplicationContext(), DownloadWebview.class);
-                        intent.putExtra("DownloadUrl", dataAdapter.getData().get(position).getLink());
-                        intent.putExtra("EpisodeNum", "");
-                        intent.putExtra("title", bean.getResults().getTitle());
-                        startActivity(intent);
-                    }
-                }
-            });
-
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            recyclerView.setAdapter(dataAdapter);
-            dataAdapter.setNewData(pinoyRuDetailBeanList);
+            dialog = new DialogSourceUtils().TagalogListSource(OtherWebviewActivity.this, this, bean, pinoyRuDetailBeanList);
             dialog.show();
-
         }
-
     }
 
 

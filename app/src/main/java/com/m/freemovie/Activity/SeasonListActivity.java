@@ -41,6 +41,8 @@ import com.m.freemovie.adapter.EpisodeAdapter;
 import com.m.freemovie.databinding.ActivitySeasonListBinding;
 import com.m.freemovie.mvp.Model.ClassBean.EpisodeBean;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 public class SeasonListActivity extends AppCompatActivity implements EpisodeAdapter.SourceListener {
@@ -212,7 +214,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                 break;
             case 2:
                 videoPosition = 2;
-                videoUrl = "https://vidrock.ru/tv/" + id + "/" + seasonNum + "/" + epNumber + "&download=false";
+                videoUrl = "https://vidrock.to/tv/" + id + "/" + seasonNum + "/" + epNumber + "&download=false";
                 setupWebView(videoUrl);
                 break;
             case 3:
@@ -244,44 +246,22 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             binding.webView.setWebContentsDebuggingEnabled(false);
         }
-        if(videoPosition == 3){
-            String htmlContent = "<!DOCTYPE html>" +
-                    "<html>" +
-                    "<head>" +
-                    "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
-                    "    <style>" +
-                    "        .video-player {" +
-                    "            position: fixed;" +
-                    "            top: 0;" +
-                    "            left: 0;" +
-                    "            width: 100%;" +
-                    "            height: 100%;" +
-                    "            border: none;" +
-                    "            object-fit: contain; /* Makes video fill while keeping aspect ratio */" +
-                    "            background-color: #000; /* Black background for letterboxing */" +
-                    "        }" +
-                    "    </style>" +
-                    "</head>" +
-                    "<body style=\"margin:0;padding:0;overflow:hidden;background:#000;\">" +
-                    "    <iframe src=\"" + videoUrl + "\"" +
-                    "            class=\"video-player\"" +
-                    "            allow=\"autoplay; encrypted-media; fullscreen\" " +
-                    "            allowfullscreen>" +
-                    "    </iframe>" +
-                    "</body>" +
-                    "</html>";
+        String baseUrl = getBaseUrl(videoUrl);
+        String html = "<!DOCTYPE html><html>" +
+                "<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">" +
+                "<style>body,html{margin:0;padding:0;width:100%;height:100%;background-color:#000;overflow:hidden;}" +
+                "iframe{border:none;width:100%;height:100%;}</style></head>" +
+                "<body><iframe src=\"" + videoUrl + "\" allow=\"autoplay; fullscreen\" allowfullscreen=\"true\"></iframe></body></html>";
+        binding.webView.loadDataWithBaseURL(baseUrl, html, "text/html", "UTF-8", null);
+    }
 
-            binding.webView.loadDataWithBaseURL(
-                    null,
-                    htmlContent,
-                    "text/html",
-                    "UTF-8",
-                    null
-            );
-        }else{
-            binding.webView.loadUrl(videoUrl);
+    private String getBaseUrl(String url) {
+        try {
+            URL parsedUrl = new URL(url);
+            return parsedUrl.getProtocol() + "://" + parsedUrl.getHost() + "/";
+        } catch (MalformedURLException e) {
+            return "https://";
         }
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

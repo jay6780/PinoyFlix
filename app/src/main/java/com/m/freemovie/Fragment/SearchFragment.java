@@ -623,11 +623,11 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                 movieRuAdapter.clearCache();
                 searchPresenter.getTagalogMovieQuery(query);
                 break;
-            case 9:
-                aniMoSearchList.clear();
-                aniMoTvSearchAdapter.setNewData(new ArrayList<>());
-                searchPresenter.getAniMoTvQuery(query);
-                break;
+//            case 9:
+//                aniMoSearchList.clear();
+//                aniMoTvSearchAdapter.setNewData(new ArrayList<>());
+//                searchPresenter.getAniMoTvQuery(query);
+//                break;
         }
     }
 
@@ -646,7 +646,7 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             case 3:
             case 6:
             case 7:
-            case 9:
+//            case 9:
                 toast = "Please enter anime series";
                 break;
             case 8:
@@ -682,9 +682,9 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
             case 6:
                 position = 8;
                 break;
-            case 7:
-                position = 9;
-                break;
+//            case 7:
+//                position = 9;
+//                break;
         }
 
         searchAll();
@@ -784,16 +784,16 @@ public class SearchFragment extends Fragment implements SearchContract.View, Vie
                     ll_reset.setVisibility(View.GONE);
                 }
                 break;
-            case 9:
-                et_search.setHint("Enter anime series");
-                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-                aniMoTvSearchAdapter = new AniMoTvSearchAdapter();
-                rv_search.setAdapter(aniMoTvSearchAdapter);
-                aniMoSearchList.clear();
-                if (ll_reset != null) {
-                    ll_reset.setVisibility(View.GONE);
-                }
-                break;
+//            case 9:
+//                et_search.setHint("Enter anime series");
+//                rv_search.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+//                aniMoTvSearchAdapter = new AniMoTvSearchAdapter();
+//                rv_search.setAdapter(aniMoTvSearchAdapter);
+//                aniMoSearchList.clear();
+//                if (ll_reset != null) {
+//                    ll_reset.setVisibility(View.GONE);
+//                }
+//                break;
 
 
         }

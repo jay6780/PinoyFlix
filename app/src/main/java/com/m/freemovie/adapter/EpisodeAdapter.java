@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.DbHelper.WatchHistoryDBHelper;
+import com.m.freemovie.Utils.DialogSourceUtils;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
 import com.m.freemovie.mvp.Model.ClassBean.EpisodeBean;
@@ -86,61 +87,11 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
     }
 
     private void showVideoOptions(EpisodeBean item, Context mContext, BaseViewHolder helper) {
-        String[] videoPlayer = {"Player 1", "Player 2","Player 3","Player 4"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        TextView titleView = new TextView(mContext);
-        titleView.setText("Select player");
-        titleView.setTextColor(Color.BLACK);
-        titleView.setPadding(40, 40, 40, 20);
-        titleView.setTextSize(15);
-        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-
-            }
-        });
-
-        builder.setCustomTitle(titleView);
-
-        builder.setItems(videoPlayer, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0:
-                        lastPosition = (helper.getAdapterPosition());
-                        sourceListener.getId(item.getId(), 1, item.getSeasonNum(), item.getEpisodeNum());
-                        dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
-                                item.getSeasonNum(), item.getEpisodeNum(), item.getSeasonId());
-                        item.setWatched(true);
-                        notifyDataSetChanged();
-                        break;
-                    case 1:
-                        lastPosition = (helper.getAdapterPosition());
-                        sourceListener.getId(item.getId(), 2, item.getSeasonNum(), item.getEpisodeNum());
-                        dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
-                                item.getSeasonNum(), item.getEpisodeNum(), item.getSeasonId());
-                        item.setWatched(true);
-                        notifyDataSetChanged();
-                        break;
-                    case 2:
-                        lastPosition = (helper.getAdapterPosition());
-                        sourceListener.getId(item.getId(), 3, item.getSeasonNum(), item.getEpisodeNum());
-                        dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
-                                item.getSeasonNum(), item.getEpisodeNum(), item.getSeasonId());
-                        item.setWatched(true);
-                        notifyDataSetChanged();
-                        break;
-                    case 3:
-                        lastPosition = (helper.getAdapterPosition());
-                        sourceListener.getId(item.getId(), 4, item.getSeasonNum(), item.getEpisodeNum());
-                        dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
-                                item.getSeasonNum(), item.getEpisodeNum(), item.getSeasonId());
-                        item.setWatched(true);
-                        notifyDataSetChanged();
-                        break;
-                }
-            }
-        });
-        builder.show();
+        lastPosition = (helper.getAdapterPosition());
+        new DialogSourceUtils().TvSeriesSource(mContext, item.getId(), item.getSeasonNum(), item.getEpisodeNum(), sourceListener);
+        dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
+                item.getSeasonNum(), item.getEpisodeNum(), item.getSeasonId());
+        item.setWatched(true);
+        notifyDataSetChanged();
     }
 }

@@ -1,30 +1,19 @@
 package com.m.freemovie.Activity;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
-import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper2;
+import com.m.freemovie.Utils.DialogSourceUtils;
 import com.m.freemovie.Utils.GlobalWindowUtils;
-import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.WindowUtils;
-import com.m.freemovie.Utils.base.BaseQuickAdapter;
-import com.m.freemovie.adapter.PiNoyMediaAdapter;
 import com.m.freemovie.databinding.ActivityOthersDetailsBinding;
 import com.m.freemovie.mvp.Contract.PinoyPediaContract;
 import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
@@ -32,7 +21,6 @@ import com.m.freemovie.mvp.Model.ClassBean.PinoyMediaDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.PinoyRuDetailBean;
 import com.m.freemovie.mvp.Presenter.PinoyPediaPresenter;
 import com.orhanobut.dialogplus.DialogPlus;
-import com.orhanobut.dialogplus.ViewHolder;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -210,40 +198,8 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
                 if (pinoyRuDetailBeanList.isEmpty()) {
                     return;
                 }
-                dialog = DialogPlus.newDialog(this)
-                        .setContentHolder(new ViewHolder(R.layout.dialog_ru_pinoy))
-                        .setContentWidth(ViewGroup.LayoutParams.MATCH_PARENT)
-                        .setContentHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-                        .setGravity(Gravity.CENTER)
-                        .setCancelable(true)
-                        .setPadding(10, 10, 10, 10)
-                        .create();
-
-                View dialogView = dialog.getHolderView();
-                RecyclerView recyclerView = dialogView.findViewById(R.id.rv_ru);
-                PiNoyMediaAdapter dataAdapter = new PiNoyMediaAdapter();
-                dataAdapter.setType(type);
-
-
-                dataAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
-                    @Override
-                    public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                        if (view.getId() == R.id.tv_download) {
-                            dialog.dismiss();
-                            Intent intent = new Intent(getApplicationContext(), DownloadWebview.class);
-                            intent.putExtra("DownloadUrl", dataAdapter.getData().get(position).getLink());
-                            intent.putExtra("EpisodeNum", "");
-                            intent.putExtra("title", title);
-                            startActivity(intent);
-                        }
-                    }
-                });
-
-                recyclerView.setLayoutManager(new LinearLayoutManager(this));
-                recyclerView.setAdapter(dataAdapter);
-                dataAdapter.setNewData(pinoyRuDetailBeanList);
+                dialog = new DialogSourceUtils().TagalogWatchSource(OthersDetailsActivity.this,type,title,pinoyRuDetailBeanList);
                 dialog.show();
-
                 break;
             case R.id.iv_back:
                 onBackPressed();

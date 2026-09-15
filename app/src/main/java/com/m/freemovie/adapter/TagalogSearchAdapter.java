@@ -31,19 +31,19 @@ public class TagalogSearchAdapter extends BaseQuickAdapter<AnimePaheSearchBean.D
 
         Glide.with(mContext)
                 .asBitmap()
-                .load(item.getImage())
+                .load(item.getAnime_image())
                 .placeholder(R.drawable.noimage)
                 .into(iv_thumb);
 
-        tv_title.setText(item.getTitle());
+        tv_title.setText(item.getAnime_title());
 
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, AnimeDetailsActivity.class);
-                intent.putExtra("imageUrl", item.getImage());
-                intent.putExtra("id", item.getUrl());
-                intent.putExtra("title", item.getTitle());
+                intent.putExtra("imageUrl", item.getAnime_image());
+                intent.putExtra("id", item.getAnime_url());
+                intent.putExtra("title", item.getAnime_title());
                 intent.putExtra("apiPosition", 2);
                 mContext.startActivity(intent);
             }

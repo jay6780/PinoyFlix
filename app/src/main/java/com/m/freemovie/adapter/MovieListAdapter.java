@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.m.freemovie.Activity.Details_activity;
 import com.m.freemovie.Activity.DownloadWebview;
 import com.m.freemovie.R;
+import com.m.freemovie.Utils.DialogSourceUtils;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
 import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
@@ -68,56 +69,9 @@ public class MovieListAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Ba
     }
 
     private void showDialog(MovieBean.ResultsBean item, BaseViewHolder helper) {
-
-        String[] option = {"Player 1","Player 2","Player 3","Player 4" ,"View Details","Download"};
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setItems(option, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case 0:
-                        movieIdListener.getMovieId(item.getId(),item.getTitle(),1);
-                        lastPosition = (helper.getAdapterPosition());
-                        notifyDataSetChanged();
-                        break;
-                    case 1:
-                        movieIdListener.getMovieId(item.getId(),item.getTitle(),2);
-                        lastPosition = (helper.getAdapterPosition());
-                        notifyItemChanged(helper.getAdapterPosition());
-                        notifyDataSetChanged();
-                        break;
-                    case 2:
-                        movieIdListener.getMovieId(item.getId(),item.getTitle(),3);
-                        lastPosition = (helper.getAdapterPosition());
-                        notifyItemChanged(helper.getAdapterPosition());
-                        notifyDataSetChanged();
-                        break;
-                    case 3:
-                        movieIdListener.getMovieId(item.getId(),item.getTitle(),4);
-                        lastPosition = (helper.getAdapterPosition());
-                        notifyItemChanged(helper.getAdapterPosition());
-                        notifyDataSetChanged();
-                        break;
-                    case 4:
-                        Intent intent = new Intent(mContext, Details_activity.class);
-                        intent.putExtra("id",item.getId());
-                        intent.putExtra("position",1);
-                        intent.putExtra("apiPosition",apiPosition);
-                        mContext.startActivity(intent);
-                        break;
-                    case 5:
-                        String downloadUrl = "https://vidvault.ru/movie/" + item.getId();
-                        Intent download = new Intent(mContext, DownloadWebview.class);
-                        download.putExtra("DownloadUrl", downloadUrl);
-                        download.putExtra("EpisodeNum", "");
-                        download.putExtra("title", item.getTitle());
-                        mContext.startActivity(download);
-                        break;
-                }
-            }
-        });
-        builder.show();
+        new DialogSourceUtils().MovieListSource(mContext, item.getId(), item.getId(), movieIdListener, apiPosition);
+        lastPosition = (helper.getAdapterPosition());
+        notifyDataSetChanged();
     }
 
     public void setPosition(int type) {

@@ -31,6 +31,7 @@ import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
 import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.BookmarkDbHelper;
+import com.m.freemovie.Utils.DialogSourceUtils;
 import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.WindowUtils;
@@ -178,61 +179,10 @@ public class Details_activity extends AppCompatActivity implements DetailContrac
     }
 
     private void watchNow() {
-        if(title == null || id == null){
+        if (title == null || id == null) {
             return;
         }
-        String[] option = {"Player 1","Player 2","Player 3","Player 4","Download"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        TextView titleView = new TextView(this);
-        titleView.setText("Select player");
-        titleView.setTextColor(Color.BLACK);
-        titleView.setPadding(40, 40, 40, 20);
-        titleView.setTextSize(15);
-
-        builder.setCustomTitle(titleView);
-
-        builder.setItems(option, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent intent = null;
-                switch (which) {
-                    case 0:
-                        intent = new Intent(Details_activity.this, VideoWebviewActivity.class);
-                        intent.putExtra("title", title);
-                        intent.putExtra("videoPosition", 1);
-                        intent.putExtra("videoId", id);
-                        intent.putExtra("apiPosition", apiPosition);
-                        break;
-                    case 1:
-                        intent = new Intent(Details_activity.this, VideoWebviewActivity.class);
-                        intent.putExtra("title", title);
-                        intent.putExtra("videoPosition", 2);
-                        intent.putExtra("videoId", id);
-                        break;
-                    case 2:
-                        intent = new Intent(Details_activity.this, VideoWebviewActivity.class);
-                        intent.putExtra("title", title);
-                        intent.putExtra("videoPosition", 3);
-                        intent.putExtra("videoId", id);
-                        break;
-                    case 3:
-                        intent = new Intent(Details_activity.this, VideoWebviewActivity.class);
-                        intent.putExtra("title", title);
-                        intent.putExtra("videoPosition", 4);
-                        intent.putExtra("videoId", id);
-                        break;
-                    case 4:
-                        String downloadUrl = "https://vidvault.ru/movie/" +id;
-                        intent = new Intent(getApplicationContext(), DownloadWebview.class);
-                        intent.putExtra("DownloadUrl", downloadUrl);
-                        intent.putExtra("EpisodeNum", "");
-                        intent.putExtra("title", title);
-                        break;
-                }
-                startActivity(intent);
-            }
-        });
-        builder.show();
+         new DialogSourceUtils().WatchSourceMovie(Details_activity.this, title, id, apiPosition);
     }
 
     @Override
