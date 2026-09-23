@@ -69,7 +69,7 @@ public class MovieListAdapter extends BaseQuickAdapter<MovieBean.ResultsBean, Ba
     }
 
     private void showDialog(MovieBean.ResultsBean item, BaseViewHolder helper) {
-        new DialogSourceUtils().MovieListSource(mContext, item.getId(), item.getId(), movieIdListener, apiPosition);
+        new DialogSourceUtils().MovieListSource(mContext, item.getId(), item.getTitle(), movieIdListener, apiPosition);
         lastPosition = (helper.getAdapterPosition());
         notifyDataSetChanged();
     }

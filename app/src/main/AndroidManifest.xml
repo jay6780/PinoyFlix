@@ -92,9 +92,8 @@
         <activity
             android:name=".Activity.SeasonListActivity"
             android:supportsPictureInPicture="true"
-            android:configChanges="screenSize|screenLayout|orientation|smallestScreenSize"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
+            android:exported="false" />
         <activity
             android:name=".Activity.Download_videoActivity"
             android:exported="false"
@@ -119,7 +118,7 @@
         <activity
             android:name=".Activity.VideoWebviewActivity"
             android:supportsPictureInPicture="true"
-            android:configChanges="screenSize|screenLayout|orientation|smallestScreenSize"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:exported="false" />
         <activity
             android:name=".Activity.MainActivity"

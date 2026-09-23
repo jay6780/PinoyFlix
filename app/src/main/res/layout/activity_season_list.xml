@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="#313647">
 
@@ -38,11 +39,16 @@
                 android:textSize="16sp" />
         </LinearLayout>
 
-        <WebView
-            android:id="@+id/webView"
+
+        <androidx.media3.ui.PlayerView
+            android:id="@+id/player_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:background="#000000"
+            app:resize_mode="zoom"
+            app:show_subtitle_button="true" />
+
 
         <TextView
             android:id="@+id/tv_select"
@@ -62,7 +68,7 @@
             android:layout_marginBottom="10dp"
             android:elevation="20dp"
             android:src="@mipmap/expand"
-            android:visibility="gone" />
+            android:visibility="visible" />
     </RelativeLayout>
 
 
