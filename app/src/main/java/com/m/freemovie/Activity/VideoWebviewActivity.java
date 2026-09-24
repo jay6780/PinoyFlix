@@ -123,6 +123,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
     private java.util.Map<String, String> pendingStreamHeaders;
     private boolean hasStartedPlayback = false;
     private String player;
+    private SubtitleView subtitleView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -226,12 +227,36 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         } catch (Exception e) {
             e.printStackTrace();
         }
+        subtitleView();
+    }
+
+    private void subtitleView() {
+        subtitleView = binding.playerView.getSubtitleView();
+        if (subtitleView != null) {
+            subtitleView.setVisibility(View.VISIBLE);
+            subtitleView.setApplyEmbeddedFontSizes(false);
+            subtitleView.setApplyEmbeddedStyles(false);
+            subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
+            subtitleView.setStyle(new androidx.media3.ui.CaptionStyleCompat(
+                    Color.WHITE,
+                    Color.argb(204, 0, 0, 0),
+                    Color.TRANSPARENT,
+                    androidx.media3.ui.CaptionStyleCompat.EDGE_TYPE_OUTLINE,
+                    Color.BLACK,
+                    null
+            ));
+
+        }
     }
 
     private boolean isHide = false;
 
     private void hideControls() {
-        isHide = !isHide;
+        if (!isHide) {
+            isHide = true;
+        } else {
+            isHide = false;
+        }
         binding.btnBackFinish.setVisibility(isHide ? View.GONE : View.VISIBLE);
     }
 
@@ -279,11 +304,9 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                     int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
                     lastScroll = lastVisibleItemPosition;
                     int totalItemCount = layoutManager.getItemCount();
-                    if (lastVisibleItemPosition > 10) {
-                        int orientation = getResources().getConfiguration().orientation;
-                        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-                            binding.llReset.setVisibility(View.VISIBLE);
-                        }
+                    int orientation = getResources().getConfiguration().orientation;
+                    if (lastVisibleItemPosition > 10 && orientation == Configuration.ORIENTATION_PORTRAIT) {
+                        binding.llReset.setVisibility(View.VISIBLE);
                         initGuide();
                     } else if (lastVisibleItemPosition == 0) {
                         binding.llReset.setVisibility(View.GONE);
@@ -353,12 +376,11 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         if (binding.playerView != null) {
             binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
         }
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         binding.swipe.setEnabled(false);
         binding.playerView.postDelayed(this::applySubtitleBottomMargin, 200);
         binding.playerView.postDelayed(this::applySubtitleBottomMargin, 200);
-        SubtitleView subtitleView = binding.playerView.getSubtitleView();
-        if (subtitleView != null) {
+        if(subtitleView!=null){
             subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
         }
         new WindowUtils(this, true, false);
@@ -382,8 +404,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         if (binding.playerView != null) {
             binding.playerView.postDelayed(this::applySubtitleBottomMargin, 200);
         }
-        SubtitleView subtitleView = binding.playerView.getSubtitleView();
-        if (subtitleView != null) {
+        if(subtitleView!=null){
             subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
         }
         new WindowUtils(this, true, false);
@@ -912,24 +933,9 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 .build();
         binding.playerView.setPlayer(exoPlayer);
         binding.playerView.setShowSubtitleButton(true);
-
-        SubtitleView subtitleView = binding.playerView.getSubtitleView();
-        if (subtitleView != null) {
-            subtitleView.setVisibility(View.VISIBLE);
-            subtitleView.setApplyEmbeddedFontSizes(false);
-            subtitleView.setApplyEmbeddedStyles(false);
-            subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
-            subtitleView.setStyle(new androidx.media3.ui.CaptionStyleCompat(
-                    Color.WHITE,
-                    Color.argb(204, 0, 0, 0),
-                    Color.TRANSPARENT,
-                    androidx.media3.ui.CaptionStyleCompat.EDGE_TYPE_OUTLINE,
-                    Color.BLACK,
-                    null
-            ));
+        if(subtitleView !=null){
             subtitleView.post(this::applySubtitleBottomMargin);
         }
-
         binding.playerView.post(() -> {
             View subtitleBtn = binding.playerView.findViewById(androidx.media3.ui.R.id.exo_subtitle);
             if (subtitleBtn != null) {
@@ -1045,9 +1051,8 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
 
     private void applySubtitleBottomMargin() {
         if (binding == null || binding.playerView == null) return;
-        SubtitleView subtitleView = binding.playerView.getSubtitleView();
+        subtitleView = binding.playerView.getSubtitleView();
         if (subtitleView == null) return;
-
         ViewGroup.LayoutParams lp = subtitleView.getLayoutParams();
         if (!(lp instanceof ViewGroup.MarginLayoutParams)) return;
         ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) lp;
@@ -1056,7 +1061,6 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         int extraDp = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? 56 : 0;
         int extraPx = (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, extraDp, getResources().getDisplayMetrics());
-
         mlp.bottomMargin = extraPx;
         subtitleView.setLayoutParams(mlp);
     }
@@ -1073,12 +1077,11 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         List<Tracks.Group> textGroups = new ArrayList<>();
         List<Integer> trackIndices = new ArrayList<>();
 
-        // Option 0: Off
         displayNames.add("Off (Turn off subtitles)");
         textGroups.add(null);
         trackIndices.add(-1);
 
-        int checkedItem = 0; // Default to Off if no track is selected
+        int checkedItem = 0;
 
         for (Tracks.Group group : tracks.getGroups()) {
             if (group.getType() == C.TRACK_TYPE_TEXT) {
@@ -1137,7 +1140,6 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                         );
                         Toast.makeText(this, "Subtitles turned off", Toast.LENGTH_SHORT).show();
                     } else {
-                        // User selected a specific subtitle language
                         Tracks.Group targetGroup = textGroups.get(which);
                         int targetIndex = trackIndices.get(which);
                         TrackSelectionOverride override = new TrackSelectionOverride(
@@ -1396,12 +1398,17 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
             binding.tvSelect.setVisibility(View.GONE);
             binding.swipe.setEnabled(false);
             isPictureMode = true;
-
+            if(subtitleView !=null){
+                subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 5f);
+            }
             RelativeLayout.LayoutParams pipParams = new RelativeLayout.LayoutParams(
                     RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
             binding.rlWebview.setLayoutParams(pipParams);
 
         } else {
+            if(subtitleView !=null){
+                subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
+            }
             binding.rvMovielist.setVisibility(View.VISIBLE);
             binding.tvSelect.setVisibility(binding.playerView.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
             binding.swipe.setEnabled(finishing);

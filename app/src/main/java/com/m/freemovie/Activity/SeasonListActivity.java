@@ -55,7 +55,6 @@ import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
 import androidx.media3.ui.AspectRatioFrameLayout;
-import androidx.media3.ui.CaptionStyleCompat;
 import androidx.media3.ui.SubtitleView;
 
 import com.kaopiz.kprogresshud.KProgressHUD;
@@ -105,6 +104,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
     private java.util.Map<String, String> pendingStreamHeaders;
     private boolean hasStartedPlayback = false;
     private String player;
+    private SubtitleView subtitleView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,32 +199,39 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                 showVolumeUI();
             }
         });
+        subtitleView();
+    }
 
+    private void subtitleView() {
+        subtitleView = binding.playerView.getSubtitleView();
+        if (subtitleView != null) {
+            subtitleView.setVisibility(View.VISIBLE);
+            subtitleView.setApplyEmbeddedFontSizes(false);
+            subtitleView.setApplyEmbeddedStyles(false);
+            subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
+            subtitleView.setStyle(new androidx.media3.ui.CaptionStyleCompat(
+                    Color.WHITE,
+                    Color.argb(204, 0, 0, 0),
+                    Color.TRANSPARENT,
+                    androidx.media3.ui.CaptionStyleCompat.EDGE_TYPE_OUTLINE,
+                    Color.BLACK,
+                    null
+            ));
+
+        }
     }
 
     private boolean isHide = false;
 
     private void hideControls() {
-        isHide = !isHide;
+        if (!isHide) {
+            isHide = true;
+        } else {
+            isHide = false;
+        }
         binding.btnBackFinish.setVisibility(isHide ? View.GONE : View.VISIBLE);
     }
 
-    private int currentResizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM;
-
-    public void toggleResizeMode() {
-        if (binding.playerView == null) return;
-        if (currentResizeMode == AspectRatioFrameLayout.RESIZE_MODE_ZOOM) {
-            currentResizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL;
-            Toast.makeText(this, "Stretch (Fill Screen)", Toast.LENGTH_SHORT).show();
-        } else if (currentResizeMode == AspectRatioFrameLayout.RESIZE_MODE_FILL) {
-            currentResizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT;
-            Toast.makeText(this, "Original (Fit)", Toast.LENGTH_SHORT).show();
-        } else {
-            currentResizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM;
-            Toast.makeText(this, "Full Screen (Zoom to Fill)", Toast.LENGTH_SHORT).show();
-        }
-        binding.playerView.setResizeMode(currentResizeMode);
-    }
 
     private void rotateScreen() {
         finishing = false;
@@ -233,13 +240,11 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         binding.btnBackFinish.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         binding.rlWebview.setLayoutParams(params);
-        currentResizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM;
         if (binding.playerView != null) {
             binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
         }
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         binding.episodeTxt.setVisibility(View.GONE);
-        SubtitleView subtitleView = binding.playerView.getSubtitleView();
         if (subtitleView != null) {
             subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
         }
@@ -262,7 +267,6 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         if (binding.playerView != null) {
             binding.playerView.postDelayed(this::applySubtitleBottomMargin, 200);
         }
-        SubtitleView subtitleView = binding.playerView.getSubtitleView();
         if (subtitleView != null) {
             subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
         }
@@ -665,26 +669,9 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                 .build();
         binding.playerView.setPlayer(exoPlayer);
         binding.playerView.setShowSubtitleButton(true);
-
-
-        SubtitleView subtitleView = binding.playerView.getSubtitleView();
         if (subtitleView != null) {
-            subtitleView.setVisibility(View.VISIBLE);
-            subtitleView.setApplyEmbeddedFontSizes(false);
-            subtitleView.setApplyEmbeddedStyles(false);
-            subtitleView.setStyle(new androidx.media3.ui.CaptionStyleCompat(
-                    Color.WHITE,
-                    Color.argb(204, 0, 0, 0),
-                    Color.TRANSPARENT,
-                    androidx.media3.ui.CaptionStyleCompat.EDGE_TYPE_OUTLINE,
-                    Color.BLACK,
-                    null
-            ));
             subtitleView.post(this::applySubtitleBottomMargin);
         }
-
-
-
         binding.playerView.post(() -> {
             View subtitleBtn = binding.playerView.findViewById(androidx.media3.ui.R.id.exo_subtitle);
             if (subtitleBtn != null) {
@@ -799,9 +786,8 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
 
     private void applySubtitleBottomMargin() {
         if (binding == null || binding.playerView == null) return;
-        SubtitleView subtitleView = binding.playerView.getSubtitleView();
+        subtitleView = binding.playerView.getSubtitleView();
         if (subtitleView == null) return;
-
         ViewGroup.LayoutParams lp = subtitleView.getLayoutParams();
         if (!(lp instanceof ViewGroup.MarginLayoutParams)) return;
         ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) lp;
@@ -810,7 +796,6 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         int extraDp = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? 56 : 0;
         int extraPx = (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, extraDp, getResources().getDisplayMetrics());
-
         mlp.bottomMargin = extraPx;
         subtitleView.setLayoutParams(mlp);
     }
@@ -1130,8 +1115,13 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
             RelativeLayout.LayoutParams pipParams = new RelativeLayout.LayoutParams(
                     RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
             binding.rlWebview.setLayoutParams(pipParams);
-
+            if (subtitleView != null) {
+                subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 5f);
+            }
         } else {
+            if (subtitleView != null) {
+                subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
+            }
             binding.rvSeason.setVisibility(View.VISIBLE);
             binding.tvSelect.setVisibility(binding.playerView.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
             binding.btnBackFinish.setVisibility(View.VISIBLE);
@@ -1275,7 +1265,6 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         releasePlayer();
         super.onDestroy();
     }
-
 
 
     @Override
