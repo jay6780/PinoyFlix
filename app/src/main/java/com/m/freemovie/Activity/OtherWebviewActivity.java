@@ -524,7 +524,10 @@ public class OtherWebviewActivity extends AppCompatActivity
                     int totalItemCount = layoutManager.getItemCount();
                     lastScroll = lastVisibleItemPosition;
                     if (lastVisibleItemPosition > 10) {
-                        binding.llReset.setVisibility(isRotate ? View.GONE : View.VISIBLE);
+                        int orientation = getResources().getConfiguration().orientation;
+                        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                            binding.llReset.setVisibility(View.VISIBLE);
+                        }
                         initGuide();
                     } else if (lastVisibleItemPosition == 0) {
                         binding.llReset.setVisibility(View.GONE);

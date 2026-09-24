@@ -7,12 +7,13 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.media.AudioManager;
 import android.media.audiofx.LoudnessEnhancer;
 import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -21,9 +22,11 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Rational;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
@@ -32,8 +35,6 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.graphics.Color;
-import android.util.TypedValue;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -58,7 +59,6 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
 import androidx.media3.ui.AspectRatioFrameLayout;
 import androidx.media3.ui.SubtitleView;
-import androidx.media3.ui.TrackSelectionDialogBuilder;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -355,6 +355,12 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         }
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         binding.swipe.setEnabled(false);
+        binding.playerView.postDelayed(this::applySubtitleBottomMargin, 200);
+        binding.playerView.postDelayed(this::applySubtitleBottomMargin, 200);
+        SubtitleView subtitleView = binding.playerView.getSubtitleView();
+        if (subtitleView != null) {
+            subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
+        }
         new WindowUtils(this, true, false);
     }
 
@@ -369,6 +375,16 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         binding.rlWebview.setLayoutParams(params);
         if (binding.playerView != null) {
             binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
+        }
+        if (binding.playerView != null) {
+            binding.playerView.postDelayed(this::applySubtitleBottomMargin, 200);
+        }
+        if (binding.playerView != null) {
+            binding.playerView.postDelayed(this::applySubtitleBottomMargin, 200);
+        }
+        SubtitleView subtitleView = binding.playerView.getSubtitleView();
+        if (subtitleView != null) {
+            subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
         }
         new WindowUtils(this, true, false);
     }
@@ -902,7 +918,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
             subtitleView.setVisibility(View.VISIBLE);
             subtitleView.setApplyEmbeddedFontSizes(false);
             subtitleView.setApplyEmbeddedStyles(false);
-            subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 20f);
+            subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
             subtitleView.setStyle(new androidx.media3.ui.CaptionStyleCompat(
                     Color.WHITE,
                     Color.argb(204, 0, 0, 0),
@@ -911,6 +927,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                     Color.BLACK,
                     null
             ));
+            subtitleView.post(this::applySubtitleBottomMargin);
         }
 
         binding.playerView.post(() -> {
@@ -1023,6 +1040,25 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         exoPlayer.setMediaItem(mediaItemBuilder.build());
         exoPlayer.prepare();
         exoPlayer.setPlayWhenReady(true);
+    }
+
+
+    private void applySubtitleBottomMargin() {
+        if (binding == null || binding.playerView == null) return;
+        SubtitleView subtitleView = binding.playerView.getSubtitleView();
+        if (subtitleView == null) return;
+
+        ViewGroup.LayoutParams lp = subtitleView.getLayoutParams();
+        if (!(lp instanceof ViewGroup.MarginLayoutParams)) return;
+        ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) lp;
+
+        int orientation = getResources().getConfiguration().orientation;
+        int extraDp = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? 56 : 0;
+        int extraPx = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, extraDp, getResources().getDisplayMetrics());
+
+        mlp.bottomMargin = extraPx;
+        subtitleView.setLayoutParams(mlp);
     }
 
     @androidx.annotation.OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)
@@ -1418,6 +1454,9 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         int orientation = getResources().getConfiguration().orientation;
+        if (binding != null && binding.playerView != null) {
+            binding.playerView.postDelayed(this::applySubtitleBottomMargin, 250);
+        }
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             binding.llReset.setVisibility(View.GONE);
             if (finishing && !isPictureMode) {
