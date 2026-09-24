@@ -7,6 +7,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.OptIn;
+import androidx.media3.common.util.UnstableApi;
+
 import com.bumptech.glide.Glide;
 import com.m.freemovie.Activity.SeasonListActivity;
 import com.m.freemovie.R;
@@ -61,7 +64,7 @@ public class SeasonsAdapter extends BaseQuickAdapter<DetailTvBean.SeasonsBean, B
                 .into(iv_thumb);
 
         helper.convertView.setOnClickListener(new View.OnClickListener() {
-            @Override
+            @OptIn(markerClass = UnstableApi.class) @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, SeasonListActivity.class);
                 intent.putExtra("title", item.getName());

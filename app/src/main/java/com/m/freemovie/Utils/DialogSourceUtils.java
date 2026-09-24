@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.OptIn;
+import androidx.media3.common.util.UnstableApi;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -52,7 +54,7 @@ public class DialogSourceUtils {
         AllSourceAdapter adapter = new AllSourceAdapter(srcListener);
 
         for (AniNekoEpisodeBean.EpisodeBean.PlayerBean.ServersBeanX.ServerGroupsBean.ServersBean sourceBean : stereamBeanList) {
-            allSourceBeans.add(new AllSourceBean(sourceBean.getText(), sourceBean.getVideoUrl(),""));
+            allSourceBeans.add(new AllSourceBean(sourceBean.getText(), sourceBean.getVideoUrl(), ""));
         }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
@@ -129,7 +131,7 @@ public class DialogSourceUtils {
         return aniMoSourceDialog;
     }
 
-    public AlertDialog.Builder WatchSourceMovie(Activity activity,String title,String id,int apiPosition) {
+    public AlertDialog.Builder WatchSourceMovie(Activity activity, String title, String id, int apiPosition) {
         String[] option = {"Player 1", "Player 2", "Download"};
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         TextView titleView = new TextView(activity);
@@ -141,6 +143,7 @@ public class DialogSourceUtils {
         builder.setCustomTitle(titleView);
 
         builder.setItems(option, new DialogInterface.OnClickListener() {
+            @OptIn(markerClass = UnstableApi.class)
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Intent intent = null;
@@ -176,25 +179,29 @@ public class DialogSourceUtils {
 
         return builder;
     }
-    public AlertDialog.Builder MovieListSource (Context mContext, String id, String title, MovieListAdapter.MovieIdListener movieIdListener, int apiPosition){
-        String[] option = {"Play","View Details", "Download"};
+
+    public AlertDialog.Builder MovieListSource(Context mContext, String id, String title, MovieListAdapter.MovieIdListener movieIdListener, int apiPosition) {
+        String[] option = {"Player 1", "Player 2", "View Details", "Download"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setItems(option, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which){
+                switch (which) {
                     case 0:
-                        movieIdListener.getMovieId(id,title,1);
+                        movieIdListener.getMovieId(id, title, 1);
                         break;
                     case 1:
-                        Intent intent = new Intent(mContext, Details_activity.class);
-                        intent.putExtra("id",id);
-                        intent.putExtra("position",1);
-                        intent.putExtra("apiPosition",apiPosition);
-                        mContext.startActivity(intent);
+                        movieIdListener.getMovieId(id, title, 2);
                         break;
                     case 2:
+                        Intent intent = new Intent(mContext, Details_activity.class);
+                        intent.putExtra("id", id);
+                        intent.putExtra("position", 2);
+                        intent.putExtra("apiPosition", apiPosition);
+                        mContext.startActivity(intent);
+                        break;
+                    case 3:
                         String downloadUrl = "https://vidvault.to/movie/" + id;
                         Intent download = new Intent(mContext, DownloadWebview.class);
                         download.putExtra("DownloadUrl", downloadUrl);

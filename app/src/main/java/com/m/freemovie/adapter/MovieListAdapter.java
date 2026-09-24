@@ -1,8 +1,5 @@
 package com.m.freemovie.adapter;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageView;
@@ -11,8 +8,6 @@ import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.bumptech.glide.Glide;
-import com.m.freemovie.Activity.Details_activity;
-import com.m.freemovie.Activity.DownloadWebview;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.DialogSourceUtils;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;

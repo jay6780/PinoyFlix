@@ -58,6 +58,7 @@ import androidx.media3.ui.SubtitleView;
 
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
+import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.WatchHistoryDBHelper;
 import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
@@ -73,7 +74,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-@UnstableApi public class SeasonListActivity extends AppCompatActivity implements EpisodeAdapter.SourceListener {
+@UnstableApi
+public class SeasonListActivity extends AppCompatActivity implements EpisodeAdapter.SourceListener {
     private ActivitySeasonListBinding binding;
     private String title, id, thumbImage, seasonId, tvSeriesName;
     private int episodeCount, seasonNum;
@@ -100,6 +102,7 @@ import java.util.Locale;
     private String pendingStreamUrl;
     private java.util.Map<String, String> pendingStreamHeaders;
     private boolean hasStartedPlayback = false;
+    private String player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,8 +129,6 @@ import java.util.Locale;
         binding.expand.setOnClickListener(view -> {
             if (finishing) {
                 rotateScreen();
-            } else {
-                toggleResizeMode();
             }
         });
         binding.btnBackFinish.setOnClickListener(new View.OnClickListener() {
@@ -198,11 +199,12 @@ import java.util.Locale;
         });
 
     }
+
     private boolean isHide = false;
+
     private void hideControls() {
         isHide = !isHide;
-        binding.expand.setVisibility(isHide? View.GONE : View.VISIBLE);
-        binding.btnBackFinish.setVisibility(isHide? View.GONE : View.VISIBLE);
+        binding.btnBackFinish.setVisibility(isHide ? View.GONE : View.VISIBLE);
     }
 
     private int currentResizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM;
@@ -224,7 +226,7 @@ import java.util.Locale;
 
     private void rotateScreen() {
         finishing = false;
-        binding.expand.setVisibility(View.VISIBLE);
+        binding.expand.setVisibility(View.GONE);
         binding.rvSeason.setVisibility(View.GONE);
         binding.btnBackFinish.setVisibility(View.VISIBLE);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
@@ -235,12 +237,6 @@ import java.util.Locale;
         }
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         binding.episodeTxt.setVisibility(View.GONE);
-        RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(dip2px(25), dip2px(25));
-        params2.addRule(RelativeLayout.ALIGN_PARENT_END);
-        params2.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        params2.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-        binding.expand.setLayoutParams(params2);
-        params2.setMargins(0, 0, 50, 35);
         new WindowUtils(this, true, false);
     }
 
@@ -256,12 +252,6 @@ import java.util.Locale;
         if (binding.playerView != null) {
             binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
         }
-        RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(dip2px(25), dip2px(25));
-        params2.addRule(RelativeLayout.ALIGN_PARENT_END);
-        params2.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        params2.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-        params2.setMargins(0, 0, 10, 10);
-        binding.expand.setLayoutParams(params2);
         new WindowUtils(this, true, false);
     }
 
@@ -342,7 +332,7 @@ import java.util.Locale;
                     String trackUrl = msg.substring("EXTRACTED_TRACK_SRC:".length()).trim();
                     if (!trackUrl.isEmpty() && !discoveredSubtitleUrls.contains(trackUrl)) {
                         discoveredSubtitleUrls.add(trackUrl);
-                        Log.d("StreamScraper", "Extracted track subtitle URL: " + trackUrl);
+//                        Log.d("StreamScraper", "Extracted track subtitle URL: " + trackUrl);
                         if (hasStartedPlayback && exoPlayer != null) {
                             addSubtitleTrack(trackUrl);
                         }
@@ -368,7 +358,7 @@ import java.util.Locale;
 
                 if (isSubtitleUrl(url) && !discoveredSubtitleUrls.contains(url)) {
                     discoveredSubtitleUrls.add(url);
-                    Log.d("StreamScraper", "Discovered subtitle URL: " + url);
+//                    Log.d("StreamScraper", "Discovered subtitle URL: " + url);
                     if (hasStartedPlayback && exoPlayer != null) {
                         addSubtitleTrack(url);
                     }
@@ -398,17 +388,12 @@ import java.util.Locale;
 
     private void injectAutoplayScript(WebView view) {
         if (view == null) return;
-        String playerVar = (player != null && !player.isEmpty()) ? player : "moviesapi";
         view.evaluateJavascript(
                 "(function() {" +
-                        "  var currentSource = '" + playerVar + "-player';" +
+                        "  var currentSource = '" + player + "-player';" +
                         "  function triggerPlay(w) {" +
                         "    if (!w) return;" +
                         "    try { w.postMessage({ source: currentSource, action: 'play' }, '*'); } catch(e){}" +
-                        "    try { w.postMessage({ source: 'vidsrc-player', action: 'play' }, '*'); } catch(e){}" +
-                        "    try { w.postMessage({ source: 'vidrock-player', action: 'play' }, '*'); } catch(e){}" +
-                        "    try { w.postMessage({ source: 'moviesapi-player', action: 'play' }, '*'); } catch(e){}" +
-                        "    try { w.postMessage({ source: 'videasy-player', action: 'play' }, '*'); } catch(e){}" +
                         "    try { w.postMessage({ action: 'play' }, '*'); } catch(e){}" +
                         "    try { w.postMessage({ type: 'play' }, '*'); } catch(e){}" +
                         "    try { w.postMessage({ method: 'play' }, '*'); } catch(e){}" +
@@ -476,7 +461,7 @@ import java.util.Locale;
         if (pendingStreamUrl == null || (!pendingStreamUrl.contains(".m3u8") && url.contains(".m3u8"))) {
             pendingStreamUrl = url;
             pendingStreamHeaders = requestHeaders;
-            Log.d("StreamScraper", "Found video stream candidate: " + url);
+//            Log.d("StreamScraper", "Found video stream candidate: " + url);
 
             runOnUiThread(() -> {
                 if (hud != null && hud.isShowing()) {
@@ -535,7 +520,7 @@ import java.util.Locale;
                         .build();
                 exoPlayer.setMediaItem(updatedItem, currentPos);
                 exoPlayer.setPlayWhenReady(isPlaying);
-                Log.d("StreamPlayback", "Dynamically added subtitle track: " + label + " (" + subUrl + ")");
+//                Log.d("StreamPlayback", "Dynamically added subtitle track: " + label + " (" + subUrl + ")");
             }
         });
     }
@@ -544,14 +529,20 @@ import java.util.Locale;
         if (url == null) return "Subtitle " + index;
         String lower = url.toLowerCase();
         if (lower.contains("eng") || lower.contains("english")) return "English";
-        if (lower.contains("spa") || lower.contains("spanish") || lower.contains("espanol")) return "Spanish";
-        if (lower.contains("tag") || lower.contains("fil") || lower.contains("tagalog") || lower.contains("filipino")) return "Filipino";
-        if (lower.contains("fre") || lower.contains("french") || lower.contains("fra")) return "French";
-        if (lower.contains("ger") || lower.contains("german") || lower.contains("deu")) return "German";
+        if (lower.contains("spa") || lower.contains("spanish") || lower.contains("espanol"))
+            return "Spanish";
+        if (lower.contains("tag") || lower.contains("fil") || lower.contains("tagalog") || lower.contains("filipino"))
+            return "Filipino";
+        if (lower.contains("fre") || lower.contains("french") || lower.contains("fra"))
+            return "French";
+        if (lower.contains("ger") || lower.contains("german") || lower.contains("deu"))
+            return "German";
         if (lower.contains("ind") || lower.contains("indonesian")) return "Indonesian";
-        if (lower.contains("jap") || lower.contains("japanese") || lower.contains("jpn")) return "Japanese";
+        if (lower.contains("jap") || lower.contains("japanese") || lower.contains("jpn"))
+            return "Japanese";
         if (lower.contains("kor") || lower.contains("korean")) return "Korean";
-        if (lower.contains("chi") || lower.contains("chinese") || lower.contains("zho")) return "Chinese";
+        if (lower.contains("chi") || lower.contains("chinese") || lower.contains("zho"))
+            return "Chinese";
         if (lower.contains("ara") || lower.contains("arabic")) return "Arabic";
         if (lower.contains("por") || lower.contains("portuguese")) return "Portuguese";
         if (lower.contains("rus") || lower.contains("russian")) return "Russian";
@@ -563,14 +554,18 @@ import java.util.Locale;
         if (url == null) return "und";
         String lower = url.toLowerCase();
         if (lower.contains("eng") || lower.contains("english")) return "en";
-        if (lower.contains("spa") || lower.contains("spanish") || lower.contains("espanol")) return "es";
-        if (lower.contains("tag") || lower.contains("fil") || lower.contains("tagalog") || lower.contains("filipino")) return "tl";
+        if (lower.contains("spa") || lower.contains("spanish") || lower.contains("espanol"))
+            return "es";
+        if (lower.contains("tag") || lower.contains("fil") || lower.contains("tagalog") || lower.contains("filipino"))
+            return "tl";
         if (lower.contains("fre") || lower.contains("french") || lower.contains("fra")) return "fr";
         if (lower.contains("ger") || lower.contains("german") || lower.contains("deu")) return "de";
         if (lower.contains("ind") || lower.contains("indonesian")) return "id";
-        if (lower.contains("jap") || lower.contains("japanese") || lower.contains("jpn")) return "ja";
+        if (lower.contains("jap") || lower.contains("japanese") || lower.contains("jpn"))
+            return "ja";
         if (lower.contains("kor") || lower.contains("korean")) return "ko";
-        if (lower.contains("chi") || lower.contains("chinese") || lower.contains("zho")) return "zh";
+        if (lower.contains("chi") || lower.contains("chinese") || lower.contains("zho"))
+            return "zh";
         if (lower.contains("ara") || lower.contains("arabic")) return "ar";
         if (lower.contains("por") || lower.contains("portuguese")) return "pt";
         if (lower.contains("rus") || lower.contains("russian")) return "ru";
@@ -680,8 +675,8 @@ import java.util.Locale;
             }
         });
 
-        Log.d("StreamPlayback", "Playing stream: " + streamUrl);
-        Log.d("StreamPlayback", "Headers: " + defaultHeaders);
+//        Log.d("StreamPlayback", "Playing stream: " + streamUrl);
+//        Log.d("StreamPlayback", "Headers: " + defaultHeaders);
 
         exoPlayer.addListener(new Player.Listener() {
             @Override
@@ -702,17 +697,17 @@ import java.util.Locale;
 
             @Override
             public void onCues(CueGroup cueGroup) {
-                Log.d("ExoPlayerSubtitles", "onCues: " + (cueGroup != null ? cueGroup.cues.size() : 0));
+//                Log.d("ExoPlayerSubtitles", "onCues: " + (cueGroup != null ? cueGroup.cues.size() : 0));
             }
 
             @Override
             public void onTracksChanged(Tracks tracks) {
-                Log.d("ExoPlayerSubtitles", "Subtitles supported: " + tracks.isTypeSupported(C.TRACK_TYPE_TEXT) + ", selected: " + tracks.isTypeSelected(C.TRACK_TYPE_TEXT));
+//                Log.d("ExoPlayerSubtitles", "Subtitles supported: " + tracks.isTypeSupported(C.TRACK_TYPE_TEXT) + ", selected: " + tracks.isTypeSelected(C.TRACK_TYPE_TEXT));
             }
 
             @Override
             public void onPlayerError(PlaybackException error) {
-                Log.e("ExoPlayer", "Playback error for " + streamUrl, error);
+//                Log.e("ExoPlayer", "Playback error for " + streamUrl, error);
                 if (hud != null && hud.isShowing()) {
                     hud.dismiss();
                 }
@@ -743,7 +738,7 @@ import java.util.Locale;
                 subtitleConfigs.add(subConfigBuilder.build());
             }
             mediaItemBuilder.setSubtitleConfigurations(subtitleConfigs);
-            Log.d("StreamPlayback", "Attached " + subtitleConfigs.size() + " subtitles to MediaItem");
+//            Log.d("StreamPlayback", "Attached " + subtitleConfigs.size() + " subtitles to MediaItem");
         }
 
         String cleanUrl = streamUrl.toLowerCase().split("\\?")[0];
@@ -780,7 +775,6 @@ import java.util.Locale;
 
         binding.playerView.setVisibility(View.VISIBLE);
         binding.tvSelect.setVisibility(View.GONE);
-        binding.expand.setVisibility(View.VISIBLE);
         exoPlayer.setMediaItem(mediaItemBuilder.build());
         exoPlayer.prepare();
         exoPlayer.setPlayWhenReady(true);
@@ -835,7 +829,7 @@ import java.util.Locale;
 
         if (lower.contains("google-analytics") || lower.contains("doubleclick")
                 || lower.contains("adnxs") || lower.contains("/beacon") || lower.contains("/analytics")
-                || cleanUrl.contains("demo-video")||cleanUrl.contains("cdn")) {
+                || cleanUrl.contains("demo-video") || cleanUrl.contains("cdn")) {
             return false;
         }
         return cleanUrl.endsWith(".m3u8")
@@ -986,6 +980,7 @@ import java.util.Locale;
     private void releasePlayer() {
         stopScraper();
         releaseExoPlayerOnly();
+        videoUrl = "";
         if (binding != null && binding.playerView != null) {
             binding.playerView.setVisibility(View.GONE);
         }
@@ -1056,17 +1051,17 @@ import java.util.Locale;
             finish();
         }
     }
-    private String player;
+
     @Override
     public void getId(String id, int position, int seasonNum, int epNumber) {
         releasePlayer();
         switch (position) {
             case 1:
-                player = "vidrock";
+                player = AppConstant.VIDROCK;
                 videoUrl = "https://vidrock.to/tv/" + id + "/" + seasonNum + "/" + epNumber + "&download=false";
                 break;
             case 2:
-                player = "moviesapi";
+                player = AppConstant.MOVIESAPI;
                 videoUrl = "https://moviesapi.to/tv/" + id + "/" + seasonNum + "/" + epNumber;
 //                Log.d("VideoUrl","bal: "+videoUrl);
                 break;

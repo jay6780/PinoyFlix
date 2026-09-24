@@ -70,6 +70,7 @@ import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.m.freemovie.R;
+import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.MovieListAdapter;
@@ -86,7 +87,8 @@ import java.util.List;
 import java.util.Locale;
 
 
-@UnstableApi public class VideoWebviewActivity extends AppCompatActivity implements MovieWatchListContract.View, MovieListAdapter.MovieIdListener {
+@UnstableApi
+public class VideoWebviewActivity extends AppCompatActivity implements MovieWatchListContract.View, MovieListAdapter.MovieIdListener {
     private String title;
     private String videoId;
     private KProgressHUD hud;
@@ -120,6 +122,7 @@ import java.util.Locale;
     private String pendingStreamUrl;
     private java.util.Map<String, String> pendingStreamHeaders;
     private boolean hasStartedPlayback = false;
+    private String player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,10 +147,9 @@ import java.util.Locale;
         binding.expand.setOnClickListener(view -> {
             if (finishing) {
                 rotateScreen();
-            } else {
-                toggleResizeMode();
             }
         });
+
         if (videoId == null) {
             Toast.makeText(getApplicationContext(), "Please try again", Toast.LENGTH_SHORT).show();
             finish();
@@ -227,10 +229,10 @@ import java.util.Locale;
     }
 
     private boolean isHide = false;
+
     private void hideControls() {
         isHide = !isHide;
-        binding.expand.setVisibility(isHide? View.GONE : View.VISIBLE);
-        binding.btnBackFinish.setVisibility(isHide? View.GONE : View.VISIBLE);
+        binding.btnBackFinish.setVisibility(isHide ? View.GONE : View.VISIBLE);
     }
 
 
@@ -341,7 +343,7 @@ import java.util.Locale;
 
     private void rotateScreen() {
         finishing = false;
-        binding.expand.setVisibility(View.VISIBLE);
+        binding.expand.setVisibility(View.GONE);
         binding.rvMovielist.setVisibility(View.GONE);
         binding.episodeTxt.setVisibility(View.GONE);
         binding.btnBackFinish.setVisibility(View.VISIBLE);
@@ -353,14 +355,6 @@ import java.util.Locale;
         }
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         binding.swipe.setEnabled(false);
-
-        RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(dip2px(25), dip2px(25));
-        params2.addRule(RelativeLayout.ALIGN_PARENT_END);
-        params2.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        params2.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-        binding.expand.setLayoutParams(params2);
-        params2.setMargins(0, 0, 50, 35);
-
         new WindowUtils(this, true, false);
     }
 
@@ -376,13 +370,6 @@ import java.util.Locale;
         if (binding.playerView != null) {
             binding.playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
         }
-        RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(dip2px(25), dip2px(25));
-        params2.addRule(RelativeLayout.ALIGN_PARENT_END);
-        params2.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        params2.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-        params2.setMargins(0, 0, 10, 10);
-        binding.expand.setLayoutParams(params2);
-        binding.swipe.setEnabled(true);
         new WindowUtils(this, true, false);
     }
 
@@ -554,7 +541,7 @@ import java.util.Locale;
                     String trackUrl = msg.substring("EXTRACTED_TRACK_SRC:".length()).trim();
                     if (!trackUrl.isEmpty() && !discoveredSubtitleUrls.contains(trackUrl)) {
                         discoveredSubtitleUrls.add(trackUrl);
-                        Log.d("StreamScraper", "Extracted track subtitle URL: " + trackUrl);
+//                        Log.d("StreamScraper", "Extracted track subtitle URL: " + trackUrl);
                         if (hasStartedPlayback && exoPlayer != null) {
                             addSubtitleTrack(trackUrl);
                         }
@@ -586,7 +573,7 @@ import java.util.Locale;
                     String trackUrl = msg.substring("EXTRACTED_TRACK_SRC:".length()).trim();
                     if (!trackUrl.isEmpty() && !discoveredSubtitleUrls.contains(trackUrl)) {
                         discoveredSubtitleUrls.add(trackUrl);
-                        Log.d("StreamScraper", "Extracted track subtitle URL: " + trackUrl);
+//                        Log.d("StreamScraper", "Extracted track subtitle URL: " + trackUrl);
                         if (hasStartedPlayback && exoPlayer != null) {
                             addSubtitleTrack(trackUrl);
                         }
@@ -613,7 +600,7 @@ import java.util.Locale;
 
                 if (isSubtitleUrl(url) && !discoveredSubtitleUrls.contains(url)) {
                     discoveredSubtitleUrls.add(url);
-                    Log.d("StreamScraper", "Discovered subtitle URL: " + url);
+//                    Log.d("StreamScraper", "Discovered subtitle URL: " + url);
                     if (hasStartedPlayback && exoPlayer != null) {
                         addSubtitleTrack(url);
                     }
@@ -644,17 +631,12 @@ import java.util.Locale;
 
     private void injectAutoplayScript(WebView view) {
         if (view == null) return;
-        String playerVar = (player != null && !player.isEmpty()) ? player : "moviesapi";
         view.evaluateJavascript(
                 "(function() {" +
-                        "  var currentSource = '" + playerVar + "-player';" +
+                        "  var currentSource = '" + player + "-player';" +
                         "  function triggerPlay(w) {" +
                         "    if (!w) return;" +
                         "    try { w.postMessage({ source: currentSource, action: 'play' }, '*'); } catch(e){}" +
-                        "    try { w.postMessage({ source: 'vidsrc-player', action: 'play' }, '*'); } catch(e){}" +
-                        "    try { w.postMessage({ source: 'vidrock-player', action: 'play' }, '*'); } catch(e){}" +
-                        "    try { w.postMessage({ source: 'moviesapi-player', action: 'play' }, '*'); } catch(e){}" +
-                        "    try { w.postMessage({ source: 'videasy-player', action: 'play' }, '*'); } catch(e){}" +
                         "    try { w.postMessage({ action: 'play' }, '*'); } catch(e){}" +
                         "    try { w.postMessage({ type: 'play' }, '*'); } catch(e){}" +
                         "    try { w.postMessage({ method: 'play' }, '*'); } catch(e){}" +
@@ -723,7 +705,7 @@ import java.util.Locale;
         if (pendingStreamUrl == null || (!pendingStreamUrl.contains(".m3u8") && url.contains(".m3u8"))) {
             pendingStreamUrl = url;
             pendingStreamHeaders = requestHeaders;
-            Log.d("StreamScraper", "Found video stream candidate: " + url);
+//            Log.d("StreamScraper", "Found video stream candidate: " + url);
 
             runOnUiThread(() -> {
                 if (hud != null && hud.isShowing()) {
@@ -782,7 +764,7 @@ import java.util.Locale;
                         .build();
                 exoPlayer.setMediaItem(updatedItem, currentPos);
                 exoPlayer.setPlayWhenReady(isPlaying);
-                Log.d("StreamPlayback", "Dynamically added subtitle track: " + label + " (" + subUrl + ")");
+//                Log.d("StreamPlayback", "Dynamically added subtitle track: " + label + " (" + subUrl + ")");
             }
         });
     }
@@ -938,8 +920,8 @@ import java.util.Locale;
             }
         });
 
-        Log.d("StreamPlayback", "Playing stream: " + streamUrl);
-        Log.d("StreamPlayback", "Headers: " + defaultHeaders);
+//        Log.d("StreamPlayback", "Playing stream: " + streamUrl);
+//        Log.d("StreamPlayback", "Headers: " + defaultHeaders);
 
         exoPlayer.addListener(new Player.Listener() {
             @Override
@@ -960,17 +942,17 @@ import java.util.Locale;
 
             @Override
             public void onCues(CueGroup cueGroup) {
-                Log.d("ExoPlayerSubtitles", "onCues: " + (cueGroup != null ? cueGroup.cues.size() : 0));
+//                Log.d("ExoPlayerSubtitles", "onCues: " + (cueGroup != null ? cueGroup.cues.size() : 0));
             }
 
             @Override
             public void onTracksChanged(Tracks tracks) {
-                Log.d("ExoPlayerSubtitles", "Subtitles supported: " + tracks.isTypeSupported(C.TRACK_TYPE_TEXT) + ", selected: " + tracks.isTypeSelected(C.TRACK_TYPE_TEXT));
+//                Log.d("ExoPlayerSubtitles", "Subtitles supported: " + tracks.isTypeSupported(C.TRACK_TYPE_TEXT) + ", selected: " + tracks.isTypeSelected(C.TRACK_TYPE_TEXT));
             }
 
             @Override
             public void onPlayerError(PlaybackException error) {
-                Log.e("ExoPlayer", "Playback error for " + streamUrl, error);
+//                Log.e("ExoPlayer", "Playback error for " + streamUrl, error);
                 if (hud != null && hud.isShowing()) {
                     hud.dismiss();
                 }
@@ -1001,7 +983,7 @@ import java.util.Locale;
                 subtitleConfigs.add(subConfigBuilder.build());
             }
             mediaItemBuilder.setSubtitleConfigurations(subtitleConfigs);
-            Log.d("StreamPlayback", "Attached " + subtitleConfigs.size() + " subtitles to MediaItem");
+//            Log.d("StreamPlayback", "Attached " + subtitleConfigs.size() + " subtitles to MediaItem");
         }
 
         String cleanUrl = streamUrl.toLowerCase().split("\\?")[0];
@@ -1167,6 +1149,7 @@ import java.util.Locale;
     private void releasePlayer() {
         stopScraper();
         releaseExoPlayerOnly();
+        videoUrl = "";
         if (binding != null && binding.playerView != null) {
             binding.playerView.setVisibility(View.GONE);
         }
@@ -1337,7 +1320,8 @@ import java.util.Locale;
             Toast.makeText(getApplicationContext(), "No more movies", Toast.LENGTH_SHORT).show();
         }
     }
-    private String player;
+
+
     @Override
     public void getMovieId(String id, String title, int position) {
         if (!isNetworkAvailable()) {
@@ -1350,12 +1334,12 @@ import java.util.Locale;
         switch (position) {
             case 1:
                 videoPosition = 1;
-                player = "vidrock";
+                player = AppConstant.VIDROCK;
                 videoUrl = "https://vidrock.to/movie/" + id;
                 break;
             case 2:
                 videoPosition = 2;
-                player = "moviesapi";
+                player = AppConstant.MOVIESAPI;
                 videoUrl = "https://moviesapi.to/movie/" + id;
                 break;
         }
