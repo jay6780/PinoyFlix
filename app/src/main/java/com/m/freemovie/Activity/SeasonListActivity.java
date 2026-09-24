@@ -55,6 +55,7 @@ import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
 import androidx.media3.ui.AspectRatioFrameLayout;
+import androidx.media3.ui.PlayerView;
 import androidx.media3.ui.SubtitleView;
 
 import com.kaopiz.kprogresshud.KProgressHUD;
@@ -76,7 +77,7 @@ import java.util.List;
 import java.util.Locale;
 
 @UnstableApi
-public class SeasonListActivity extends AppCompatActivity implements EpisodeAdapter.SourceListener {
+public class SeasonListActivity extends AppCompatActivity implements EpisodeAdapter.SourceListener, View.OnClickListener {
     private ActivitySeasonListBinding binding;
     private String title, id, thumbImage, seasonId, tvSeriesName;
     private int episodeCount, seasonNum;
@@ -127,23 +128,11 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
 //        Log.d("SeasonList","ids"+" videoId: "+id + " SeasonId: "+seasonId);
+        binding.expand.setOnClickListener(this);
+        binding.btnBackFinish.setOnClickListener(this);
+        binding.playerView.setOnClickListener(this);
 
-        binding.expand.setOnClickListener(view -> {
-            if (finishing) {
-                rotateScreen();
-            }
-        });
-        binding.btnBackFinish.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (finishing) {
-                    finish();
-                } else {
-                    defaultScreen();
-                }
-            }
-        });
-        binding.playerView.setOnClickListener(view -> hideControls());
+
         try {
             booster = new LoudnessEnhancer(0);
             booster.setEnabled(true);
@@ -1008,6 +997,9 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         if (binding != null && binding.tvSelect != null) {
             binding.tvSelect.setVisibility(View.VISIBLE);
         }
+        if(scraper!=null){
+            scraper.clearCache(true);
+        }
         trackSelector = null;
         discoveredSubtitleUrls.clear();
         pendingStreamUrl = null;
@@ -1286,4 +1278,30 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         }
     }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.expand:
+                if (finishing) {
+                    rotateScreen();
+                }
+                break;
+            case R.id.player_view:
+                binding.playerView.setControllerVisibilityListener(new PlayerView.ControllerVisibilityListener() {
+                    @Override
+                    public void onVisibilityChanged(int visibility) {
+                        binding.btnBackFinish.setVisibility(visibility);
+                    }
+                });
+                break;
+            case R.id.btn_back_finish:
+                if (finishing) {
+                    releasePlayer();
+                    finish();
+                } else {
+                    defaultScreen();
+                }
+                break;
+        }
+    }
 }

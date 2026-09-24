@@ -58,6 +58,7 @@ import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
 import androidx.media3.ui.AspectRatioFrameLayout;
+import androidx.media3.ui.PlayerView;
 import androidx.media3.ui.SubtitleView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -88,7 +89,7 @@ import java.util.Locale;
 
 
 @UnstableApi
-public class VideoWebviewActivity extends AppCompatActivity implements MovieWatchListContract.View, MovieListAdapter.MovieIdListener {
+public class VideoWebviewActivity extends AppCompatActivity implements MovieWatchListContract.View, MovieListAdapter.MovieIdListener, View.OnClickListener {
     private String title;
     private String videoId;
     private KProgressHUD hud;
@@ -145,12 +146,6 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait");
         hud.show();
-        binding.expand.setOnClickListener(view -> {
-            if (finishing) {
-                rotateScreen();
-            }
-        });
-
         if (videoId == null) {
             Toast.makeText(getApplicationContext(), "Please try again", Toast.LENGTH_SHORT).show();
             finish();
@@ -173,18 +168,6 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 initApi();
             }
         });
-        binding.btnBackFinish.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (finishing) {
-                    finish();
-                } else {
-                    defaultScreen();
-                }
-            }
-        });
-
-        binding.playerView.setOnClickListener(view -> hideControls());
 
         binding.volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -204,7 +187,6 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 showVolumeUI();
             }
         });
-
 
         switch (videoPosition) {
             case 1:
@@ -228,6 +210,10 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
             e.printStackTrace();
         }
         subtitleView();
+
+        binding.expand.setOnClickListener(this);
+        binding.btnBackFinish.setOnClickListener(this);
+        binding.playerView.setOnClickListener(this);
     }
 
     private void subtitleView() {
@@ -250,15 +236,6 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
     }
 
     private boolean isHide = false;
-
-    private void hideControls() {
-        if (!isHide) {
-            isHide = true;
-        } else {
-            isHide = false;
-        }
-        binding.btnBackFinish.setVisibility(isHide ? View.GONE : View.VISIBLE);
-    }
 
 
     private void reset() {
@@ -380,7 +357,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         binding.swipe.setEnabled(false);
         binding.playerView.postDelayed(this::applySubtitleBottomMargin, 200);
         binding.playerView.postDelayed(this::applySubtitleBottomMargin, 200);
-        if(subtitleView!=null){
+        if (subtitleView != null) {
             subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
         }
         new WindowUtils(this, true, false);
@@ -404,7 +381,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         if (binding.playerView != null) {
             binding.playerView.postDelayed(this::applySubtitleBottomMargin, 200);
         }
-        if(subtitleView!=null){
+        if (subtitleView != null) {
             subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
         }
         new WindowUtils(this, true, false);
@@ -933,7 +910,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 .build();
         binding.playerView.setPlayer(exoPlayer);
         binding.playerView.setShowSubtitleButton(true);
-        if(subtitleView !=null){
+        if (subtitleView != null) {
             subtitleView.post(this::applySubtitleBottomMargin);
         }
         binding.playerView.post(() -> {
@@ -1194,6 +1171,9 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         if (binding != null && binding.tvSelect != null) {
             binding.tvSelect.setVisibility(View.VISIBLE);
         }
+        if(scraper!=null){
+            scraper.clearCache(true);
+        }
         trackSelector = null;
         discoveredSubtitleUrls.clear();
         pendingStreamUrl = null;
@@ -1398,7 +1378,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
             binding.tvSelect.setVisibility(View.GONE);
             binding.swipe.setEnabled(false);
             isPictureMode = true;
-            if(subtitleView !=null){
+            if (subtitleView != null) {
                 subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 5f);
             }
             RelativeLayout.LayoutParams pipParams = new RelativeLayout.LayoutParams(
@@ -1406,7 +1386,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
             binding.rlWebview.setLayoutParams(pipParams);
 
         } else {
-            if(subtitleView !=null){
+            if (subtitleView != null) {
                 subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
             }
             binding.rvMovielist.setVisibility(View.VISIBLE);
@@ -1561,6 +1541,33 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
                 binding.swipe.setRefreshing(false);
             }
             releasePlayer();
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.expand:
+                if (finishing) {
+                    rotateScreen();
+                }
+                break;
+            case R.id.btn_back_finish:
+                if (finishing) {
+                    releasePlayer();
+                    finish();
+                } else {
+                    defaultScreen();
+                }
+                break;
+            case R.id.player_view:
+                binding.playerView.setControllerVisibilityListener(new PlayerView.ControllerVisibilityListener() {
+                    @Override
+                    public void onVisibilityChanged(int visibility) {
+                        binding.btnBackFinish.setVisibility(visibility);
+                    }
+                });
+                break;
         }
     }
 }
