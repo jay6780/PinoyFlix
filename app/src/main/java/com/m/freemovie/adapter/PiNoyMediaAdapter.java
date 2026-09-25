@@ -14,6 +14,9 @@ import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
 import com.m.freemovie.mvp.Model.ClassBean.PinoyRuDetailBean;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PiNoyMediaAdapter extends BaseQuickAdapter<PinoyRuDetailBean, BaseViewHolder> {
     private PinoyPlayerAdapter pinoyPlayerAdapter;
     private int type;
@@ -30,7 +33,14 @@ public class PiNoyMediaAdapter extends BaseQuickAdapter<PinoyRuDetailBean, BaseV
         helper.addOnClickListener(R.id.tv_download);
         rv_player.setLayoutManager(new LinearLayoutManager(mContext));
         pinoyPlayerAdapter = new PinoyPlayerAdapter();
-        pinoyPlayerAdapter.setNewData(item.getVideoUrls());
+
+        List<String> filteredVideoUrls = new ArrayList<>();
+        for(String videoUrl : item.getVideoUrls()){
+            if(videoUrl.contains("voe.sx")){
+                filteredVideoUrls.add(videoUrl);
+            }
+        }
+        pinoyPlayerAdapter.setNewData(filteredVideoUrls);
         rv_player.setAdapter(pinoyPlayerAdapter);
 
         pinoyPlayerAdapter.setOnItemChildClickListener(new OnItemChildClickListener() {

@@ -47,6 +47,7 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
     private String Image;
     private PinoyPediaPresenter presenter;
     private List<PinoyRuDetailBean> pinoyRuDetailBeanList = new ArrayList<>();
+    private List<String> filteredVideoUrls = new ArrayList<>();
 
     private static final OkHttpClient OK_HTTP_CLIENT = new OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
@@ -195,7 +196,12 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tv_watch:
-                if (pinoyRuDetailBeanList.isEmpty()) {
+                if (pinoyRuDetailBeanList !=null && pinoyRuDetailBeanList.isEmpty()) {
+                    return;
+                }
+                if(filteredVideoUrls !=null && filteredVideoUrls.isEmpty()){
+                    Toast.makeText(getApplicationContext(), "No video source found", Toast.LENGTH_SHORT).show();
+                    finish();
                     return;
                 }
                 dialog = new DialogSourceUtils().TagalogWatchSource(OthersDetailsActivity.this,type,title,pinoyRuDetailBeanList);
@@ -247,7 +253,13 @@ public class OthersDetailsActivity extends AppCompatActivity implements View.OnC
 
             String link = "https://pinoymoviepedia.ru/links/" + downloadId + "/";
             pinoyRuDetailBeanList.clear();
+
             List<String> embedUrls = bean.getResults().getEmbedUrls();
+            for (String videoUrl : embedUrls) {
+                if (videoUrl.contains("voe.sx")) {
+                    filteredVideoUrls.add(videoUrl);
+                }
+            }
 
             pinoyRuDetailBeanList.add(new PinoyRuDetailBean(embedUrls, link));
             if (!bean.getResults().getImages().isEmpty()) {
