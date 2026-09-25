@@ -77,6 +77,11 @@ public class KProgressHUD {
     public static KProgressHUD create(Context context) {
         return new KProgressHUD(context);
     }
+    public KProgressHUD setOnDismissListener(DialogInterface.OnDismissListener listener) {
+        mProgressDialog.setOnDismissListener(listener);
+        return this;
+    }
+
 
   /**
    * Create a new HUD. specify the HUD style (if you use a custom view, you need {@code KProgressHUD.create(Context context)}).
@@ -367,11 +372,10 @@ public class KProgressHUD {
             layoutParams.gravity = Gravity.CENTER;
             window.setAttributes(layoutParams);
 
-            setCanceledOnTouchOutside(false);
+            setCanceledOnTouchOutside(true);
 
             initViews();
         }
-
         private void initViews() {
             mBackgroundLayout = (BackgroundLayout) findViewById(R.id.background);
             mBackgroundLayout.setBaseColor(mWindowColor);

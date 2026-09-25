@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.OptIn;
+import androidx.media3.common.util.UnstableApi;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,7 +18,7 @@ import com.m.freemovie.mvp.Model.ClassBean.PinoyRuDetailBean;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@OptIn(markerClass = UnstableApi.class)
 public class PiNoyMediaAdapter extends BaseQuickAdapter<PinoyRuDetailBean, BaseViewHolder> {
     private PinoyPlayerAdapter pinoyPlayerAdapter;
     private int type;
