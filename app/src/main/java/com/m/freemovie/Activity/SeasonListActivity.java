@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Rational;
@@ -50,10 +51,12 @@ import androidx.media3.common.Tracks;
 import androidx.media3.common.text.CueGroup;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.datasource.DefaultHttpDataSource;
+import androidx.media3.datasource.HttpDataSource;
 import androidx.media3.exoplayer.DefaultLoadControl;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
+import androidx.media3.exoplayer.upstream.DefaultLoadErrorHandlingPolicy;
 import androidx.media3.ui.AspectRatioFrameLayout;
 import androidx.media3.ui.PlayerView;
 import androidx.media3.ui.SubtitleView;
@@ -70,7 +73,9 @@ import com.m.freemovie.databinding.ActivitySeasonListBinding;
 import com.m.freemovie.mvp.Model.ClassBean.EpisodeBean;
 
 import java.io.ByteArrayInputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,6 +111,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
     private boolean hasStartedPlayback = false;
     private String player;
     private SubtitleView subtitleView;
+    private String currentLoadedUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,6 +197,35 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         subtitleView();
     }
 
+    private String extractDomain(String url) {
+        if (url == null || url.trim().isEmpty()) {
+            return "";
+        }
+        try {
+            Uri uri = Uri.parse(url);
+            String host = uri.getHost();
+            if (host != null) {
+                if (host.startsWith("www.")) {
+                    host = host.substring(4);
+                }
+                return host;
+            }
+        } catch (Exception e) {
+            try {
+                URL parsedUrl = new URL(url);
+                String host = parsedUrl.getHost();
+                if (host != null) {
+                    if (host.startsWith("www.")) {
+                        host = host.substring(4);
+                    }
+                    return host;
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        return "";
+    }
+
     private void subtitleView() {
         subtitleView = binding.playerView.getSubtitleView();
         if (subtitleView != null) {
@@ -262,6 +297,123 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         new WindowUtils(this, true, false);
     }
 
+    private void applySubtitleBottomMargin() {
+        if (binding == null || binding.playerView == null) return;
+        subtitleView = binding.playerView.getSubtitleView();
+        if (subtitleView == null) return;
+        ViewGroup.LayoutParams lp = subtitleView.getLayoutParams();
+        if (!(lp instanceof ViewGroup.MarginLayoutParams)) return;
+        ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) lp;
+
+        int orientation = getResources().getConfiguration().orientation;
+        int extraDp = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? 56 : 0;
+        int extraPx = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, extraDp, getResources().getDisplayMetrics());
+        mlp.bottomMargin = extraPx;
+        subtitleView.setLayoutParams(mlp);
+    }
+
+
+    private boolean isAdOrJunkUrl(String url) {
+        if (url == null) return false;
+        String lower = url.toLowerCase();
+        return lower.contains("google-analytics")
+                || lower.contains("googlesyndication")
+                || lower.contains("doubleclick")
+                || lower.contains("adservice")
+                || lower.contains("adnxs")
+                || lower.contains("popads")
+                || lower.contains("propeller")
+                || lower.contains("adsterra")
+                || lower.contains("exoclick")
+                || lower.contains("trafficjunky")
+                || lower.contains("histats")
+                || lower.contains("llvpn.com")
+                || lower.contains("creative-sb1")
+                || lower.contains("juicyads")
+                || lower.contains("adnium")
+                || lower.contains("tsyndicate")
+                || lower.contains("adsco.re")
+                || lower.contains("googletagmanager")
+                || lower.contains("cloudflareinsights")
+                || lower.contains("/beacon")
+                || lower.contains("test-videos.co.uk")
+                || lower.contains("bigbuckbunny")
+                || lower.contains("big_buck_bunny")
+                || lower.contains("sample-videos")
+                || lower.contains("demo-video")
+                || lower.contains("w3schools")
+                || lower.contains("gtv-videos-bucket")
+                || lower.contains("sample.mp4")
+                || lower.contains("dummy.mp4")
+                || lower.contains("test.mp4")
+                || lower.contains("10s_1mb")
+                || lower.endsWith(".gif")
+                || lower.endsWith(".svg")
+                || lower.endsWith(".ico")
+                || lower.endsWith(".woff")
+                || lower.endsWith(".woff2")
+                || lower.endsWith(".ttf");
+    }
+
+    private boolean isVideoStreamUrl(String url) {
+        if (url == null) return false;
+        String lower = url.toLowerCase();
+        String cleanUrl = lower.split("\\?")[0];
+        if (cleanUrl.endsWith(".js") || cleanUrl.endsWith(".css") || cleanUrl.endsWith(".html")
+                || cleanUrl.endsWith(".htm") || cleanUrl.endsWith(".json") || cleanUrl.endsWith(".jpg")
+                || cleanUrl.endsWith(".jpeg") || cleanUrl.endsWith(".png") || cleanUrl.endsWith(".webp")
+                || cleanUrl.endsWith(".gif") || cleanUrl.endsWith(".svg") || cleanUrl.endsWith(".ico")
+                || cleanUrl.endsWith(".txt") || cleanUrl.endsWith(".vtt") || cleanUrl.endsWith(".srt")
+                || cleanUrl.endsWith(".woff") || cleanUrl.endsWith(".woff2") || cleanUrl.endsWith(".ttf")
+                || cleanUrl.endsWith(".ts") || cleanUrl.endsWith(".m4s") || cleanUrl.endsWith(".key")
+                || cleanUrl.endsWith(".aac") || cleanUrl.endsWith(".mp3")
+                || lower.contains(".ts?") || lower.contains(".m4s?") || lower.contains(".key?")) {
+            return false;
+        }
+
+        if (lower.contains("google-analytics") || lower.contains("doubleclick")
+                || lower.contains("adnxs") || lower.contains("/beacon") || lower.contains("/analytics")
+                || cleanUrl.contains("demo-video")
+                || lower.contains("test-videos.co.uk")
+                || lower.contains("bigbuckbunny")
+                || lower.contains("big_buck_bunny")
+                || lower.contains("sample-videos")
+                || lower.contains("w3schools")
+                || lower.contains("gtv-videos-bucket")
+                || lower.contains("sample.mp4")
+                || lower.contains("dummy.mp4")
+                || lower.contains("test.mp4")
+                || lower.contains("10s_1mb")) {
+            return false;
+        }
+        return cleanUrl.endsWith(".m3u8")
+                || cleanUrl.endsWith(".mpd")
+                || cleanUrl.endsWith(".mp4")
+                || cleanUrl.endsWith(".mkv")
+                || cleanUrl.endsWith(".webm")
+                || lower.contains(".m3u8")
+                || lower.contains(".mpd")
+                || lower.contains("/hls/")
+                || lower.contains("/playlist")
+                || lower.contains("/manifest")
+                || lower.contains(".mp4?")
+                || lower.contains(".mkv?")
+                || lower.contains(".webm?");
+    }
+
+    private boolean isSubtitleUrl(String url) {
+        if (url == null) return false;
+        String lower = url.toLowerCase();
+        String cleanUrl = lower.split("\\?")[0];
+        if (isAdOrJunkUrl(url)) return false;
+        return cleanUrl.endsWith(".vtt") || cleanUrl.endsWith(".srt")
+                || cleanUrl.endsWith(".ass") || cleanUrl.endsWith(".sub")
+                || lower.contains(".vtt") || lower.contains(".srt")
+                || lower.contains("/subtitles/") || lower.contains("/captions/")
+                || lower.contains("sub.vtt");
+    }
+
     private void resolveAndPlayStream(String webEmbedUrl) {
         discoveredSubtitleUrls.clear();
         pendingStreamUrl = null;
@@ -282,9 +434,12 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         }
 
         if (isVideoStreamUrl(webEmbedUrl)) {
-            playStream(webEmbedUrl, webEmbedUrl, null);
+            verifyVideoStatusAndPlay(webEmbedUrl, webEmbedUrl, null);
             return;
         }
+
+        currentLoadedUrl = webEmbedUrl;
+        player = extractDomain(webEmbedUrl);
 
         if (scraper == null) {
             scraper = new WebView(this);
@@ -309,6 +464,8 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         settings.setUserAgentString("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
+        settings.setSupportMultipleWindows(false);
+        settings.setJavaScriptCanOpenWindowsAutomatically(false);
 
         try {
             CookieManager cookieManager = CookieManager.getInstance();
@@ -319,6 +476,11 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         }
 
         scraper.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+                return false;
+            }
+
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
@@ -333,13 +495,13 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                 if (msg != null && msg.startsWith("EXTRACTED_VIDEO_SRC:")) {
                     String streamUrl = msg.substring("EXTRACTED_VIDEO_SRC:".length()).trim();
                     if (isVideoStreamUrl(streamUrl)) {
-                        schedulePlayback(streamUrl, webEmbedUrl, null);
+                        String activeEmbed = (currentLoadedUrl != null && !currentLoadedUrl.isEmpty()) ? currentLoadedUrl : webEmbedUrl;
+                        schedulePlayback(streamUrl, activeEmbed, null);
                     }
                 } else if (msg != null && msg.startsWith("EXTRACTED_TRACK_SRC:")) {
                     String trackUrl = msg.substring("EXTRACTED_TRACK_SRC:".length()).trim();
                     if (!trackUrl.isEmpty() && !discoveredSubtitleUrls.contains(trackUrl)) {
                         discoveredSubtitleUrls.add(trackUrl);
-//                        Log.d("StreamScraper", "Extracted track subtitle URL: " + trackUrl);
                         if (hasStartedPlayback && exoPlayer != null) {
                             addSubtitleTrack(trackUrl);
                         }
@@ -351,21 +513,59 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
 
         scraper.setWebViewClient(new WebViewClient() {
             @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                if (request == null || request.getUrl() == null) {
+                    return false;
+                }
+                String url = request.getUrl().toString();
+                String scheme = request.getUrl().getScheme();
+                if (scheme == null || (!scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https"))) {
+                    return true;
+                }
+
+                if (isAdOrJunkUrl(url)) {
+                    return true;
+                }
+
+                if (isVideoStreamUrl(url)) {
+                    String activeEmbed = (currentLoadedUrl != null && !currentLoadedUrl.isEmpty()) ? currentLoadedUrl : webEmbedUrl;
+                    schedulePlayback(url, activeEmbed, null);
+                    return true;
+                }
+
+                currentLoadedUrl = url;
+                String redirectedHost = extractDomain(url);
+                if (redirectedHost != null && !redirectedHost.isEmpty()) {
+                    player = redirectedHost;
+                }
+
+                return false;
+            }
+
+            @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                if (!isVideoStreamUrl(url)) {
+                    currentLoadedUrl = url;
+                    String finishedHost = extractDomain(url);
+                    if (finishedHost != null && !finishedHost.isEmpty()) {
+                        player = finishedHost;
+                    }
+                }
+//                Log.d("ScraperDomain", "Page finished on: " + url + " (domain: " + player + ")");
                 injectAutoplayScript(view);
             }
 
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
+
                 if (isAdOrJunkUrl(url)) {
                     return new WebResourceResponse("text/plain", "UTF-8", new ByteArrayInputStream(new byte[0]));
                 }
 
                 if (isSubtitleUrl(url) && !discoveredSubtitleUrls.contains(url)) {
                     discoveredSubtitleUrls.add(url);
-//                    Log.d("StreamScraper", "Discovered subtitle URL: " + url);
                     if (hasStartedPlayback && exoPlayer != null) {
                         addSubtitleTrack(url);
                     }
@@ -373,9 +573,51 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
 
                 if (isVideoStreamUrl(url)) {
                     java.util.Map<String, String> requestHeaders = request.getRequestHeaders();
-                    schedulePlayback(url, webEmbedUrl, requestHeaders);
+                    String activeEmbed = (currentLoadedUrl != null && !currentLoadedUrl.isEmpty()) ? currentLoadedUrl : webEmbedUrl;
+                    schedulePlayback(url, activeEmbed, requestHeaders);
                 }
                 return super.shouldInterceptRequest(view, request);
+            }
+
+            @Override
+            public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+                super.onReceivedHttpError(view, request, errorResponse);
+                if (request != null && request.isForMainFrame()) {
+                    int statusCode = errorResponse != null ? errorResponse.getStatusCode() : -1;
+                    if (statusCode == 404 || statusCode >= 500) {
+                        runOnUiThread(() -> {
+                            if (!hasStartedPlayback) {
+                                if (hud != null && hud.isShowing()) {
+                                    hud.dismiss();
+                                }
+                                String msg = (statusCode == 404)
+                                        ? "Video page not found"
+                                        : "Server error";
+                                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, android.webkit.WebResourceError error) {
+                super.onReceivedError(view, request, error);
+                if (request != null && request.isForMainFrame()) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && error != null) {
+                        int errCode = error.getErrorCode();
+                        if (errCode == ERROR_HOST_LOOKUP || errCode == ERROR_CONNECT || errCode == ERROR_TIMEOUT) {
+                            runOnUiThread(() -> {
+                                if (!hasStartedPlayback) {
+                                    if (hud != null && hud.isShowing()) {
+                                        hud.dismiss();
+                                    }
+                                    Toast.makeText(getApplicationContext(), "Failed to connect to server. Please select another server.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                }
             }
         });
 
@@ -383,24 +625,35 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
             scraperTimeoutHandler.removeCallbacks(scraperTimeoutRunnable);
         }
         scraperTimeoutRunnable = () -> {
-            if (hud != null && hud.isShowing()) {
-                hud.dismiss();
+            if (!hasStartedPlayback && pendingStreamUrl == null) {
+                if (hud != null && hud.isShowing()) {
+                    hud.dismiss();
+                }
+                binding.playerView.setVisibility(View.VISIBLE);
+                Toast.makeText(getApplicationContext(), "Server response slow. Please select another server.", Toast.LENGTH_SHORT).show();
             }
-            Toast.makeText(getApplicationContext(), "Server response slow. Please select another server below.", Toast.LENGTH_SHORT).show();
         };
-        scraperTimeoutHandler.postDelayed(scraperTimeoutRunnable, 20000);
+        scraperTimeoutHandler.postDelayed(scraperTimeoutRunnable, 45000);
 
         scraper.loadUrl(webEmbedUrl);
     }
 
     private void injectAutoplayScript(WebView view) {
         if (view == null) return;
+        String currentUrl = view.getUrl();
+        String currentHost = extractDomain(currentUrl);
+        String activePlayer = (currentHost != null && !currentHost.isEmpty()) ? currentHost : player;
+        String shortPlayer = (activePlayer != null && activePlayer.contains(".")) ? activePlayer.substring(0, activePlayer.indexOf(".")) : (activePlayer != null ? activePlayer : "");
+
         view.evaluateJavascript(
                 "(function() {" +
-                        "  var currentSource = '" + player + "-player';" +
+                        "  try { window.open = function() { return null; }; } catch(e){}" +
+                        "  var currentSource = '" + (activePlayer != null ? activePlayer : "") + "-player';" +
+                        "  var shortSource = '" + shortPlayer + "-player';" +
                         "  function triggerPlay(w) {" +
                         "    if (!w) return;" +
                         "    try { w.postMessage({ source: currentSource, action: 'play' }, '*'); } catch(e){}" +
+                        "    try { w.postMessage({ source: shortSource, action: 'play' }, '*'); } catch(e){}" +
                         "    try { w.postMessage({ action: 'play' }, '*'); } catch(e){}" +
                         "    try { w.postMessage({ type: 'play' }, '*'); } catch(e){}" +
                         "    try { w.postMessage({ method: 'play' }, '*'); } catch(e){}" +
@@ -410,23 +663,110 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                         "  function checkDoc(doc) {" +
                         "    if (!doc) return;" +
                         "    try {" +
+                        "      var closeBtns = doc.querySelectorAll('.close, .btn-close, [class*=\"modal\" i] button, [class*=\"overlay\" i] button, [aria-label*=\"close\" i], .close-modal');" +
+                        "      for (var c = 0; c < closeBtns.length; c++) {" +
+                        "        try { closeBtns[c].click(); } catch(e){}" +
+                        "      }" +
+                        "      var overlays = doc.querySelectorAll('[id*=\"overlay\" i], [class*=\"overlay\" i], [id*=\"pop\" i], [class*=\"popbox\" i], [class*=\"popup\" i]');" +
+                        "      for (var o = 0; o < overlays.length; o++) {" +
+                        "        try {" +
+                        "          if (overlays[o].tagName !== 'VIDEO' && overlays[o].tagName !== 'BODY') {" +
+                        "            if (overlays[o].style) {" +
+                        "              overlays[o].style.display = 'none';" +
+                        "              overlays[o].style.pointerEvents = 'none';" +
+                        "            }" +
+                        "          }" +
+                        "        } catch(e){}" +
+                        "      }" +
+                        "      function isGoodStream(u) {" +
+                        "        if (!u || typeof u !== 'string') return false;" +
+                        "        var l = u.toLowerCase();" +
+                        "        if (l.indexOf('test-videos') !== -1 || l.indexOf('bigbuck') !== -1 || l.indexOf('sample') !== -1 || l.indexOf('demo-video') !== -1 || l.indexOf('w3schools') !== -1 || l.indexOf('10s_1mb') !== -1) return false;" +
+                        "        return true;" +
+                        "      }" +
+                        "      try {" +
+                        "        if (typeof sources !== 'undefined' && sources) {" +
+                        "          if (sources.hls && isGoodStream(sources.hls)) console.log('EXTRACTED_VIDEO_SRC:' + sources.hls);" +
+                        "          if (sources.mp4 && isGoodStream(sources.mp4)) console.log('EXTRACTED_VIDEO_SRC:' + sources.mp4);" +
+                        "        }" +
+                        "      } catch(e){}" +
+                        "      try {" +
+                        "        if (window.sources) {" +
+                        "          if (window.sources.hls && isGoodStream(window.sources.hls)) console.log('EXTRACTED_VIDEO_SRC:' + window.sources.hls);" +
+                        "          if (window.sources.mp4 && isGoodStream(window.sources.mp4)) console.log('EXTRACTED_VIDEO_SRC:' + window.sources.mp4);" +
+                        "        }" +
+                        "      } catch(e){}" +
+                        "      try {" +
+                        "        if (typeof jwplayer === 'function') {" +
+                        "          var jw = jwplayer();" +
+                        "          if (jw && typeof jw.getPlaylist === 'function') {" +
+                        "            var pl = jw.getPlaylist();" +
+                        "            if (pl && pl[0]) {" +
+                        "              if (pl[0].sources) {" +
+                        "                for (var p = 0; p < pl[0].sources.length; p++) {" +
+                        "                  if (pl[0].sources[p].file && isGoodStream(pl[0].sources[p].file)) {" +
+                        "                    console.log('EXTRACTED_VIDEO_SRC:' + pl[0].sources[p].file);" +
+                        "                  }" +
+                        "                }" +
+                        "              }" +
+                        "              if (pl[0].file && isGoodStream(pl[0].file)) {" +
+                        "                console.log('EXTRACTED_VIDEO_SRC:' + pl[0].file);" +
+                        "              }" +
+                        "            }" +
+                        "          }" +
+                        "        }" +
+                        "      } catch(e){}" +
+                        "      var scripts = doc.querySelectorAll('script');" +
+                        "      for (var s = 0; s < scripts.length; s++) {" +
+                        "        var txt = scripts[s].textContent || scripts[s].innerText;" +
+                        "        if (txt) {" +
+                        "          var hlsMatch = txt.match(/['\"]hls['\"]\\s*:\\s*['\"]([^'\"]+)['\"]/i);" +
+                        "          if (hlsMatch && hlsMatch[1] && isGoodStream(hlsMatch[1])) console.log('EXTRACTED_VIDEO_SRC:' + hlsMatch[1]);" +
+                        "          var mp4Match = txt.match(/['\"]mp4['\"]\\s*:\\s*['\"]([^'\"]+)['\"]/i);" +
+                        "          if (mp4Match && mp4Match[1] && isGoodStream(mp4Match[1])) console.log('EXTRACTED_VIDEO_SRC:' + mp4Match[1]);" +
+                        "          var m3u8Match = txt.match(/['\"](https?:\\/\\/[^'\"]+\\.m3u8[^'\"]*)['\"]/i);" +
+                        "          if (m3u8Match && m3u8Match[1] && isGoodStream(m3u8Match[1])) console.log('EXTRACTED_VIDEO_SRC:' + m3u8Match[1]);" +
+                        "          var b64Match = txt.match(/atob\\(['\"]([A-Za-z0-9+/=]{20,})['\"]\\)/);" +
+                        "          if (b64Match && b64Match[1]) {" +
+                        "            try {" +
+                        "              var dec = atob(b64Match[1]);" +
+                        "              if (dec && dec.indexOf('http') !== -1 && isGoodStream(dec)) console.log('EXTRACTED_VIDEO_SRC:' + dec);" +
+                        "            } catch(e){}" +
+                        "          }" +
+                        "          var b64Urls = txt.match(/['\"](aHR0c[A-Za-z0-9+/=]{20,})['\"]/g);" +
+                        "          if (b64Urls) {" +
+                        "            for (var b = 0; b < b64Urls.length; b++) {" +
+                        "              try {" +
+                        "                var rawB64 = b64Urls[b].replace(/['\"]/g, '');" +
+                        "                var dec2 = atob(rawB64);" +
+                        "                if (dec2 && (dec2.indexOf('.m3u8') !== -1 || dec2.indexOf('.mp4') !== -1) && isGoodStream(dec2)) {" +
+                        "                  console.log('EXTRACTED_VIDEO_SRC:' + dec2);" +
+                        "                }" +
+                        "              } catch(e){}" +
+                        "            }" +
+                        "          }" +
+                        "        }" +
+                        "      }" +
                         "      var trks = doc.querySelectorAll('track');" +
                         "      for (var t = 0; t < trks.length; t++) {" +
                         "        if (trks[t].src) console.log('EXTRACTED_TRACK_SRC:' + trks[t].src);" +
                         "      }" +
-                        "      var vids = doc.querySelectorAll('video');" +
+                        "      var vids = doc.querySelectorAll('video, source');" +
                         "      for (var j = 0; j < vids.length; j++) {" +
-                        "        vids[j].muted = true;" +
-                        "        vids[j].setAttribute('playsinline', '');" +
-                        "        vids[j].play().catch(function(){});" +
-                        "        if (vids[j].src && vids[j].src.indexOf('blob:') === -1) {" +
-                        "          console.log('EXTRACTED_VIDEO_SRC:' + vids[j].src);" +
+                        "        if (vids[j].tagName === 'VIDEO') {" +
+                        "          vids[j].muted = true;" +
+                        "          vids[j].setAttribute('playsinline', '');" +
+                        "          try { vids[j].play().catch(function(){}); } catch(e){}" +
                         "        }" +
-                        "        if (vids[j].currentSrc && vids[j].currentSrc.indexOf('blob:') === -1) {" +
+                        "        var src1 = vids[j].src || vids[j].getAttribute('src');" +
+                        "        if (src1 && src1.indexOf('blob:') === -1 && isGoodStream(src1)) {" +
+                        "          console.log('EXTRACTED_VIDEO_SRC:' + src1);" +
+                        "        }" +
+                        "        if (vids[j].currentSrc && vids[j].currentSrc.indexOf('blob:') === -1 && isGoodStream(vids[j].currentSrc)) {" +
                         "          console.log('EXTRACTED_VIDEO_SRC:' + vids[j].currentSrc);" +
                         "        }" +
                         "      }" +
-                        "      var btns = doc.querySelectorAll('.play, .vjs-big-play-button, .jw-display-icon-display, button[aria-label*=\"play\" i], [class*=\"play-btn\" i], [class*=\"play_btn\" i], [id*=\"play\" i], [class*=\"player\" i] button, button');" +
+                        "      var btns = doc.querySelectorAll('.play, .vjs-big-play-button, .jw-display-icon-display, button[aria-label*=\"play\" i], [class*=\"play-btn\" i], [class*=\"play_btn\" i], [id*=\"play\" i], [class*=\"player\" i] button');" +
                         "      for (var k = 0; k < btns.length; k++) {" +
                         "        try { btns[k].click(); } catch(e){}" +
                         "      }" +
@@ -450,29 +790,56 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                         "  if (!window.__playScanStarted) {" +
                         "    window.__playScanStarted = true;" +
                         "    var count = 0;" +
-                        "    var interval = setInterval(function() {" +
+                        "    window.__playInterval = setInterval(function() {" +
                         "      count++;" +
-                        "      if (count > 50) { clearInterval(interval); return; }" +
+                        "      if (count > 8 || window.__playStopped) { clearInterval(window.__playInterval); return; }" +
                         "      try {" +
                         "        scanAll(window, document);" +
                         "      } catch(e) {}" +
-                        "    }, 100);" +
+                        "    }, 600);" +
                         "  }" +
                         "})();", null);
     }
 
     private void schedulePlayback(String url, String webEmbedUrl, java.util.Map<String, String> requestHeaders) {
-        if (hasStartedPlayback) {
+        if (!isVideoStreamUrl(url)) {
             return;
         }
-        if (pendingStreamUrl == null || (!pendingStreamUrl.contains(".m3u8") && url.contains(".m3u8"))) {
+        boolean isCurrentM3u8 = pendingStreamUrl != null && pendingStreamUrl.contains(".m3u8");
+        boolean isNewM3u8 = url != null && url.contains(".m3u8");
+
+        if (hasStartedPlayback) {
+            if (isCurrentM3u8) {
+                return;
+            }
+            if (!isNewM3u8) {
+                return;
+            }
+//            Log.d("SchedulePlayback", "Upgrading from MP4 to full M3U8 stream: " + url);
+        }
+
+        if (pendingStreamUrl == null || (!isCurrentM3u8 && isNewM3u8)) {
             pendingStreamUrl = url;
             pendingStreamHeaders = requestHeaders;
-//            Log.d("StreamScraper", "Found video stream candidate: " + url);
+
+            if (scraperTimeoutRunnable != null) {
+                scraperTimeoutHandler.removeCallbacks(scraperTimeoutRunnable);
+            }
 
             runOnUiThread(() -> {
+                if (scraper != null && isNewM3u8) {
+                    try {
+                        scraper.evaluateJavascript(
+                                "(function() {" +
+                                        "  window.__playStopped = true;" +
+                                        "  if (window.__playInterval) clearInterval(window.__playInterval);" +
+                                        "})();", null);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
                 if (hud != null && hud.isShowing()) {
-                    hud.setLabel("Loading video & subtitles...");
+                    hud.setLabel("Checking video stream...");
                 }
             });
 
@@ -480,21 +847,132 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                 streamDebounceHandler.removeCallbacks(triggerPlaybackRunnable);
             }
             triggerPlaybackRunnable = () -> {
-                if (pendingStreamUrl != null && !hasStartedPlayback) {
+                if (pendingStreamUrl != null) {
                     hasStartedPlayback = true;
                     if (scraperTimeoutRunnable != null) {
                         scraperTimeoutHandler.removeCallbacks(scraperTimeoutRunnable);
                     }
-                    runOnUiThread(() -> {
-                        if (hud != null && hud.isShowing()) {
-                            hud.setLabel("Buffering video...");
-                        }
-                        playStream(pendingStreamUrl, webEmbedUrl, pendingStreamHeaders);
-                    });
+                    verifyVideoStatusAndPlay(pendingStreamUrl, webEmbedUrl, pendingStreamHeaders);
                 }
             };
-            streamDebounceHandler.postDelayed(triggerPlaybackRunnable, 400);
+            long debounceDelay = isNewM3u8 ? 300 : 1500;
+            streamDebounceHandler.postDelayed(triggerPlaybackRunnable, debounceDelay);
         }
+    }
+
+    private String getMergedCookies(String... urls) {
+        try {
+            CookieManager cookieManager = CookieManager.getInstance();
+            cookieManager.flush();
+            java.util.Map<String, String> cookieMap = new java.util.LinkedHashMap<>();
+            for (String u : urls) {
+                if (u == null || u.isEmpty()) continue;
+                String c = cookieManager.getCookie(u);
+                if (c != null) {
+                    for (String part : c.split(";")) {
+                        String[] kv = part.trim().split("=", 2);
+                        if (kv.length == 2 && !kv[0].trim().isEmpty()) {
+                            cookieMap.put(kv[0].trim(), kv[1].trim());
+                        }
+                    }
+                }
+            }
+            if (cookieMap.isEmpty()) return null;
+            StringBuilder sb = new StringBuilder();
+            for (java.util.Map.Entry<String, String> entry : cookieMap.entrySet()) {
+                if (sb.length() > 0) sb.append("; ");
+                sb.append(entry.getKey()).append("=").append(entry.getValue());
+            }
+            return sb.toString();
+        } catch (Exception e) {
+//            Log.e("CookieHelper", "Error merging cookies: ", e);
+            return null;
+        }
+    }
+
+    private void verifyVideoStatusAndPlay(String streamUrl, String webEmbedUrl, java.util.Map<String, String> requestHeaders) {
+        new Thread(() -> {
+            HttpURLConnection conn = null;
+            try {
+                URI uri = new URI(streamUrl);
+                URL url = uri.toURL();
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
+
+                String embedOrigin = getBaseUrl(webEmbedUrl != null ? webEmbedUrl : streamUrl);
+                String origin = embedOrigin.endsWith("/") ? embedOrigin.substring(0, embedOrigin.length() - 1) : embedOrigin;
+                conn.setRequestProperty("Referer", webEmbedUrl != null ? webEmbedUrl : embedOrigin);
+                conn.setRequestProperty("Origin", origin);
+
+                String cookieHeader = getMergedCookies(videoUrl, webEmbedUrl, currentLoadedUrl, streamUrl);
+                if (cookieHeader != null) {
+                    conn.setRequestProperty("Cookie", cookieHeader);
+                }
+
+                conn.setRequestProperty("Range", "bytes=0-1024");
+                conn.setConnectTimeout(8000);
+                conn.setReadTimeout(8000);
+                conn.setInstanceFollowRedirects(true);
+
+                int responseCode = conn.getResponseCode();
+//                Log.d("VideoStatus", "Checked URI status for " + streamUrl + " -> Response Code: " + responseCode);
+
+                if (responseCode == 429) {
+//                    Log.w("VideoStatus", "Server returned 429 Too Many Requests, backing off for 2s...");
+                    runOnUiThread(() -> {
+                        if (hud != null && hud.isShowing()) {
+                            hud.setLabel("Server busy (429), retrying...");
+                        }
+                    });
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException ignored) {
+                    }
+                } else if (responseCode == 404 || responseCode == 410 || responseCode >= 500) {
+//                    Log.e("VideoStatus", "Video stream returned error status code: " + responseCode);
+                    runOnUiThread(() -> {
+                        if (hud != null && hud.isShowing()) {
+                            hud.dismiss();
+                        }
+                        String msg = (responseCode == 404 || responseCode == 410)
+                                ? "Video not found."
+                                : "Server error";
+                        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                    });
+                    hasStartedPlayback = false;
+                    pendingStreamUrl = null;
+                    return;
+                }
+            } catch (Exception e) {
+//                Log.w("VideoStatus", "URI status check exception: " + e.getMessage());
+                if (e instanceof java.io.FileNotFoundException || (e.getMessage() != null && e.getMessage().contains("404"))) {
+                    runOnUiThread(() -> {
+                        if (hud != null && hud.isShowing()) {
+                            hud.dismiss();
+                        }
+                        Toast.makeText(getApplicationContext(), "Video not found (404). Please select another server.", Toast.LENGTH_SHORT).show();
+                    });
+                    hasStartedPlayback = false;
+                    pendingStreamUrl = null;
+                    return;
+                }
+            } finally {
+                if (conn != null) {
+                    try {
+                        conn.disconnect();
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+
+            runOnUiThread(() -> {
+                if (hud != null && hud.isShowing()) {
+                    hud.setLabel("Buffering video...");
+                }
+                playStream(streamUrl, webEmbedUrl, requestHeaders);
+            });
+        }).start();
     }
 
     private void addSubtitleTrack(String subUrl) {
@@ -527,7 +1005,6 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                         .build();
                 exoPlayer.setMediaItem(updatedItem, currentPos);
                 exoPlayer.setPlayWhenReady(isPlaying);
-//                Log.d("StreamPlayback", "Dynamically added subtitle track: " + label + " (" + subUrl + ")");
             }
         });
     }
@@ -584,14 +1061,25 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
     private void playStream(String streamUrl, String webEmbedUrl, java.util.Map<String, String> interceptedHeaders) {
         releaseExoPlayerOnly();
 
+        if (hud != null) {
+            hud.setLabel("Buffering video...");
+            if (!hud.isShowing()) {
+                hud.show();
+            }
+        }
+
         java.util.Map<String, String> defaultHeaders = new java.util.HashMap<>();
         if (interceptedHeaders != null) {
             for (java.util.Map.Entry<String, String> entry : interceptedHeaders.entrySet()) {
                 String key = entry.getKey();
-                if (key != null && !key.equalsIgnoreCase("Range")
+                if (key != null
+                        && !key.equalsIgnoreCase("Range")
                         && !key.equalsIgnoreCase("Host")
                         && !key.equalsIgnoreCase("Accept-Encoding")
-                        && !key.equalsIgnoreCase("Content-Length")) {
+                        && !key.equalsIgnoreCase("Content-Length")
+                        && !key.equalsIgnoreCase("X-Requested-With")
+                        && !key.toLowerCase().startsWith("sec-fetch-")
+                        && !key.toLowerCase().startsWith("sec-ch-")) {
                     defaultHeaders.put(key, entry.getValue());
                 }
             }
@@ -606,31 +1094,19 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         if (!defaultHeaders.containsKey("Origin") && !defaultHeaders.containsKey("origin")) {
             defaultHeaders.put("Origin", origin);
         }
-        try {
-            CookieManager cookieManager = CookieManager.getInstance();
-            cookieManager.flush();
-            String streamCookie = cookieManager.getCookie(streamUrl);
-            String embedCookie = webEmbedUrl != null ? cookieManager.getCookie(webEmbedUrl) : null;
-            String cookie = "";
-            if (streamCookie != null && !streamCookie.isEmpty()) {
-                cookie = streamCookie;
+        if (!defaultHeaders.containsKey("Cookie") && !defaultHeaders.containsKey("cookie")) {
+            String cookieHeader = getMergedCookies(videoUrl, webEmbedUrl, currentLoadedUrl, streamUrl);
+            if (cookieHeader != null) {
+                defaultHeaders.put("Cookie", cookieHeader);
             }
-            if (embedCookie != null && !embedCookie.isEmpty()) {
-                cookie = cookie.isEmpty() ? embedCookie : (cookie + "; " + embedCookie);
-            }
-            if (!cookie.isEmpty() && !defaultHeaders.containsKey("Cookie") && !defaultHeaders.containsKey("cookie")) {
-                defaultHeaders.put("Cookie", cookie);
-            }
-        } catch (Exception e) {
-            Log.e("ExoPlayer", "Error obtaining cookies: ", e);
         }
 
         DefaultLoadControl loadControl = new DefaultLoadControl.Builder()
                 .setBufferDurationsMs(
-                        3000,
-                        30000,
-                        500,
-                        1000
+                        15000,
+                        50000,
+                        1500,
+                        2500
                 )
                 .setPrioritizeTimeOverSizeThresholds(true)
                 .build();
@@ -638,11 +1114,34 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         DefaultHttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSource.Factory()
                 .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
                 .setDefaultRequestProperties(defaultHeaders)
-                .setConnectTimeoutMs(8000)
-                .setReadTimeoutMs(8000)
+                .setConnectTimeoutMs(15000)
+                .setReadTimeoutMs(15000)
                 .setAllowCrossProtocolRedirects(true);
 
-        DefaultMediaSourceFactory mediaSourceFactory = new DefaultMediaSourceFactory(httpDataSourceFactory);
+        DefaultLoadErrorHandlingPolicy loadErrorHandlingPolicy = new DefaultLoadErrorHandlingPolicy(4) {
+            @Override
+            public int getMinimumLoadableRetryCount(int dataType) {
+                return 4;
+            }
+
+            @Override
+            public long getRetryDelayMsFor(LoadErrorInfo loadErrorInfo) {
+                if (loadErrorInfo.exception instanceof HttpDataSource.InvalidResponseCodeException) {
+                    HttpDataSource.InvalidResponseCodeException httpError =
+                            (HttpDataSource.InvalidResponseCodeException) loadErrorInfo.exception;
+                    if (httpError.responseCode == 404 || httpError.responseCode == 410) {
+                        return C.TIME_UNSET;
+                    }
+                    if (httpError.responseCode == 429) {
+                        return 1500;
+                    }
+                }
+                return super.getRetryDelayMsFor(loadErrorInfo);
+            }
+        };
+
+        DefaultMediaSourceFactory mediaSourceFactory = new DefaultMediaSourceFactory(httpDataSourceFactory)
+                .setLoadErrorHandlingPolicy(loadErrorHandlingPolicy);
 
         trackSelector = new DefaultTrackSelector(this);
         DefaultTrackSelector.Parameters parameters = trackSelector.buildUponParameters()
@@ -668,13 +1167,21 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
             }
         });
 
-//        Log.d("StreamPlayback", "Playing stream: " + streamUrl);
-//        Log.d("StreamPlayback", "Headers: " + defaultHeaders);
-
         exoPlayer.addListener(new Player.Listener() {
             @Override
             public void onPlaybackStateChanged(int playbackState) {
                 if (playbackState == Player.STATE_READY) {
+                    if (exoPlayer != null && exoPlayer.getPlayWhenReady()) {
+                        if (hud != null && hud.isShowing()) {
+                            hud.dismiss();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onIsPlayingChanged(boolean isPlaying) {
+                if (isPlaying) {
                     if (hud != null && hud.isShowing()) {
                         hud.dismiss();
                     }
@@ -690,21 +1197,39 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
 
             @Override
             public void onCues(CueGroup cueGroup) {
-//                Log.d("ExoPlayerSubtitles", "onCues: " + (cueGroup != null ? cueGroup.cues.size() : 0));
             }
 
             @Override
             public void onTracksChanged(Tracks tracks) {
-//                Log.d("ExoPlayerSubtitles", "Subtitles supported: " + tracks.isTypeSupported(C.TRACK_TYPE_TEXT) + ", selected: " + tracks.isTypeSelected(C.TRACK_TYPE_TEXT));
             }
 
             @Override
             public void onPlayerError(PlaybackException error) {
-//                Log.e("ExoPlayer", "Playback error for " + streamUrl, error);
                 if (hud != null && hud.isShowing()) {
                     hud.dismiss();
                 }
-                Toast.makeText(getApplicationContext(), "Playback error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                String msg = "Playback error";
+                Throwable cause = error.getCause();
+                if (cause instanceof HttpDataSource.InvalidResponseCodeException) {
+                    HttpDataSource.InvalidResponseCodeException httpError =
+                            (HttpDataSource.InvalidResponseCodeException) cause;
+                    if (httpError.responseCode == 404 || httpError.responseCode == 410) {
+                        msg = "Video not found (404). Please select another server.";
+                    } else {
+                        msg = "Server error (" + httpError.responseCode + "). Please select another server.";
+                    }
+                } else if (error.errorCode == PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND) {
+                    msg = "Video not found (404). Please select another server.";
+                } else if (error.getMessage() != null) {
+                    if (error.getMessage().contains("404")) {
+                        msg = "Video not found (404). Please select another server.";
+                    } else if (error.getMessage().contains("Response code")) {
+                        msg = error.getMessage() + ". Please select another server.";
+                    } else {
+                        msg = "Playback error: " + error.getMessage();
+                    }
+                }
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -731,7 +1256,6 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                 subtitleConfigs.add(subConfigBuilder.build());
             }
             mediaItemBuilder.setSubtitleConfigurations(subtitleConfigs);
-//            Log.d("StreamPlayback", "Attached " + subtitleConfigs.size() + " subtitles to MediaItem");
         }
 
         String cleanUrl = streamUrl.toLowerCase().split("\\?")[0];
@@ -750,17 +1274,23 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
 
         if (scraper != null) {
             try {
+                scraper.stopLoading();
                 scraper.evaluateJavascript(
                         "(function() {" +
+                                "  window.__playStopped = true;" +
+                                "  if (window.__playInterval) clearInterval(window.__playInterval);" +
                                 "  try {" +
                                 "    var vids = document.querySelectorAll('video');" +
                                 "    for (var i = 0; i < vids.length; i++) {" +
                                 "      vids[i].pause();" +
-                                "      vids[i].muted = true;" +
+                                "      vids[i].src = '';" +
+                                "      vids[i].removeAttribute('src');" +
+                                "      vids[i].load();" +
                                 "    }" +
                                 "  } catch(e) {}" +
                                 "})();", null);
                 scraper.onPause();
+                scraper.loadUrl("about:blank");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -771,102 +1301,6 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         exoPlayer.setMediaItem(mediaItemBuilder.build());
         exoPlayer.prepare();
         exoPlayer.setPlayWhenReady(true);
-    }
-
-    private void applySubtitleBottomMargin() {
-        if (binding == null || binding.playerView == null) return;
-        subtitleView = binding.playerView.getSubtitleView();
-        if (subtitleView == null) return;
-        ViewGroup.LayoutParams lp = subtitleView.getLayoutParams();
-        if (!(lp instanceof ViewGroup.MarginLayoutParams)) return;
-        ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) lp;
-
-        int orientation = getResources().getConfiguration().orientation;
-        int extraDp = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? 56 : 0;
-        int extraPx = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, extraDp, getResources().getDisplayMetrics());
-        mlp.bottomMargin = extraPx;
-        subtitleView.setLayoutParams(mlp);
-    }
-
-
-    private boolean isAdOrJunkUrl(String url) {
-        if (url == null) return false;
-        String lower = url.toLowerCase();
-        return lower.contains("google-analytics")
-                || lower.contains("googlesyndication")
-                || lower.contains("doubleclick")
-                || lower.contains("adservice")
-                || lower.contains("adnxs")
-                || lower.contains("popads")
-                || lower.contains("propeller")
-                || lower.contains("adsterra")
-                || lower.contains("exoclick")
-                || lower.contains("trafficjunky")
-                || lower.contains("histats")
-                || lower.contains("llvpn.com")
-                || lower.contains("creative-sb1")
-                || lower.contains("juicyads")
-                || lower.contains("adnium")
-                || lower.contains("tsyndicate")
-                || lower.contains("adsco.re")
-                || lower.contains("googletagmanager")
-                || lower.contains("cloudflareinsights")
-                || lower.contains("/beacon")
-                || lower.endsWith(".gif")
-                || lower.endsWith(".svg")
-                || lower.endsWith(".ico")
-                || lower.endsWith(".woff")
-                || lower.endsWith(".woff2")
-                || lower.endsWith(".ttf");
-    }
-
-    private boolean isVideoStreamUrl(String url) {
-        if (url == null) return false;
-        String lower = url.toLowerCase();
-        String cleanUrl = lower.split("\\?")[0];
-        if (cleanUrl.endsWith(".js") || cleanUrl.endsWith(".css") || cleanUrl.endsWith(".html")
-                || cleanUrl.endsWith(".htm") || cleanUrl.endsWith(".json") || cleanUrl.endsWith(".jpg")
-                || cleanUrl.endsWith(".jpeg") || cleanUrl.endsWith(".png") || cleanUrl.endsWith(".webp")
-                || cleanUrl.endsWith(".gif") || cleanUrl.endsWith(".svg") || cleanUrl.endsWith(".ico")
-                || cleanUrl.endsWith(".txt") || cleanUrl.endsWith(".vtt") || cleanUrl.endsWith(".srt")
-                || cleanUrl.endsWith(".woff") || cleanUrl.endsWith(".woff2") || cleanUrl.endsWith(".ttf")
-                || cleanUrl.endsWith(".ts") || cleanUrl.endsWith(".m4s") || cleanUrl.endsWith(".key")
-                || cleanUrl.endsWith(".aac") || cleanUrl.endsWith(".mp3")
-                || lower.contains(".ts?") || lower.contains(".m4s?") || lower.contains(".key?")) {
-            return false;
-        }
-
-        if (lower.contains("google-analytics") || lower.contains("doubleclick")
-                || lower.contains("adnxs") || lower.contains("/beacon") || lower.contains("/analytics")
-                || cleanUrl.contains("demo-video") || cleanUrl.contains("cdn")) {
-            return false;
-        }
-        return cleanUrl.endsWith(".m3u8")
-                || cleanUrl.endsWith(".mpd")
-                || cleanUrl.endsWith(".mp4")
-                || cleanUrl.endsWith(".mkv")
-                || cleanUrl.endsWith(".webm")
-                || lower.contains(".m3u8")
-                || lower.contains(".mpd")
-                || lower.contains("/hls/")
-                || lower.contains("/playlist")
-                || lower.contains("/manifest")
-                || lower.contains(".mp4?")
-                || lower.contains(".mkv?")
-                || lower.contains(".webm?");
-    }
-
-    private boolean isSubtitleUrl(String url) {
-        if (url == null) return false;
-        String lower = url.toLowerCase();
-        String cleanUrl = lower.split("\\?")[0];
-        if (isAdOrJunkUrl(url)) return false;
-        return cleanUrl.endsWith(".vtt") || cleanUrl.endsWith(".srt")
-                || cleanUrl.endsWith(".ass") || cleanUrl.endsWith(".sub")
-                || lower.contains(".vtt") || lower.contains(".srt")
-                || lower.contains("/subtitles/") || lower.contains("/captions/")
-                || lower.contains("sub.vtt");
     }
 
     @androidx.annotation.OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)
@@ -880,6 +1314,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         List<String> displayNames = new ArrayList<>();
         List<Tracks.Group> textGroups = new ArrayList<>();
         List<Integer> trackIndices = new ArrayList<>();
+
         displayNames.add("Off (Turn off subtitles)");
         textGroups.add(null);
         trackIndices.add(-1);
@@ -913,10 +1348,10 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
             }
         }
 
-        if (displayNames.size() == 1) {
+        if (displayNames.size() == 1) { // Only "Off" is in the list
             new AlertDialog.Builder(this, R.style.AlertDialogTheme)
                     .setTitle("Subtitles")
-                    .setMessage("No subtitle tracks found in this video stream.\n\nSubtitles depend on the video server. If you need subtitles, please try selecting another server below (e.g. Player 2).")
+                    .setMessage("No subtitle tracks found in this video stream.\n\nSubtitles depend on the video server. If you need subtitles, please try selecting another server below.")
                     .setPositiveButton("OK", null)
                     .show();
             return;
@@ -933,7 +1368,6 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                         return;
                     }
                     if (which == 0) {
-                        // User selected "Off"
                         exoPlayer.setTrackSelectionParameters(
                                 exoPlayer.getTrackSelectionParameters()
                                         .buildUpon()
@@ -943,7 +1377,6 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                         );
                         Toast.makeText(this, "Subtitles turned off", Toast.LENGTH_SHORT).show();
                     } else {
-                        // User selected a specific subtitle language
                         Tracks.Group targetGroup = textGroups.get(which);
                         int targetIndex = trackIndices.get(which);
                         TrackSelectionOverride override = new TrackSelectionOverride(
@@ -965,6 +1398,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
                 .setNegativeButton("Cancel", null)
                 .show();
     }
+
 
     private void releaseExoPlayerOnly() {
         if (exoPlayer != null) {
@@ -997,7 +1431,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         if (binding != null && binding.tvSelect != null) {
             binding.tvSelect.setVisibility(View.VISIBLE);
         }
-        if(scraper!=null){
+        if (scraper != null) {
             scraper.clearCache(true);
         }
         trackSelector = null;

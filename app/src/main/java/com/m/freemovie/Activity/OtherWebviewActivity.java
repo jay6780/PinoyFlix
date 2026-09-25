@@ -147,7 +147,6 @@ public class OtherWebviewActivity extends AppCompatActivity
     private String player;
     private String currentLoadedUrl;
     private SubtitleView subtitleView;
-    private int currentResizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
