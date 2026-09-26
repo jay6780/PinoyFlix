@@ -45,6 +45,7 @@ import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.DialogSourceUtils;
 import com.m.freemovie.Utils.GlobalWindowUtils;
+import com.m.freemovie.Utils.MyApplication;
 import com.m.freemovie.Utils.VideoUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.MovieRuListAdapter;
@@ -312,6 +313,7 @@ public class OtherWebviewActivity extends AppCompatActivity
             if (videoUrl != null && !videoUrl.isEmpty()) {
                 binding.playerView.setVisibility(View.VISIBLE);
                 binding.tvSelect.setVisibility(View.GONE);
+                MyApplication.deleteCache(getApplicationContext());
                 if (videoUtils != null) {
                     videoUtils.resolveAndPlayStream(videoUrl);
                 }
@@ -580,6 +582,7 @@ public class OtherWebviewActivity extends AppCompatActivity
             videoUtils.releasePlayer();
         }
         this.videoUrl = url;
+        MyApplication.deleteCache(getApplicationContext());
         if (videoUtils != null) {
             binding.tvSelect.setVisibility(View.GONE);
             binding.playerView.setVisibility(View.VISIBLE);

@@ -43,6 +43,7 @@ import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.GlobalWindowUtils;
+import com.m.freemovie.Utils.MyApplication;
 import com.m.freemovie.Utils.VideoUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.MovieListAdapter;
@@ -309,6 +310,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         } else {
             binding.playerView.setVisibility(View.VISIBLE);
             binding.tvSelect.setVisibility(View.GONE);
+            MyApplication.deleteCache(getApplicationContext());
             if (videoUtils != null) {
                 videoUtils.resolveAndPlayStream(videoUrl);
             }
@@ -438,6 +440,7 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         if (videoUtils != null) {
             videoUtils.releasePlayer();
         }
+        MyApplication.deleteCache(getApplicationContext());
         this.title = title;
         this.videoId = id;
         switch (position) {
