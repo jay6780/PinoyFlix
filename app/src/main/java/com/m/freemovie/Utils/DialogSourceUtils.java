@@ -133,7 +133,7 @@ public class DialogSourceUtils {
     }
 
     public AlertDialog.Builder WatchSourceMovie(Activity activity, String title, String id, int apiPosition) {
-        String[] option = {"Player 1", "Player 2", "Download"};
+        String[] option = {"Player 1", "Player 2", "Player 3","Player 4", "Download"};
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         TextView titleView = new TextView(activity);
         titleView.setText("Select player");
@@ -164,7 +164,21 @@ public class DialogSourceUtils {
                         intent.putExtra("apiPosition", apiPosition);
                         break;
                     case 2:
-                        String downloadUrl = "https://vidvault.to/movie/" + id;
+                        intent = new Intent(activity, VideoWebviewActivity.class);
+                        intent.putExtra("title", title);
+                        intent.putExtra("videoPosition", 3);
+                        intent.putExtra("videoId", id);
+                        intent.putExtra("apiPosition", apiPosition);
+                        break;
+                    case 3:
+                        intent = new Intent(activity, VideoWebviewActivity.class);
+                        intent.putExtra("title", title);
+                        intent.putExtra("videoPosition", 4);
+                        intent.putExtra("videoId", id);
+                        intent.putExtra("apiPosition", apiPosition);
+                        break;
+                    case 4:
+                        String downloadUrl = "https://vidvault.to/m1/m/" + id;
                         intent = new Intent(activity, DownloadWebview.class);
                         intent.putExtra("DownloadUrl", downloadUrl);
                         intent.putExtra("EpisodeNum", "");
@@ -182,12 +196,13 @@ public class DialogSourceUtils {
     }
 
     public AlertDialog.Builder MovieListSource(Context mContext, String id, String title, MovieListAdapter.MovieIdListener movieIdListener, int apiPosition) {
-        String[] option = {"Player 1", "Player 2", "View Details", "Download"};
+        String[] option = {"Player 1", "Player 2","Player 3", "Player 4","View Details", "Download"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setItems(option, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                Intent intent = null;
                 switch (which) {
                     case 0:
                         movieIdListener.getMovieId(id, title, 1);
@@ -196,14 +211,20 @@ public class DialogSourceUtils {
                         movieIdListener.getMovieId(id, title, 2);
                         break;
                     case 2:
-                        Intent intent = new Intent(mContext, Details_activity.class);
+                        movieIdListener.getMovieId(id, title, 3);
+                        break;
+                    case 3:
+                        movieIdListener.getMovieId(id, title, 4);
+                        break;
+                    case 4:
+                        intent = new Intent(mContext, Details_activity.class);
                         intent.putExtra("id", id);
                         intent.putExtra("position", 2);
                         intent.putExtra("apiPosition", apiPosition);
                         mContext.startActivity(intent);
                         break;
-                    case 3:
-                        String downloadUrl = "https://vidvault.to/movie/" + id;
+                    case 5:
+                        String downloadUrl = "https://vidvault.to/m1/m/" + id;
                         Intent download = new Intent(mContext, DownloadWebview.class);
                         download.putExtra("DownloadUrl", downloadUrl);
                         download.putExtra("EpisodeNum", "");
@@ -218,7 +239,7 @@ public class DialogSourceUtils {
     }
 
     public AlertDialog.Builder TvSeriesSource(Context mContext, String id, int seasonNum, int EpisodeNum, EpisodeAdapter.SourceListener sourceListener) {
-        String[] videoPlayer = {"Player 1", "Player 2"};
+        String[] videoPlayer = {"Player 1", "Player 2","Player 3","Player 4"};
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         TextView titleView = new TextView(mContext);
         titleView.setText("Select player");
@@ -243,6 +264,12 @@ public class DialogSourceUtils {
                         break;
                     case 1:
                         sourceListener.getId(id, 2, seasonNum, EpisodeNum);
+                        break;
+                    case 2:
+                        sourceListener.getId(id, 3, seasonNum, EpisodeNum);
+                        break;
+                    case 3:
+                        sourceListener.getId(id, 4, seasonNum, EpisodeNum);
                         break;
                 }
             }

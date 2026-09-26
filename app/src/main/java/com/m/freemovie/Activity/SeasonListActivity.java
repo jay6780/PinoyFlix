@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Rational;
 import android.util.TypedValue;
 import android.view.Display;
@@ -220,10 +221,18 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         MyApplication.deleteCache(getApplicationContext());
         switch (position) {
             case 1:
-                videoUrl = "https://vidrock.to/tv/" + id + "/" + seasonNum + "/" + epNumber + "&download=false";
+                videoUrl = "https://player.videasy.ws/embed/tv/" + id + "/" + seasonNum + "/" + epNumber;
+//                Log.d("VideoUrl","bal: "+videoUrl);
                 break;
             case 2:
+                videoUrl = "https://vidrock.to/tv/" + id + "/" + seasonNum + "/" + epNumber + "&download=false";
+                break;
+            case 3:
                 videoUrl = "https://moviesapi.to/tv/" + id + "/" + seasonNum + "/" + epNumber;
+//                Log.d("VideoUrl","bal: "+videoUrl);
+                break;
+            case 4:
+                videoUrl = "https://vidfast.vc/tv/" + id + "/" + seasonNum + "/" + epNumber;
 //                Log.d("VideoUrl","bal: "+videoUrl);
                 break;
         }

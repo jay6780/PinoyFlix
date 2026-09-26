@@ -215,7 +215,7 @@ public class VideoUtils {
         if (url == null) return false;
         String lower = url.toLowerCase();
         String cleanUrl = lower.split("\\?")[0];
-        if (isAdOrJunkUrl(url)) return false;
+        if (isAdOrJunkUrl(url) || isThumbnailTrackUrl(url)) return false;
         return cleanUrl.endsWith(".vtt") || cleanUrl.endsWith(".srt")
                 || cleanUrl.endsWith(".ass") || cleanUrl.endsWith(".sub")
                 || lower.contains(".vtt") || lower.contains(".srt")
@@ -223,6 +223,16 @@ public class VideoUtils {
                 || lower.contains("sub.vtt");
     }
 
+    private boolean isThumbnailTrackUrl(String url) {
+        if (url == null) return false;
+        String lower = url.toLowerCase();
+        return lower.contains("thumb")
+                || lower.contains("sprite")
+                || lower.contains("storyboard")
+                || lower.contains("preview")
+                || lower.contains("seekbar")
+                || lower.contains("scrub");
+    }
     public void resolveAndPlayStream(String videoUrl) {
         isRelease = false;
         this.videoUrl = videoUrl;
@@ -307,7 +317,8 @@ public class VideoUtils {
                     }
                 } else if (msg != null && msg.startsWith("EXTRACTED_TRACK_SRC:")) {
                     String trackUrl = msg.substring("EXTRACTED_TRACK_SRC:".length()).trim();
-                    if (!trackUrl.isEmpty() && !discoveredSubtitleUrls.contains(trackUrl)) {
+                    if (!trackUrl.isEmpty() && isSubtitleUrl(trackUrl) && isEnglishSubtitle(trackUrl)
+                            && !discoveredSubtitleUrls.contains(trackUrl)) {
                         discoveredSubtitleUrls.add(trackUrl);
                         if (hasStartedPlayback && exoPlayer != null) {
                             addSubtitleTrack(trackUrl);
@@ -330,11 +341,11 @@ public class VideoUtils {
                     return true;
                 }
 
-                if (isAdOrJunkUrl(url)) {
+                if (isAdOrJunkUrl(url) && !url.contains(videoUrl)) {
                     return true;
                 }
 
-                if (isVideoStreamUrl(url)) {
+                if (isVideoStreamUrl(url) && !url.contains(videoUrl)) {
                     String activeEmbed = (currentLoadedUrl != null && !currentLoadedUrl.isEmpty()) ? currentLoadedUrl : videoUrl;
                     schedulePlayback(url, activeEmbed, null);
                     return true;
@@ -371,7 +382,7 @@ public class VideoUtils {
                     return new WebResourceResponse("text/plain", "UTF-8", new ByteArrayInputStream(new byte[0]));
                 }
 
-                if (isSubtitleUrl(url) && !discoveredSubtitleUrls.contains(url)) {
+                if (isSubtitleUrl(url) && isEnglishSubtitle(url) && !discoveredSubtitleUrls.contains(url)) {
                     discoveredSubtitleUrls.add(url);
                     if (hasStartedPlayback && exoPlayer != null) {
                         addSubtitleTrack(url);
@@ -443,6 +454,9 @@ public class VideoUtils {
         scraperTimeoutHandler.postDelayed(scraperTimeoutRunnable, 45000);
 
         scraper.loadUrl(videoUrl);
+    }
+    private boolean isEnglishSubtitle(String url) {
+        return "en".equals(extractLanguageCode(url));
     }
 
     private String extractDomain(String url) {
@@ -850,24 +864,6 @@ public class VideoUtils {
         if (url == null) return "Subtitle " + index;
         String lower = url.toLowerCase();
         if (lower.contains("eng") || lower.contains("english")) return "English";
-        if (lower.contains("spa") || lower.contains("spanish") || lower.contains("espanol"))
-            return "Spanish";
-        if (lower.contains("tag") || lower.contains("fil") || lower.contains("tagalog") || lower.contains("filipino"))
-            return "Filipino";
-        if (lower.contains("fre") || lower.contains("french") || lower.contains("fra"))
-            return "French";
-        if (lower.contains("ger") || lower.contains("german") || lower.contains("deu"))
-            return "German";
-        if (lower.contains("ind") || lower.contains("indonesian")) return "Indonesian";
-        if (lower.contains("jap") || lower.contains("japanese") || lower.contains("jpn"))
-            return "Japanese";
-        if (lower.contains("kor") || lower.contains("korean")) return "Korean";
-        if (lower.contains("chi") || lower.contains("chinese") || lower.contains("zho"))
-            return "Chinese";
-        if (lower.contains("ara") || lower.contains("arabic")) return "Arabic";
-        if (lower.contains("por") || lower.contains("portuguese")) return "Portuguese";
-        if (lower.contains("rus") || lower.contains("russian")) return "Russian";
-        if (lower.contains("ita") || lower.contains("italian")) return "Italian";
         return "Subtitle " + index;
     }
 
@@ -875,22 +871,6 @@ public class VideoUtils {
         if (url == null) return "und";
         String lower = url.toLowerCase();
         if (lower.contains("eng") || lower.contains("english")) return "en";
-        if (lower.contains("spa") || lower.contains("spanish") || lower.contains("espanol"))
-            return "es";
-        if (lower.contains("tag") || lower.contains("fil") || lower.contains("tagalog") || lower.contains("filipino"))
-            return "tl";
-        if (lower.contains("fre") || lower.contains("french") || lower.contains("fra")) return "fr";
-        if (lower.contains("ger") || lower.contains("german") || lower.contains("deu")) return "de";
-        if (lower.contains("ind") || lower.contains("indonesian")) return "id";
-        if (lower.contains("jap") || lower.contains("japanese") || lower.contains("jpn"))
-            return "ja";
-        if (lower.contains("kor") || lower.contains("korean")) return "ko";
-        if (lower.contains("chi") || lower.contains("chinese") || lower.contains("zho"))
-            return "zh";
-        if (lower.contains("ara") || lower.contains("arabic")) return "ar";
-        if (lower.contains("por") || lower.contains("portuguese")) return "pt";
-        if (lower.contains("rus") || lower.contains("russian")) return "ru";
-        if (lower.contains("ita") || lower.contains("italian")) return "it";
         return "und";
     }
 

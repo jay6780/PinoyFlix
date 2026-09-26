@@ -19,6 +19,7 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Rational;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -142,14 +143,20 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
 
         switch (videoPosition) {
             case 1:
-                videoUrl = "https://vidrock.to/movie/" + videoId;
+                videoUrl = "https://player.videasy.ws/embed/movie/" + videoId;
                 break;
             case 2:
                 videoUrl = "https://moviesapi.to/movie/" + videoId;
                 break;
+            case 3:
+                videoUrl = "https://vidrock.to/movie/" + videoId;
+                break;
+            case 4:
+                videoUrl = "https://vidfast.vc/movie/" + videoId;
+                break;
         }
         subtitleView = binding.playerView.getSubtitleView();
-        videoUtils = new VideoUtils(this, subtitleView, binding.playerView, binding.rlWebview, binding.tvSelect,binding.btnBackFinish);
+        videoUtils = new VideoUtils(this, subtitleView, binding.playerView, binding.rlWebview, binding.tvSelect, binding.btnBackFinish);
 
         initApi();
         initStart();
@@ -446,11 +453,19 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         switch (position) {
             case 1:
                 videoPosition = 1;
-                videoUrl = "https://vidrock.to/movie/" + id;
+                videoUrl = "https://player.videasy.ws/embed/movie/" + id;
                 break;
             case 2:
                 videoPosition = 2;
                 videoUrl = "https://moviesapi.to/movie/" + id;
+                break;
+            case 3:
+                videoPosition = 3;
+                videoUrl = "https://vidrock.to/movie/" + id;
+                break;
+            case 4:
+                videoPosition = 4;
+                videoUrl = "https://vidfast.vc/movie/" + id;
                 break;
         }
         binding.tvSelect.setVisibility(View.GONE);
