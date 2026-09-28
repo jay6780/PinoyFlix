@@ -43,8 +43,10 @@ import com.app.hubert.guide.listener.OnGuideChangedListener;
 import com.app.hubert.guide.model.GuidePage;
 import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
+import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.MyApplication;
+import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.VideoUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.MovieListAdapter;
@@ -143,18 +145,21 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
 
         switch (videoPosition) {
             case 1:
-                videoUrl = "https://player.videasy.ws/embed/movie/" + videoId;
+                videoUrl = SPUtils.getInstance().getString(AppConstant.vidEasy_movie, "https://player.videasy.ws/embed/movie") + "/" + videoId;
                 break;
             case 2:
-                videoUrl = "https://moviesapi.to/movie/" + videoId;
+                videoUrl = SPUtils.getInstance().getString(AppConstant.moviesApi_movie, "https://moviesapi.to/movie") + "/" + videoId;
                 break;
             case 3:
-                videoUrl = "https://vidrock.to/movie/" + videoId;
+                videoUrl = SPUtils.getInstance().getString(AppConstant.vidRock_movie, "https://vidrock.to/movie") + "/" + videoId;
                 break;
             case 4:
-                videoUrl = "https://vidfast.vc/movie/" + videoId;
+                videoUrl = SPUtils.getInstance().getString(AppConstant.vidFast_movie, "https://vidfast.vc/movie") + "/" + videoId;
                 break;
         }
+
+//        Log.d("VideoUrl", "start: " + videoUrl);
+
         subtitleView = binding.playerView.getSubtitleView();
         videoUtils = new VideoUtils(this, subtitleView, binding.playerView, binding.rlWebview, binding.tvSelect, binding.btnBackFinish);
 
@@ -452,22 +457,19 @@ public class VideoWebviewActivity extends AppCompatActivity implements MovieWatc
         this.videoId = id;
         switch (position) {
             case 1:
-                videoPosition = 1;
-                videoUrl = "https://player.videasy.ws/embed/movie/" + id;
+                videoUrl = SPUtils.getInstance().getString(AppConstant.vidEasy_movie, "https://player.videasy.ws/embed/movie") + "/" + videoId;
                 break;
             case 2:
-                videoPosition = 2;
-                videoUrl = "https://moviesapi.to/movie/" + id;
+                videoUrl = SPUtils.getInstance().getString(AppConstant.moviesApi_movie, "https://moviesapi.to/movie") + "/" + videoId;
                 break;
             case 3:
-                videoPosition = 3;
-                videoUrl = "https://vidrock.to/movie/" + id;
+                videoUrl = SPUtils.getInstance().getString(AppConstant.vidRock_movie, "https://vidrock.to/movie") + "/" + videoId;
                 break;
             case 4:
-                videoPosition = 4;
-                videoUrl = "https://vidfast.vc/movie/" + id;
+                videoUrl = SPUtils.getInstance().getString(AppConstant.vidFast_movie, "https://vidfast.vc/movie") + "/" + videoId;
                 break;
         }
+//        Log.d("VideoUrl", "listSelect: " + videoUrl);
         binding.tvSelect.setVisibility(View.GONE);
         if (binding.playerView.getVisibility() == View.GONE) {
             binding.playerView.setVisibility(View.VISIBLE);

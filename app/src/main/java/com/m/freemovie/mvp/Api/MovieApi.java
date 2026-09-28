@@ -19,6 +19,7 @@ import com.m.freemovie.mvp.Model.ClassBean.DetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.DetailDownloadBean;
 import com.m.freemovie.mvp.Model.ClassBean.DetailTvBean;
 import com.m.freemovie.mvp.Model.ClassBean.DownloadNineAnimeBean;
+import com.m.freemovie.mvp.Model.ClassBean.MovieApiBean;
 import com.m.freemovie.mvp.Model.ClassBean.MovieBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeBean;
 import com.m.freemovie.mvp.Model.ClassBean.NineAnimeEpisodeBean;
@@ -31,6 +32,7 @@ import com.m.freemovie.mvp.Model.ClassBean.PinoyMovieRuBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.RevivalSeriesBean;
 import com.m.freemovie.mvp.Model.ClassBean.SearchRuBean;
+import com.m.freemovie.mvp.Model.ClassBean.SeriesApiBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogEpisodeBean;
 import com.m.freemovie.mvp.Model.ClassBean.TagalogInfoBean;
@@ -40,7 +42,6 @@ import com.m.freemovie.mvp.Model.ClassBean.ZoRoDetailBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoPageBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoSearchBean;
 import com.m.freemovie.mvp.Model.ClassBean.ZoRoVideoUrlBean;
-import com.m.freemovie.mvp.Model.ZoroSearchModel;
 
 import java.util.List;
 
@@ -421,4 +422,12 @@ public interface MovieApi {
     @GET("anineko/search")
     Observable<AniNekoSearchBean> getSearchAniNeko(
             @Query("q") String q);
+
+    //movieDomain
+    @GET("movieList")
+    Observable<MovieApiBean> getMovieDomain();
+    //SeriesDomain
+    @GET("SeriesList")
+    Observable<SeriesApiBean> getSeriesDomain();
+
 }

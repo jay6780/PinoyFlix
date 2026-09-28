@@ -31,7 +31,11 @@ import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.adapter.OptionAdapter;
 import com.m.freemovie.databinding.ActivityMainBinding;
+import com.m.freemovie.mvp.Contract.ApiListContract;
+import com.m.freemovie.mvp.Model.ClassBean.MovieApiBean;
 import com.m.freemovie.mvp.Model.ClassBean.OptionBean;
+import com.m.freemovie.mvp.Model.ClassBean.SeriesApiBean;
+import com.m.freemovie.mvp.Presenter.ApiListPresenter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 import meow.bottomnavigation.MeowBottomNavigation;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, ApiListContract.View {
     private ActivityMainBinding binding;
 
     private ImageView btn_back5;
@@ -49,12 +53,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private RecyclerView rv_option;
     private OptionAdapter optionAdapter;
     private List<OptionBean> optionBeanList = new ArrayList<>();
+    private ApiListPresenter apiListPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
-        new GlobalWindowUtils(this,true);
+        new GlobalWindowUtils(this, true);
         setContentView(binding.getRoot());
         getSupportActionBar().hide();
         btn_back5 = findViewById(R.id.btn_back5);
@@ -67,6 +72,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         optionBeanList.add(new OptionBean("file"));
         optionBeanList.add(new OptionBean("guide"));
         optionAdapter.setNewData(optionBeanList);
+        apiListPresenter = new ApiListPresenter(this);
+        apiListPresenter.getMovieApiList();
+        apiListPresenter.getSeriesApiList();
 
 
         optionAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
@@ -188,15 +196,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     startHourCount();
                 }
             }.start();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
 
     private void initPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE,android.Manifest.permission.READ_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
+        ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
     }
+
     private void initializeBottomNavigation() {
         try {
             Fragment searchFragment;
@@ -262,7 +271,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -317,4 +325,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    public void showLoading() {
+
+    }
+
+    @Override
+    public void showError(String error) {
+
+    }
+
+    @Override
+    public void hideLoading() {
+
+    }
+
+    @Override
+    public void getMovieApi(MovieApiBean movieApiBean) {
+        if (movieApiBean != null && movieApiBean.getProviders().size() != 0) {
+            List<String> movieApiList = new ArrayList<>();
+            for (MovieApiBean.ProvidersBean data : movieApiBean.getProviders()) {
+                movieApiList.add(data.getUrl());
+            }
+            SPUtils.getInstance().put(AppConstant.vidEasy_movie, movieApiList.get(0));
+            SPUtils.getInstance().put(AppConstant.moviesApi_movie, movieApiList.get(1));
+            SPUtils.getInstance().put(AppConstant.vidRock_movie, movieApiList.get(2));
+            SPUtils.getInstance().put(AppConstant.vidFast_movie, movieApiList.get(3));
+        }
+
+    }
+
+    @Override
+    public void getSeriesApi(SeriesApiBean seriesApiBean) {
+        if (seriesApiBean != null && seriesApiBean.getProviders().size() != 0) {
+            List<String> movieApiList = new ArrayList<>();
+            for (SeriesApiBean.ProvidersBean data : seriesApiBean.getProviders()) {
+                movieApiList.add(data.getUrl());
+            }
+            SPUtils.getInstance().put(AppConstant.vidEasy_series, movieApiList.get(0));
+            SPUtils.getInstance().put(AppConstant.vidRock_series, movieApiList.get(1));
+            SPUtils.getInstance().put(AppConstant.moviesApi_series, movieApiList.get(2));
+            SPUtils.getInstance().put(AppConstant.vidFast_series, movieApiList.get(3));
+        }
+    }
 }

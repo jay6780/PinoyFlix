@@ -31,10 +31,12 @@ import androidx.media3.ui.AspectRatioFrameLayout;
 import androidx.media3.ui.SubtitleView;
 
 import com.m.freemovie.R;
+import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.DbHelper.WatchHistoryDBHelper;
 import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
 import com.m.freemovie.Utils.MyApplication;
+import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.VideoUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.EpisodeAdapter;
@@ -146,7 +148,7 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         });
 
         subtitleView = binding.playerView.getSubtitleView();
-        videoUtils = new VideoUtils(this, subtitleView, binding.playerView, binding.rlWebview, binding.tvSelect,binding.btnBackFinish);
+        videoUtils = new VideoUtils(this, subtitleView, binding.playerView, binding.rlWebview, binding.tvSelect, binding.btnBackFinish);
     }
 
     private void rotateScreen() {
@@ -221,21 +223,19 @@ public class SeasonListActivity extends AppCompatActivity implements EpisodeAdap
         MyApplication.deleteCache(getApplicationContext());
         switch (position) {
             case 1:
-                videoUrl = "https://player.videasy.ws/embed/tv/" + id + "/" + seasonNum + "/" + epNumber;
-//                Log.d("VideoUrl","bal: "+videoUrl);
+                videoUrl = SPUtils.getInstance().getString(AppConstant.vidEasy_series, "https://player.videasy.ws/embed/tv") + "/" + id + "/" + seasonNum + "/" + epNumber;
                 break;
             case 2:
-                videoUrl = "https://vidrock.to/tv/" + id + "/" + seasonNum + "/" + epNumber + "&download=false";
+                videoUrl = SPUtils.getInstance().getString(AppConstant.vidRock_series, "https://vidrock.to/tv") + "/" + id + "/" + seasonNum + "/" + epNumber + "&download=false";
                 break;
             case 3:
-                videoUrl = "https://moviesapi.to/tv/" + id + "/" + seasonNum + "/" + epNumber;
-//                Log.d("VideoUrl","bal: "+videoUrl);
+                videoUrl = SPUtils.getInstance().getString(AppConstant.moviesApi_series, "https://moviesapi.to/tv") + "/" + id + "/" + seasonNum + "/" + epNumber;
                 break;
             case 4:
-                videoUrl = "https://vidfast.vc/tv/" + id + "/" + seasonNum + "/" + epNumber;
-//                Log.d("VideoUrl","bal: "+videoUrl);
+                videoUrl = SPUtils.getInstance().getString(AppConstant.vidFast_series, "https://vidfast.vc/tv") + "/" + id + "/" + seasonNum + "/" + epNumber;
                 break;
         }
+//        Log.d("VideoUrl", "bal: " + videoUrl);
         binding.tvSelect.setVisibility(View.GONE);
         if (binding.playerView.getVisibility() == View.GONE) {
             binding.playerView.setVisibility(View.VISIBLE);
