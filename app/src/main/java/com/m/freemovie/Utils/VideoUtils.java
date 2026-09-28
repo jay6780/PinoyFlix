@@ -66,7 +66,19 @@ public class VideoUtils {
     private Activity activity;
     private ExoPlayer exoPlayer;
     private DefaultTrackSelector trackSelector;
+    public static class SubtitleTrackInfo {
+        public final String url;
+        public final String label;
+        public final String lang;
+
+        public SubtitleTrackInfo(String url, String label, String lang) {
+            this.url = url;
+            this.label = label;
+            this.lang = lang;
+        }
+    }
     private final List<String> discoveredSubtitleUrls = new ArrayList<>();
+    private final java.util.Map<String, SubtitleTrackInfo> discoveredSubtitleMap = new java.util.LinkedHashMap<>();
     private WebView scraper;
     private final Handler scraperTimeoutHandler = new Handler(Looper.getMainLooper());
     private Runnable scraperTimeoutRunnable;
@@ -106,15 +118,16 @@ public class VideoUtils {
                 });
 
 
-        subtitleView = playerView.getSubtitleView();
-        if (subtitleView != null) {
-            subtitleView.setVisibility(View.VISIBLE);
-            subtitleView.setApplyEmbeddedFontSizes(false);
-            subtitleView.setApplyEmbeddedStyles(false);
-            subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
-            subtitleView.setStyle(new androidx.media3.ui.CaptionStyleCompat(
+        this.subtitleView = playerView != null && playerView.getSubtitleView() != null ? playerView.getSubtitleView() : subtitleView;
+        if (this.subtitleView != null) {
+            this.subtitleView.setVisibility(View.VISIBLE);
+            this.subtitleView.setViewType(SubtitleView.VIEW_TYPE_CANVAS);
+            this.subtitleView.setApplyEmbeddedFontSizes(true);
+            this.subtitleView.setApplyEmbeddedStyles(true);
+            this.subtitleView.setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
+            this.subtitleView.setStyle(new androidx.media3.ui.CaptionStyleCompat(
                     Color.WHITE,
-                    Color.argb(204, 0, 0, 0),
+                    Color.argb(180, 0, 0, 0),
                     Color.TRANSPARENT,
                     androidx.media3.ui.CaptionStyleCompat.EDGE_TYPE_OUTLINE,
                     Color.BLACK,
@@ -220,6 +233,7 @@ public class VideoUtils {
                 || cleanUrl.endsWith(".ass") || cleanUrl.endsWith(".sub")
                 || lower.contains(".vtt") || lower.contains(".srt")
                 || lower.contains("/subtitles/") || lower.contains("/captions/")
+                || lower.contains("/subs/") || lower.contains("subtitle")
                 || lower.contains("sub.vtt");
     }
 
@@ -237,6 +251,7 @@ public class VideoUtils {
         isRelease = false;
         this.videoUrl = videoUrl;
         discoveredSubtitleUrls.clear();
+        discoveredSubtitleMap.clear();
         pendingStreamUrl = null;
         pendingStreamHeaders = null;
         hasStartedPlayback = false;
@@ -315,9 +330,28 @@ public class VideoUtils {
                         String activeEmbed = (currentLoadedUrl != null && !currentLoadedUrl.isEmpty()) ? currentLoadedUrl : videoUrl;
                         schedulePlayback(streamUrl, activeEmbed, null);
                     }
+                } else if (msg != null && msg.startsWith("EXTRACTED_TRACK_INFO:")) {
+                    String json = msg.substring("EXTRACTED_TRACK_INFO:".length()).trim();
+                    try {
+                        org.json.JSONObject obj = new org.json.JSONObject(json);
+                        String trackUrl = obj.optString("url", "").trim();
+                        String label = obj.optString("label", "").trim();
+                        String lang = obj.optString("lang", "").trim();
+                        if (!trackUrl.isEmpty() && isSubtitleUrl(trackUrl)) {
+                            if (!discoveredSubtitleUrls.contains(trackUrl)) {
+                                discoveredSubtitleUrls.add(trackUrl);
+                            }
+                            discoveredSubtitleMap.put(trackUrl, new SubtitleTrackInfo(trackUrl, label, lang));
+                            if (hasStartedPlayback && exoPlayer != null) {
+                                addSubtitleTrack(trackUrl);
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 } else if (msg != null && msg.startsWith("EXTRACTED_TRACK_SRC:")) {
                     String trackUrl = msg.substring("EXTRACTED_TRACK_SRC:".length()).trim();
-                    if (!trackUrl.isEmpty() && isSubtitleUrl(trackUrl) && isEnglishSubtitle(trackUrl)
+                    if (!trackUrl.isEmpty() && isSubtitleUrl(trackUrl)
                             && !discoveredSubtitleUrls.contains(trackUrl)) {
                         discoveredSubtitleUrls.add(trackUrl);
                         if (hasStartedPlayback && exoPlayer != null) {
@@ -382,7 +416,7 @@ public class VideoUtils {
                     return new WebResourceResponse("text/plain", "UTF-8", new ByteArrayInputStream(new byte[0]));
                 }
 
-                if (isSubtitleUrl(url) && isEnglishSubtitle(url) && !discoveredSubtitleUrls.contains(url)) {
+                if (isSubtitleUrl(url) && !discoveredSubtitleUrls.contains(url)) {
                     discoveredSubtitleUrls.add(url);
                     if (hasStartedPlayback && exoPlayer != null) {
                         addSubtitleTrack(url);
@@ -454,9 +488,6 @@ public class VideoUtils {
         scraperTimeoutHandler.postDelayed(scraperTimeoutRunnable, 45000);
 
         scraper.loadUrl(videoUrl);
-    }
-    private boolean isEnglishSubtitle(String url) {
-        return "en".equals(extractLanguageCode(url));
     }
 
     private String extractDomain(String url) {
@@ -562,6 +593,16 @@ public class VideoUtils {
                         "              if (pl[0].file && isGoodStream(pl[0].file)) {" +
                         "                console.log('EXTRACTED_VIDEO_SRC:' + pl[0].file);" +
                         "              }" +
+                        "              if (pl[0].tracks && pl[0].tracks.length) {" +
+                        "                for (var tr = 0; tr < pl[0].tracks.length; tr++) {" +
+                        "                  var trk = pl[0].tracks[tr];" +
+                        "                  if (trk && trk.file && (trk.kind === 'captions' || trk.kind === 'subtitles' || !trk.kind)) {" +
+                        "                    var tLab = trk.label || trk.name || '';" +
+                        "                    var tLng = trk.language || trk.lang || '';" +
+                        "                    console.log('EXTRACTED_TRACK_INFO:' + JSON.stringify({ url: trk.file, label: tLab, lang: tLng }));" +
+                        "                  }" +
+                        "                }" +
+                        "              }" +
                         "            }" +
                         "          }" +
                         "        }" +
@@ -599,8 +640,26 @@ public class VideoUtils {
                         "      }" +
                         "      var trks = doc.querySelectorAll('track');" +
                         "      for (var t = 0; t < trks.length; t++) {" +
-                        "        if (trks[t].src) console.log('EXTRACTED_TRACK_SRC:' + trks[t].src);" +
+                        "        var tSrc = trks[t].src || trks[t].getAttribute('src');" +
+                        "        if (tSrc) {" +
+                        "          var tLab = trks[t].label || trks[t].getAttribute('label') || '';" +
+                        "          var tLng = trks[t].srclang || trks[t].getAttribute('srclang') || '';" +
+                        "          console.log('EXTRACTED_TRACK_INFO:' + JSON.stringify({ url: tSrc, label: tLab, lang: tLng }));" +
+                        "        }" +
                         "      }" +
+                        "      try {" +
+                        "        if (window.player && window.player.subtitles) {" +
+                        "          for (var sidx = 0; sidx < window.player.subtitles.length; sidx++) {" +
+                        "            var sItem = window.player.subtitles[sidx];" +
+                        "            var sUrl = sItem.url || sItem.file || sItem.src;" +
+                        "            if (sUrl) {" +
+                        "              var sLab = sItem.label || sItem.name || '';" +
+                        "              var sLng = sItem.lang || sItem.language || '';" +
+                        "              console.log('EXTRACTED_TRACK_INFO:' + JSON.stringify({ url: sUrl, label: sLab, lang: sLng }));" +
+                        "            }" +
+                        "          }" +
+                        "        }" +
+                        "      } catch(e){}" +
                         "      var vids = doc.querySelectorAll('video, source');" +
                         "      for (var j = 0; j < vids.length; j++) {" +
                         "        if (vids[j].tagName === 'VIDEO') {" +
@@ -842,12 +901,14 @@ public class VideoUtils {
                 String mimeType = subLower.endsWith(".srt") ? MimeTypes.APPLICATION_SUBRIP : MimeTypes.TEXT_VTT;
                 String label = extractSubtitleLabel(subUrl, newConfigs.size() + 1);
                 String lang = extractLanguageCode(subUrl);
-                MediaItem.SubtitleConfiguration newSub = new MediaItem.SubtitleConfiguration.Builder(Uri.parse(subUrl))
+                MediaItem.SubtitleConfiguration.Builder newSubBuilder = new MediaItem.SubtitleConfiguration.Builder(Uri.parse(subUrl))
                         .setMimeType(mimeType)
                         .setLanguage(lang)
-                        .setLabel(label)
-                        .build();
-                newConfigs.add(newSub);
+                        .setLabel(label);
+                if ("en".equals(lang) || newConfigs.isEmpty()) {
+                    newSubBuilder.setSelectionFlags(C.SELECTION_FLAG_DEFAULT);
+                }
+                newConfigs.add(newSubBuilder.build());
 
                 long currentPos = exoPlayer.getCurrentPosition();
                 boolean isPlaying = exoPlayer.getPlayWhenReady();
@@ -855,6 +916,7 @@ public class VideoUtils {
                         .setSubtitleConfigurations(newConfigs)
                         .build();
                 exoPlayer.setMediaItem(updatedItem, currentPos);
+                exoPlayer.prepare();
                 exoPlayer.setPlayWhenReady(isPlaying);
             }
         });
@@ -862,16 +924,104 @@ public class VideoUtils {
 
     private String extractSubtitleLabel(String url, int index) {
         if (url == null) return "Subtitle " + index;
-        String lower = url.toLowerCase();
-        if (lower.contains("eng") || lower.contains("english")) return "English";
+        if (discoveredSubtitleMap.containsKey(url)) {
+            SubtitleTrackInfo info = discoveredSubtitleMap.get(url);
+            if (info != null && !TextUtils.isEmpty(info.label)) {
+                return info.label;
+            }
+        }
+        String lang = extractLanguageCode(url);
+        if ("en".equals(lang)) return "English";
+        if ("fr".equals(lang)) return "French";
+        if ("es".equals(lang)) return "Spanish";
+        if ("tl".equals(lang)) return "Tagalog";
+        if ("de".equals(lang)) return "German";
+        if ("it".equals(lang)) return "Italian";
+        if ("pt".equals(lang)) return "Portuguese";
+        if ("ar".equals(lang)) return "Arabic";
+        if ("ru".equals(lang)) return "Russian";
+        if ("ja".equals(lang)) return "Japanese";
+        if ("ko".equals(lang)) return "Korean";
+        if ("zh".equals(lang)) return "Chinese";
         return "Subtitle " + index;
     }
 
     private String extractLanguageCode(String url) {
         if (url == null) return "und";
+        if (discoveredSubtitleMap.containsKey(url)) {
+            SubtitleTrackInfo info = discoveredSubtitleMap.get(url);
+            if (info != null && !TextUtils.isEmpty(info.lang)) {
+                String l = info.lang.toLowerCase().trim();
+                if (l.startsWith("en")) return "en";
+                if (l.startsWith("fr")) return "fr";
+                if (l.startsWith("es")) return "es";
+                if (l.startsWith("tl") || l.startsWith("fil")) return "tl";
+                return l;
+            }
+            if (info != null && !TextUtils.isEmpty(info.label)) {
+                String l = info.label.toLowerCase().trim();
+                if (l.contains("english")) return "en";
+                if (l.contains("french") || l.contains("français") || l.contains("francais")) return "fr";
+                if (l.contains("spanish") || l.contains("español") || l.contains("espanol")) return "es";
+                if (l.contains("tagalog") || l.contains("filipino")) return "tl";
+            }
+        }
+
         String lower = url.toLowerCase();
-        if (lower.contains("eng") || lower.contains("english")) return "en";
+
+        // 1. Explicit query parameters
+        if (lower.contains("lang=en") || lower.contains("srclang=en") || lower.contains("language=en") || lower.contains("lang=eng")) return "en";
+        if (lower.contains("lang=fr") || lower.contains("srclang=fr") || lower.contains("language=fr") || lower.contains("lang=fre") || lower.contains("lang=fra")) return "fr";
+        if (lower.contains("lang=es") || lower.contains("srclang=es") || lower.contains("language=es") || lower.contains("lang=spa")) return "es";
+        if (lower.contains("lang=tl") || lower.contains("srclang=tl") || lower.contains("lang=fil")) return "tl";
+
+        // 2. Full language names
+        if (lower.contains("english")) return "en";
+        if (lower.contains("french") || lower.contains("francais") || lower.contains("français")) return "fr";
+        if (lower.contains("spanish") || lower.contains("espanol") || lower.contains("español")) return "es";
+        if (lower.contains("tagalog") || lower.contains("filipino")) return "tl";
+        if (lower.contains("german") || lower.contains("deutsch")) return "de";
+        if (lower.contains("italian") || lower.contains("italiano")) return "it";
+        if (lower.contains("portuguese") || lower.contains("portugues")) return "pt";
+
+        // 3. Delimited language codes (never bare contains)
+        String path = lower.split("\\?")[0];
+        if (isCodeDelimited(path, "en") || isCodeDelimited(path, "eng") || isCodeDelimited(path, "en-us") || isCodeDelimited(path, "en-gb")) {
+            return "en";
+        }
+        if (isCodeDelimited(path, "fr") || isCodeDelimited(path, "fre") || isCodeDelimited(path, "fra") || isCodeDelimited(path, "fr-fr")) {
+            return "fr";
+        }
+        if (isCodeDelimited(path, "es") || isCodeDelimited(path, "spa") || isCodeDelimited(path, "es-es")) {
+            return "es";
+        }
+        if (isCodeDelimited(path, "tl") || isCodeDelimited(path, "fil")) {
+            return "tl";
+        }
+        if (isCodeDelimited(path, "de") || isCodeDelimited(path, "ger") || isCodeDelimited(path, "deu")) {
+            return "de";
+        }
+        if (isCodeDelimited(path, "it") || isCodeDelimited(path, "ita")) {
+            return "it";
+        }
+        if (isCodeDelimited(path, "pt") || isCodeDelimited(path, "por")) {
+            return "pt";
+        }
+
         return "und";
+    }
+
+    private boolean isCodeDelimited(String path, String code) {
+        if (path == null || code == null) return false;
+        return path.contains("/" + code + ".")
+                || path.contains("_" + code + ".")
+                || path.contains("-" + code + ".")
+                || path.contains("." + code + ".")
+                || path.contains("/" + code + "/")
+                || path.contains("_" + code + "_")
+                || path.contains("-" + code + "-")
+                || path.endsWith("/" + code)
+                || path.endsWith("_" + code);
     }
 
     @androidx.annotation.OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)
@@ -957,12 +1107,63 @@ public class VideoUtils {
             }
         };
 
-        DefaultMediaSourceFactory mediaSourceFactory = new DefaultMediaSourceFactory(httpDataSourceFactory)
+        DefaultHttpDataSource.Factory cleanHttpDataSourceFactory = new DefaultHttpDataSource.Factory()
+                .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+                .setConnectTimeoutMs(15000)
+                .setReadTimeoutMs(15000)
+                .setAllowCrossProtocolRedirects(true);
+
+        androidx.media3.datasource.DataSource.Factory routingDataSourceFactory = () -> {
+            androidx.media3.datasource.DataSource videoSource = httpDataSourceFactory.createDataSource();
+            androidx.media3.datasource.DataSource cleanSource = cleanHttpDataSourceFactory.createDataSource();
+            return new androidx.media3.datasource.DataSource() {
+                private androidx.media3.datasource.DataSource activeSource = videoSource;
+
+                @Override
+                public void addTransferListener(androidx.media3.datasource.TransferListener transferListener) {
+                    videoSource.addTransferListener(transferListener);
+                    cleanSource.addTransferListener(transferListener);
+                }
+
+                @Override
+                public long open(androidx.media3.datasource.DataSpec dataSpec) throws java.io.IOException {
+                    String specUrl = dataSpec.uri.toString().toLowerCase();
+                    if (isSubtitleUrl(specUrl)) {
+                        activeSource = cleanSource;
+                    } else {
+                        activeSource = videoSource;
+                    }
+                    return activeSource.open(dataSpec);
+                }
+
+                @Override
+                public int read(byte[] buffer, int offset, int length) throws java.io.IOException {
+                    return activeSource.read(buffer, offset, length);
+                }
+
+                @Override
+                public Uri getUri() {
+                    return activeSource.getUri();
+                }
+
+                @Override
+                public java.util.Map<String, List<String>> getResponseHeaders() {
+                    return activeSource.getResponseHeaders();
+                }
+
+                @Override
+                public void close() throws java.io.IOException {
+                    activeSource.close();
+                }
+            };
+        };
+
+        DefaultMediaSourceFactory mediaSourceFactory = new DefaultMediaSourceFactory(routingDataSourceFactory)
                 .setLoadErrorHandlingPolicy(loadErrorHandlingPolicy);
 
         trackSelector = new DefaultTrackSelector(activity);
         DefaultTrackSelector.Parameters parameters = trackSelector.buildUponParameters()
-                .setPreferredTextLanguage("en")
+                .setPreferredTextLanguages("en", "eng")
                 .setSelectUndeterminedTextLanguage(true)
                 .build();
         trackSelector.setParameters(parameters);
@@ -974,8 +1175,13 @@ public class VideoUtils {
                 .build();
         playerView.setPlayer(exoPlayer);
         playerView.setShowSubtitleButton(true);
-        if (subtitleView != null) {
-            subtitleView.post(this::applySubtitleBottomMargin);
+        if (playerView.getSubtitleView() != null) {
+            this.subtitleView = playerView.getSubtitleView();
+            this.subtitleView.setVisibility(View.VISIBLE);
+            this.subtitleView.setViewType(SubtitleView.VIEW_TYPE_CANVAS);
+            this.subtitleView.setApplyEmbeddedFontSizes(true);
+            this.subtitleView.setApplyEmbeddedStyles(true);
+            this.subtitleView.post(this::applySubtitleBottomMargin);
         }
         playerView.post(() -> {
             View subtitleBtn = playerView.findViewById(androidx.media3.ui.R.id.exo_subtitle);
@@ -1014,6 +1220,14 @@ public class VideoUtils {
 
             @Override
             public void onCues(CueGroup cueGroup) {
+                activity.runOnUiThread(() -> {
+                    if (subtitleView != null) {
+                        subtitleView.setCues(cueGroup.cues);
+                    }
+                    if (playerView != null && playerView.getSubtitleView() != null && playerView.getSubtitleView() != subtitleView) {
+                        playerView.getSubtitleView().setCues(cueGroup.cues);
+                    }
+                });
             }
 
             @Override
@@ -1053,7 +1267,13 @@ public class VideoUtils {
         MediaItem.Builder mediaItemBuilder = new MediaItem.Builder().setUri(streamUrl);
         if (!discoveredSubtitleUrls.isEmpty()) {
             List<MediaItem.SubtitleConfiguration> subtitleConfigs = new ArrayList<>();
-            boolean hasDefault = false;
+            int defaultIndex = 0;
+            for (int i = 0; i < discoveredSubtitleUrls.size(); i++) {
+                if ("en".equals(extractLanguageCode(discoveredSubtitleUrls.get(i)))) {
+                    defaultIndex = i;
+                    break;
+                }
+            }
             for (int i = 0; i < discoveredSubtitleUrls.size(); i++) {
                 String subUrl = discoveredSubtitleUrls.get(i);
                 String subLower = subUrl.toLowerCase().split("\\?")[0];
@@ -1066,9 +1286,8 @@ public class VideoUtils {
                         .setLanguage(lang)
                         .setLabel(label);
 
-                if (!hasDefault && (lang.equals("en") || i == 0)) {
+                if (i == defaultIndex) {
                     subConfigBuilder.setSelectionFlags(C.SELECTION_FLAG_DEFAULT);
-                    hasDefault = true;
                 }
                 subtitleConfigs.add(subConfigBuilder.build());
             }
@@ -1091,7 +1310,6 @@ public class VideoUtils {
 
         if (scraper != null) {
             try {
-                scraper.stopLoading();
                 scraper.evaluateJavascript(
                         "(function() {" +
                                 "  window.__playStopped = true;" +
@@ -1100,14 +1318,20 @@ public class VideoUtils {
                                 "    var vids = document.querySelectorAll('video');" +
                                 "    for (var i = 0; i < vids.length; i++) {" +
                                 "      vids[i].pause();" +
-                                "      vids[i].src = '';" +
-                                "      vids[i].removeAttribute('src');" +
-                                "      vids[i].load();" +
+                                "      vids[i].muted = true;" +
                                 "    }" +
                                 "  } catch(e) {}" +
                                 "})();", null);
-                scraper.onPause();
-                scraper.loadUrl("about:blank");
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    if (scraper != null && !isRelease) {
+                        try {
+                            scraper.stopLoading();
+                            scraper.onPause();
+                            scraper.loadUrl("about:blank");
+                        } catch (Exception ignored) {
+                        }
+                    }
+                }, 6000);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1210,13 +1434,21 @@ public class VideoUtils {
                     }
                     if (which == 0) {
                         // User selected "Off"
-                        exoPlayer.setTrackSelectionParameters(
-                                exoPlayer.getTrackSelectionParameters()
-                                        .buildUpon()
-                                        .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
-                                        .clearOverridesOfType(C.TRACK_TYPE_TEXT)
-                                        .build()
-                        );
+                        androidx.media3.common.TrackSelectionParameters offParams = exoPlayer.getTrackSelectionParameters()
+                                .buildUpon()
+                                .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
+                                .clearOverridesOfType(C.TRACK_TYPE_TEXT)
+                                .build();
+                        exoPlayer.setTrackSelectionParameters(offParams);
+                        if (trackSelector != null) {
+                            trackSelector.setParameters(offParams);
+                        }
+                        if (subtitleView != null) {
+                            subtitleView.setVisibility(View.GONE);
+                        }
+                        if (playerView != null && playerView.getSubtitleView() != null) {
+                            playerView.getSubtitleView().setVisibility(View.GONE);
+                        }
                         Toast.makeText(activity, "Subtitles turned off", Toast.LENGTH_SHORT).show();
                     } else {
                         Tracks.Group targetGroup = textGroups.get(which);
@@ -1225,14 +1457,24 @@ public class VideoUtils {
                                 targetGroup.getMediaTrackGroup(),
                                 targetIndex
                         );
-                        exoPlayer.setTrackSelectionParameters(
-                                exoPlayer.getTrackSelectionParameters()
-                                        .buildUpon()
-                                        .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
-                                        .clearOverridesOfType(C.TRACK_TYPE_TEXT)
-                                        .addOverride(override)
-                                        .build()
-                        );
+                        androidx.media3.common.TrackSelectionParameters selectParams = exoPlayer.getTrackSelectionParameters()
+                                .buildUpon()
+                                .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
+                                .clearOverridesOfType(C.TRACK_TYPE_TEXT)
+                                .addOverride(override)
+                                .build();
+                        exoPlayer.setTrackSelectionParameters(selectParams);
+                        if (trackSelector != null) {
+                            trackSelector.setParameters(selectParams);
+                        }
+                        if (subtitleView != null) {
+                            subtitleView.setVisibility(View.VISIBLE);
+                            subtitleView.bringToFront();
+                        }
+                        if (playerView != null && playerView.getSubtitleView() != null) {
+                            playerView.getSubtitleView().setVisibility(View.VISIBLE);
+                            playerView.getSubtitleView().bringToFront();
+                        }
                         Toast.makeText(activity, "Selected: " + itemsArray[which], Toast.LENGTH_SHORT).show();
                     }
                     dialog.dismiss();
@@ -1285,6 +1527,7 @@ public class VideoUtils {
         }
         trackSelector = null;
         discoveredSubtitleUrls.clear();
+        discoveredSubtitleMap.clear();
         pendingStreamUrl = null;
         pendingStreamHeaders = null;
         hasStartedPlayback = false;

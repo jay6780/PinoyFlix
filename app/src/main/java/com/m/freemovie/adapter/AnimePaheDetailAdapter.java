@@ -85,7 +85,6 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
                     lastPosition = -1;
                     videoPlayListerner.getVideoUrl(new ArrayList<>(),"",item);
                 } else {
-                    lastPosition = (helper.getAdapterPosition());
 //                    Log.d("EpisodeNum: ",item.getEpisode());
                     lastPosition = (helper.getAdapterPosition());
                     videoPlayListerner.getVideoUrl(item.getServersBeans(),item.getEpisodeUrl(),item);

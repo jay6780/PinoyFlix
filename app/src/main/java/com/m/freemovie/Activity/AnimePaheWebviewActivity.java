@@ -51,6 +51,7 @@ import com.m.freemovie.Utils.DbHelper.SpinnerTotalDbHelper;
 import com.m.freemovie.Utils.DialogSourceUtils;
 import com.m.freemovie.Utils.GlobalWindowUtils;
 import com.m.freemovie.Utils.LinearLayoutManagerWithSmoothScroller;
+import com.m.freemovie.Utils.MyApplication;
 import com.m.freemovie.Utils.SPUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.AllSourceAdapter;
@@ -569,6 +570,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     }
 
     private void clearCache() {
+        MyApplication.deleteCache(getApplicationContext());
         if (binding != null && binding.webView != null) {
             binding.webView.clearCache(true);
             binding.webView.clearHistory();

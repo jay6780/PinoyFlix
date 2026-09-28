@@ -3,7 +3,6 @@ package com.m.freemovie.adapter;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -25,10 +24,11 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
 
     private WatchHistoryDBHelper dbHelper;
     private SourceListener sourceListener;
-    private  int lastPosition = -1;
-    public interface SourceListener{
-        void getId(String id,int position,int seasonNum,int epNumber);
+    private int lastPosition = -1;
+    public interface SourceListener {
+        void getId(String id, int position, int seasonNum, int epNumber);
     }
+
     public EpisodeAdapter(SourceListener sourceListener) {
         super(R.layout.episode_item);
         this.sourceListener = sourceListener;
@@ -44,9 +44,9 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
         TextView tv_watched = helper.getView(R.id.tv_watched);
         RelativeLayout rl_select = helper.getView(R.id.rl_select);
 
-        if(lastPosition == (helper.getAdapterPosition())){
+        if (lastPosition == (helper.getAdapterPosition())) {
             rl_select.setBackgroundColor(Color.parseColor("#050E3C"));
-        }else{
+        } else {
             rl_select.setBackgroundColor(Color.parseColor("#313647"));
         }
 
@@ -64,14 +64,14 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
         helper.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!isNetworkAvailable()){
-                    Toast.makeText(mContext,"Please check internet and try again",Toast.LENGTH_SHORT).show();
+                if (!isNetworkAvailable()) {
+                    Toast.makeText(mContext, "Please check internet and try again", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if(lastPosition == (helper.getAdapterPosition())){
+                if (lastPosition == (helper.getAdapterPosition())) {
                     lastPosition = -1;
-                }else {
-                    showVideoOptions(item,mContext,helper);
+                } else {
+                    showVideoOptions(item, mContext, helper);
                 }
             }
         });
@@ -87,11 +87,21 @@ public class EpisodeAdapter extends BaseQuickAdapter<EpisodeBean, BaseViewHolder
     }
 
     private void showVideoOptions(EpisodeBean item, Context mContext, BaseViewHolder helper) {
-        lastPosition = (helper.getAdapterPosition());
-        new DialogSourceUtils().TvSeriesSource(mContext, item.getId(), item.getSeasonNum(), item.getEpisodeNum(), sourceListener);
-        dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
-                item.getSeasonNum(), item.getEpisodeNum(), item.getSeasonId());
-        item.setWatched(true);
+        lastPosition = helper.getAdapterPosition();
+
+        new DialogSourceUtils().TvSeriesSource(
+                mContext,
+                item.getId(),
+                item.getSeasonNum(),
+                item.getEpisodeNum(),
+                sourceListener,
+                () -> {
+                    dbHelper.markEpisodeAsWatched(item.getId(), item.getTitle(),
+                            item.getSeasonNum(), item.getEpisodeNum(), item.getSeasonId());
+                    item.setWatched(true);
+                    notifyDataSetChanged();
+                });
+
         notifyDataSetChanged();
     }
 }

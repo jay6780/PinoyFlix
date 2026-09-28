@@ -238,46 +238,30 @@ public class DialogSourceUtils {
         return builder;
     }
 
-    public AlertDialog.Builder TvSeriesSource(Context mContext, String id, int seasonNum, int EpisodeNum, EpisodeAdapter.SourceListener sourceListener) {
-        String[] videoPlayer = {"Player 1", "Player 2","Player 3","Player 4"};
+    public AlertDialog.Builder TvSeriesSource(Context mContext, String id, int seasonNum, int EpisodeNum,
+                                              EpisodeAdapter.SourceListener sourceListener,
+                                              Runnable onPlayerSelected) {
+        String[] videoPlayer = {"Player 1", "Player 2", "Player 3", "Player 4"};
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         TextView titleView = new TextView(mContext);
         titleView.setText("Select player");
         titleView.setTextColor(Color.BLACK);
         titleView.setPadding(40, 40, 40, 20);
         titleView.setTextSize(15);
-        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-
-            }
-        });
-
         builder.setCustomTitle(titleView);
 
         builder.setItems(videoPlayer, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0:
-                        sourceListener.getId(id, 1, seasonNum, EpisodeNum);
-                        break;
-                    case 1:
-                        sourceListener.getId(id, 2, seasonNum, EpisodeNum);
-                        break;
-                    case 2:
-                        sourceListener.getId(id, 3, seasonNum, EpisodeNum);
-                        break;
-                    case 3:
-                        sourceListener.getId(id, 4, seasonNum, EpisodeNum);
-                        break;
+                if (onPlayerSelected != null) {
+                    onPlayerSelected.run();
                 }
+                sourceListener.getId(id, which + 1, seasonNum, EpisodeNum);
             }
         });
         builder.show();
         return builder;
     }
-
     public DialogPlus TagalogWatchSource(Activity activity, int type, String title, List<PinoyRuDetailBean> pinoyRuDetailBeanList) {
         DialogPlus dialog = DialogPlus.newDialog(activity)
                 .setContentHolder(new ViewHolder(R.layout.dialog_ru_pinoy))
