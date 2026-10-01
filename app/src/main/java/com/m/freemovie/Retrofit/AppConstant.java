@@ -24,6 +24,7 @@ public class AppConstant {
     public static final String InterstitialId = "ca-app-pub-4940235333780807/3808106112";
     public static final String BannerAppId = "ca-app-pub-4940235333780807/3670307066";
     public static final String SpinnerPosition = "SpinnerPosition";
+    public static final String movieDownloadUrl = "movieDownloadUrl";
     public static final String vidEasy_movie = "vidEasy_movie";
     public static final String moviesApi_movie = "moviesApi_movie";
     public static final String vidRock_movie = "vidRock_movie";

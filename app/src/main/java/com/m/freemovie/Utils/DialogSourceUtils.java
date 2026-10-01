@@ -10,7 +10,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.OptIn;
 import androidx.media3.common.util.UnstableApi;
@@ -21,6 +20,7 @@ import com.m.freemovie.Activity.Details_activity;
 import com.m.freemovie.Activity.DownloadWebview;
 import com.m.freemovie.Activity.VideoWebviewActivity;
 import com.m.freemovie.R;
+import com.m.freemovie.Retrofit.AppConstant;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.adapter.AllSourceAdapter;
 import com.m.freemovie.adapter.EpisodeAdapter;
@@ -178,7 +178,7 @@ public class DialogSourceUtils {
                         intent.putExtra("apiPosition", apiPosition);
                         break;
                     case 4:
-                        String downloadUrl = "https://vidvault.to/m1/m/" + id;
+                        String downloadUrl = SPUtils.getInstance().getString(AppConstant.movieDownloadUrl,"https://vidvault.to/m1/m/") + id;
                         intent = new Intent(activity, DownloadWebview.class);
                         intent.putExtra("DownloadUrl", downloadUrl);
                         intent.putExtra("EpisodeNum", "");
@@ -219,12 +219,12 @@ public class DialogSourceUtils {
                     case 4:
                         intent = new Intent(mContext, Details_activity.class);
                         intent.putExtra("id", id);
-                        intent.putExtra("position", 2);
+                        intent.putExtra("position", 1);
                         intent.putExtra("apiPosition", apiPosition);
                         mContext.startActivity(intent);
                         break;
                     case 5:
-                        String downloadUrl = "https://vidvault.to/m1/m/" + id;
+                        String downloadUrl = SPUtils.getInstance().getString(AppConstant.movieDownloadUrl,"https://vidvault.to/m1/m/") + id;
                         Intent download = new Intent(mContext, DownloadWebview.class);
                         download.putExtra("DownloadUrl", downloadUrl);
                         download.putExtra("EpisodeNum", "");

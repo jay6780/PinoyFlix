@@ -347,6 +347,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             for (MovieApiBean.ProvidersBean data : movieApiBean.getProviders()) {
                 movieApiList.add(data.getUrl());
             }
+//            Log.d("DownloadUrl","val :" +movieApiBean.getDownloadurl());
+            SPUtils.getInstance().put(AppConstant.movieDownloadUrl, movieApiBean.getDownloadurl());
             SPUtils.getInstance().put(AppConstant.vidEasy_movie, movieApiList.get(0));
             SPUtils.getInstance().put(AppConstant.moviesApi_movie, movieApiList.get(1));
             SPUtils.getInstance().put(AppConstant.vidRock_movie, movieApiList.get(2));

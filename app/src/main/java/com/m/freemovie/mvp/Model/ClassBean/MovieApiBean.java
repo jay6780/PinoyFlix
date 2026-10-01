@@ -13,6 +13,7 @@ public class MovieApiBean {
     private String type;
     private int count;
     private List<ProvidersBean> providers;
+    private String downloadurl;
 
     public String getType() {
         return type;
@@ -36,6 +37,14 @@ public class MovieApiBean {
 
     public void setProviders(List<ProvidersBean> providers) {
         this.providers = providers;
+    }
+
+    public String getDownloadurl() {
+        return downloadurl;
+    }
+
+    public void setDownloadurl(String downloadurl) {
+        this.downloadurl = downloadurl;
     }
 
     public static class ProvidersBean {
