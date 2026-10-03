@@ -2,22 +2,17 @@ package com.m.freemovie.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
-
 import com.bumptech.glide.Glide;
 import com.m.freemovie.R;
-import com.m.freemovie.Utils.DbHelper.PinoyWatchHistoryHelper;
 import com.m.freemovie.Utils.base.BaseQuickAdapter;
 import com.m.freemovie.Utils.base.BaseViewHolder;
 import com.m.freemovie.mvp.Model.ClassBean.AniKoToWatchBean;
@@ -52,7 +47,7 @@ public class AnimePaheDetailAdapter extends BaseQuickAdapter<AnimePaheBeanList, 
         RelativeLayout rl_select = helper.getView(R.id.rl_select);
         TextView tv_watched = helper.getView(R.id.tv_watched);
 
-        if (lastPosition == (helper.getAdapterPosition()) && item.isWatched()) {
+        if (lastPosition == (helper.getAdapterPosition())) {
             rl_select.setBackgroundColor(Color.parseColor("#050E3C"));
         } else {
             rl_select.setBackgroundColor(Color.parseColor("#313647"));

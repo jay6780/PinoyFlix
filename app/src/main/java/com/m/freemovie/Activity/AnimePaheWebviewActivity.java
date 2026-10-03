@@ -86,7 +86,7 @@ import java.util.Locale;
 
 public class AnimePaheWebviewActivity extends AppCompatActivity
         implements AnimePaheDetailContract.View, AnimePaheDetailAdapter.EpisodeListener, AdapterView.OnItemSelectedListener,
-        AllSourceAdapter.SrcListener,AniMoSourceAdapter.SrcListener {
+        AllSourceAdapter.SrcListener, AniMoSourceAdapter.SrcListener {
     private ActivityAnimePaheWebviewBinding binding;
     private String id, title;
     private AnimePaheDetailAdapter episodeAdapter;
@@ -112,7 +112,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     private String imageUrl;
     private int animePosition;
     private int bookmarkNum;
-    private DialogPlus sourceDialog, anikoToSourceDialog,aniMoSourceDialog,PaHeSourceDialog;
+    private DialogPlus sourceDialog, anikoToSourceDialog, aniMoSourceDialog, PaHeSourceDialog;
     private AnimePaheBeanList animePaheBeanList;
     private List<AllSourceBean> allSourceBeanList = new ArrayList<>();
 
@@ -825,7 +825,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             }
 
             if (!allServers.isEmpty()) {
-                sourceDialog = new DialogSourceUtils().ShowDialog(this,AnimePaheWebviewActivity.this,allServers);
+                sourceDialog = new DialogSourceUtils().ShowDialog(this, AnimePaheWebviewActivity.this, allServers);
             } else {
                 Toast.makeText(this, "No Server Data", Toast.LENGTH_SHORT).show();
             }
@@ -882,11 +882,11 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
     @Override
     public void getAniMoEpisodes(AniMoTvEpisodeBean aniMoTvEpisodeBean) {
         if (aniMoTvEpisodeBean != null && aniMoTvEpisodeBean.getResults().size() != 0) {
-            if(!allSourceBeanList.isEmpty()){
+            if (!allSourceBeanList.isEmpty()) {
                 allSourceBeanList.clear();
             }
             for (AniMoTvEpisodeBean.ResultsBean resultsBean : aniMoTvEpisodeBean.getResults()) {
-                allSourceBeanList.add(new AllSourceBean(resultsBean.getName(), resultsBean.getUrl(),""));
+                allSourceBeanList.add(new AllSourceBean(resultsBean.getName(), resultsBean.getUrl(), ""));
             }
         }
         aniMoSourceDialog = new DialogSourceUtils().ShowAniMoAdapter(this, AnimePaheWebviewActivity.this, allSourceBeanList);
@@ -944,19 +944,19 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
     @Override
     public void getPaHeTrack(AnimePaheDownloadBean downloadBean) {
-        if(downloadBean !=null){
-            if(!allSourceBeanList.isEmpty()){
+        if (downloadBean != null) {
+            if (!allSourceBeanList.isEmpty()) {
                 allSourceBeanList.clear();
             }
-            if(downloadBean.getResults().getStreaming().size() !=0 && !downloadBean.getResults().getStreaming().isEmpty()){
-                for(AnimePaheDownloadBean.ResultsBean.StreamingBean streamingBean : downloadBean.getResults().getStreaming()){
-                    allSourceBeanList.add(new AllSourceBean(streamingBean.getQuality(),streamingBean.getUrl(),""));
+            if (downloadBean.getResults().getStreaming().size() != 0 && !downloadBean.getResults().getStreaming().isEmpty()) {
+                for (AnimePaheDownloadBean.ResultsBean.StreamingBean streamingBean : downloadBean.getResults().getStreaming()) {
+                    allSourceBeanList.add(new AllSourceBean(streamingBean.getQuality(), streamingBean.getUrl(), ""));
                 }
-            }else{
-                allSourceBeanList.add(new AllSourceBean("HD",downloadBean.getResults().getVideo().getUrl(),""));
+            } else {
+                allSourceBeanList.add(new AllSourceBean("HD", downloadBean.getResults().getVideo().getUrl(), ""));
             }
         }
-        PaHeSourceDialog = new DialogSourceUtils().ShowAnimePaHeSoruce(this,AnimePaheWebviewActivity.this,allSourceBeanList);
+        PaHeSourceDialog = new DialogSourceUtils().ShowAnimePaHeSoruce(this, AnimePaheWebviewActivity.this, allSourceBeanList);
 
     }
 
@@ -1009,13 +1009,15 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 if (serversBeanList.isEmpty()) {
                     return;
                 }
-                if(!allSourceBeanList.isEmpty()){
+                if (!allSourceBeanList.isEmpty()) {
                     allSourceBeanList.clear();
                 }
-                for(AniKoToWatchBean.EpisodesBean.ServersBean serversBean : serversBeanList){
-                    allSourceBeanList.add(new AllSourceBean(serversBean.getName(),serversBean.getVideoUrl(),serversBean.getType()));
+                for (AniKoToWatchBean.EpisodesBean.ServersBean serversBean : serversBeanList) {
+                    if (serversBeanList.size() != 0) {
+                        allSourceBeanList.add(new AllSourceBean(serversBean.getName(), serversBean.getVideoUrl(), ""));
+                    }
                 }
-                anikoToSourceDialog = new DialogSourceUtils().showAnikotoSource(this,AnimePaheWebviewActivity.this,allSourceBeanList);
+                anikoToSourceDialog = new DialogSourceUtils().showAnikotoSource(this, AnimePaheWebviewActivity.this, allSourceBeanList);
                 break;
             case 2:
                 if (videoUrl.isEmpty()) {

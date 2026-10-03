@@ -1,14 +1,16 @@
 package com.m.freemovie.mvp.Model.ClassBean;
 
+import android.text.TextUtils;
+
 public class AllSourceBean {
     private String qualityName;
     private String url;
     private String type;
 
-    public AllSourceBean(String qualityName, String url,String type) {
-        this.qualityName = qualityName;
-        this.url = url;
-        this.type = type;
+    public AllSourceBean(String qualityName, String url, String type) {
+        this.qualityName = TextUtils.isEmpty(qualityName) ? "" : qualityName;
+        this.url = TextUtils.isEmpty(url) ? "" : url;
+        this.type = TextUtils.isEmpty(type) ? "" : type;
     }
 
     public String getQualityName() {
