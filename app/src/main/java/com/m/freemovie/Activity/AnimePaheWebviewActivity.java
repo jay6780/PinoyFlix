@@ -588,13 +588,13 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
             if (!isNetworkAvailable()) {
                 return;
             }
+            binding.tvSelect.setVisibility(View.GONE);
             if (newProgress < 100) {
                 binding.progressBar.setVisibility(View.VISIBLE);
                 binding.progressBar.setProgress(newProgress);
             } else {
                 binding.progressBar.setProgress(100);
                 binding.progressBar.setVisibility(View.GONE);
-                binding.tvSelect.setVisibility(View.GONE);
             }
         }
     }

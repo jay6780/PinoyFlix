@@ -660,6 +660,7 @@ public class TagalogWebviewActivity extends AppCompatActivity
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
             super.onProgressChanged(view, newProgress);
+            binding.tvSelect.setVisibility(View.GONE);
             if (newProgress < 100) {
                 binding.progressBar.setVisibility(View.VISIBLE);
                 binding.progressBar.setProgress(newProgress);
