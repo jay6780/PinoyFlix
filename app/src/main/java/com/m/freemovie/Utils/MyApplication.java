@@ -33,9 +33,9 @@ public class MyApplication extends Application {
 
     public static void deleteCache(Context context) {
         if(context instanceof Activity){
-            WebViewPool pool = new SingularWebViewPool(((Activity)context));
-            WebView cachedView = pool.obtain(((Activity)context));
-            if(!pool.release(cachedView ,((Activity)context))) {
+            WebViewPool pool = new SingularWebViewPool((context));
+            WebView cachedView = pool.obtain((context));
+            if(!pool.release(cachedView ,(context))) {
             }
         }
         try {

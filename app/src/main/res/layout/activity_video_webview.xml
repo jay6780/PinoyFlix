@@ -22,8 +22,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
                 android:layout_marginTop="7dp"
+                android:layout_marginEnd="10dp"
                 android:elevation="20dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
@@ -42,13 +42,12 @@
             </LinearLayout>
 
 
-
             <androidx.media3.ui.PlayerView
                 android:id="@+id/player_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="gone"
                 android:background="#000000"
+                android:visibility="gone"
                 app:resize_mode="zoom"
                 app:show_subtitle_button="true" />
 

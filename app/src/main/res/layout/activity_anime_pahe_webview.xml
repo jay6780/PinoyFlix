@@ -60,32 +60,46 @@
         </RelativeLayout>
 
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_below="@+id/rl_webview"
+            android:layout_marginTop="-3dp"
+            android:max="100"
+            android:progress="0"
+            android:progressTint="#FFFFFF"
+            android:progressBackgroundTint="#00000000"
+            android:visibility="gone" />
+
+
         <RelativeLayout
             android:id="@+id/rl_option"
-            android:layout_below="@+id/rl_webview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/progressBar">
 
             <TextView
                 android:id="@+id/episodeTxt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
                 android:layout_centerVertical="true"
+                android:layout_marginStart="5dp"
                 android:textSize="16sp" />
 
             <Spinner
                 android:id="@+id/spinner"
+                style="@style/CustomSpinnerStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:visibility="gone"
                 android:layout_centerVertical="true"
-                android:textSize="12sp"
                 android:minHeight="0dp"
                 android:paddingStart="0dp"
                 android:paddingEnd="0dp"
-                style="@style/CustomSpinnerStyle" />
+                android:textSize="12sp"
+                android:visibility="gone" />
 
         </RelativeLayout>
 

@@ -282,6 +282,18 @@ public class DownloadWebview extends AppCompatActivity {
             return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888);
         }
 
+        @Override
+        public void onProgressChanged(WebView view, int newProgress) {
+            super.onProgressChanged(view, newProgress);
+            if (newProgress < 100) {
+                binding.progressBar.setVisibility(View.VISIBLE);
+                binding.progressBar.setProgress(newProgress);
+            } else {
+                binding.progressBar.setProgress(100);
+                binding.progressBar.setVisibility(View.GONE);
+            }
+        }
+
 
     }
 

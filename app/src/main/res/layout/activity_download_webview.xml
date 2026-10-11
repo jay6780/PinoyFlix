@@ -47,7 +47,18 @@
             android:src="@mipmap/refresh_white" />
     </RelativeLayout>
 
-
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_below="@+id/rl_title"
+        android:layout_marginTop="-3dp"
+        android:max="100"
+        android:progress="0"
+        android:progressTint="#FFFFFF"
+        android:progressBackgroundTint="#00000000"
+        android:visibility="gone" />
     <FrameLayout
         android:visibility="gone"
         android:id="@+id/web_container"

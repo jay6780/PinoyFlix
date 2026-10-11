@@ -178,7 +178,7 @@ public class DialogSourceUtils {
                         intent.putExtra("apiPosition", apiPosition);
                         break;
                     case 4:
-                        String downloadUrl = SPUtils.getInstance().getString(AppConstant.movieDownloadUrl,"https://vidvault.to/m1/m/") + id;
+                        String downloadUrl = SPUtils.getInstance().getString(AppConstant.movieDownloadUrl,"https://vidvault.to/movie/") + id;
                         intent = new Intent(activity, DownloadWebview.class);
                         intent.putExtra("DownloadUrl", downloadUrl);
                         intent.putExtra("EpisodeNum", "");
@@ -224,7 +224,7 @@ public class DialogSourceUtils {
                         mContext.startActivity(intent);
                         break;
                     case 5:
-                        String downloadUrl = SPUtils.getInstance().getString(AppConstant.movieDownloadUrl,"https://vidvault.to/m1/m/") + id;
+                        String downloadUrl = SPUtils.getInstance().getString(AppConstant.movieDownloadUrl,"https://vidvault.to/movie/") + id;
                         Intent download = new Intent(mContext, DownloadWebview.class);
                         download.putExtra("DownloadUrl", downloadUrl);
                         download.putExtra("EpisodeNum", "");

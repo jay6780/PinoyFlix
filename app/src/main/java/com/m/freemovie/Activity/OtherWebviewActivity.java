@@ -1,14 +1,19 @@
 package com.m.freemovie.Activity;
 
 import android.annotation.SuppressLint;
+import android.app.PendingIntent;
 import android.app.PictureInPictureParams;
+import android.app.RemoteAction;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.Point;
+import android.graphics.drawable.Icon;
 import android.media.AudioManager;
 import android.media.audiofx.LoudnessEnhancer;
 import android.net.ConnectivityManager;
@@ -21,7 +26,6 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Rational;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -30,6 +34,7 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.ui.PlayerView;
 import androidx.media3.ui.SubtitleView;
@@ -45,7 +50,6 @@ import com.app.hubert.guide.model.HighLight;
 import com.m.freemovie.R;
 import com.m.freemovie.Utils.DialogSourceUtils;
 import com.m.freemovie.Utils.GlobalWindowUtils;
-import com.m.freemovie.Utils.MyApplication;
 import com.m.freemovie.Utils.VideoUtils;
 import com.m.freemovie.Utils.WindowUtils;
 import com.m.freemovie.adapter.MovieRuListAdapter;
@@ -96,7 +100,13 @@ public class OtherWebviewActivity extends AppCompatActivity
     private DialogPlus dialog;
     private VideoUtils videoUtils;
     private SubtitleView subtitleView;
-
+    private static final String ACTION_PIP_CONTROL = "com.m.freemovie.PIP_CONTROL";
+    private static final String EXTRA_CONTROL_TYPE = "control_type";
+    private static final int CONTROL_REWIND = 1;
+    private static final int CONTROL_PLAY_PAUSE = 2;
+    private static final int CONTROL_FORWARD = 3;
+    private static final long SEEK_MS = 10_000;
+    private BroadcastReceiver pipReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,6 +134,12 @@ public class OtherWebviewActivity extends AppCompatActivity
         initApi();
         subtitleView = binding.playerView.getSubtitleView();
         videoUtils = new VideoUtils(this, subtitleView, binding.playerView, binding.rlWebview, binding.tvSelect, binding.btnBackFinish);
+
+        videoUtils.setPlaybackStateCallback(isPlaying -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                updatePipActions();
+            }
+        });
         initStart();
 
         binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -313,7 +329,6 @@ public class OtherWebviewActivity extends AppCompatActivity
             if (videoUrl != null && !videoUrl.isEmpty()) {
                 binding.playerView.setVisibility(View.VISIBLE);
                 binding.tvSelect.setVisibility(View.GONE);
-                MyApplication.deleteCache(getApplicationContext());
                 if (videoUtils != null) {
                     videoUtils.resolveAndPlayStream(videoUrl);
                 }
@@ -371,6 +386,8 @@ public class OtherWebviewActivity extends AppCompatActivity
             RelativeLayout.LayoutParams pipParams = new RelativeLayout.LayoutParams(
                     RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
             binding.rlWebview.setLayoutParams(pipParams);
+            registerPipReceiver();
+            updatePipActions();
 
         } else {
             if (videoUtils != null) {
@@ -386,6 +403,91 @@ public class OtherWebviewActivity extends AppCompatActivity
             } else {
                 binding.expand.setVisibility(View.INVISIBLE);
                 rotateScreen();
+            }
+            unregisterPipReceiver();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private RemoteAction createPipAction(int iconRes, String title, int controlType) {
+        Intent intent = new Intent(ACTION_PIP_CONTROL)
+                .setPackage(getPackageName())
+                .putExtra(EXTRA_CONTROL_TYPE, controlType);
+        PendingIntent pi = PendingIntent.getBroadcast(
+                this, controlType, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        return new RemoteAction(Icon.createWithResource(this, iconRes), title, title, pi);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private PictureInPictureParams buildPipParams() {
+        boolean playing = videoUtils != null && videoUtils.isPlayerPlaying();
+
+        List<RemoteAction> actions = new ArrayList<>();
+        actions.add(createPipAction(android.R.drawable.ic_media_rew, "Rewind", CONTROL_REWIND));
+        actions.add(createPipAction(
+                playing ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play,
+                playing ? "Pause" : "Play", CONTROL_PLAY_PAUSE));
+        actions.add(createPipAction(android.R.drawable.ic_media_ff, "Forward", CONTROL_FORWARD));
+
+        return new PictureInPictureParams.Builder()
+                .setAspectRatio(new Rational(16, 9))
+                .setActions(actions)
+                .build();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void updatePipActions() {
+        if (isInPictureInPictureMode()) {
+            try {
+                setPictureInPictureParams(buildPipParams());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void registerPipReceiver() {
+        if (pipReceiver != null) return;
+        pipReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent == null || !ACTION_PIP_CONTROL.equals(intent.getAction()) || videoUtils == null) return;
+                switch (intent.getIntExtra(EXTRA_CONTROL_TYPE, 0)) {
+                    case CONTROL_REWIND:
+                        videoUtils.seekBackward(SEEK_MS);
+                        break;
+                    case CONTROL_PLAY_PAUSE:
+                        videoUtils.togglePlayPause();
+                        break;
+                    case CONTROL_FORWARD:
+                        videoUtils.seekForward(SEEK_MS);
+                        break;
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    updatePipActions();
+                }
+            }
+        };
+        ContextCompat.registerReceiver(this, pipReceiver,
+                new IntentFilter(ACTION_PIP_CONTROL), ContextCompat.RECEIVER_NOT_EXPORTED);
+    }
+
+    private void unregisterPipReceiver() {
+        if (pipReceiver != null) {
+            try {
+                unregisterReceiver(pipReceiver);
+            } catch (Exception ignored) {
+            }
+            pipReceiver = null;
+        }
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (isPictureMode) {
+            if (videoUtils != null) {
+                videoUtils.releasePlayer();
             }
         }
     }
@@ -405,25 +507,12 @@ public class OtherWebviewActivity extends AppCompatActivity
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
             return;
         }
-
-        Display d = getWindowManager().getDefaultDisplay();
-        Point p = new Point();
-        d.getSize(p);
-        int width = p.x;
-        int height = p.y;
-
-        Rational ratio = new Rational(width, height);
-
-        PictureInPictureParams.Builder pipBuilder = new PictureInPictureParams.Builder();
-        pipBuilder.setAspectRatio(ratio);
-
         try {
-            enterPictureInPictureMode(pipBuilder.build());
+            enterPictureInPictureMode(buildPipParams());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
     private void showVolumeUI() {
         binding.llVolume.setVisibility(View.VISIBLE);
         if (volumeTimer != null) volumeTimer.cancel();
@@ -582,7 +671,6 @@ public class OtherWebviewActivity extends AppCompatActivity
             videoUtils.releasePlayer();
         }
         this.videoUrl = url;
-        MyApplication.deleteCache(getApplicationContext());
         if (videoUtils != null) {
             binding.tvSelect.setVisibility(View.GONE);
             binding.playerView.setVisibility(View.VISIBLE);

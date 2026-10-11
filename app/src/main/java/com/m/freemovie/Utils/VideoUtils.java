@@ -1209,6 +1209,9 @@ public class VideoUtils {
                         hud.dismiss();
                     }
                 }
+                if (playbackStateCallback != null) {
+                    playbackStateCallback.onPlayingStateChanged(isPlaying);
+                }
             }
 
             @Override
@@ -1506,6 +1509,7 @@ public class VideoUtils {
     }
 
     public void releasePlayer() {
+        MyApplication.deleteCache(activity.getApplicationContext());
         stopScraper();
         releaseExoPlayerOnly();
         isRelease = true;
@@ -1568,8 +1572,10 @@ public class VideoUtils {
     }
 
     public void onPause() {
-        if (scraper != null && exoPlayer != null) {
+        if (scraper != null) {
             scraper.onPause();
+        }
+        if (exoPlayer != null) {
             exoPlayer.pause();
         }
     }
@@ -1626,5 +1632,193 @@ public class VideoUtils {
                 imageView.setVisibility(visibility);
             }
         });
+    }
+
+    public interface PlaybackStateCallback {
+        void onPlayingStateChanged(boolean isPlaying);
+    }
+
+    private PlaybackStateCallback playbackStateCallback;
+
+    public void setPlaybackStateCallback(PlaybackStateCallback callback) {
+        this.playbackStateCallback = callback;
+    }
+
+    public boolean isPlayerPlaying() {
+        return exoPlayer != null
+                && exoPlayer.getPlayWhenReady()
+                && exoPlayer.getPlaybackState() != Player.STATE_ENDED
+                && exoPlayer.getPlaybackState() != Player.STATE_IDLE;
+    }
+
+    public void togglePlayPause() {
+        if (exoPlayer == null) return;
+        if (exoPlayer.getPlaybackState() == Player.STATE_ENDED) {
+            exoPlayer.seekTo(0);
+            exoPlayer.play();
+        } else if (exoPlayer.getPlayWhenReady()) {
+            exoPlayer.pause();
+        } else {
+            exoPlayer.play();
+        }
+    }
+
+    public void seekForward(long ms) {
+        if (exoPlayer == null) return;
+        long target = exoPlayer.getCurrentPosition() + ms;
+        long duration = exoPlayer.getDuration();
+        if (duration != C.TIME_UNSET) target = Math.min(target, duration);
+        exoPlayer.seekTo(target);
+    }
+
+    public void seekBackward(long ms) {
+        if (exoPlayer == null) return;
+        exoPlayer.seekTo(Math.max(0, exoPlayer.getCurrentPosition() - ms));
+    }
+
+    /**
+     * Play a video stored on the device.
+     * Accepts a file path ("/storage/emulated/0/Movies/a.mp4"),
+     * a "file://" string or a "content://" string.
+     */
+    public void playLocalVideo(String pathOrUri) {
+        if (TextUtils.isEmpty(pathOrUri)) {
+            Toast.makeText(activity, "Invalid video path", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Uri uri;
+        if (pathOrUri.startsWith("content://") || pathOrUri.startsWith("file://")) {
+            uri = Uri.parse(pathOrUri);
+        } else {
+            uri = Uri.fromFile(new java.io.File(pathOrUri));
+        }
+        playLocalVideo(uri, null);
+    }
+
+    public void playLocalVideo(Uri videoUri) {
+        playLocalVideo(videoUri, null);
+    }
+
+    public void playLocalVideo(Uri videoUri, Uri subtitleUri) {
+        if (videoUri == null || playerView == null) {
+            Toast.makeText(activity, "Invalid video", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        isRelease = false;
+        this.videoUrl = videoUri.toString();
+        pendingStreamUrl = null;
+        pendingStreamHeaders = null;
+        hasStartedPlayback = true;
+        discoveredSubtitleUrls.clear();
+        discoveredSubtitleMap.clear();
+        stopScraper();
+        releaseExoPlayerOnly();
+
+        trackSelector = new DefaultTrackSelector(activity);
+        trackSelector.setParameters(trackSelector.buildUponParameters()
+                .setPreferredTextLanguages("en", "eng")
+                .setSelectUndeterminedTextLanguage(true)
+                .build());
+        exoPlayer = new ExoPlayer.Builder(activity)
+                .setMediaSourceFactory(new DefaultMediaSourceFactory(activity))
+                .setTrackSelector(trackSelector)
+                .build();
+
+        playerView.setPlayer(exoPlayer);
+        playerView.setVisibility(View.VISIBLE);
+        playerView.setShowSubtitleButton(true);
+
+        if (playerView.getSubtitleView() != null) {
+            this.subtitleView = playerView.getSubtitleView();
+            this.subtitleView.setVisibility(View.VISIBLE);
+            this.subtitleView.setViewType(SubtitleView.VIEW_TYPE_CANVAS);
+            this.subtitleView.setApplyEmbeddedFontSizes(true);
+            this.subtitleView.setApplyEmbeddedStyles(true);
+            this.subtitleView.post(this::applySubtitleBottomMargin);
+        }
+        playerView.post(() -> {
+            View subtitleBtn = playerView.findViewById(androidx.media3.ui.R.id.exo_subtitle);
+            if (subtitleBtn != null) {
+                subtitleBtn.setOnClickListener(v -> showSubtitleDialog());
+            }
+        });
+
+        exoPlayer.addListener(new Player.Listener() {
+            @Override
+            public void onPlaybackStateChanged(int playbackState) {
+                if (playbackState == Player.STATE_READY && hud != null && hud.isShowing()) {
+                    hud.dismiss();
+                }
+            }
+
+            @Override
+            public void onIsPlayingChanged(boolean isPlaying) {
+                if (isPlaying && hud != null && hud.isShowing()) {
+                    hud.dismiss();
+                }
+                if (playbackStateCallback != null) {
+                    playbackStateCallback.onPlayingStateChanged(isPlaying);
+                }
+            }
+
+            @Override
+            public void onRenderedFirstFrame() {
+                if (hud != null && hud.isShowing()) {
+                    hud.dismiss();
+                }
+            }
+
+            @Override
+            public void onCues(CueGroup cueGroup) {
+                activity.runOnUiThread(() -> {
+                    if (subtitleView != null) {
+                        subtitleView.setCues(cueGroup.cues);
+                    }
+                });
+            }
+
+            @Override
+            public void onPlayerError(PlaybackException error) {
+                if (hud != null && hud.isShowing()) {
+                    hud.dismiss();
+                }
+                String msg;
+                if (error.errorCode == PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND) {
+                    msg = "Video file not found";
+                } else if (error.errorCode == PlaybackException.ERROR_CODE_IO_NO_PERMISSION) {
+                    msg = "No permission to read this video";
+                } else {
+                    msg = "Playback error: " + error.getMessage();
+                }
+                Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        MediaItem.Builder itemBuilder = new MediaItem.Builder().setUri(videoUri);
+
+        if (subtitleUri != null) {
+            String subPath = subtitleUri.toString().toLowerCase().split("\\?")[0];
+            String subMime = subPath.endsWith(".vtt") ? MimeTypes.TEXT_VTT : MimeTypes.APPLICATION_SUBRIP;
+            List<MediaItem.SubtitleConfiguration> subs = new ArrayList<>();
+            subs.add(new MediaItem.SubtitleConfiguration.Builder(subtitleUri)
+                    .setMimeType(subMime)
+                    .setLanguage("en")
+                    .setLabel("External subtitle")
+                    .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                    .build());
+            itemBuilder.setSubtitleConfigurations(subs);
+        }
+
+        if (hud != null) {
+            hud.setLabel("Loading video...");
+            if (!hud.isShowing()) {
+                hud.show();
+            }
+        }
+
+        exoPlayer.setMediaItem(itemBuilder.build());
+        exoPlayer.prepare();
+        exoPlayer.setPlayWhenReady(true);
     }
 }
