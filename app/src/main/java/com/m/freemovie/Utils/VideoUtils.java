@@ -1495,12 +1495,13 @@ public class VideoUtils {
                 })
 
                 .setNegativeButton("Cancel", null)
-                .show();
-
+                .create();
         alertDialog.setOnShowListener(dialog -> {
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK);
             alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
         });
+
+        alertDialog.show();
 
     }
 
