@@ -126,7 +126,7 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
 
     private void startPlayVideo(String videoPath) {
         binding.tvSelect.setVisibility(View.GONE);
-        if(videoUtils !=null){
+        if (videoUtils != null) {
             videoUtils.playLocalVideo(videoPath);
         }
     }
@@ -435,6 +435,24 @@ public class DownloadVideoViewActivity extends AppCompatActivity implements View
             enterPictureInPictureMode(pipBuilder.build());
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        int orientation = getResources().getConfiguration().orientation;
+        if (videoUtils != null) {
+            videoUtils.applySubtitleBottomMargin();
+        }
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (finishing && !isPictureMode) {
+                rotateScreen();
+            }
+        } else {
+            if (!finishing && !isPictureMode) {
+                defaultScreen();
+            }
         }
     }
 

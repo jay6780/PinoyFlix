@@ -66,6 +66,7 @@ public class VideoUtils {
     private Activity activity;
     private ExoPlayer exoPlayer;
     private DefaultTrackSelector trackSelector;
+
     public static class SubtitleTrackInfo {
         public final String url;
         public final String label;
@@ -77,6 +78,7 @@ public class VideoUtils {
             this.lang = lang;
         }
     }
+
     private final List<String> discoveredSubtitleUrls = new ArrayList<>();
     private final java.util.Map<String, SubtitleTrackInfo> discoveredSubtitleMap = new java.util.LinkedHashMap<>();
     private WebView scraper;
@@ -98,7 +100,7 @@ public class VideoUtils {
     private boolean isRelease = false;
     private ImageView imageView;
 
-    public VideoUtils(Activity activity, SubtitleView subtitleView, PlayerView playerView, RelativeLayout relativeLayout, TextView textView,ImageView imageView) {
+    public VideoUtils(Activity activity, SubtitleView subtitleView, PlayerView playerView, RelativeLayout relativeLayout, TextView textView, ImageView imageView) {
         this.activity = activity;
         this.playerView = playerView;
         this.subtitleView = subtitleView;
@@ -111,7 +113,7 @@ public class VideoUtils {
                 .setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-                        if(exoPlayer == null){
+                        if (exoPlayer == null) {
                             releasePlayer();
                         }
                     }
@@ -247,6 +249,7 @@ public class VideoUtils {
                 || lower.contains("seekbar")
                 || lower.contains("scrub");
     }
+
     public void resolveAndPlayStream(String videoUrl) {
         isRelease = false;
         this.videoUrl = videoUrl;
@@ -832,7 +835,7 @@ public class VideoUtils {
 //                    Log.w("VideoStatus", "Server returned 429 Too Many Requests, backing off for 2s...");
                     activity.runOnUiThread(() -> {
                         if (hud != null && hud.isShowing() && !isRelease) {
-                                hud.setLabel("Server busy (429), retrying...");
+                            hud.setLabel("Server busy (429), retrying...");
                         }
                     });
                     try {
@@ -878,7 +881,7 @@ public class VideoUtils {
             if (isRelease) return;
             activity.runOnUiThread(() -> {
                 if (hud != null && hud.isShowing() && !isRelease) {
-                     hud.setLabel("Buffering video...");
+                    hud.setLabel("Buffering video...");
                 }
                 playStream(streamUrl, webEmbedUrl, requestHeaders);
             });
@@ -961,8 +964,10 @@ public class VideoUtils {
             if (info != null && !TextUtils.isEmpty(info.label)) {
                 String l = info.label.toLowerCase().trim();
                 if (l.contains("english")) return "en";
-                if (l.contains("french") || l.contains("français") || l.contains("francais")) return "fr";
-                if (l.contains("spanish") || l.contains("español") || l.contains("espanol")) return "es";
+                if (l.contains("french") || l.contains("français") || l.contains("francais"))
+                    return "fr";
+                if (l.contains("spanish") || l.contains("español") || l.contains("espanol"))
+                    return "es";
                 if (l.contains("tagalog") || l.contains("filipino")) return "tl";
             }
         }
@@ -970,15 +975,21 @@ public class VideoUtils {
         String lower = url.toLowerCase();
 
         // 1. Explicit query parameters
-        if (lower.contains("lang=en") || lower.contains("srclang=en") || lower.contains("language=en") || lower.contains("lang=eng")) return "en";
-        if (lower.contains("lang=fr") || lower.contains("srclang=fr") || lower.contains("language=fr") || lower.contains("lang=fre") || lower.contains("lang=fra")) return "fr";
-        if (lower.contains("lang=es") || lower.contains("srclang=es") || lower.contains("language=es") || lower.contains("lang=spa")) return "es";
-        if (lower.contains("lang=tl") || lower.contains("srclang=tl") || lower.contains("lang=fil")) return "tl";
+        if (lower.contains("lang=en") || lower.contains("srclang=en") || lower.contains("language=en") || lower.contains("lang=eng"))
+            return "en";
+        if (lower.contains("lang=fr") || lower.contains("srclang=fr") || lower.contains("language=fr") || lower.contains("lang=fre") || lower.contains("lang=fra"))
+            return "fr";
+        if (lower.contains("lang=es") || lower.contains("srclang=es") || lower.contains("language=es") || lower.contains("lang=spa"))
+            return "es";
+        if (lower.contains("lang=tl") || lower.contains("srclang=tl") || lower.contains("lang=fil"))
+            return "tl";
 
         // 2. Full language names
         if (lower.contains("english")) return "en";
-        if (lower.contains("french") || lower.contains("francais") || lower.contains("français")) return "fr";
-        if (lower.contains("spanish") || lower.contains("espanol") || lower.contains("español")) return "es";
+        if (lower.contains("french") || lower.contains("francais") || lower.contains("français"))
+            return "fr";
+        if (lower.contains("spanish") || lower.contains("espanol") || lower.contains("español"))
+            return "es";
         if (lower.contains("tagalog") || lower.contains("filipino")) return "tl";
         if (lower.contains("german") || lower.contains("deutsch")) return "de";
         if (lower.contains("italian") || lower.contains("italiano")) return "it";
@@ -1428,7 +1439,7 @@ public class VideoUtils {
         final int initialCheckedItem = checkedItem;
         String[] itemsArray = displayNames.toArray(new String[0]);
 
-        new AlertDialog.Builder(activity, R.style.AlertDialogTheme)
+        AlertDialog alertDialog = new AlertDialog.Builder(activity, R.style.AlertDialogTheme)
                 .setTitle("Select Subtitle Language")
                 .setSingleChoiceItems(itemsArray, initialCheckedItem, (dialog, which) -> {
                     if (exoPlayer == null) {
@@ -1482,8 +1493,15 @@ public class VideoUtils {
                     }
                     dialog.dismiss();
                 })
+
                 .setNegativeButton("Cancel", null)
                 .show();
+
+        alertDialog.setOnShowListener(dialog -> {
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK);
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
+        });
+
     }
 
 
@@ -1513,7 +1531,7 @@ public class VideoUtils {
         stopScraper();
         releaseExoPlayerOnly();
         isRelease = true;
-        if(hud !=null && hud.isShowing()){
+        if (hud != null && hud.isShowing()) {
             hud.dismiss();
         }
         videoUrl = "";
@@ -1523,7 +1541,7 @@ public class VideoUtils {
         if (textView != null) {
             textView.setVisibility(View.VISIBLE);
         }
-        if(imageView !=null){
+        if (imageView != null) {
             imageView.setVisibility(View.VISIBLE);
         }
         if (scraper != null) {

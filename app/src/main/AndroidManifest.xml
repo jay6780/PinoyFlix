@@ -50,7 +50,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".Activity.DownloadVideoViewActivity"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|keyboardHidden|uiMode"
+            android:configChanges="screenSize|screenLayout|orientation|smallestScreenSize"
             android:supportsPictureInPicture="true"
             android:exported="false"
             android:screenOrientation="portrait" />

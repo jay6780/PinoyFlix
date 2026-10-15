@@ -803,7 +803,7 @@ public class OtherWebviewActivity extends AppCompatActivity
             if (isRotate && !finishing && !isPictureMode) {
                 defaultScreen();
             }
-            if (lastScroll > 5) {
+            if (lastScroll > 5 && isRotate) {
                 binding.llReset.setVisibility(isPictureMode ? View.GONE : View.VISIBLE);
             }
         }
