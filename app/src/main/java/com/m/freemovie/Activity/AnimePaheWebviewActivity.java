@@ -1036,4 +1036,14 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
         }
     }
 
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        binding.webView.onPause();
+        binding.webView.stopLoading();
+        binding.webView.clearCache(true);
+        MyApplication.deleteCache(getApplicationContext());
+    }
+
 }
