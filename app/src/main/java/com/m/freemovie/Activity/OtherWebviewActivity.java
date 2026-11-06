@@ -65,10 +65,19 @@ import com.m.freemovie.mvp.Presenter.PinoyPediaPresenter;
 import com.m.freemovie.mvp.Presenter.PinoyRuAllPresenter;
 import com.orhanobut.dialogplus.DialogPlus;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 @UnstableApi
 public class OtherWebviewActivity extends AppCompatActivity
@@ -95,6 +104,7 @@ public class OtherWebviewActivity extends AppCompatActivity
     private PinoyPediaPresenter pinoyPediaPresenter;
     private List<PinoyRuDetailBean> pinoyRuDetailBeanList = new ArrayList<>();
     private String link;
+    private String title;
     private int lastScroll;
     private boolean isPictureMode = false;
     private DialogPlus dialog;
@@ -107,6 +117,31 @@ public class OtherWebviewActivity extends AppCompatActivity
     private static final int CONTROL_FORWARD = 3;
     private static final long SEEK_MS = 10_000;
     private BroadcastReceiver pipReceiver;
+
+    private final List<String> filteredVideoUrls = Collections.synchronizedList(new ArrayList<>());
+    private volatile boolean detailLoaded = false;
+    private volatile boolean scrapeDone = false;
+    private String downloadId;
+    private String pendingDownloadLink;
+    private PinoyMediaDetailBean lastDetailBean;
+
+    private static final OkHttpClient OK_HTTP_CLIENT = new OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
+            .build();
+
+    private static final Pattern DOWNLOAD_PATTERN = Pattern.compile("https://pinoymoviepedia\\.ru/links/([a-zA-Z0-9]+)/");
+    private static final Pattern DOWNLOAD_TABLE_PATTERN = Pattern.compile("<a href='https://pinoymoviepedia\\.ru/links/([a-zA-Z0-9]+)/' target='_blank'>Download</a>");
+    private static final Pattern EMBED_IFRAME_PATTERN = Pattern.compile(
+            "<iframe[^>]+src=[\"'](https?://[^\"']*(?:voe\\.sx|streamtape|dood|filemoon|mixdrop|embedsito|sbembed)[^\"']*)[\"']",
+            Pattern.CASE_INSENSITIVE
+    );
+    private static final Pattern EMBED_GENERIC_PATTERN = Pattern.compile(
+            "<iframe[^>]+src=[\"'](https?://[^\"']+)[\"']",
+            Pattern.CASE_INSENSITIVE
+    );
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,8 +154,6 @@ public class OtherWebviewActivity extends AppCompatActivity
         videoUrl = getIntent().getStringExtra("videoUrl");
         position = getIntent().getIntExtra("position", 1);
         type = getIntent().getIntExtra("type", 1);
-//        Log.d("Type", "val: " + type);
-//        Log.d("PlayerDomain", "val: " + player);
 
         binding.llReset.setVisibility(View.GONE);
         initRecyclerMovie();
@@ -559,6 +592,11 @@ public class OtherWebviewActivity extends AppCompatActivity
             public void run() {
                 Toast.makeText(getApplicationContext(), "Error fetching data: " + error, Toast.LENGTH_SHORT).show();
                 binding.swipe.setRefreshing(false);
+                detailLoaded = true;
+                if (scrapeDone) {
+                    rebuildDetailBeanList();
+                    showSourceDialogIfReady();
+                }
             }
         }, 500);
     }
@@ -575,25 +613,62 @@ public class OtherWebviewActivity extends AppCompatActivity
 
     @Override
     public void getDetailSuccess(PinoyMediaDetailBean bean) {
-        if (bean != null && bean.getResults() != null) {
-            pinoyRuDetailBeanList.clear();
-            List<String> embedUrls = bean.getResults().getEmbedUrls();
-            List<String> filteredVideoUrls = new ArrayList<>();
-            for (String videoUrl : embedUrls) {
-                if (videoUrl.contains("voe.sx")) {
-                    filteredVideoUrls.add(videoUrl);
-                }
-            }
+        detailLoaded = true;
+        lastDetailBean = bean;
 
-            if (filteredVideoUrls.isEmpty()) {
-                Toast.makeText(getApplicationContext(), "No video source found", Toast.LENGTH_SHORT).show();
-                return;
+        if (bean != null && bean.getData() != null) {
+            if (bean.getData().getTitle() != null) {
+                title = bean.getData().getTitle();
             }
-
-            pinoyRuDetailBeanList.add(new PinoyRuDetailBean(filteredVideoUrls, link));
-            dialog = new DialogSourceUtils().TagalogListSource(OtherWebviewActivity.this, this, bean, pinoyRuDetailBeanList);
-            dialog.show();
         }
+
+        if (pendingDownloadLink == null) {
+            pendingDownloadLink = !TextUtils.isEmpty(downloadId)
+                    ? "https://pinoymoviepedia.ru/links/" + downloadId + "/"
+                    : link;
+        }
+
+        if (scrapeDone) {
+            rebuildDetailBeanList();
+            showSourceDialogIfReady();
+        }
+    }
+
+    private void rebuildDetailBeanList() {
+        List<String> merged;
+        synchronized (filteredVideoUrls) {
+            merged = new ArrayList<>(filteredVideoUrls);
+        }
+        String dl = pendingDownloadLink != null
+                ? pendingDownloadLink
+                : (!TextUtils.isEmpty(downloadId)
+                ? "https://pinoymoviepedia.ru/links/" + downloadId + "/"
+                : link);
+        pinoyRuDetailBeanList.clear();
+        pinoyRuDetailBeanList.add(new PinoyRuDetailBean(merged, dl));
+    }
+
+    private void showSourceDialogIfReady() {
+        List<String> urls = pinoyRuDetailBeanList.isEmpty()
+                ? null
+                : pinoyRuDetailBeanList.get(0).getVideoUrls();
+
+        if (urls == null || urls.isEmpty()) {
+            Toast.makeText(getApplicationContext(), "No video source found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
+        }
+
+        if (lastDetailBean == null) {
+            lastDetailBean = new PinoyMediaDetailBean();
+        }
+
+        dialog = new DialogSourceUtils().TagalogListSource(
+                OtherWebviewActivity.this, this, lastDetailBean, pinoyRuDetailBeanList);
+        dialog.show();
     }
 
     @Override
@@ -658,8 +733,65 @@ public class OtherWebviewActivity extends AppCompatActivity
 
     @Override
     public void getMovieId(String link, String downloadId) {
+        this.link = link;
+        this.downloadId = downloadId;
+        this.title = null;
+        this.lastDetailBean = null;
+
+        synchronized (filteredVideoUrls) {
+            filteredVideoUrls.clear();
+        }
+        detailLoaded = false;
+        scrapeDone = false;
+        pendingDownloadLink = null;
+        pinoyRuDetailBeanList.clear();
+
+        startScrape(link);
         pinoyPediaPresenter.getUrl(link);
-        this.link = downloadId;
+    }
+
+    private void startScrape(String pageUrl) {
+        if (TextUtils.isEmpty(pageUrl)) {
+            scrapeDone = true;
+            return;
+        }
+        new Thread(() -> {
+            try {
+                FetchResult fr = fetchPageData(pageUrl);
+                runOnUiThread(() -> {
+                    if (!TextUtils.isEmpty(fr.downloadId)) {
+                        downloadId = fr.downloadId;
+                    }
+                    synchronized (filteredVideoUrls) {
+                        for (String u : fr.embedUrls) {
+                            if (!filteredVideoUrls.contains(u)) filteredVideoUrls.add(u);
+                        }
+                    }
+                    if (pendingDownloadLink == null) {
+                        pendingDownloadLink = !TextUtils.isEmpty(downloadId)
+                                ? "https://pinoymoviepedia.ru/links/" + downloadId + "/"
+                                : pageUrl;
+                    }
+                    scrapeDone = true;
+                    if (detailLoaded) {
+                        rebuildDetailBeanList();
+                        showSourceDialogIfReady();
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+                runOnUiThread(() -> {
+                    if (pendingDownloadLink == null) {
+                        pendingDownloadLink = pageUrl;
+                    }
+                    scrapeDone = true;
+                    if (detailLoaded) {
+                        rebuildDetailBeanList();
+                        showSourceDialogIfReady();
+                    }
+                });
+            }
+        }).start();
     }
 
     @Override
@@ -853,5 +985,53 @@ public class OtherWebviewActivity extends AppCompatActivity
             }
 
         }
+    }
+
+    private static final class FetchResult {
+        String downloadId;
+        List<String> embedUrls = new ArrayList<>();
+    }
+
+    private static FetchResult fetchPageData(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                .build();
+
+        FetchResult result = new FetchResult();
+        try (Response response = OK_HTTP_CLIENT.newCall(request).execute()) {
+            if (!response.isSuccessful()) return result;
+
+            String html = response.body().string();
+
+            Matcher downloadMatcher = DOWNLOAD_TABLE_PATTERN.matcher(html);
+            if (downloadMatcher.find()) {
+                result.downloadId = downloadMatcher.group(1);
+            } else {
+                Matcher linkMatcher = DOWNLOAD_PATTERN.matcher(html);
+                if (linkMatcher.find()) {
+                    result.downloadId = linkMatcher.group(1);
+                }
+            }
+
+            Matcher embedMatcher = EMBED_IFRAME_PATTERN.matcher(html);
+            while (embedMatcher.find()) {
+                String u = embedMatcher.group(1);
+                if (!result.embedUrls.contains(u)) {
+                    result.embedUrls.add(u);
+                }
+            }
+
+            if (result.embedUrls.isEmpty()) {
+                Matcher generic = EMBED_GENERIC_PATTERN.matcher(html);
+                while (generic.find()) {
+                    String u = generic.group(1);
+                    if (!result.embedUrls.contains(u)) {
+                        result.embedUrls.add(u);
+                    }
+                }
+            }
+        }
+        return result;
     }
 }

@@ -3,58 +3,53 @@ package com.m.freemovie.mvp.Model.ClassBean;
 import java.util.List;
 
 public class PinoyMediaDetailBean {
+
     /**
-     * author : yazky
-     * results : {"url":"https://pinoymoviepedia.ru/movies/baka-doon-sa-buwan/","title":"Baka Doon sa Buwan (2024) - Watch Full Pinoy Movies Online","originalTitle":"Baka Doon sa Buwan","synopsis":"Watch Baka Doon sa Buwan 2024 Full Movie Tagalog somewhere in space 2024 An eight-year-old half-Filipina and half-African American living with her mentally unstable mother grows up believing that her father has been absent from their lives because he is on the moon.Baka Doon sa Buwan 2024 Free Download Link Streaming Online HD","images":[{"full":"https://image.tmdb.org/t/p/original/g0ump5v70kxABfsS7Kq4bXa8XKa.jpg","thumb":"https://image.tmdb.org/t/p/w300/g0ump5v70kxABfsS7Kq4bXa8XKa.jpg","alt":"Baka Doon sa Buwan (2024)"}],"director":[{"name":"Noah Tonga","profileUrl":"https://pinoymoviepedia.ru/director/noah-tonga/","image":"https://pinoymoviepedia.ru/wp-content/themes/dooplay/assets/img/no/cast.png"}],"cast":[{"name":"Aaliyah Marciano","profileUrl":"https://pinoymoviepedia.ru/cast/aaliyah-marciano/","image":"https://pinoymoviepedia.ru/wp-content/themes/dooplay/assets/img/no/cast.png"},{"name":"Kate Alejandrino","profileUrl":"https://pinoymoviepedia.ru/cast/kate-alejandrino/","image":"https://image.tmdb.org/t/p/w92/eLKEXySsICRWUXD0c3S6gSzRUpq.jpg"},{"name":"Mimi Felicia","profileUrl":"https://pinoymoviepedia.ru/cast/mimi-felicia/","image":"https://pinoymoviepedia.ru/wp-content/themes/dooplay/assets/img/no/cast.png"},{"name":"Jed Cuestas","profileUrl":"https://pinoymoviepedia.ru/cast/jed-cuestas/","image":"https://pinoymoviepedia.ru/wp-content/themes/dooplay/assets/img/no/cast.png"}],"embedUrls":["https://voe.sx/e/onfjftt7r6wb","https://abstream.to/embed/atdlqxhnyq23","https://myvidplay.com/e/dzqgkw26y3qx"]}
+     * success : true
+     * pageUrl : https://pinoymoviepedia.ru/movies/milf-2026/
+     * data : {"title":"MILF (2026)","poster":"https://image.tmdb.org/t/p/w780/nIccp5Nhyg8oXYC9qtiwY4bFx3H.jpg\n","synopsis":"Watch MILF 2026 Full Movie HD The OG VIVA Hot Babes reunite for a wild night out with VMX vixen Ashley Lopez. Their evening takes an unexpected turn as the four longtime friends compete with a younger woman for a handsome bartender\u2019s attention, sparking a playful clash of beauty and generations.MILF 2026 Streaming Online HD Link","downloadLinks":[{"text":"Hollywood Movies","url":"https://bluray7.com/"},{"text":"Hollywood Movies","url":"https://bluray7.com/"},{"text":"External Link","url":"https://image.tmdb.org/t/p/original/nIccp5Nhyg8oXYC9qtiwY4bFx3H.jpg"},{"text":"External Link","url":"https://image.tmdb.org/t/p/original/2RkxDyGHuU9vx0OEqtTozZvu2vZ.jpg"},{"text":"External Link","url":"https://image.tmdb.org/t/p/original/2o0MUN90bk0v9ULatfrmosWFcSK.jpg"}]}
      */
 
-    private String author;
-    private ResultsBean results;
+    private boolean success;
+    private String pageUrl;
+    private DataBean data;
 
-    public String getAuthor() {
-        return author;
+    public boolean isSuccess() {
+        return success;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 
-    public ResultsBean getResults() {
-        return results;
+    public String getPageUrl() {
+        return pageUrl;
     }
 
-    public void setResults(ResultsBean results) {
-        this.results = results;
+    public void setPageUrl(String pageUrl) {
+        this.pageUrl = pageUrl;
     }
 
-    public static class ResultsBean {
+    public DataBean getData() {
+        return data;
+    }
+
+    public void setData(DataBean data) {
+        this.data = data;
+    }
+
+    public static class DataBean {
         /**
-         * url : https://pinoymoviepedia.ru/movies/baka-doon-sa-buwan/
-         * title : Baka Doon sa Buwan (2024) - Watch Full Pinoy Movies Online
-         * originalTitle : Baka Doon sa Buwan
-         * synopsis : Watch Baka Doon sa Buwan 2024 Full Movie Tagalog somewhere in space 2024 An eight-year-old half-Filipina and half-African American living with her mentally unstable mother grows up believing that her father has been absent from their lives because he is on the moon.Baka Doon sa Buwan 2024 Free Download Link Streaming Online HD
-         * images : [{"full":"https://image.tmdb.org/t/p/original/g0ump5v70kxABfsS7Kq4bXa8XKa.jpg","thumb":"https://image.tmdb.org/t/p/w300/g0ump5v70kxABfsS7Kq4bXa8XKa.jpg","alt":"Baka Doon sa Buwan (2024)"}]
-         * director : [{"name":"Noah Tonga","profileUrl":"https://pinoymoviepedia.ru/director/noah-tonga/","image":"https://pinoymoviepedia.ru/wp-content/themes/dooplay/assets/img/no/cast.png"}]
-         * cast : [{"name":"Aaliyah Marciano","profileUrl":"https://pinoymoviepedia.ru/cast/aaliyah-marciano/","image":"https://pinoymoviepedia.ru/wp-content/themes/dooplay/assets/img/no/cast.png"},{"name":"Kate Alejandrino","profileUrl":"https://pinoymoviepedia.ru/cast/kate-alejandrino/","image":"https://image.tmdb.org/t/p/w92/eLKEXySsICRWUXD0c3S6gSzRUpq.jpg"},{"name":"Mimi Felicia","profileUrl":"https://pinoymoviepedia.ru/cast/mimi-felicia/","image":"https://pinoymoviepedia.ru/wp-content/themes/dooplay/assets/img/no/cast.png"},{"name":"Jed Cuestas","profileUrl":"https://pinoymoviepedia.ru/cast/jed-cuestas/","image":"https://pinoymoviepedia.ru/wp-content/themes/dooplay/assets/img/no/cast.png"}]
-         * embedUrls : ["https://voe.sx/e/onfjftt7r6wb","https://abstream.to/embed/atdlqxhnyq23","https://myvidplay.com/e/dzqgkw26y3qx"]
+         * title : MILF (2026)
+         * poster : https://image.tmdb.org/t/p/w780/nIccp5Nhyg8oXYC9qtiwY4bFx3H.jpg
+         * synopsis : Watch MILF 2026 Full Movie HD The OG VIVA Hot Babes reunite for a wild night out with VMX vixen Ashley Lopez. Their evening takes an unexpected turn as the four longtime friends compete with a younger woman for a handsome bartender’s attention, sparking a playful clash of beauty and generations.MILF 2026 Streaming Online HD Link
+         * downloadLinks : [{"text":"Hollywood Movies","url":"https://bluray7.com/"},{"text":"Hollywood Movies","url":"https://bluray7.com/"},{"text":"External Link","url":"https://image.tmdb.org/t/p/original/nIccp5Nhyg8oXYC9qtiwY4bFx3H.jpg"},{"text":"External Link","url":"https://image.tmdb.org/t/p/original/2RkxDyGHuU9vx0OEqtTozZvu2vZ.jpg"},{"text":"External Link","url":"https://image.tmdb.org/t/p/original/2o0MUN90bk0v9ULatfrmosWFcSK.jpg"}]
          */
 
-        private String url;
         private String title;
-        private String originalTitle;
+        private String poster;
         private String synopsis;
-        private List<ImagesBean> images;
-        private List<DirectorBean> director;
-        private List<CastBean> cast;
-        private List<String> embedUrls;
-
-        public String getUrl() {
-            return url;
-        }
-
-        public void setUrl(String url) {
-            this.url = url;
-        }
+        private List<DownloadLinksBean> downloadLinks;
 
         public String getTitle() {
             return title;
@@ -64,12 +59,12 @@ public class PinoyMediaDetailBean {
             this.title = title;
         }
 
-        public String getOriginalTitle() {
-            return originalTitle;
+        public String getPoster() {
+            return poster;
         }
 
-        public void setOriginalTitle(String originalTitle) {
-            this.originalTitle = originalTitle;
+        public void setPoster(String poster) {
+            this.poster = poster;
         }
 
         public String getSynopsis() {
@@ -80,143 +75,37 @@ public class PinoyMediaDetailBean {
             this.synopsis = synopsis;
         }
 
-        public List<ImagesBean> getImages() {
-            return images;
+        public List<DownloadLinksBean> getDownloadLinks() {
+            return downloadLinks;
         }
 
-        public void setImages(List<ImagesBean> images) {
-            this.images = images;
+        public void setDownloadLinks(List<DownloadLinksBean> downloadLinks) {
+            this.downloadLinks = downloadLinks;
         }
 
-        public List<DirectorBean> getDirector() {
-            return director;
-        }
-
-        public void setDirector(List<DirectorBean> director) {
-            this.director = director;
-        }
-
-        public List<CastBean> getCast() {
-            return cast;
-        }
-
-        public void setCast(List<CastBean> cast) {
-            this.cast = cast;
-        }
-
-        public List<String> getEmbedUrls() {
-            return embedUrls;
-        }
-
-        public void setEmbedUrls(List<String> embedUrls) {
-            this.embedUrls = embedUrls;
-        }
-
-        public static class ImagesBean {
+        public static class DownloadLinksBean {
             /**
-             * full : https://image.tmdb.org/t/p/original/g0ump5v70kxABfsS7Kq4bXa8XKa.jpg
-             * thumb : https://image.tmdb.org/t/p/w300/g0ump5v70kxABfsS7Kq4bXa8XKa.jpg
-             * alt : Baka Doon sa Buwan (2024)
+             * text : Hollywood Movies
+             * url : https://bluray7.com/
              */
 
-            private String full;
-            private String thumb;
-            private String alt;
+            private String text;
+            private String url;
 
-            public String getFull() {
-                return full;
+            public String getText() {
+                return text;
             }
 
-            public void setFull(String full) {
-                this.full = full;
+            public void setText(String text) {
+                this.text = text;
             }
 
-            public String getThumb() {
-                return thumb;
+            public String getUrl() {
+                return url;
             }
 
-            public void setThumb(String thumb) {
-                this.thumb = thumb;
-            }
-
-            public String getAlt() {
-                return alt;
-            }
-
-            public void setAlt(String alt) {
-                this.alt = alt;
-            }
-        }
-
-        public static class DirectorBean {
-            /**
-             * name : Noah Tonga
-             * profileUrl : https://pinoymoviepedia.ru/director/noah-tonga/
-             * image : https://pinoymoviepedia.ru/wp-content/themes/dooplay/assets/img/no/cast.png
-             */
-
-            private String name;
-            private String profileUrl;
-            private String image;
-
-            public String getName() {
-                return name;
-            }
-
-            public void setName(String name) {
-                this.name = name;
-            }
-
-            public String getProfileUrl() {
-                return profileUrl;
-            }
-
-            public void setProfileUrl(String profileUrl) {
-                this.profileUrl = profileUrl;
-            }
-
-            public String getImage() {
-                return image;
-            }
-
-            public void setImage(String image) {
-                this.image = image;
-            }
-        }
-
-        public static class CastBean {
-            /**
-             * name : Aaliyah Marciano
-             * profileUrl : https://pinoymoviepedia.ru/cast/aaliyah-marciano/
-             * image : https://pinoymoviepedia.ru/wp-content/themes/dooplay/assets/img/no/cast.png
-             */
-
-            private String name;
-            private String profileUrl;
-            private String image;
-
-            public String getName() {
-                return name;
-            }
-
-            public void setName(String name) {
-                this.name = name;
-            }
-
-            public String getProfileUrl() {
-                return profileUrl;
-            }
-
-            public void setProfileUrl(String profileUrl) {
-                this.profileUrl = profileUrl;
-            }
-
-            public String getImage() {
-                return image;
-            }
-
-            public void setImage(String image) {
-                this.image = image;
+            public void setUrl(String url) {
+                this.url = url;
             }
         }
     }

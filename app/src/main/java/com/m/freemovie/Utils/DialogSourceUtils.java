@@ -320,7 +320,7 @@ public class DialogSourceUtils {
                     Intent intent = new Intent(activity, DownloadWebview.class);
                     intent.putExtra("DownloadUrl", dataAdapter.getData().get(position).getLink());
                     intent.putExtra("EpisodeNum", "");
-                    intent.putExtra("title", bean.getResults().getTitle());
+                    intent.putExtra("title", bean.getData().getTitle());
                     activity.startActivity(intent);
                 }
             }
