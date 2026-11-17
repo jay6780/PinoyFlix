@@ -205,6 +205,8 @@ public class VideoUtils {
                 || lower.contains("sample-videos")
                 || lower.contains("w3schools")
                 || lower.contains("gtv-videos-bucket")
+                || cleanUrl.endsWith(".mpd")
+                || lower.contains(".mpd?")
                 || lower.contains("sample.mp4")
                 || lower.contains("dummy.mp4")
                 || lower.contains("test.mp4")
@@ -1350,9 +1352,15 @@ public class VideoUtils {
                 e.printStackTrace();
             }
         }
-        exoPlayer.setMediaItem(mediaItemBuilder.build());
-        exoPlayer.prepare();
-        exoPlayer.setPlayWhenReady(true);
+        try {
+            exoPlayer.setMediaItem(mediaItemBuilder.build());
+            exoPlayer.prepare();
+            exoPlayer.setPlayWhenReady(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (hud != null && hud.isShowing()) hud.dismiss();
+            Toast.makeText(activity, "Unsupported stream. Please select another server.", Toast.LENGTH_SHORT).show();
+        }
     }
 
 

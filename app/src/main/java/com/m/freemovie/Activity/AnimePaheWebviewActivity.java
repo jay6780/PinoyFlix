@@ -454,6 +454,7 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
                 binding.webView.clearCache(true);
                 binding.webView.clearHistory();
                 binding.webView.reload();
+                MyApplication.deleteCache(getApplicationContext());
             }
             super.onBackPressed();
             finish();
@@ -1038,12 +1039,22 @@ public class AnimePaheWebviewActivity extends AppCompatActivity
 
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        binding.webView.onPause();
-        binding.webView.stopLoading();
-        binding.webView.clearCache(true);
-        MyApplication.deleteCache(getApplicationContext());
+    protected void onPause() {
+        super.onPause();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode()) {
+            return;
+        }
+        if(binding !=null){
+            binding.webView.onPause();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(binding !=null){
+            binding.webView.onResume();
+        }
     }
 
 }
